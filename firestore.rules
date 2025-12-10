@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Development mode - allow read/write for all
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // قواعد خاصة للمنتجات
+    match /products/{product} {
+      // السماح للجميع بقراءة المنتجات
+      allow read: if true;
+      
+      // السماح بإنشاء وتحديث وحذف المنتجات للجميع في وضع التطوير
+      allow create, update, delete: if true;
+    }
+    
+    // قواعد خاصة للطلبات
+    match /orders/{order} {
+      // السماح بقراءة الطلبات للجميع في وضع التطوير
+      allow read: if true;
+      
+      // السماح بإنشاء وتحديث وحذف الطلبات للجميع في وضع التطوير
+      allow create, update, delete: if true;
+    }
+    
+    // قواعد خاصة لبيانات المستخدمين
+    match /users/{userId} {
+      // السماح بقراءة وتحديث وحذف بيانات المستخدمين للجميع في وضع التطوير
+      allow read, update, create, delete: if true;
+    }
+  }
+}

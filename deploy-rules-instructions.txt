@@ -1,0 +1,50 @@
+تعليمات لتحديث قواعد Firebase Firestore:
+
+1. افتح المتصفح واذهب إلى: https://console.firebase.google.com/
+2. سجل الدخول باستخدام حساب Google الخاص بك
+3. اختر مشروع T-REX Shop (t-rex-5b17f)
+4. من القائمة الجانبية، انقر على "Firestore Database"
+5. انتقل إلى علامة التبويب "Rules"
+6. استبدل القواعد الحالية بالمحتوى أدناه:
+
+القواعد الجديدة:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Development mode - allow read/write for all
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // قواعد خاصة للمنتجات
+    match /products/{product} {
+      // السماح للجميع بقراءة المنتجات
+      allow read: if true;
+      
+      // السماح بإنشاء وتحديث وحذف المنتجات للجميع في وضع التطوير
+      allow create, update, delete: if true;
+    }
+    
+    // قواعد خاصة للطلبات
+    match /orders/{order} {
+      // السماح بقراءة الطلبات للجميع في وضع التطوير
+      allow read: if true;
+      
+      // السماح بإنشاء وتحديث وحذف الطلبات للجميع في وضع التطوير
+      allow create, update, delete: if true;
+    }
+    
+    // قواعد خاصة لبيانات المستخدمين
+    match /users/{userId} {
+      // السماح بقراءة وتحديث وحذف بيانات المستخدمين للجميع في وضع التطوير
+      allow read, update, create, delete: if true;
+    }
+  }
+}
+
+7. انقر على "نشر" لحفظ القواعد الجديدة
+
+بعد تحديث القواعد، يجب أن تكون able to:
+- إضافة منتجات جديدة إلى قاعدة البيانات
+- قراءة المنتجات الموجودة
+- تحديث أو حذف المنتجات حسب الحاجة

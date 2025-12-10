@@ -1,0 +1,18 @@
+@echo off
+echo ==========================================
+echo T-REX Shop Server Firewall Fix
+echo ==========================================
+echo.
+echo The firewall rule for T-REX Shop server needs to be created.
+echo Please follow these steps:
+echo.
+echo 1. Right-click on the Start menu
+echo 2. Select "Windows PowerShell (Admin)" or "Command Prompt (Admin)"
+echo 3. Navigate to this folder:
+echo    cd /d "C:\Users\Abo Hamza\Desktop\T-REX_Shop_fu"
+echo 4. Run this command:
+echo    powershell -Command "New-NetFirewallRule -DisplayName 'T-REX Shop Server' -Direction Inbound -Protocol TCP -LocalPort 4001 -Action Allow"
+echo.
+echo After running the command, restart your server and try the app again.
+echo.
+pause

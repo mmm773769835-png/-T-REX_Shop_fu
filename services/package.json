@@ -1,0 +1,14 @@
+{
+  "name": "@trex-shop/services",
+  "version": "1.0.0",
+  "description": "Services module for T-REX Shop",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "info": "echo \"This is a services module. To run the app, navigate to parent folder and run: npm start\"",
+    "start": "echo \"⚠️  Cannot start from services folder. Please run: cd .. && npm start\""
+  },
+  "keywords": ["services", "auth", "api"],
+  "author": "",
+  "license": "ISC"
+}

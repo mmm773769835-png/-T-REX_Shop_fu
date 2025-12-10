@@ -1,0 +1,70 @@
+{
+  "expo": {
+    "name": "T-REX Shop",
+    "slug": "trex-shop",
+    "owner": "trexshop",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "trexshop",
+    "userInterfaceStyle": "automatic",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+
+    "android": {
+      "package": "com.trexshop.app",
+      "versionCode": 2,
+
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+
+      "permissions": [
+        "INTERNET",
+        "VIBRATE"
+      ],
+
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "trexshop"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+
+      "googleServicesFile": "./google-services.json"
+    },
+
+    "extra": {
+      "eas": {
+        "projectId": "501b6d0b-9352-489d-8a74-57b84e1393bd"
+      },
+      "firebase": {
+        "apiKey": "YOUR_API_KEY",
+        "authDomain": "t-rex-5b17f.firebaseapp.com",
+        "projectId": "t-rex-5b17f",
+        "storageBucket": "t-rex-5b17f.appspot.com",
+        "messagingSenderId": "37814615065",
+        "appId": "YOUR_APP_ID",
+        "measurementId": "YOUR_MEASUREMENT_ID"
+      }
+    }
+  }
+}
+

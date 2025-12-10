@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test T-REX Shop Server</title>
+</head>
+<body>
+    <h1>Test T-REX Shop Server Connectivity</h1>
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testOtp()">Test OTP Request</button>
+    <div id="result"></div>
+
+    <script>
+        const API_URL = 'http://172.20.44.26:4001';
+        const resultDiv = document.getElementById('result');
+
+        async function testHealth() {
+            try {
+                resultDiv.innerHTML = 'Testing health endpoint...';
+                const response = await fetch(`${API_URL}/api/health`);
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        async function testOtp() {
+            try {
+                resultDiv.innerHTML = 'Testing OTP request...';
+                const response = await fetch(`${API_URL}/api/auth/request-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'owner',
+                        password: '773769835As',
+                        phone: '773769835',
+                        via: 'both'
+                    })
+                });
+
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

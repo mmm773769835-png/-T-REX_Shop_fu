@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "37814615065",
+    "project_id": "t-rex-5b17f",
+    "storage_bucket": "t-rex-5b17f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37814615065:android:3b39b3622c8fbc0358fe88",
+        "android_client_info": {
+          "package_name": "com.trex.shop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37814615065:android:fcdc9d63539d1aa258fe88",
+        "android_client_info": {
+          "package_name": "com.trexshop.app"
+
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
