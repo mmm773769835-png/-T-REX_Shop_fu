@@ -4,40 +4,17 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView,
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
+import { PRODUCT_CATEGORIES, PRODUCT_ATTRIBUTES } from "../shared/constants/productConstants";
 
 // Import Firebase functions and instances from our service
 import { db, storage, collection, addDoc, ref, uploadBytes, getDownloadURL } from "../../services/FirebaseAuthService";
 
-// قائمة الأقسام المتاحة
-const CATEGORIES = [
-  "إلكترونيات",
-  "ملابس",
-  "أغذية",
-  "منزلية",
-  "رياضية",
-  "كتب",
-  "ألعاب",
-  "مستلزمات صحية",
-  "أخرى"
-];
-
-// قائمة الصفات المتاحة
-const ATTRIBUTES = [
-  "جديد",
-  "مستعمل - حالة جيدة",
-  "مستعمل - حالة متوسطة",
-  "عرض خاص",
-  "محدود الكمية",
-  "الأكثر مبيعاً",
-  "مميز"
-];
-
-export default function AddProduct({ navigation }: any) {
+export default function AddProduct({ navigation, route }: any) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [attribute, setAttribute] = useState(ATTRIBUTES[0]);
+  const [category, setCategory] = useState(route?.params?.category || PRODUCT_CATEGORIES[0]);
+  const [attribute, setAttribute] = useState(route?.params?.attribute || PRODUCT_ATTRIBUTES[0]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -141,7 +118,7 @@ export default function AddProduct({ navigation }: any) {
         attribute,
         paymentMethod,
         imageUrl,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       };
 
       await addDoc(collection(db, "products"), productData);
@@ -296,7 +273,7 @@ export default function AddProduct({ navigation }: any) {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={CATEGORIES}
+              data={PRODUCT_CATEGORIES}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -329,7 +306,7 @@ export default function AddProduct({ navigation }: any) {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={ATTRIBUTES}
+              data={PRODUCT_ATTRIBUTES}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity

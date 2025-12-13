@@ -16,26 +16,15 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, getDoc, doc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, onSnapshot, query, orderBy, addDoc, getDoc, doc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+// استيراد db من ملف AuthService بدلاً من إنشائه مباشرة
+import { db } from "../../services/FirebaseAuthService";
 import SidebarV2 from "./components/SidebarV2";
 import Button from "../shared/components/Button";
+import { useCart } from "../contexts/CartContext";
+import { CATEGORIES_WITH_ICONS } from "../shared/constants/productConstants";
 
-// إعداد Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw",
-  authDomain: "t-rex-5b17f.firebaseapp.com",
-  projectId: "t-rex-5b17f",
-  storageBucket: "t-rex-5b17f.firebasestorage.app",
-  messagingSenderId: "37814615065",
-  appId: "1:37814615065:android:3b39b3622c8fbc0358fe88",
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
 const { width } = Dimensions.get("window");
 
 const normalizeText = (text: string): string =>
@@ -47,18 +36,7 @@ const normalizeText = (text: string): string =>
     .trim();
 
 // قائمة الأقسام المتاحة
-const CATEGORIES = [
-  { id: "1", name: "جميع المنتجات", icon: "apps" },
-  { id: "2", name: "إلكترونيات", icon: "phone-portrait" },
-  { id: "3", name: "ملابس", icon: "shirt" },
-  { id: "4", name: "أغذية", icon: "restaurant" },
-  { id: "5", name: "منزلية", icon: "home" },
-  { id: "6", name: "رياضية", icon: "fitness" },
-  { id: "7", name: "كتب", icon: "book" },
-  { id: "8", name: "ألعاب", icon: "game-controller" },
-  { id: "9", name: "مستلزمات صحية", icon: "medkit" },
-  { id: "10", name: "أخرى", icon: "ellipsis-horizontal" }
-];
+const CATEGORIES = [...CATEGORIES_WITH_ICONS];
 
 interface Product {
   id: string;
@@ -68,6 +46,7 @@ interface Product {
   imageUrl: string;
   paymentMethod?: string;
   category?: string;
+  quantity?: number; // Added quantity property
 }
 
 interface RouteParams {
@@ -89,7 +68,7 @@ const HomeV2: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cart, setCart] = useState<Product[]>([]);
+  const { cart, addToCart } = useCart(); // Use cart context
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(width));
   const [userImage, setUserImage] = useState<string | null>(null);
@@ -142,7 +121,7 @@ const HomeV2: React.FC = () => {
           attribute: "جديد",
           paymentMethod: "cash",
           imageUrl: "https://via.placeholder.com/300x300/4A90E2/FFFFFF?text=📱",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
         {
           name: "قميص رياضي",
@@ -152,7 +131,7 @@ const HomeV2: React.FC = () => {
           attribute: "جديد",
           paymentMethod: "card",
           imageUrl: "https://via.placeholder.com/300x300/50C878/FFFFFF?text=👕",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
         {
           name: "كتاب برمجة",
@@ -162,7 +141,7 @@ const HomeV2: React.FC = () => {
           attribute: "جديد",
           paymentMethod: "transfer",
           imageUrl: "https://via.placeholder.com/300x300/FF6B6B/FFFFFF?text=📚",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
         {
           name: "سماعة لاسلكية",
@@ -172,7 +151,7 @@ const HomeV2: React.FC = () => {
           attribute: "مميز",
           paymentMethod: "cash",
           imageUrl: "https://via.placeholder.com/300x300/9B59B6/FFFFFF?text=🎧",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         },
         {
           name: "حقيبة سفر",
@@ -182,14 +161,14 @@ const HomeV2: React.FC = () => {
           attribute: "جديد",
           paymentMethod: "card",
           imageUrl: "https://via.placeholder.com/300x300/F39C12/FFFFFF?text=👜",
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         }
       ];
 
       // Add all demo products
       for (const product of demoProducts) {
-        await addDoc(collection(db, "products"), product);
-        console.log(`✅ تم إضافة المنتج: ${product.name}`);
+        const docRef = await addDoc(collection(db, "products"), product);
+        console.log(`✅ تم إضافة المنتج: ${product.name} بـ ID: ${docRef.id}`);
       }
       
       console.log("✅ تم إضافة جميع المنتجات التجريبية بنجاح");
@@ -259,75 +238,48 @@ const HomeV2: React.FC = () => {
       // إنشاء استعلام لترتيب المنتجات حسب الوقت
       const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
       
+      // التحقق من صحة الاستعلام
+      console.log("🔍 جاري تنفيذ الاستعلام لتحميل المنتجات...");
+      
       const unsubscribe = onSnapshot(q, (snapshot) => {
         try {
           console.log("📥 تم استلام تحديث من قاعدة البيانات. عدد الوثائق:", snapshot.docs.length);
           
-          // استخدام Map لتتبع المعرفات المكررة (أفضل من Set للأداء)
-          const productMap = new Map<string, Product>();
+          // معالجة الوثائق مباشرة إلى مصفوفة منتجات
+          const items: Product[] = [];
           
           snapshot.docs.forEach((doc) => {
             const data = doc.data();
             console.log("📄 بيانات الوثيقة:", doc.id, data);
             
-            // التحقق من أن الوثيقة لها معرف فريد
-            if (!productMap.has(doc.id)) {
-              productMap.set(doc.id, {
+            // التأكد من أن البيانات تحتوي على الحقول المطلوبة
+            if (data && data.name && data.price !== undefined) {
+              items.push({
                 id: doc.id,
-                ...(data as Omit<Product, "id">),
+                name: data.name || "منتج غير مسمى",
+                price: typeof data.price === 'number' ? data.price : parseFloat(data.price) || 0,
+                description: data.description || "لا يوجد وصف",
+                imageUrl: data.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
+                category: data.category || "غير مصنف",
+                paymentMethod: data.paymentMethod || "cash"
               });
             } else {
-              console.warn("⚠️ تم تجاهل وثيقة مكررة بالمعرف:", doc.id);
+              console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", doc.id, data);
             }
           });
           
-          // تحويل Map إلى Array
-          const items = Array.from(productMap.values());
           console.log("📦 المنتجات المحولة:", items);
           
-          // تحقق من صحة البيانات - السماح بمنتجات بدون بعض الحقول ولكن مع تحذير
-          const validProducts: Product[] = [];
-          const invalidProducts: any[] = [];
-          
-          items.forEach(product => {
-            // التحقق الأساسي من وجود اسم وسعر
-            if (product.name && product.price !== undefined) {
-              // التأكد من أن السعر هو رقم
-              if (typeof product.price === 'number') {
-                validProducts.push(product);
-                console.log("✅ منتج صالح:", product.name, "- السعر:", product.price);
-              } else {
-                // محاولة تحويل السعر إلى رقم
-                const numericPrice = parseFloat(String(product.price));
-                if (!isNaN(numericPrice)) {
-                  validProducts.push({ ...product, price: numericPrice });
-                  console.log("✅ منتج صالح بعد التحويل:", product.name, "- السعر:", numericPrice);
-                } else {
-                  invalidProducts.push(product);
-                  console.log("❌ منتج غير صالح - سعر غير صحيح:", product);
-                }
-              }
-            } else {
-              invalidProducts.push(product);
-              console.log("❌ منتج غير صالح - بيانات ناقصة:", product);
-            }
-          });
-          
-          console.log("✅ المنتجات الصالحة:", validProducts.length);
-          if (invalidProducts.length > 0) {
-            console.log("⚠️ المنتجات غير الصالحة:", invalidProducts.length);
-          }
-          
-          setProducts(validProducts);
+          setProducts(items);
           setLoading(false);
           setError(null);
           
           // طباعة معلومات التصحيح
-          console.log("✅ تم تحميل المنتجات:", validProducts.length);
-          if (validProducts.length > 0) {
-            console.log("📝 أول منتج:", validProducts[0]);
+          console.log("✅ تم تحميل المنتجات:", items.length);
+          if (items.length > 0) {
+            console.log("📝 أول منتج:", items[0]);
           } else {
-            console.log("📝 لا توجد منتجات صالحة في قاعدة البيانات");
+            console.log("📝 لا توجد منتجات في قاعدة البيانات");
           }
         } catch (err) {
           console.error("❌ خطأ في معالجة البيانات:", err);
@@ -349,9 +301,9 @@ const HomeV2: React.FC = () => {
     }
   }, []);
 
-  // 🛒 إضافة منتج إلى السلة
-  const addToCart = (product: Product) => {
-    setCart([...cart, product]);
+  // 🛒 إضافة منتج إلى السلة (updated to use context)
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
     Alert.alert("✅", `تم إضافة ${product.name} إلى السلة`);
   };
 
@@ -405,7 +357,7 @@ const HomeV2: React.FC = () => {
             style={styles.addToCartButton}
             onPress={(e) => {
               e.stopPropagation();
-              addToCart(item);
+              handleAddToCart(item);
             }}
           >
             <Ionicons name="add" size={20} color="#fff" />
