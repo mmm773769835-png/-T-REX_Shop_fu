@@ -4,7 +4,6 @@ import { CartProvider } from './src/contexts/CartContext';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ActivityIndicator, View, Text, StyleSheet, Alert } from 'react-native';
 import { useAuth } from './src/contexts/AuthContext';
-import ErrorBoundary from './src/shared/components/ErrorBoundary';
 // Initialize Firebase early to prevent "No Firebase App '[DEFAULT]' has been created" error
 import './src/init/firebaseInit';
 
@@ -13,13 +12,11 @@ export default function App() {
   console.log('[DEBUG] App component started');
   // #endregion
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <CartProvider>
-          <AppWithLoader />
-        </CartProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <CartProvider>
+        <AppWithLoader />
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
