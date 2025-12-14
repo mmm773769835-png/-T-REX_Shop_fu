@@ -4,22 +4,38 @@ import { CartProvider } from './src/contexts/CartContext';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ActivityIndicator, View, Text, StyleSheet, Alert } from 'react-native';
 import { useAuth } from './src/contexts/AuthContext';
+import ErrorBoundary from './src/shared/components/ErrorBoundary';
+// Initialize Firebase early to prevent "No Firebase App '[DEFAULT]' has been created" error
+import './src/init/firebaseInit';
 
 export default function App() {
+  // #region agent log
+  console.log('[DEBUG] App component started');
+  // #endregion
   return (
-    <AuthProvider>
-      <CartProvider>
-        <AppWithLoader />
-      </CartProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <AppWithLoader />
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
 const AppWithLoader = () => {
+  // #region agent log
+  console.log('[DEBUG] AppWithLoader component started');
+  // #endregion
   const { loading, error } = useAuth();
+  // #region agent log
+  console.log('[DEBUG] useAuth result:', { loading, hasError: !!error, errorMessage: error?.message });
+  // #endregion
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
+    // #region agent log
+    // #endregion
     // Check if environment variables are set
     const checkEnvironment = () => {
       // In a real app, you might want to check critical env vars here
@@ -29,6 +45,8 @@ const AppWithLoader = () => {
     if (checkEnvironment()) {
       // Simulate app initialization delay
       const timer = setTimeout(() => {
+        // #region agent log
+        // #endregion
         setAppReady(true);
       }, 1000);
       
@@ -37,6 +55,8 @@ const AppWithLoader = () => {
   }, []);
   
   if (loading || !appReady) {
+    // #region agent log
+    // #endregion
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007bff" />
@@ -46,6 +66,8 @@ const AppWithLoader = () => {
   }
   
   if (error) {
+    // #region agent log
+    // #endregion
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>حدث خطأ في تحميل التطبيق</Text>
@@ -55,7 +77,15 @@ const AppWithLoader = () => {
     );
   }
   
-  return <AppNavigator />;
+  // #region agent log
+  // #endregion
+  try {
+    return <AppNavigator />;
+  } catch (navError) {
+    // #region agent log
+    // #endregion
+    throw navError;
+  }
 };
 
 const styles = StyleSheet.create({
