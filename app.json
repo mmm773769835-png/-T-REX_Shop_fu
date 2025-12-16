@@ -8,9 +8,7 @@
     "icon": "./assets/icon.png",
     "scheme": "trexshop",
     "userInterfaceStyle": "automatic",
-    "plugins": [
-      "expo-tracking-transparency"
-    ],
+    "plugins": [],
 
     "splash": {
       "image": "./assets/splash.png",

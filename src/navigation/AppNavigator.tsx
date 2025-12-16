@@ -53,11 +53,11 @@ const MainTabs = () => {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Home" component={HomeV2} options={{ headerShown: false }} />
-      <Tab.Screen name="Categories" component={HomeV2} options={{ headerShown: false }} />
-      <Tab.Screen name="Search" component={HomeV2} options={{ headerShown: false }} />
-      <Tab.Screen name="Cart" component={CartScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+      <Tab.Screen name='Home' component={HomeV2} options={{ headerShown: false }} />
+      <Tab.Screen name='Categories' component={HomeV2} options={{ headerShown: false }} />
+      <Tab.Screen name='Search' component={HomeV2} options={{ headerShown: false }} />
+      <Tab.Screen name='Cart' component={CartScreen} options={{ headerShown: false }} />
+      <Tab.Screen name='Profile' component={ProfileScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 };
@@ -67,12 +67,12 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        <Stack.Screen name='MainTabs' component={MainTabs} />
+        <Stack.Screen name='ProductDetails' component={ProductDetailsScreen} />
+        <Stack.Screen name='Login' component={LoginScreen} />
+        <Stack.Screen name='Register' component={RegisterScreen} />
+        <Stack.Screen name='OrderHistory' component={OrderHistoryScreen} />
+        <Stack.Screen name='Checkout' component={CheckoutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
