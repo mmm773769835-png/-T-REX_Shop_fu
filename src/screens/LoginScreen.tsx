@@ -74,6 +74,32 @@ export default function LoginScreen({ navigation }: any) {
     navigation.navigate("PhoneLogin");
   };
 
+  // Google Sign-In
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await authService.signInWithGoogle();
+      if (error) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          error.message || (language === "ar" ? "فشل تسجيل الدخول عبر Google" : "Google Sign-In failed")
+        );
+      } else if (data?.url) {
+        Alert.alert(
+          language === "ar" ? "تنبيه" : "Notice",
+          language === "ar" ? "جاري فتح متصفح Google..." : "Opening Google browser..."
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "حدث خطأ أثناء تسجيل الدخول" : "An error occurred during login"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const styles = getStyles(isDarkMode, colors);
 
   return (
@@ -143,7 +169,23 @@ export default function LoginScreen({ navigation }: any) {
             </Text>
           </TouchableOpacity>
         </View>
-        
+
+        {/* قسم تسجيل الدخول عبر Google */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {language === "ar" ? "أو سجل دخول باستخدام" : "Or sign in with"}
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, styles.googleButton]}
+            onPress={handleGoogleSignIn}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {language === "ar" ? "🌐 Google" : "🌐 Google"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* قسم الخيارات الإضافية */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
@@ -255,6 +297,9 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   },
   phoneButton: {
     backgroundColor: "#28a745",
+  },
+  googleButton: {
+    backgroundColor: "#4285F4",
   },
   skipButton: {
     backgroundColor: "#6c757d",

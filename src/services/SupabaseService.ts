@@ -54,6 +54,21 @@ export const authService = {
     return { data, error };
   },
 
+  // Sign in with Google OAuth
+  signInWithGoogle: async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'com.trexshop.app://auth/callback',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      }
+    });
+    return { data, error };
+  },
+
   // Sign out
   signOut: async () => {
     const { error } = await supabase.auth.signOut();
