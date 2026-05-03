@@ -15,10 +15,11 @@
         }
         body {
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
             min-height: 100vh;
             padding-bottom: 80px;
             overflow-x: hidden;
+            color: #fff;
         }
         /* 3D Animations */
         @keyframes float {
@@ -41,14 +42,15 @@
             0% { transform: rotateY(0deg); }
             100% { transform: rotateY(360deg); }
         }
-        /* Header Style with 3D */
+        /* Header Style - Dark with Gold */
         .app-header {
-            background: linear-gradient(135deg, #FF6600 0%, #FF8C00 50%, #FF9500 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
             padding: 15px;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(255,102,0,0.3), 0 8px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(255,215,0,0.15), 0 8px 30px rgba(0,0,0,0.5);
+            border-bottom: 2px solid rgba(255,215,0,0.3);
             transform-style: preserve-3d;
             perspective: 1000px;
         }
@@ -65,22 +67,31 @@
             transform-style: preserve-3d;
         }
         .dino-icon {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
             box-shadow: 0 5px 20px rgba(255, 165, 0, 0.5), inset 0 -3px 10px rgba(0,0,0,0.1);
             animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite;
             transform-style: preserve-3d;
             cursor: pointer;
             transition: transform 0.3s;
+            overflow: hidden;
+            border: 3px solid #FFD700;
+        }
+        .dino-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .dino-icon:hover {
             transform: scale(1.2) rotateY(20deg);
+        }
+        .logo-gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
         }
         .app-title {
             color: #fff;
@@ -137,39 +148,44 @@
             color: #fff;
             cursor: pointer;
         }
-        /* Banner */
+        /* Banner - Dark with Gold */
         .banner {
             margin: 15px;
             height: 150px;
-            background: linear-gradient(135deg, #FF6600, #FF8C00, #FFD700);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
+            border: 2px solid rgba(255,215,0,0.3);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.1);
         }
         .banner-content {
             text-align: center;
-            color: #fff;
+            color: #FFD700;
             z-index: 2;
         }
         .banner h2 {
             font-size: 1.5rem;
             margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
         .banner p {
             font-size: 0.9rem;
             opacity: 0.9;
+            color: #FFA500;
         }
         .banner-dino {
             position: absolute;
             font-size: 100px;
-            opacity: 0.3;
+            opacity: 0.2;
             right: -20px;
             bottom: -20px;
+            color: #FFD700;
         }
-        /* Categories */
+        /* Categories - Dark */
         .categories {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -180,27 +196,34 @@
         .category-item {
             text-align: center;
             padding: 10px;
-            background: #fff;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .category-item:hover {
+            border-color: rgba(255,215,0,0.5);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.2);
         }
         .category-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #FF6600, #FF8C00);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             margin: 0 auto 8px;
+            box-shadow: 0 3px 10px rgba(255,215,0,0.3);
         }
         .category-name {
             font-size: 0.75rem;
-            color: #333;
+            color: #FFD700;
             font-weight: 600;
         }
-        /* Products Section */
+        /* Products Section - Dark */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -211,10 +234,11 @@
         .section-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #333;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.3);
         }
         .view-all {
-            color: #FF6600;
+            color: #FFA500;
             font-size: 0.85rem;
             text-decoration: none;
         }
@@ -225,23 +249,29 @@
             padding: 0 15px;
         }
         .product-card {
-            background: #fff;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            border-color: rgba(255,215,0,0.5);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.2);
         }
         .product-image {
             width: 100%;
             height: 140px;
             object-fit: cover;
-            background: #f0f0f0;
+            background: #0f0f0f;
         }
         .product-info {
             padding: 12px;
         }
         .product-name {
             font-size: 0.85rem;
-            color: #333;
+            color: #fff;
             margin-bottom: 8px;
             line-height: 1.4;
             height: 2.4em;
@@ -249,44 +279,51 @@
         }
         .product-price {
             font-size: 1.1rem;
-            color: #FF6600;
+            color: #FFD700;
             font-weight: 700;
         }
         .product-old-price {
             font-size: 0.75rem;
-            color: #999;
+            color: #888;
             text-decoration: line-through;
         }
         .product-tag {
             display: inline-block;
-            background: #FF6600;
-            color: #fff;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #1a1a1a;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.7rem;
             margin-top: 5px;
+            font-weight: 600;
         }
-        /* Bottom Navigation */
+        /* Bottom Navigation - Dark */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #fff;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 15px rgba(255,215,0,0.1);
             z-index: 1000;
+            border-top: 1px solid rgba(255,215,0,0.2);
         }
         .nav-item {
             text-align: center;
-            color: #999;
+            color: #888;
             text-decoration: none;
             font-size: 0.7rem;
+            transition: all 0.3s ease;
         }
         .nav-item.active {
-            color: #FF6600;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .nav-item:hover {
+            color: #FFA500;
         }
         .nav-icon {
             font-size: 1.4rem;
@@ -427,6 +464,103 @@
         .admin-badge.show {
             display: block;
         }
+        /* Cart Panel Styles */
+        .cart-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background: #fff;
+            z-index: 2001;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+        .cart-panel.active {
+            display: block;
+            animation: slideInRight 0.3s ease;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .cart-header {
+            background: linear-gradient(135deg, #FF6600, #FF8C00);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .cart-content {
+            padding: 20px;
+            min-height: calc(100vh - 200px);
+        }
+        .cart-footer {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+        }
+        /* Cart Badge on Icon */
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn {
+            position: relative;
+        }
+        /* User Panel Styles */
+        .user-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 2001;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .user-panel.active {
+            display: block;
+            animation: scaleIn 0.3s ease;
+        }
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        /* Switch between login/signup */
+        .auth-switch {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .auth-switch a {
+            color: #FF6600;
+            text-decoration: none;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -440,7 +574,9 @@
     <div class="admin-panel" id="loginPanel">
         <button class="close-btn" onclick="closePanels()">×</button>
         <div class="panel-header">
-            <div class="dino-icon" style="margin: 0 auto 10px;">🦖</div>
+            <div class="dino-icon" style="margin: 0 auto 10px; width: 60px; height: 60px;">
+                <img src="logo.png" alt="Admin" onerror="this.style.display='none'; this.parentElement.innerHTML='👑';">
+            </div>
             <h3 class="panel-title">تسجيل دخول الأدمن</h3>
         </div>
         <div id="loginMessages"></div>
@@ -461,7 +597,9 @@
     <div class="admin-panel" id="productPanel">
         <button class="close-btn" onclick="closePanels()">×</button>
         <div class="panel-header">
-            <div class="dino-icon" style="margin: 0 auto 10px;">➕</div>
+            <div class="dino-icon" style="margin: 0 auto 10px; width: 60px; height: 60px;">
+                <img src="logo.png" alt="Add Product" onerror="this.style.display='none'; this.parentElement.innerHTML='➕';">
+            </div>
             <h3 class="panel-title">إضافة منتج جديد</h3>
         </div>
         <div id="productMessages"></div>
@@ -496,16 +634,121 @@
         </form>
     </div>
 
+    <!-- Cart Panel -->
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 1.3rem;">🛒 سلة التسوق</h3>
+                <button onclick="closePanels()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+        </div>
+        <div class="cart-content">
+            <div id="cartItems"></div>
+            <div id="cartTotal"></div>
+        </div>
+        <div class="cart-footer">
+            <button id="checkoutBtn" class="btn-submit" onclick="checkout()" style="display: none;">
+                💳 إتمام الشراء
+            </button>
+            <p style="text-align: center; margin-top: 10px; font-size: 0.8rem; color: #888;">
+                🚚 توصيل سريع | 🔄 استبدال خلال 14 يوم
+            </p>
+        </div>
+    </div>
+
+    <!-- User Login Panel -->
+    <div class="user-panel" id="userLoginPanel">
+        <button class="close-btn" onclick="closePanels()">×</button>
+        <div class="panel-header">
+            <div class="dino-icon" style="margin: 0 auto 10px; width: 60px; height: 60px;">
+                <img src="logo.png" alt="Login" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">
+            </div>
+            <h3 class="panel-title">تسجيل الدخول</h3>
+        </div>
+        <div id="userLoginMessages"></div>
+        <form id="userLoginForm" onsubmit="handleUserLogin(event)">
+            <div class="form-group">
+                <label>البريد الإلكتروني</label>
+                <input type="email" id="userEmail" required placeholder="example@email.com">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="userPassword" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-submit">تسجيل الدخول</button>
+        </form>
+        <div class="auth-switch">
+            ليس لديك حساب؟ <a href="#" onclick="showSignupPanel(); return false;">سجل الآن</a>
+        </div>
+    </div>
+
+    <!-- Signup Panel -->
+    <div class="user-panel" id="signupPanel">
+        <button class="close-btn" onclick="closePanels()">×</button>
+        <div class="panel-header">
+            <div class="dino-icon" style="margin: 0 auto 10px; width: 60px; height: 60px;">
+                <img src="logo.png" alt="Signup" onerror="this.style.display='none'; this.parentElement.innerHTML='✨';">
+            </div>
+            <h3 class="panel-title">إنشاء حساب جديد</h3>
+        </div>
+        <div id="signupMessages"></div>
+        <form id="signupForm" onsubmit="handleUserSignup(event)">
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="signupName" required placeholder="محمد أحمد">
+            </div>
+            <div class="form-group">
+                <label>البريد الإلكتروني</label>
+                <input type="email" id="signupEmail" required placeholder="example@email.com">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="signupPassword" required placeholder="8 أحرف على الأقل">
+            </div>
+            <button type="submit" class="btn-submit">إنشاء الحساب</button>
+        </form>
+        <div class="auth-switch">
+            لديك حساب؟ <a href="#" onclick="closePanels(); showUserLoginPanel(); return false;">سجل دخول</a>
+        </div>
+    </div>
+
+    <!-- User Profile Panel -->
+    <div class="user-panel" id="userProfilePanel">
+        <button class="close-btn" onclick="closePanels()">×</button>
+        <div class="panel-header">
+            <div class="dino-icon" style="margin: 0 auto 10px; width: 60px; height: 60px;">
+                <img src="logo.png" alt="Profile" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">
+            </div>
+            <h3 class="panel-title">حسابي</h3>
+        </div>
+        <div id="profileInfo"></div>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="showCartPanel()" class="btn-submit" style="flex: 1; background: linear-gradient(135deg, #2196F3, #1976D2);">
+                🛒 طلباتي
+            </button>
+            <button onclick="logoutUser()" class="btn-submit" style="flex: 1; background: linear-gradient(135deg, #ff4444, #cc0000);">
+                🚪 خروج
+            </button>
+        </div>
+    </div>
+
     <!-- App Header -->
     <header class="app-header">
         <div class="header-top">
             <div class="app-logo">
-                <div class="dino-icon">🦖</div>
-                <span class="app-title">T-REX Shop</span>
+                <div class="dino-icon">
+                    <img src="logo.png" alt="T-REX Shop Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='🦖';">
+                </div>
+                <img src="logo-text.png" alt="T-REX Shop" class="logo-text-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" style="height: 30px; width: auto;">
+                <span class="app-title" style="display: none;">T-REX Shop</span>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="showLoginPanel()" id="loginBtn">👤</button>
-                <button class="icon-btn" onclick="logoutAdmin()" id="logoutBtn" style="display: none;">�</button>
+                <button class="icon-btn" onclick="showCartPanel()" id="cartBtn">
+                    🛒
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+                <button class="icon-btn" onclick="showUserLoginPanel()" id="userBtn">👤</button>
+                <button class="icon-btn" onclick="logoutAdmin()" id="logoutBtn" style="display: none;">🚪</button>
             </div>
         </div>
         <div class="search-container">
@@ -525,19 +768,19 @@
 
     <!-- Categories -->
     <div class="categories">
-        <div class="category-item">
+        <div class="category-item" onclick="loadProducts('إلكترونيات')" style="cursor: pointer;">
             <div class="category-icon">📱</div>
             <div class="category-name">إلكترونيات</div>
         </div>
-        <div class="category-item">
+        <div class="category-item" onclick="loadProducts('ملابس')" style="cursor: pointer;">
             <div class="category-icon">👕</div>
             <div class="category-name">ملابس</div>
         </div>
-        <div class="category-item">
+        <div class="category-item" onclick="loadProducts('أحذية')" style="cursor: pointer;">
             <div class="category-icon">👟</div>
             <div class="category-name">أحذية</div>
         </div>
-        <div class="category-item">
+        <div class="category-item" onclick="loadProducts('إكسسوارات')" style="cursor: pointer;">
             <div class="category-icon">⌚</div>
             <div class="category-name">إكسسوارات</div>
         </div>
@@ -554,23 +797,19 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active">
+        <a href="#" class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
             <span class="nav-icon">🏠</span>
             <span>الرئيسية</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="document.querySelector('.categories').scrollIntoView({behavior: 'smooth'}); return false;">
             <span class="nav-icon">📂</span>
             <span>الأقسام</span>
         </a>
-        <a href="#" class="nav-item" onclick="showProductPanel(); return false;" id="addProductNav" style="display: none;">
-            <span class="nav-icon">➕</span>
-            <span>إضافة</span>
-        </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="showCartPanel(); return false;">
             <span class="nav-icon">🛒</span>
             <span>السلة</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="#" class="nav-item" onclick="showUserLoginPanel(); return false;">
             <span class="nav-icon">👤</span>
             <span>حسابي</span>
         </a>
@@ -648,6 +887,9 @@
                     console.error('Supabase Error:', error);
                     throw new Error('فشل في جلب المنتجات: ' + error.message);
                 }
+                
+                // Save products for cart functionality
+                allProducts = products || [];
                 
                 if (!products || products.length === 0) {
                     container.innerHTML = `
@@ -747,28 +989,299 @@
         }
         
         // ==========================================
-        // CART FUNCTIONS
+        // CART FUNCTIONS - Professional E-commerce
         // ==========================================
         
+        let allProducts = [];
+        
         function addToCart(productId) {
-            cart.push(productId);
-            updateCartBadge();
-            showNotification('✅ تمت إضافة المنتج للسلة', 'success');
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) {
+                showNotification('⚠️ المنتج غير متوفر', 'error');
+                return;
+            }
+            
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image_url: product.image_url,
+                    currency: product.currency || 'ر.ي',
+                    quantity: 1
+                });
+            }
+            
+            saveCart();
+            updateCartUI();
+            showCartNotification(product.name);
         }
         
-        function updateCartBadge() {
-            const badges = document.querySelectorAll('.cart-badge');
-            badges.forEach(badge => {
-                badge.textContent = cart.length;
-                badge.style.display = cart.length > 0 ? 'block' : 'none';
-            });
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            updateCartUI();
+            showCartPanel();
+        }
+        
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    saveCart();
+                    updateCartUI();
+                }
+            }
+        }
+        
+        function saveCart() {
+            localStorage.setItem('trex_cart', JSON.stringify(cart));
         }
         
         function loadCart() {
             const savedCart = localStorage.getItem('trex_cart');
             if (savedCart) {
                 cart = JSON.parse(savedCart);
-                updateCartBadge();
+                updateCartUI();
+            }
+        }
+        
+        function updateCartUI() {
+            // Update badge
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badges = document.querySelectorAll('.cart-badge');
+            badges.forEach(badge => {
+                badge.textContent = totalItems;
+                badge.style.display = totalItems > 0 ? 'flex' : 'none';
+            });
+        }
+        
+        function showCartPanel() {
+            const panel = document.getElementById('cartPanel');
+            const overlay = document.getElementById('overlay');
+            
+            if (cart.length === 0) {
+                document.getElementById('cartItems').innerHTML = `
+                    <div style="text-align: center; padding: 50px 20px;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">🛒</div>
+                        <p style="color: #666; margin-bottom: 10px;">السلة فارغة</p>
+                        <p style="font-size: 0.9rem; color: #999;">أضف منتجات رائعة لتبدأ التسوق</p>
+                    </div>
+                `;
+                document.getElementById('cartTotal').innerHTML = '';
+                document.getElementById('checkoutBtn').style.display = 'none';
+            } else {
+                renderCartItems();
+            }
+            
+            panel.classList.add('active');
+            overlay.classList.add('active');
+        }
+        
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
+            let total = 0;
+            
+            container.innerHTML = cart.map(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                return `
+                    <div style="display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px;">
+                        <img src="${item.image_url || 'https://via.placeholder.com/80?text=No+Image'}" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 0.95rem; margin-bottom: 5px; color: #333;">${item.name}</h4>
+                            <p style="color: #FF6600; font-weight: 700; margin-bottom: 8px;">
+                                ${item.price} ${item.currency}
+                            </p>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button onclick="updateQuantity(${item.id}, -1)" 
+                                        style="width: 30px; height: 30px; border: none; background: #ddd; border-radius: 50%; cursor: pointer; font-weight: bold;">-</button>
+                                <span style="font-weight: 600;">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" 
+                                        style="width: 30px; height: 30px; border: none; background: #FF6600; color: white; border-radius: 50%; cursor: pointer; font-weight: bold;">+</button>
+                                <button onclick="removeFromCart(${item.id})" 
+                                        style="margin-right: auto; background: none; border: none; color: #ff4444; cursor: pointer; font-size: 1.2rem;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('cartTotal').innerHTML = `
+                <div style="border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #666;">المجموع:</span>
+                        <span style="font-weight: 700; font-size: 1.2rem; color: #FF6600;">${total.toFixed(2)} ر.ي</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #888;">${cart.reduce((sum, i) => sum + i.quantity, 0)} منتج في السلة</p>
+                </div>
+            `;
+            document.getElementById('checkoutBtn').style.display = 'block';
+        }
+        
+        function showCartNotification(productName) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #00C851, #00b248);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 30px;
+                box-shadow: 0 8px 25px rgba(0,200,81,0.4);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            notification.innerHTML = `✅ <span>تمت إضافة "${productName.substring(0, 20)}..." للسلة</span>`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 2500);
+        }
+        
+        // ==========================================
+        // USER ACCOUNT FUNCTIONS
+        // ==========================================
+        
+        let currentUser = null;
+        
+        function showUserLoginPanel() {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('userLoginPanel').classList.add('active');
+        }
+        
+        function showUserProfile() {
+            if (!currentUser) {
+                showUserLoginPanel();
+                return;
+            }
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('userProfilePanel').classList.add('active');
+            renderUserProfile();
+        }
+        
+        function showSignupPanel() {
+            closePanels();
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('signupPanel').classList.add('active');
+        }
+        
+        async function handleUserLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            
+            try {
+                showMessage('userLoginMessages', '⏳ جاري تسجيل الدخول...', 'info');
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                
+                currentUser = data.user;
+                localStorage.setItem('trex_user', JSON.stringify(currentUser));
+                showMessage('userLoginMessages', '✅ مرحباً بعودتك! تم تسجيل الدخول بنجاح', 'success');
+                
+                setTimeout(() => {
+                    closePanels();
+                    updateUserUI();
+                    showNotification(`👋 مرحباً ${currentUser.email.split('@')[0]}!`, 'success');
+                }, 1500);
+            } catch (error) {
+                showMessage('userLoginMessages', '❌ ' + (error.message === 'Invalid login credentials' ? 'البريد أو كلمة المرور غير صحيحة' : error.message), 'error');
+            }
+        }
+        
+        async function handleUserSignup(e) {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+            
+            try {
+                showMessage('signupMessages', '⏳ جاري إنشاء حسابك...', 'info');
+                const { data, error } = await supabaseClient.auth.signUp({ 
+                    email, 
+                    password,
+                    options: { data: { full_name: name } }
+                });
+                if (error) throw error;
+                
+                showMessage('signupMessages', '✅ تم إنشاء حسابك بنجاح! تحقق من بريدك لتفعيل الحساب', 'success');
+                setTimeout(() => {
+                    closePanels();
+                    showUserLoginPanel();
+                }, 2000);
+            } catch (error) {
+                showMessage('signupMessages', '❌ ' + error.message, 'error');
+            }
+        }
+        
+        async function logoutUser() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            localStorage.removeItem('trex_user');
+            updateUserUI();
+            showNotification('🚪 تم تسجيل الخروج بنجاح', 'info');
+        }
+        
+        function updateUserUI() {
+            const userBtn = document.getElementById('userBtn');
+            if (currentUser) {
+                userBtn.innerHTML = '👤 ' + currentUser.email.split('@')[0];
+                userBtn.onclick = showUserProfile;
+            } else {
+                userBtn.innerHTML = '👤 دخول';
+                userBtn.onclick = showUserLoginPanel;
+            }
+        }
+        
+        function renderUserProfile() {
+            if (!currentUser) return;
+            const profileInfo = document.getElementById('profileInfo');
+            profileInfo.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF6600, #FF8C00); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">👤</div>
+                    <h3 style="color: #333; margin-bottom: 5px;">${currentUser.user_metadata?.full_name || 'مستخدم T-REX'}</h3>
+                    <p style="color: #888; font-size: 0.9rem;">${currentUser.email}</p>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 15px;">
+                    <p style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>طلباتي:</span>
+                        <span style="font-weight: 700; color: #FF6600;">${cart.length} طلب</span>
+                    </p>
+                    <p style="display: flex; justify-content: space-between;">
+                        <span>تاريخ التسجيل:</span>
+                        <span style="color: #666;">${new Date(currentUser.created_at).toLocaleDateString('ar-SA')}</span>
+                    </p>
+                </div>
+            `;
+        }
+        
+        async function checkUserSession() {
+            const savedUser = localStorage.getItem('trex_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserUI();
+            }
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('trex_user', JSON.stringify(user));
+                updateUserUI();
             }
         }
         
@@ -776,7 +1289,7 @@
         // ADMIN PANEL FUNCTIONS
         // ==========================================
         
-        function showLoginPanel() {
+        function showAdminLoginPanel() {
             document.getElementById('overlay').classList.add('active');
             document.getElementById('loginPanel').classList.add('active');
         }
@@ -784,7 +1297,7 @@
         function showProductPanel() {
             if (!currentAdmin) {
                 showMessage('loginMessages', '⚠️ يجب تسجيل الدخول كأدمن أولاً', 'error');
-                showLoginPanel();
+                showAdminLoginPanel();
                 return;
             }
             document.getElementById('overlay').classList.add('active');
@@ -793,7 +1306,7 @@
         
         function closePanels() {
             document.getElementById('overlay').classList.remove('active');
-            document.querySelectorAll('.admin-panel').forEach(panel => {
+            document.querySelectorAll('.admin-panel, .cart-panel, .user-panel').forEach(panel => {
                 panel.classList.remove('active');
             });
         }
@@ -980,12 +1493,45 @@
             }
         });
         
+        // Checkout Function
+        function checkout() {
+            if (cart.length === 0) {
+                showNotification('🛒 السلة فارغة!', 'error');
+                return;
+            }
+            
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let orderDetails = cart.map(item => 
+                `• ${item.name} - ${item.quantity} x ${item.price} = ${item.price * item.quantity} ر.ي`
+            ).join('\n');
+            
+            let message = `🦟 *طلب جديد من T-REX Shop!*\n\n` +
+                         `📦 المنتجات:\n${orderDetails}\n\n` +
+                         `💰 المجموع: ${total.toFixed(2)} ر.ي\n` +
+                         `👤 العميل: ${currentUser?.email || 'زائر'}\n\n` +
+                         `📞 يرجى التواصل لتأكيد الطلب`;
+            
+            let whatsappUrl = `https://wa.me/967773769835?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showNotification('✅ تم فتح واتساب لإتمام الطلب', 'success');
+        }
+        
+        // Initialize user session check
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserSession();
+        });
+        
         // Add animation styles
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideDown {
                 from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
                 to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             }
         `;
         document.head.appendChild(style);
