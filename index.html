@@ -924,18 +924,54 @@
         // Handle Google Sign-In callback
         async function handleAuthCallback() {
             try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                console.log('🔍 Checking for auth callback...');
 
-                if (error) {
-                    console.error('❌ Auth callback error:', error);
-                    return;
-                }
+                // Parse hash parameters from URL
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token');
 
-                if (session) {
-                    console.log('✅ User authenticated:', session.user);
-                    currentUser = session.user;
-                    updateUIForLoggedInUser(session.user);
-                    showNotification('تم تسجيل الدخول بنجاح!', 'success');
+                if (accessToken) {
+                    console.log('✅ Access token found in URL');
+
+                    // Set the session with the tokens
+                    const { data, error } = await supabaseClient.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken || ''
+                    });
+
+                    if (error) {
+                        console.error('❌ Error setting session:', error);
+                        showNotification('فشل في إعداد الجلسة', 'error');
+                        return;
+                    }
+
+                    if (data.session) {
+                        console.log('✅ Session established:', data.session.user);
+                        currentUser = data.session.user;
+                        updateUIForLoggedInUser(data.session.user);
+                        showNotification('تم تسجيل الدخول بنجاح! مرحباً ' + (data.session.user.user_metadata?.full_name || ''), 'success');
+
+                        // Clean up URL (remove tokens from browser history)
+                        window.history.replaceState({}, document.title, window.location.pathname);
+
+                        // Close login panel if open
+                        closePanels();
+                    }
+                } else {
+                    // Try to get existing session
+                    const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+                    if (error) {
+                        console.error('❌ Auth callback error:', error);
+                        return;
+                    }
+
+                    if (session) {
+                        console.log('✅ Existing session found:', session.user);
+                        currentUser = session.user;
+                        updateUIForLoggedInUser(session.user);
+                    }
                 }
             } catch (error) {
                 console.error('❌ Auth callback exception:', error);
@@ -965,18 +1001,52 @@
 
             console.log('👤 User logged in:', userName);
 
+            // Store user info
             localStorage.setItem('currentUser', JSON.stringify({
                 id: user.id,
                 email: user.email,
                 name: userName,
                 avatar: userAvatar
             }));
+
+            // Update header user button with avatar
+            const userBtn = document.getElementById('userBtn');
+            if (userBtn && userAvatar) {
+                userBtn.innerHTML = `<img src="${userAvatar}" alt="${userName}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #FFD700;">`;
+                userBtn.onclick = showUserProfile;
+                userBtn.title = userName;
+            } else if (userBtn) {
+                userBtn.innerHTML = '👤 ' + userName.split(' ')[0];
+                userBtn.onclick = showUserProfile;
+                userBtn.title = userName;
+            }
+
+            // Show sign out button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.style.display = 'inline-flex';
+                logoutBtn.onclick = signOut;
+            }
         }
 
         // Update UI for logged out user
         function updateUIForLoggedOutUser() {
             localStorage.removeItem('currentUser');
             console.log('👤 User logged out');
+
+            // Reset header user button
+            const userBtn = document.getElementById('userBtn');
+            if (userBtn) {
+                userBtn.innerHTML = '👤';
+                userBtn.onclick = showUserLoginPanel;
+                userBtn.title = 'تسجيل الدخول';
+            }
+
+            // Hide sign out button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.style.display = 'none';
+            }
         }
 
         // Check current session on load
@@ -1401,21 +1471,58 @@
         function renderUserProfile() {
             if (!currentUser) return;
             const profileInfo = document.getElementById('profileInfo');
+
+            const userName = currentUser.user_metadata?.full_name || 'مستخدم T-REX';
+            const userAvatar = currentUser.user_metadata?.avatar_url;
+            const userEmail = currentUser.email;
+
             profileInfo.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF6600, #FF8C00); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">👤</div>
-                    <h3 style="color: #333; margin-bottom: 5px;">${currentUser.user_metadata?.full_name || 'مستخدم T-REX'}</h3>
-                    <p style="color: #888; font-size: 0.9rem;">${currentUser.email}</p>
+                    ${userAvatar ?
+                        `<img src="${userAvatar}" alt="${userName}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #FFD700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 15px;">` :
+                        `<div style="width: 100px; height: 100px; background: linear-gradient(135deg, #FFD700, #FF6600); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">👤</div>`
+                    }
+                    <h3 style="color: #333; margin-bottom: 5px; font-size: 1.4rem; font-weight: 700;">${userName}</h3>
+                    <p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;">${userEmail}</p>
+                    <span style="display: inline-block; background: #4CAF50; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-top: 5px;">✓ متصل عبر Google</span>
                 </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 15px;">
-                    <p style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>طلباتي:</span>
-                        <span style="font-weight: 700; color: #FF6600;">${cart.length} طلب</span>
-                    </p>
-                    <p style="display: flex; justify-content: space-between;">
-                        <span>تاريخ التسجيل:</span>
-                        <span style="color: #666;">${new Date(currentUser.created_at).toLocaleDateString('ar-SA')}</span>
-                    </p>
+
+                <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <h4 style="color: #333; margin-bottom: 15px; border-bottom: 2px solid #FFD700; padding-bottom: 10px;">📊 ملخص الحساب</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div style="font-size: 24px; margin-bottom: 5px;">🛒</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #FF6600;">${cart.length}</div>
+                            <div style="color: #888; font-size: 0.85rem;">السلة</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div style="font-size: 24px; margin-bottom: 5px;">📦</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #4CAF50;">0</div>
+                            <div style="color: #888; font-size: 0.85rem;">الطلبات</div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        <p style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                            <span style="color: #666;">🆔 معرف المستخدم:</span>
+                            <span style="font-family: monospace; font-size: 0.85rem; color: #333;">${currentUser.id?.substring(0, 8)}...</span>
+                        </p>
+                        <p style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                            <span style="color: #666;">📅 تاريخ التسجيل:</span>
+                            <span style="color: #333; font-weight: 500;">${new Date(currentUser.created_at || Date.now()).toLocaleDateString('ar-SA')}</span>
+                        </p>
+                        <p style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #666;">🔐 طريقة الدخول:</span>
+                            <span style="color: #4285F4; font-weight: 500;">Google</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="signOut()" class="btn-submit" style="background: linear-gradient(135deg, #ff4444, #cc0000); width: 100%;">
+                        🚪 تسجيل الخروج
+                    </button>
                 </div>
             `;
         }
