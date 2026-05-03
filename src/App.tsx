@@ -1,4 +1,5 @@
 import React from 'react';
+import { ProductsProvider } from './contexts/ProductsContext';
 import { SafeAreaView, StatusBar } from 'react-native';
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './contexts/AuthContext';
@@ -12,14 +13,16 @@ const App = () => {
     <AuthProvider>
       <CartProvider>
         <CurrencyProvider>
-          <ThemeProvider>
-            <LanguageProvider>
-              <SafeAreaView style={{ flex: 1 }}>
-                <StatusBar barStyle="dark-content" />
-                <AppNavigator />
-              </SafeAreaView>
-            </LanguageProvider>
-          </ThemeProvider>
+          <ProductsProvider>
+            <ThemeProvider>
+              <LanguageProvider>
+                <SafeAreaView style={{ flex: 1 }}>
+                  <StatusBar barStyle="dark-content" />
+                  <AppNavigator />
+                </SafeAreaView>
+              </LanguageProvider>
+            </ThemeProvider>
+          </ProductsProvider>
         </CurrencyProvider>
       </CartProvider>
     </AuthProvider>

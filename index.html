@@ -179,11 +179,16 @@
         }
         .banner-dino {
             position: absolute;
-            font-size: 100px;
-            opacity: 0.2;
-            right: -20px;
-            bottom: -20px;
-            color: #FFD700;
+            right: 20px;
+            bottom: 20px;
+            opacity: 0.8;
+        }
+        .banner-dino img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
         /* Categories - Dark */
         .categories {
@@ -759,7 +764,9 @@
 
     <!-- Banner -->
     <div class="banner">
-        <div class="banner-dino">🦖</div>
+        <div class="banner-dino">
+            <img src="logo.png" alt="T-REX" onerror="this.style.display='none'; this.parentElement.innerHTML='🦖';" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #FFD700;">
+        </div>
         <div class="banner-content">
             <h2>عروض تي-ريكس</h2>
             <p>خصومات تصل إلى 50%</p>

@@ -10,6 +10,7 @@ import { DealsProvider } from './src/contexts/DealsContext';
 import { ReviewsProvider } from './src/contexts/ReviewsContext';
 import { AdvancedFiltersProvider } from './src/contexts/AdvancedFiltersContext';
 import { SearchProvider } from './src/contexts/SearchContext';
+import { ProductsProvider } from './src/contexts/ProductsContext';
 import { ActivityIndicator, View, Text, StyleSheet, Alert } from 'react-native';
 import { useAuth } from './src/contexts/AuthContext';
 // Initialize Firebase early to prevent "No Firebase App '[DEFAULT]' has been created" error
@@ -35,13 +36,15 @@ export default function App() {
                 <ReviewsProvider>
                   <AdvancedFiltersProvider>
                     <SearchProvider>
-                      <ThemeProvider>
-                        <LanguageProvider>
-                          <ToastProvider>
-                            <AppWithLoader />
-                          </ToastProvider>
-                        </LanguageProvider>
-                      </ThemeProvider>
+                      <ProductsProvider>
+                        <ThemeProvider>
+                          <LanguageProvider>
+                            <ToastProvider>
+                              <AppWithLoader />
+                            </ToastProvider>
+                          </LanguageProvider>
+                        </ThemeProvider>
+                      </ProductsProvider>
                     </SearchProvider>
                   </AdvancedFiltersProvider>
                 </ReviewsProvider>
