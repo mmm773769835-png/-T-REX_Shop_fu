@@ -1,14 +1,5 @@
-/**
- * Test Firebase Emulator Connection
- * 
- * This script tests the connection to Firebase emulators
- */
-
-// Import Firebase modules
-import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator } from 'firebase/storage';
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, getDocs } = require('firebase/firestore');
 
 // Firebase configuration
 const firebaseConfig = {
@@ -22,32 +13,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Get Firebase services
-const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-// Connect to emulators with updated ports
-console.log('Connecting to Firebase emulators...');
+// Test connection
+async function testConnection() {
+  try {
+    console.log('Testing Firebase connection...');
+    const querySnapshot = await getDocs(collection(db, "products"));
+    console.log(`Successfully connected! Found ${querySnapshot.size} products.`);
+  } catch (error) {
+    console.error('Firebase connection error:', error);
+  }
+}
 
-// Connect to Auth emulator
-connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-console.log('✅ Auth emulator connected');
-
-// Connect to Firestore emulator
-connectFirestoreEmulator(db, '127.0.0.1', 8081);
-console.log('✅ Firestore emulator connected');
-
-// Connect to Storage emulator
-connectStorageEmulator(storage, '127.0.0.1', 9200);
-console.log('✅ Storage emulator connected');
-
-console.log('\n🎉 All Firebase emulators connected successfully!');
-console.log('\n🔗 Emulator URLs:');
-console.log('   Auth: http://127.0.0.1:9099');
-console.log('   Firestore: http://127.0.0.1:8081');
-console.log('   Storage: http://127.0.0.1:9200');
-console.log('   Emulator UI: http://127.0.0.1:4002\n');
-
-export { auth, db, storage };
+testConnection();

@@ -1,33 +1,55 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Development mode - allow read/write for all
-    match /{document=**} {
-      allow read, write: if true;
+    // دالة مساعدة للتحقق من أن المستخدم مسجل دخول
+    function isLoggedIn() {
+      return request.auth != null;
     }
     
-    // قواعد خاصة للمنتجات
-    match /products/{product} {
-      // السماح للجميع بقراءة المنتجات
-      allow read: if true;
-      
-      // السماح بإنشاء وتحديث وحذف المنتجات للجميع في وضع التطوير
-      allow create, update, delete: if true;
+    // دالة للتحقق من أن المستخدم هو المدير
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email == 'mmm773769835@gmail.com';
     }
     
-    // قواعد خاصة للطلبات
-    match /orders/{order} {
-      // السماح بقراءة الطلبات للجميع في وضع التطوير
-      allow read: if true;
-      
-      // السماح بإنشاء وتحديث وحذف الطلبات للجميع في وضع التطوير
-      allow create, update, delete: if true;
+    // دالة للتحقق من أن المستخدم يملك البيانات
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
     
-    // قواعد خاصة لبيانات المستخدمين
+    // المنتجات - القراءة للجميع، الكتابة للمدير فقط
+    match /products/{productId} {
+      allow read: if true; // الجميع يقرأ
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    
+    // الطلبات - القراءة للمستخدمين المسجلين، الكتابة لمالك الطلب أو المدير
+    match /orders/{orderId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn() && 
+                       request.data.userId == request.auth.uid;
+      allow update: if isLoggedIn() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+    
+    // بيانات المستخدمين - كل مستخدم يقرأ ويكتب بياناته فقط
     match /users/{userId} {
-      // السماح بقراءة وتحديث وحذف بيانات المستخدمين للجميع في وضع التطوير
-      allow read, update, create, delete: if true;
+      allow read: if isLoggedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isLoggedIn() && isOwner(userId);
+      allow update: if isLoggedIn() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+    
+    // عناوين المستخدمين
+    match /addresses/{addressId} {
+      allow read: if isLoggedIn() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn() && 
+                       request.data.userId == request.auth.uid;
+      allow update, delete: if isLoggedIn() && 
+                               (resource.data.userId == request.auth.uid || isAdmin());
     }
   }
 }

@@ -15,14 +15,14 @@ const PRODUCTION_API_URL = "https://your-server.example.com";
 // إذا كان السيرفر محلياً - اختر أحد الخيارات:
 
 // الخيار 1: استخدم IP address (للهاتف الحقيقي أو Android Emulator)
-const LOCAL_IP = '127.0.0.1'; // ✅ IP address من شبكة WiFi
+const LOCAL_IP = '172.20.44.8'; // ✅ IP address من شبكة WiFi (محدث من ipconfig)
 const USE_IP = true; // ✅ مفعّل لاستخدام IP address
 
 // الخيار 2: استخدم localhost (للـ iOS Simulator أو إذا كان التطبيق على نفس الجهاز)
 const USE_LOCALHOST = false; // معطّل
 
 // المنفذ (Port)
-const PORT = 4001; // ✅ سيرفر rrst يعمل على المنفذ 4001
+const PORT = 3000; // ✅ سيرفر rrst يعمل على المنفذ 3000
 
 // ========================================
 // لا تعدّل ما بعد هذا السطر

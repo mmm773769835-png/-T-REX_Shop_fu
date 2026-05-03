@@ -1,0 +1,221 @@
+# ADMIN ENVIRONMENT SETUP - T-REX Shop
+# **IMPORTANT**: Copy this content to server/.env file
+
+# Admin Credentials
+ADMIN_EMAIL=mmm712874799@gmail.com
+ADMIN_HASH=$2b$10$xksSDHsv9imdMwSRFr2dDe.zF6V8C1tIUyhPU2wAVydPHpfd7RgmO
+
+# Server Configuration
+PORT=4001
+NODE_ENV=development
+
+# Firebase Configuration
+FIREBASE_PROJECT_ID=t-rex-5b17f
+FIREBASE_PRIVATE_KEY="your_private_key"
+FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@t-rex-5b17f.iam.gserviceaccount.com"
+
+# JWT Secret
+JWT_SECRET=t-rex-shop-secret-key-2026
+
+# Twilio Configuration (for SMS)
+TWILIO_ACCOUNT_SID=your_twilio_sid
+TWILIO_AUTH_TOKEN=your_twilio_token
+TWILIO_PHONE_NUMBER=your_twilio_phone
+
+# CORS Configuration
+ALLOWED_ORIGINS=http://localhost:19006,http://localhost:8084,exp://localhost:8081
+
+# Database Configuration
+MONGODB_URI=mongodb://localhost:27017/t-rex-shop
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_email_password
+
+# File Upload Configuration
+UPLOAD_PATH=./uploads
+MAX_FILE_SIZE=10485760
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=15
+RATE_LIMIT_MAX=100
+
+# Security
+BCRYPT_ROUNDS=10
+SESSION_SECRET=t-rex-shop-session-secret
+
+# Logging
+LOG_LEVEL=info
+LOG_FILE=./logs/app.log
+
+# Cache Configuration
+REDIS_URL=redis://localhost:6379
+CACHE_TTL=3600
+
+# API Configuration
+API_BASE_URL=http://localhost:4001
+API_VERSION=v1
+
+# Development Settings
+DEBUG=true
+MOCK_PAYMENTS=false
+MOCK_SMS=true
+
+# Production Settings (comment out in development)
+# SSL_ENABLED=true
+# SSL_CERT_PATH=./certs/server.crt
+# SSL_KEY_PATH=./certs/server.key
+
+# Monitoring
+SENTRY_DSN=your_sentry_dsn
+ANALYTICS_ENABLED=false
+
+# Backup Configuration
+BACKUP_ENABLED=true
+BACKUP_INTERVAL=24
+BACKUP_PATH=./backups
+
+# Feature Flags
+ENABLE_REGISTRATION=true
+ENABLE_SOCIAL_LOGIN=false
+ENABLE_MULTI_LANGUAGE=true
+ENABLE_CURRENCY_CONVERSION=false
+
+# Performance
+COMPRESSION_ENABLED=true
+MINIFICATION_ENABLED=true
+CACHING_ENABLED=true
+
+# Security Headers
+HELMET_ENABLED=true
+CORS_ENABLED=true
+CSRF_ENABLED=false
+
+# Database Connection Pool
+DB_POOL_MIN=5
+DB_POOL_MAX=20
+
+# Queue Configuration
+QUEUE_ENABLED=true
+QUEUE_CONCURRENCY=10
+
+# WebSocket Configuration
+WEBSOCKET_ENABLED=true
+WEBSOCKET_PORT=4002
+
+# Search Configuration
+SEARCH_ENABLED=true
+SEARCH_INDEX=products
+
+# Notification Configuration
+NOTIFICATION_ENABLED=true
+NOTIFICATION_QUEUE=notifications
+
+# Payment Configuration
+PAYMENT_PROVIDERS=stripe,paypal
+CURRENCY=USD
+
+# Shipping Configuration
+SHIPPING_PROVIDERS=ups,fedex,dhl
+DEFAULT_SHIPPING=standard
+
+# Tax Configuration
+TAX_ENABLED=true
+TAX_RATE=0.1
+
+# Inventory Configuration
+INVENTORY_ENABLED=true
+LOW_STOCK_THRESHOLD=10
+
+# Analytics Configuration
+ANALYTICS_PROVIDER=google
+TRACKING_ID=your_tracking_id
+
+# Social Media Configuration
+SOCIAL_SHARE_ENABLED=true
+SOCIAL_PLATFORMS=facebook,twitter,instagram
+
+# SEO Configuration
+SEO_ENABLED=true
+META_DESCRIPTION=T-REX Shop - Your Premium Shopping Destination
+META_KEYWORDS=t-rex,shop,premium,quality
+
+# CDN Configuration
+CDN_ENABLED=false
+CDN_URL=https://cdn.trexshop.com
+
+# Cloud Storage Configuration
+CLOUD_STORAGE_ENABLED=false
+CLOUD_PROVIDER=aws
+CLOUD_BUCKET=trex-shop-assets
+
+# API Rate Limiting
+API_RATE_LIMIT=1000
+API_RATE_WINDOW=3600
+
+# Maintenance Mode
+MAINTENANCE_MODE=false
+MAINTENANCE_MESSAGE=Site under maintenance. Please check back soon.
+
+# Feature Toggles
+FEATURE_NEW_PRODUCTS=true
+FEATURE_SALE_ITEMS=true
+FEATURE_FEATURED_PRODUCTS=true
+FEATURE_RECENTLY_VIEWED=true
+FEATURE_WISHLIST=true
+FEATURE_COMPARISON=false
+FEATURE_REVIEWS=true
+FEATURE_RATINGS=true
+FEATURE_RECOMMENDATIONS=true
+
+# Email Templates
+EMAIL_TEMPLATES_PATH=./templates/emails
+EMAIL_FROM_NAME=T-REX Shop
+EMAIL_FROM_EMAIL=noreply@trexshop.com
+
+# SMS Templates
+SMS_TEMPLATES_PATH=./templates/sms
+SMS_FROM_NAME=TREXSHOP
+
+# Push Notifications
+PUSH_NOTIFICATIONS_ENABLED=false
+PUSH_VAPID_PUBLIC_KEY=your_vapid_public_key
+PUSH_VAPID_PRIVATE_KEY=your_vapid_private_key
+
+# Webhooks
+WEBHOOK_ENABLED=false
+WEBHOOK_URL=https://webhook.trexshop.com
+WEBHOOK_SECRET=webhook_secret_key
+
+# Third-party Integrations
+GOOGLE_ANALYTICS_ID=your_ga_id
+FACEBOOK_PIXEL_ID=your_fb_pixel_id
+TWITTER_PIXEL_ID=your_twitter_pixel_id
+
+# Custom Configuration
+CUSTOM_LOGO_URL=https://trexshop.com/logo.png
+CUSTOM_FAVICON_URL=https://trexshop.com/favicon.ico
+CUSTOM_THEME_COLOR=#FFD700
+
+# Development Tools
+HOT_RELOAD=true
+LIVE_RELOAD=true
+DEBUG_SQL=false
+PERFORMANCE_MONITORING=true
+
+# Testing Configuration
+TEST_DATABASE_URL=mongodb://localhost:27017/t-rex-shop-test
+TEST_EMAIL_DISABLED=true
+TEST_SMS_DISABLED=true
+
+# Production Overrides (uncomment for production)
+# NODE_ENV=production
+# DEBUG=false
+# LOG_LEVEL=warn
+# MOCK_PAYMENTS=false
+# MOCK_SMS=false
+# SSL_ENABLED=true
+# CDN_ENABLED=true
+# CLOUD_STORAGE_ENABLED=true

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged } from '../../services/FirebaseAuthService';
+import { authService } from '../services/SupabaseService';
 
 // Define types
 interface User {
@@ -26,23 +26,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged((firebaseUser: any) => {
-      if (firebaseUser) {
+    console.log('[DEBUG] AuthContext: Setting up auth state listener');
+    const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
+      console.log('[DEBUG] AuthContext: Auth state changed', event, session);
+      if (session?.user) {
         setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          phoneNumber: firebaseUser.phoneNumber,
+          uid: session.user.id,
+          email: session.user.email || null,
+          displayName: session.user.user_metadata?.full_name || null,
+          phoneNumber: session.user.phone || null,
           // Add any other user properties you want to track
         });
       } else {
         setUser(null);
       }
       setLoading(false);
+      console.log('[DEBUG] AuthContext: Loading set to false');
     });
 
     // Cleanup subscription on unmount
-    return () => unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const value = {
@@ -53,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

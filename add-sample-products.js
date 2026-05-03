@@ -1,4 +1,3 @@
-// Standalone script to add sample products to Firestore
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, addDoc } = require('firebase/firestore');
 
@@ -16,8 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Demo products
-const demoProducts = [
+// Sample products
+const sampleProducts = [
   {
     name: "هاتف ذكي",
     price: 299.99,
@@ -26,7 +25,7 @@ const demoProducts = [
     attribute: "جديد",
     paymentMethod: "cash",
     imageUrl: "https://via.placeholder.com/300x300/4A90E2/FFFFFF?text=📱",
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     name: "قميص رياضي",
@@ -36,7 +35,7 @@ const demoProducts = [
     attribute: "جديد",
     paymentMethod: "card",
     imageUrl: "https://via.placeholder.com/300x300/50C878/FFFFFF?text=👕",
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     name: "كتاب برمجة",
@@ -46,46 +45,24 @@ const demoProducts = [
     attribute: "جديد",
     paymentMethod: "transfer",
     imageUrl: "https://via.placeholder.com/300x300/FF6B6B/FFFFFF?text=📚",
-    createdAt: new Date(),
-  },
-  {
-    name: "سماعة لاسلكية",
-    price: 89.99,
-    description: "سماعة بلوتوث عالية الجودة مع إلغاء الضوضاء",
-    category: "إلكترونيات",
-    attribute: "مميز",
-    paymentMethod: "cash",
-    imageUrl: "https://via.placeholder.com/300x300/9B59B6/FFFFFF?text=🎧",
-    createdAt: new Date(),
-  },
-  {
-    name: "حقيبة سفر",
-    price: 49.99,
-    description: "حقيبة سفر كبيرة بجودة عالية ومتينة",
-    category: "منزلية",
-    attribute: "جديد",
-    paymentMethod: "card",
-    imageUrl: "https://via.placeholder.com/300x300/F39C12/FFFFFF?text=👜",
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   }
 ];
 
+// Add sample products
 async function addSampleProducts() {
-  console.log("Adding sample products to Firestore...");
-  
   try {
-    for (const product of demoProducts) {
+    console.log("Adding sample products...");
+    
+    for (const product of sampleProducts) {
       const docRef = await addDoc(collection(db, "products"), product);
-      console.log(`✅ Added product: ${product.name} with ID: ${docRef.id}`);
+      console.log(`Added product: ${product.name} with ID: ${docRef.id}`);
     }
     
-    console.log("✅ All sample products added successfully!");
-    process.exit(0);
+    console.log("All sample products added successfully!");
   } catch (error) {
-    console.error("❌ Error adding sample products:", error);
-    process.exit(1);
+    console.error("Error adding sample products:", error);
   }
 }
 
-// Run the function
 addSampleProducts();

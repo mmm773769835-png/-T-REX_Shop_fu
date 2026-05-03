@@ -1,21 +1,18 @@
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendSignInLinkToEmail, isSignInWithEmailLink, updatePassword, sendPasswordResetEmail, signInWithPhoneNumber, RecaptchaVerifier, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { initializeApp, getApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc, connectFirestoreEmulator, collection, addDoc } from 'firebase/firestore';
-import { connectStorageEmulator, getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getFirestore, doc, setDoc, getDoc, connectFirestoreEmulator, collection, addDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { connectStorageEmulator, getStorage, ref, uploadBytes, uploadString, getDownloadURL } from 'firebase/storage';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import firebaseConfig from '../src/config/firebaseConfig';
 
-// Firebase configuration (same as in HomeV2.tsx)
-const firebaseConfig = {
-  apiKey: "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw",
-  authDomain: "t-rex-5b17f.firebaseapp.com",
-  projectId: "t-rex-5b17f",
-  storageBucket: "t-rex-5b17f.firebasestorage.app",
-  messagingSenderId: "37814615065",
-  appId: "1:37814615065:android:3b39b3622c8fbc0358fe88",
-};
+// Simple Firebase initialization
+let app;
+try {
+  app = getApp();
+} catch (error) {
+  app = initializeApp(firebaseConfig);
+}
 
-// Initialize Firebase with AsyncStorage persistence
-const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
@@ -23,17 +20,18 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Connect to emulators in development mode with updated ports
-if (typeof __DEV__ !== 'undefined' && __DEV__) {
-  // Connect to Firestore emulator with new port
-  connectFirestoreEmulator(db, '127.0.0.1', 8081);
-  
-  // Connect to Storage emulator with new port
-  connectStorageEmulator(storage, '127.0.0.1', 9200);
-  
-  console.log('🔌 Connected to Firebase emulators');
-  console.log('📚 Firestore Emulator: 127.0.0.1:8081');
-  console.log('💾 Storage Emulator: 127.0.0.1:9200');
-}
+// Disabled due to Java version requirement
+// if (typeof __DEV__ !== 'undefined' && __DEV__) {
+//   // Connect to Firestore emulator with new port (avoiding Expo port conflict)
+//   connectFirestoreEmulator(db, '127.0.0.1', 8082);
+//   
+//   // Connect to Storage emulator with new port
+//   connectStorageEmulator(storage, '127.0.0.1', 9200);
+//   
+//   console.log('🔌 Connected to Firebase emulators');
+//   console.log('📚 Firestore Emulator: 127.0.0.1:8082');
+//   console.log('💾 Storage Emulator: 127.0.0.1:9200');
+// }
 
 /**
  * Sign in with email and password
@@ -236,13 +234,17 @@ export const confirmPhoneSignIn = async (confirmationResult, code) => {
 export const signOutUser = async () => {
   try {
     await signOut(auth);
+    
+    // Clear remembered credentials
+    await ReactNativeAsyncStorage.removeItem('rememberedEmail');
+    await ReactNativeAsyncStorage.removeItem('rememberedPassword');
+    
     return { success: true, message: '✅ تم تسجيل الخروج بنجاح' };
   } catch (error) {
     console.error('❌ خطأ أثناء تسجيل الخروج:', error.message);
     return { success: false, message: 'فشل تسجيل الخروج. يرجى المحاولة مرة أخرى' };
   }
 };
-
 /**
  * Send password reset email
  * @param {string} email - User's email
@@ -307,8 +309,14 @@ export {
   doc,
   setDoc,
   getDoc,
+  deleteDoc,
+  updateDoc,
+  onSnapshot,
+  query,
+  orderBy,
   // Storage functions
   ref,
   uploadBytes,
+  uploadString,
   getDownloadURL
 };

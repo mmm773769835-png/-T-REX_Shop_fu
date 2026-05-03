@@ -67,3 +67,9 @@ JWT_SECRET=trex_shop_secret_key_change_in_production_2024
 
 
 
+
+
+
+
+
+

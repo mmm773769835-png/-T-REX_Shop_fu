@@ -1,0 +1,51 @@
+═══════════════════════════════════════════════════
+  Firebase App Distribution - مرجع سريع
+═══════════════════════════════════════════════════
+
+📍 معلومات المشروع:
+   Project ID: t-rex-5b17f
+   App ID: 1:37814615065:android:3b39b3622c8fbc0358fe88
+   Package: com.trexshop.app
+
+═══════════════════════════════════════════════════
+  الخطوات السريعة
+═══════════════════════════════════════════════════
+
+1️⃣  تثبيت Firebase CLI:
+   npm install -g firebase-tools
+
+2️⃣  تسجيل الدخول:
+   firebase login
+
+3️⃣  تفعيل App Distribution:
+   https://console.firebase.google.com/project/t-rex-5b17f/appdistribution
+
+4️⃣  تشغيل السكريبت:
+   .\بناء-ورفع-فيرباس.bat
+
+═══════════════════════════════════════════════════
+  الأوامر اليدوية
+═══════════════════════════════════════════════════
+
+بناء APK:
+   cd android
+   .\gradlew assembleRelease
+   cd ..
+
+رفع إلى Firebase:
+   firebase appdistribution:distribute android\app\build\outputs\apk\release\app-release.apk --app 1:37814615065:android:3b39b3622c8fbc0358fe88 --groups testers --release-notes "إصدار جديد"
+
+═══════════════════════════════════════════════════
+  إدارة المختبرين
+═══════════════════════════════════════════════════
+
+إنشاء مجموعة:
+   firebase appdistribution:groups:create testers
+
+إضافة مختبر:
+   firebase appdistribution:testers:add testers email@example.com
+
+أو عبر Console:
+   https://console.firebase.google.com/project/t-rex-5b17f/appdistribution/testers-and-groups
+
+═══════════════════════════════════════════════════

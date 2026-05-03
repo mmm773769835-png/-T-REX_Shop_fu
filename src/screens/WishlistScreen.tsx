@@ -1,57 +1,49 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../shared/components/Button";
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  description: string;
-}
+import { ThemeContext } from '../contexts/ThemeContext';
+import { LanguageContext } from '../contexts/LanguageContext';
+import { useWishList } from '../contexts/WishListContext';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { useCart } from '../contexts/CartContext';
+import { sanitizeImageUrl } from '../utils/imageUtils';
 
 const WishlistScreen = ({ navigation }: any) => {
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([
-    {
-      id: "1",
-      name: "هاتف ذكي",
-      price: 299.99,
-      imageUrl: "https://via.placeholder.com/300x300/4A90E2/FFFFFF?text=📱",
-      description: "هاتف حديث بكاميرا عالية الدقة"
-    },
-    {
-      id: "2",
-      name: "سماعة لاسلكية",
-      price: 89.99,
-      imageUrl: "https://via.placeholder.com/300x300/50C878/FFFFFF?text=🎧",
-      description: "سماعة بلوتوث عالية الجودة"
-    }
-  ]);
+  const { isDarkMode, colors } = useContext(ThemeContext);
+  const { language } = useContext(LanguageContext);
+  const { formatPrice } = useCurrency();
+  const { state, removeFromWishList } = useWishList();
+  const { addToCart } = useCart();
+
+  const styles = getStyles(isDarkMode, colors);
 
   const handleRemoveFromWishlist = (id: string) => {
     Alert.alert(
-      "إزالة من قائمة الرغبات",
-      "هل أنت متأكد من إزالة هذا المنتج من قائمة الرغبات؟",
+      language === "ar" ? "إزالة من قائمة الأمنيات" : "Remove from Wishlist",
+      language === "ar" ? "هل أنت متأكد من إزالة هذا المنتج من قائمة الأمنيات؟" : "Are you sure you want to remove this product from wishlist?",
       [
-        { text: "إلغاء", style: "cancel" },
+        { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
         {
-          text: "إزالة",
+          text: language === "ar" ? "إزالة" : "Remove",
           style: "destructive",
           onPress: () => {
-            setWishlistItems(wishlistItems.filter(item => item.id !== id));
+            removeFromWishList(id);
           }
         }
       ]
     );
   };
 
-  const handleAddToCart = (item: WishlistItem) => {
-    Alert.alert("✅", `تم إضافة ${item.name} إلى السلة`);
+  const handleAddToCart = (item: any) => {
+    addToCart(item);
+    Alert.alert(
+      language === "ar" ? "✅ تم الإضافة" : "✅ Added",
+      language === "ar" ? `تم إضافة ${item.name} إلى السلة` : `Added ${item.name} to cart`
+    );
   };
 
-  const handleViewProduct = (item: WishlistItem) => {
-    // @ts-ignore
+  const handleViewProduct = (item: any) => {
     navigation.navigate('ProductDetails', { product: item });
   };
 
@@ -59,22 +51,27 @@ const WishlistScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={isDarkMode ? "#fff" : "#000"} />
         </TouchableOpacity>
-        <Text style={styles.title}>❤️ قائمة الرغبات</Text>
+        <Text style={styles.title}>
+          {language === "ar" ? "❤️ قائمة الأمنيات" : "❤️ Wishlist"}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
 
-      {wishlistItems.length === 0 ? (
+      {state.items.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="heart-outline" size={80} color="#ccc" />
-          <Text style={styles.emptyTitle}>قائمة الرغبات فارغة</Text>
-          <Text style={styles.emptyText}>ابدأ بإضافة المنتجات التي تعجبك</Text>
+          <Ionicons name="heart-outline" size={80} color={isDarkMode ? "#666" : "#ccc"} />
+          <Text style={styles.emptyTitle}>
+            {language === "ar" ? "قائمة الأمنيات فارغة" : "Wishlist is empty"}
+          </Text>
+          <Text style={styles.emptyText}>
+            {language === "ar" ? "ابدأ بإضافة المنتجات التي تعجبك" : "Start adding products you like"}
+          </Text>
           <View style={styles.browseButton}>
             <Button 
-              title="تصفح المنتجات" 
+              title={language === "ar" ? "تصفح المنتجات" : "Browse Products"} 
               onPress={() => {
-                // @ts-ignore
                 navigation.navigate("MainTabs");
               }}
             />
@@ -82,10 +79,10 @@ const WishlistScreen = ({ navigation }: any) => {
         </View>
       ) : (
         <ScrollView style={styles.content}>
-          {wishlistItems.map((item) => (
+          {state.items.map((item: any) => (
             <View key={item.id} style={styles.wishlistItem}>
               <TouchableOpacity onPress={() => handleViewProduct(item)}>
-                <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
+                <Image source={{ uri: sanitizeImageUrl((item.images && item.images.length > 0) ? item.images[0] : item.imageUrl) }} style={styles.itemImage} />
               </TouchableOpacity>
               <View style={styles.itemDetails}>
                 <TouchableOpacity onPress={() => handleViewProduct(item)}>
@@ -95,7 +92,7 @@ const WishlistScreen = ({ navigation }: any) => {
                   </Text>
                 </TouchableOpacity>
                 <View style={styles.itemFooter}>
-                  <Text style={styles.itemPrice}>{item.price.toFixed(2)} ر.س</Text>
+                  <Text style={styles.itemPrice}>{formatPrice(item.price, (item.currency || 'YER') as any)}</Text>
                   <View style={styles.itemActions}>
                     <TouchableOpacity 
                       style={styles.actionButton}
@@ -120,17 +117,17 @@ const WishlistScreen = ({ navigation }: any) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.header,
     elevation: 2,
   },
   backButton: {
@@ -139,6 +136,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -155,10 +153,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
+    color: colors.text,
   },
   emptyText: {
     fontSize: 16,
-    color: "#666",
+    color: colors.textSecondary,
     marginBottom: 32,
     textAlign: "center",
   },
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
   },
   wishlistItem: {
     flexDirection: "row",
-    backgroundColor: "#f8f8f8",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -186,10 +185,11 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: "bold",
+    color: colors.text,
   },
   itemDescription: {
     fontSize: 14,
-    color: "#666",
+    color: colors.textSecondary,
     marginVertical: 4,
   },
   itemFooter: {

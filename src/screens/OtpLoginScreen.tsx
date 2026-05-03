@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, Alert, Image, TouchableOpacity, ScrollView } from "react-native";
 import Input from "../shared/components/Input";
 import Button from "../shared/components/Button";
-import { signInWithPhone, confirmPhoneSignIn } from "../../services/FirebaseAuthService";
-import { RecaptchaVerifier } from "firebase/auth";
+import { authService } from '../services/SupabaseService';
+import { getDefaultLogoImage } from "../utils/imageUtils";
+import { LanguageContext } from '../contexts/LanguageContext';
 
 const OtpLoginScreen = ({ navigation }: any) => {
+  const { language } = useContext(LanguageContext);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1); // 1: enter phone, 2: enter otp
@@ -24,13 +26,13 @@ const OtpLoginScreen = ({ navigation }: any) => {
 
   const handleSendOtp = async () => {
     if (!phone) {
-      Alert.alert("خطأ", "يرجى إدخال رقم الهاتف");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رقم الهاتف" : "Please enter phone number");
       return;
     }
 
     // Simple phone validation
     if (phone.length < 10) {
-      Alert.alert("خطأ", "يرجى إدخال رقم هاتف صحيح");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رقم هاتف صحيح" : "Please enter a valid phone number");
       return;
     }
 
@@ -39,15 +41,15 @@ const OtpLoginScreen = ({ navigation }: any) => {
       // Create recaptcha verifier
       // Note: In a real app, you would need to implement recaptcha properly
       // For now, we'll simulate the process
-      Alert.alert("معلومات", "في تطبيق حقيقي، سيتم إرسال رمز التحقق عبر رسالة نصية. نحن نحاكي هذا السلوك الآن.");
+      Alert.alert(language === 'ar' ? "معلومات" : "Info", language === 'ar' ? "في تطبيق حقيقي، سيتم إرسال رمز التحقق عبر رسالة نصية. نحن نحاكي هذا السلوك الآن." : "In a real app, verification code would be sent via SMS. We're simulating this behavior now.");
       
       // Simulate successful OTP sending
       setStep(2);
       setCountdown(30); // 30 seconds cooldown
-      Alert.alert("نجاح", "تم إرسال رمز التحقق إلى هاتفك");
+      Alert.alert(language === 'ar' ? "نجاح" : "Success", language === 'ar' ? "تم إرسال رمز التحقق إلى هاتفك" : "Verification code sent to your phone");
     } catch (error: any) {
       console.error("OTP Error:", error);
-      Alert.alert("خطأ", error.message || "فشل في إرسال رمز التحقق. يرجى التحقق من الاتصال بالإنترنت");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", error.message || (language === 'ar' ? "فشل في إرسال رمز التحقق. يرجى التحقق من الاتصال بالإنترنت" : "Failed to send verification code. Please check your internet connection"));
     } finally {
       setLoading(false);
     }
@@ -55,13 +57,13 @@ const OtpLoginScreen = ({ navigation }: any) => {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      Alert.alert("خطأ", "يرجى إدخال رمز التحقق");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رمز التحقق" : "Please enter verification code");
       return;
     }
 
     // Validate OTP format
     if (otp.length !== 6 || !/^[0-9]+$/.test(otp)) {
-      Alert.alert("خطأ", "يرجى إدخال رمز تحقق صحيح مكون من 6 أرقام");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رمز تحقق صحيح مكون من 6 أرقام" : "Please enter a valid 6-digit verification code");
       return;
     }
 
@@ -69,12 +71,12 @@ const OtpLoginScreen = ({ navigation }: any) => {
     try {
       // In a real implementation, we would use Firebase phone auth
       // For now, we'll simulate successful verification
-      Alert.alert("نجاح", "تم تسجيل الدخول بنجاح");
+      Alert.alert(language === 'ar' ? "نجاح" : "Success", language === 'ar' ? "تم تسجيل الدخول بنجاح" : "Login successful");
       // @ts-ignore
       navigation.navigate("MainTabs", { loggedIn: true });
     } catch (error: any) {
       console.error("Verify Error:", error);
-      Alert.alert("خطأ", error.message || "رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", error.message || (language === 'ar' ? "رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى" : "Invalid verification code. Please try again"));
     } finally {
       setLoading(false);
     }
@@ -92,7 +94,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
 
   const handleResendOtp = () => {
     if (countdown > 0) {
-      Alert.alert("انتظر", `يرجى الانتظار ${countdown} ثانية قبل إعادة إرسال الرمز`);
+      Alert.alert(language === 'ar' ? "انتظر" : "Wait", language === 'ar' ? `يرجى الانتظار ${countdown} ثانية قبل إعادة إرسال الرمز` : `Please wait ${countdown} seconds before resending`);
       return;
     }
     handleSendOtp();
@@ -102,12 +104,12 @@ const OtpLoginScreen = ({ navigation }: any) => {
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
         <Image 
-          source={{ uri: "https://via.placeholder.com/100/007bff/FFFFFF?text=TREX" }} 
+          source={{ uri: getDefaultLogoImage() }} 
           style={styles.logo}
         />
-        <Text style={styles.title}>مرحباً بك في متجر T-REX</Text>
+        <Text style={styles.title}>{language === 'ar' ? "مرحباً بك في متجر T-REX" : "Welcome to T-REX Store"}</Text>
         <Text style={styles.subtitle}>
-          {step === 1 ? "أدخل رقم هاتفك لتسجيل الدخول" : "أدخل رمز التحقق"}
+          {step === 1 ? (language === 'ar' ? "أدخل رقم هاتفك لتسجيل الدخول" : "Enter your phone number to login") : (language === 'ar' ? "أدخل رمز التحقق" : "Enter verification code")}
         </Text>
       </View>
 
@@ -115,8 +117,8 @@ const OtpLoginScreen = ({ navigation }: any) => {
         {step === 1 ? (
           <>
             <Input
-              label="رقم الهاتف"
-              placeholder="أدخل رقم هاتفك"
+              label={language === 'ar' ? "رقم الهاتف" : "Phone Number"}
+              placeholder={language === 'ar' ? "أدخل رقم هاتفك" : "Enter your phone number"}
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -125,14 +127,14 @@ const OtpLoginScreen = ({ navigation }: any) => {
             
             {/* Verification Method Selection */}
             <View style={styles.methodSelection}>
-              <Text style={styles.methodLabel}>طريقة التحقق:</Text>
+              <Text style={styles.methodLabel}>{language === 'ar' ? "طريقة التحقق:" : "Verification Method:"}</Text>
               <View style={styles.methodButtons}>
                 <TouchableOpacity 
                   style={[styles.methodButton, styles.selectedMethodButton]}
                   onPress={() => {}}
                 >
                   <Text style={[styles.methodButtonText, styles.selectedMethodButtonText]}>
-                    رسالة نصية
+                    {language === 'ar' ? "رسالة نصية" : "SMS"}
                   </Text>
                 </TouchableOpacity>
                 
@@ -141,7 +143,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
                   onPress={() => {}}
                 >
                   <Text style={[styles.methodButtonText]}>
-                    واتساب
+                    {language === 'ar' ? "واتساب" : "WhatsApp"}
                   </Text>
                 </TouchableOpacity>
                 
@@ -150,7 +152,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
                   onPress={() => {}}
                 >
                   <Text style={[styles.methodButtonText]}>
-                    كلاهما
+                    {language === 'ar' ? "كلاهما" : "Both"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -158,7 +160,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
 
             <View style={styles.loginButton}>
               <Button 
-                title={loading ? "جاري الإرسال..." : "إرسال رمز التحقق"} 
+                title={loading ? (language === 'ar' ? "جاري الإرسال..." : "Sending...") : (language === 'ar' ? "إرسال رمز التحقق" : "Send Verification Code")} 
                 onPress={handleSendOtp} 
                 disabled={loading}
                 size="large"
@@ -168,7 +170,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
             
             <View style={styles.skipButtonContainer}>
               <Button 
-                title="⏭️ تخطي (دخول كضيف)" 
+                title={language === 'ar' ? "⏭️ تخطي (دخول كضيف)" : "⏭️ Skip (Guest Login)"} 
                 onPress={handleSkip} 
                 variant="outline"
                 size="medium"
@@ -179,8 +181,8 @@ const OtpLoginScreen = ({ navigation }: any) => {
         ) : (
           <>
             <Input
-              label="رمز التحقق"
-              placeholder="أدخل الرمز المكون من 6 أرقام"
+              label={language === 'ar' ? "رمز التحقق" : "Verification Code"}
+              placeholder={language === 'ar' ? "أدخل الرمز المكون من 6 أرقام" : "Enter 6-digit code"}
               value={otp}
               onChangeText={(text) => {
                 // Limit to 6 characters and only numbers
@@ -194,7 +196,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
 
             <View style={styles.loginButton}>
               <Button 
-                title={loading ? "جاري التحقق..." : "تحقق من الرمز"} 
+                title={loading ? (language === 'ar' ? "جاري التحقق..." : "Verifying...") : (language === 'ar' ? "تحقق من الرمز" : "Verify Code")} 
                 onPress={handleVerifyOtp} 
                 disabled={loading}
                 size="large"
@@ -205,7 +207,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
             <View style={styles.resendContainer}>
               <View style={styles.resendButtonWrapper}>
                 <Button 
-                  title="تغيير رقم الهاتف"
+                  title={language === 'ar' ? "تغيير رقم الهاتف" : "Change Phone Number"}
                   onPress={() => setStep(1)}
                   variant="outline"
                   disabled={loading}
@@ -216,7 +218,7 @@ const OtpLoginScreen = ({ navigation }: any) => {
               
               <View style={styles.resendButtonWrapper}>
                 <Button 
-                  title={countdown > 0 ? `إعادة الإرسال (${countdown})` : "إعادة إرسال الرمز"}
+                  title={countdown > 0 ? (language === 'ar' ? `إعادة الإرسال (${countdown})` : `Resend (${countdown})`) : (language === 'ar' ? "إعادة إرسال الرمز" : "Resend Code")}
                   onPress={handleResendOtp}
                   variant="outline"
                   disabled={loading || countdown > 0}
@@ -229,10 +231,10 @@ const OtpLoginScreen = ({ navigation }: any) => {
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>ليس لديك حساب؟</Text>
+          <Text style={styles.footerText}>{language === 'ar' ? "ليس لديك حساب؟" : "Don't have an account?"}</Text>
           <View style={styles.registerButton}>
             <Button 
-              title="إنشاء حساب جديد" 
+              title={language === 'ar' ? "إنشاء حساب جديد" : "Create New Account"} 
               onPress={handleRegister} 
               variant="outline"
               size="large"

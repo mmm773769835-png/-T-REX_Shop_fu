@@ -1,57 +1,69 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw",
-  authDomain: "t-rex-5b17f.firebaseapp.com",
-  projectId: "t-rex-5b17f",
-  storageBucket: "t-rex-5b17f.firebasestorage.app",
-  messagingSenderId: "37814615065",
-  appId: "1:37814615065:android:3b39b3622c8fbc0358fe88",
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+import { getDefaultUserImage } from "../utils/imageUtils";
+import { LanguageContext } from '../contexts/LanguageContext';
+import { dbService, storageService } from '../services/SupabaseService';
 
 const EditProfile = ({ navigation, route }: any) => {
+  const { language } = useContext(LanguageContext);
   const [name, setName] = useState(route.params?.name || "");
   const [phone, setPhone] = useState(route.params?.phone || "");
   const [image, setImage] = useState(route.params?.photoURL || null);
   const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (!permissionResult.granted) {
+      Alert.alert("❌", language === 'ar' ? "نحتاج إلى إذن للوصول إلى المعرض" : "We need permission to access the gallery");
+      return;
+    }
+    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
     });
-    if (!result.canceled) setImage(result.assets[0].uri);
+    
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
   };
 
   const handleSave = async () => {
-    if (!name || !phone) return Alert.alert("⚠️", "الرجاء إدخال الاسم ورقم الهاتف");
+    if (!name || !phone) return Alert.alert("⚠️", language === 'ar' ? "الرجاء إدخال الاسم ورقم الهاتف" : "Please enter name and phone number");
 
     try {
       setLoading(true);
       let photoURL = image;
       if (image && !image.startsWith("https")) {
+        // التحقق من نوع الصورة لتجنب خطأ ArrayBuffer
         const response = await fetch(image);
         const blob = await response.blob();
-        const fileRef = ref(storage, `profiles/${phone}.jpg`);
-        await uploadBytes(fileRef, blob);
-        photoURL = await getDownloadURL(fileRef);
+
+        // رفع الصورة إلى Supabase Storage
+        const filename = `profiles/${phone}.jpg`;
+        const { data, error } = await storageService.upload('profile-images', filename, blob);
+
+        if (error) {
+          throw error;
+        }
+
+        photoURL = storageService.getPublicUrl('profile-images', filename);
       }
 
-      await setDoc(doc(db, "users", phone), { name, phone, photoURL });
-      Alert.alert("✅ تم تحديث بيانات الحساب بنجاح");
+      // حفظ بيانات المستخدم في Supabase
+      const { error } = await dbService.add('users', { name, phone, photo_url: photoURL });
+
+      if (error) {
+        throw error;
+      }
+
+      Alert.alert("✅", language === 'ar' ? "تم تحديث بيانات الحساب بنجاح" : "Account data updated successfully");
       navigation.goBack();
     } catch (error) {
       console.error(error);
-      Alert.alert("❌ حدث خطأ أثناء حفظ البيانات");
+      Alert.alert("❌", language === 'ar' ? "حدث خطأ أثناء حفظ البيانات" : "An error occurred while saving data");
     } finally {
       setLoading(false);
     }
@@ -59,14 +71,14 @@ const EditProfile = ({ navigation, route }: any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>✏️ تعديل الحساب</Text>
+      <Text style={styles.title}>{language === 'ar' ? '✏️ تعديل الحساب' : '✏️ Edit Account'}</Text>
 
       <TouchableOpacity onPress={pickImage}>
         <Image
           source={
             image
               ? { uri: image }
-              : { uri: "https://via.placeholder.com/150/007bff/FFFFFF?text=User" }
+              : { uri: getDefaultUserImage() }
           }
           style={styles.profileImage}
         />
@@ -74,20 +86,20 @@ const EditProfile = ({ navigation, route }: any) => {
 
       <TextInput
         style={styles.input}
-        placeholder="الاسم الكامل"
+        placeholder={language === 'ar' ? "الاسم الكامل" : "Full Name"}
         value={name}
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
-        placeholder="رقم الهاتف"
+        placeholder={language === 'ar' ? "رقم الهاتف" : "Phone Number"}
         keyboardType="phone-pad"
         value={phone}
         onChangeText={setPhone}
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
-        <Text style={styles.saveText}>{loading ? "⏳ جاري الحفظ..." : "💾 حفظ التغييرات"}</Text>
+        <Text style={styles.saveText}>{loading ? (language === 'ar' ? "⏳ جاري الحفظ..." : "⏳ Saving...") : (language === 'ar' ? "💾 حفظ التغييرات" : "💾 Save Changes")}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -1,5 +1,8 @@
 {
   "expo": {
+    "experiments": {
+      "typedRoutes": true
+    },
     "name": "T-REX Shop",
     "slug": "trex-shop",
     "owner": "trexshop",
@@ -7,8 +10,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "trexshop",
+    "web": {
+      "port": 8082
+    },
+    "devServer": {
+      "port": 8082
+    },
     "userInterfaceStyle": "automatic",
-    "plugins": [],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
 
     "splash": {
       "image": "./assets/splash.png",
@@ -22,12 +34,24 @@
 
     "ios": {
       "bundleIdentifier": "com.trexshop.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:trex-shop.com"
+      ],
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "trexshop"
+            ]
+          }
+        ]
+      }
     },
 
     "android": {
       "package": "com.trexshop.app",
-      "versionCode": 2,
+
 
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -36,7 +60,10 @@
 
       "permissions": [
         "INTERNET",
-        "VIBRATE"
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
       ],
 
       "intentFilters": [
@@ -62,18 +89,16 @@
         "projectId": "501b6d0b-9352-489d-8a74-57b84e1393bd"
       },
       "firebase": {
-        "apiKey": "YOUR_API_KEY",
+        "apiKey": "AIzaSyBvak56MOiHl2hr_ix36gsDU6u5dFdIEkw",
         "authDomain": "t-rex-5b17f.firebaseapp.com",
         "projectId": "t-rex-5b17f",
-        "storageBucket": "t-rex-5b17f.appspot.com",
+        "storageBucket": "t-rex-5b17f.firebasestorage.app",
         "messagingSenderId": "37814615065",
-        "appId": "YOUR_APP_ID",
-        "measurementId": "YOUR_MEASUREMENT_ID"
+        "appId": "1:37814615065:android:3b39b3622c8fbc0358fe88",
+        "measurementId": ""
       }
-    },
-    
-    "packagerOpts": {
-      "port": 8083
     }
+    
+
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import {
   View,
   Text,
@@ -15,15 +15,13 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { collection, onSnapshot, query, orderBy, addDoc, getDoc, doc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-// استيراد db من ملف AuthService بدلاً من إنشائه مباشرة
-import { db } from "../../services/FirebaseAuthService";
+import { dbService, authService } from '../services/SupabaseService';
 import SidebarV2 from "./components/SidebarV2";
 import Button from "../shared/components/Button";
 import { useCart } from "../contexts/CartContext";
 import { CATEGORIES_WITH_ICONS } from "../shared/constants/productConstants";
+import { ThemeContext } from "../contexts/ThemeContext";
+import { LanguageContext } from '../contexts/LanguageContext';
 
 const { width } = Dimensions.get("window");
 
@@ -44,9 +42,13 @@ interface Product {
   price: number;
   description: string;
   imageUrl: string;
+  images?: string[];
   paymentMethod?: string;
   category?: string;
-  quantity?: number; // Added quantity property
+  quantity?: number;
+  currency?: string;
+  discount?: number;
+  originalPrice?: number;
 }
 
 interface RouteParams {
@@ -54,38 +56,35 @@ interface RouteParams {
   loggedIn?: boolean;
 }
 
-const HomeV2: React.FC = () => {
-  const navigation = useNavigation<any>();
-  const route = useRoute();
+const HomeV2: React.FC = ({ route, navigation }: any) => {
   const routeParams = route.params as RouteParams | undefined;
   const routeAdmin = routeParams?.admin || false;
   const routeLoggedIn = routeParams?.loggedIn || false;
   const [isAdmin, setIsAdmin] = useState(routeAdmin);
   const [isLoggedIn, setIsLoggedIn] = useState(routeLoggedIn || routeAdmin);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<"ar" | "en">("ar");
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const { language, switchLanguage } = useContext(LanguageContext);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { cart, addToCart } = useCart(); // Use cart context
+  const { addToCart } = useCart(); // Use cart context
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(width));
   const [userImage, setUserImage] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState("جميع المنتجات");
+  const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
 
   // التحقق من دور المشرف عند تحميل الشاشة
   useEffect(() => {
     const checkUserRole = async () => {
       if (routeLoggedIn || routeAdmin) {
-        const auth = getAuth(); // الحصول على مثيل المصادقة
-        const currentUser = auth.currentUser;
-        if (currentUser) {
+        const { user } = await authService.getCurrentUser();
+        if (user) {
           // التحقق من دور المشرف من قاعدة البيانات
           try {
-            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
+            const { data, error } = await dbService.get('users', { eq: { id: user.id } });
+            if (data && data.length > 0) {
+              const userData = data[0];
               setIsAdmin(userData.role === "admin");
             }
           } catch (error) {
@@ -94,7 +93,7 @@ const HomeV2: React.FC = () => {
         }
       }
     };
-    
+
     checkUserRole();
   }, [routeLoggedIn, routeAdmin]);
 
@@ -107,77 +106,12 @@ const HomeV2: React.FC = () => {
     setIsLoggedIn(routeLoggedIn || routeAdmin);
   }, [route.params]);
 
-  // 🧪 إضافة منتجات تجريبية (للتطوير)
-  const addDemoProducts = async () => {
-    try {
-      console.log("🧪 جاري إضافة منتجات تجريبية...");
-      
-      const demoProducts = [
-        {
-          name: "هاتف ذكي",
-          price: 299.99,
-          description: "هاتف حديث بكاميرا عالية الدقة وذاكرة واسعة",
-          category: "إلكترونيات",
-          attribute: "جديد",
-          paymentMethod: "cash",
-          imageUrl: "https://via.placeholder.com/300x300/4A90E2/FFFFFF?text=📱",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          name: "قميص رياضي",
-          price: 29.99,
-          description: "قميص مريح للرياضة مصنوع من مواد عالية الجودة",
-          category: "ملابس",
-          attribute: "جديد",
-          paymentMethod: "card",
-          imageUrl: "https://via.placeholder.com/300x300/50C878/FFFFFF?text=👕",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          name: "كتاب برمجة",
-          price: 19.99,
-          description: "كتاب شامل لتعلم البرمجة من الصفر إلى الاحتراف",
-          category: "كتب",
-          attribute: "جديد",
-          paymentMethod: "transfer",
-          imageUrl: "https://via.placeholder.com/300x300/FF6B6B/FFFFFF?text=📚",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          name: "سماعة لاسلكية",
-          price: 89.99,
-          description: "سماعة بلوتوث عالية الجودة مع إلغاء الضوضاء",
-          category: "إلكترونيات",
-          attribute: "مميز",
-          paymentMethod: "cash",
-          imageUrl: "https://via.placeholder.com/300x300/9B59B6/FFFFFF?text=🎧",
-          createdAt: new Date().toISOString(),
-        },
-        {
-          name: "حقيبة سفر",
-          price: 49.99,
-          description: "حقيبة سفر كبيرة بجودة عالية ومتينة",
-          category: "منزلية",
-          attribute: "جديد",
-          paymentMethod: "card",
-          imageUrl: "https://via.placeholder.com/300x300/F39C12/FFFFFF?text=👜",
-          createdAt: new Date().toISOString(),
-        }
-      ];
-
-      // Add all demo products
-      for (const product of demoProducts) {
-        const docRef = await addDoc(collection(db, "products"), product);
-        console.log(`✅ تم إضافة المنتج: ${product.name} بـ ID: ${docRef.id}`);
-      }
-      
-      console.log("✅ تم إضافة جميع المنتجات التجريبية بنجاح");
-      Alert.alert("نجاح", "تمت إضافة جميع المنتجات التجريبية بنجاح");
-    } catch (err) {
-      console.error("❌ خطأ في إضافة المنتجات التجريبية:", err);
-      Alert.alert("خطأ", "فشل في إضافة المنتجات التجريبية");
+  // تحديث selectedCategory عند تغيير اللغة
+  useEffect(() => {
+    if (selectedCategory === "جميع المنتجات" || selectedCategory === "All Products") {
+      setSelectedCategory(language === "ar" ? "جميع المنتجات" : "All Products");
     }
-  };
+  }, [language, selectedCategory]);
 
   // تحديث المنتجات يدويًا (زر Refresh)
   const refreshProducts = () => {
@@ -190,11 +124,11 @@ const HomeV2: React.FC = () => {
     }, 500);
   };
 
-  // 📦 تحميل المنتجات من Firestore
+  // 📦 تحميل المنتجات من Supabase
   useEffect(() => {
     // في حالة التطوير، يمكن استخدام بيانات تجريبية
     const USE_DEMO_DATA = false; // غيّر إلى true لاستخدام بيانات تجريبية
-    
+
     if (USE_DEMO_DATA) {
       // بيانات تجريبية للتطوير
       const demoProducts: Product[] = [
@@ -223,77 +157,89 @@ const HomeV2: React.FC = () => {
           category: "كتب"
         }
       ];
-      
+
       setTimeout(() => {
         setProducts(demoProducts);
         setLoading(false);
         setError(null);
         console.log("✅ تم تحميل البيانات التجريبية");
       }, 1000);
-      
+
       return;
     }
-    
+
     try {
-      // إنشاء استعلام لترتيب المنتجات حسب الوقت
-      const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
-      
-      // التحقق من صحة الاستعلام
+      // تحميل المنتجات من Supabase
       console.log("🔍 جاري تنفيذ الاستعلام لتحميل المنتجات...");
-      
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        try {
-          console.log("📥 تم استلام تحديث من قاعدة البيانات. عدد الوثائق:", snapshot.docs.length);
-          
-          // معالجة الوثائق مباشرة إلى مصفوفة منتجات
-          const items: Product[] = [];
-          
-          snapshot.docs.forEach((doc) => {
-            const data = doc.data();
-            console.log("📄 بيانات الوثيقة:", doc.id, data);
-            
+
+      const loadProducts = async () => {
+        const { data, error } = await dbService.get('products', {
+          order: { column: 'created_at', ascending: false }
+        });
+
+        if (error) {
+          console.error("❌ خطأ في تحميل المنتجات:", error);
+          setError("فشل في تحميل المنتجات. يرجى التحقق من الاتصال بالإنترنت.");
+          setLoading(false);
+          return;
+        }
+
+        console.log("📥 تم استلام تحديث من قاعدة البيانات. عدد الوثائق:", data?.length || 0);
+
+        // معالجة البيانات إلى مصفوفة منتجات
+        const items: Product[] = [];
+
+        if (data) {
+          data.forEach((item: any) => {
+            console.log("📄 بيانات الوثيقة:", item.id, item);
+
             // التأكد من أن البيانات تحتوي على الحقول المطلوبة
-            if (data && data.name && data.price !== undefined) {
+            if (item && item.name && item.price !== undefined) {
               items.push({
-                id: doc.id,
-                name: data.name || "منتج غير مسمى",
-                price: typeof data.price === 'number' ? data.price : parseFloat(data.price) || 0,
-                description: data.description || "لا يوجد وصف",
-                imageUrl: data.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
-                category: data.category || "غير مصنف",
-                paymentMethod: data.paymentMethod || "cash"
+                id: item.id,
+                name: item.name || "منتج غير مسمى",
+                price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0,
+                description: item.description || "لا يوجد وصف",
+                imageUrl: item.image_url || item.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
+                images: item.images || (item.image_url ? [item.image_url] : []),
+                category: item.category || "غير مصنف",
+                paymentMethod: item.payment_method || item.paymentMethod || "cash",
+                currency: item.currency || "YER",
+                discount: item.discount || 0,
+                originalPrice: item.original_price || item.originalPrice || null
               });
             } else {
-              console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", doc.id, data);
+              console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", item.id, item);
             }
           });
-          
-          console.log("📦 المنتجات المحولة:", items);
-          
-          setProducts(items);
-          setLoading(false);
-          setError(null);
-          
-          // طباعة معلومات التصحيح
-          console.log("✅ تم تحميل المنتجات:", items.length);
-          if (items.length > 0) {
-            console.log("📝 أول منتج:", items[0]);
-          } else {
-            console.log("📝 لا توجد منتجات في قاعدة البيانات");
-          }
-        } catch (err) {
-          console.error("❌ خطأ في معالجة البيانات:", err);
-          setError("فشل في معالجة البيانات");
-          setLoading(false);
         }
-      }, (error) => {
-        console.error("❌ خطأ في تحميل المنتجات:", error);
-        setError("فشل في تحميل المنتجات. يرجى التحقق من الاتصال بالإنترنت.");
-        setLoading(false);
-      });
 
-      // تنظيف المستمع عند إزالة المكون
-      return () => unsubscribe();
+        console.log("📦 المنتجات المحولة:", items);
+
+        setProducts(items);
+        setLoading(false);
+        setError(null);
+
+        // طباعة معلومات التصحيح
+        console.log("✅ تم تحميل المنتجات:", items.length);
+        if (items.length > 0) {
+          console.log("📝 أول منتج:", items[0]);
+        } else {
+          console.log("📝 لا توجد منتجات في قاعدة البيانات");
+        }
+      };
+
+      loadProducts();
+
+      // يمكن إضافة Realtime subscription هنا إذا لزم الأمر
+      // const subscription = dbService.subscribe('products', (payload) => {
+      //   console.log('Realtime update:', payload);
+      //   loadProducts();
+      // });
+
+      // return () => {
+      //   subscription.unsubscribe();
+      // };
     } catch (err) {
       console.error("❌ خطأ في تحميل المنتجات:", err);
       setError("فشل في تحميل المنتجات. يرجى التحقق من الاتصال بالإنترنت.");
@@ -304,7 +250,7 @@ const HomeV2: React.FC = () => {
   // 🛒 إضافة منتج إلى السلة (updated to use context)
   const handleAddToCart = (product: Product) => {
     addToCart(product);
-    Alert.alert("✅", `تم إضافة ${product.name} إلى السلة`);
+    Alert.alert("✅", language === "ar" ? `تم إضافة ${product.name} إلى السلة` : `${product.name} added to cart`);
   };
 
   // 🎨 عرض القسم
@@ -312,66 +258,86 @@ const HomeV2: React.FC = () => {
     <TouchableOpacity
       style={[
         styles.categoryButton,
-        selectedCategory === item.name && styles.selectedCategory,
+        selectedCategory === (language === "ar" ? item.nameAr : item.name) && styles.selectedCategory,
         { backgroundColor: isDarkMode ? "#333" : "#e0e0e0" }
       ]}
-      onPress={() => setSelectedCategory(item.name)}
+      onPress={() => setSelectedCategory(language === "ar" ? item.nameAr : item.name)}
     >
       <Ionicons 
         name={item.icon as any} 
         size={20} 
-        color={selectedCategory === item.name ? "#007bff" : (isDarkMode ? "#fff" : "#333")} 
+        color={selectedCategory === (language === "ar" ? item.nameAr : item.name) ? "#007bff" : (isDarkMode ? "#fff" : "#333")} 
       />
       <Text style={[
         styles.categoryText,
-        selectedCategory === item.name && styles.selectedCategoryText,
+        selectedCategory === (language === "ar" ? item.nameAr : item.name) && styles.selectedCategoryText,
         { color: isDarkMode ? "#fff" : "#333" }
       ]}>
-        {item.name}
+        {language === "ar" ? item.nameAr : item.name}
       </Text>
     </TouchableOpacity>
   );
 
   // 📦 عرض المنتج
-  const renderProduct = ({ item }: { item: Product }) => (
-    <TouchableOpacity 
-      style={[styles.productCard, { backgroundColor: isDarkMode ? "#333" : "#fff" }]}
-      onPress={() => {
-        // @ts-ignore
-        navigation.navigate('ProductDetails', { product: item });
-      }}
-    >
-      <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-      <View style={styles.productInfo}>
-        <Text style={[styles.productName, { color: isDarkMode ? "#fff" : "#333" }]} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text style={[styles.productDescription, { color: isDarkMode ? "#ccc" : "#666" }]} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.productFooter}>
-          <Text style={[styles.productPrice, { color: isDarkMode ? "#4da6ff" : "#007bff" }]}>
-            {item.price.toFixed(2)} ر.س
-          </Text>
-          <TouchableOpacity 
-            style={styles.addToCartButton}
-            onPress={(e) => {
-              e.stopPropagation();
-              handleAddToCart(item);
-            }}
-          >
-            <Ionicons name="add" size={20} color="#fff" />
-          </TouchableOpacity>
+  const renderProduct = ({ item }: { item: Product }) => {
+    const discountPercent = item.originalPrice && item.originalPrice > item.price
+      ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)
+      : 0;
+
+    return (
+      <TouchableOpacity
+        style={[styles.productCard, { backgroundColor: isDarkMode ? "#333" : "#fff" }]}
+        onPress={() => {
+          // @ts-ignore
+          navigation.navigate('ProductDetails', { product: item });
+        }}
+      >
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} style={styles.productImage} />
+          {discountPercent > 0 && (
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountBadgeText}>-{discountPercent}%</Text>
+            </View>
+          )}
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+        <View style={styles.productInfo}>
+          <Text style={[styles.productName, { color: isDarkMode ? "#fff" : "#333" }]} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={[styles.productDescription, { color: isDarkMode ? "#ccc" : "#666" }]} numberOfLines={2}>
+            {item.description}
+          </Text>
+          <View style={styles.productFooter}>
+            <View style={styles.priceContainer}>
+              {item.originalPrice && item.originalPrice > item.price && (
+                <Text style={[styles.originalPrice, { color: isDarkMode ? "#999" : "#999" }]}>
+                  {item.originalPrice.toFixed(2)} {(item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي')}
+                </Text>
+              )}
+              <Text style={[styles.productPrice, { color: isDarkMode ? "#4da6ff" : "#007bff" }]}>
+                {item.price.toFixed(2)} {(item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي')}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.addToCartButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleAddToCart(item);
+              }}
+            >
+              <Ionicons name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   // تصفية المنتجات حسب القسم والبحث
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       // تصفية حسب القسم
-      const categoryMatch = selectedCategory === "جميع المنتجات" || 
+      const categoryMatch = selectedCategory === (language === "ar" ? "جميع المنتجات" : "All Products") ||
                            (product.category && product.category === selectedCategory);
       
       // تصفية حسب البحث
@@ -415,11 +381,11 @@ const HomeV2: React.FC = () => {
     <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? "#333" : "#f0f0f0" }]}>
       <Ionicons name="search" size={20} color={isDarkMode ? "#ccc" : "#666"} style={styles.searchIcon} />
       <TextInput
-        style={[styles.searchInput, { 
+        style={[styles.searchInput, {
           backgroundColor: isDarkMode ? "#444" : "#fff",
           color: isDarkMode ? "#fff" : "#333"
         }]}
-        placeholder="ابحث عن منتجات..."
+        placeholder={language === "ar" ? "ابحث عن منتجات..." : "Search for products..."}
         placeholderTextColor={isDarkMode ? "#aaa" : "#999"}
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -453,7 +419,7 @@ const HomeV2: React.FC = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007bff" />
           <Text style={[styles.loadingText, { color: isDarkMode ? "#ccc" : "#666" }]}>
-            جاري تحميل المنتجات...
+            {language === "ar" ? "جاري تحميل المنتجات..." : "Loading products..."}
           </Text>
         </View>
       );
@@ -466,11 +432,11 @@ const HomeV2: React.FC = () => {
           <Text style={[styles.errorText, { color: isDarkMode ? "#ff8888" : "#ff4444" }]}>
             {error}
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.retryButton}
             onPress={refreshProducts}
           >
-            <Text style={styles.retryText}>إعادة المحاولة</Text>
+            <Text style={styles.retryText}>{language === "ar" ? "إعادة المحاولة" : "Retry"}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -481,16 +447,8 @@ const HomeV2: React.FC = () => {
         <View style={styles.emptyContainer}>
           <Ionicons name="cube" size={48} color={isDarkMode ? "#666" : "#ccc"} />
           <Text style={[styles.emptyText, { color: isDarkMode ? "#999" : "#999" }]}>
-            لا توجد منتجات متاحة
+            {language === "ar" ? "لا توجد منتجات متاحة" : "No products available"}
           </Text>
-          {isAdmin && (
-            <TouchableOpacity 
-              style={styles.demoButton}
-              onPress={addDemoProducts}
-            >
-              <Text style={styles.demoText}>إضافة منتج تجريبي</Text>
-            </TouchableOpacity>
-          )}
         </View>
       );
     }
@@ -517,18 +475,6 @@ const HomeV2: React.FC = () => {
       {renderCategories()}
       
       <View style={styles.content}>
-        {/* زر إضافة منتجات تجريبية في وضع التطوير */}
-        {__DEV__ && (
-          <View style={styles.devButtonContainer}>
-            <Button 
-              title="إضافة منتجات تجريبية" 
-              onPress={addDemoProducts}
-              variant="success"
-              size="small"
-            />
-          </View>
-        )}
-        
         {renderProducts()}
       </View>
       
@@ -547,8 +493,6 @@ const HomeV2: React.FC = () => {
       
       {/* القائمة الجانبية */}
       <SidebarV2 
-        onToggleLanguage={() => setCurrentLanguage(currentLanguage === "ar" ? "en" : "ar")}
-        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         onAddProduct={() => {
           // @ts-ignore
           navigation.navigate("AddProduct");
@@ -566,10 +510,8 @@ const HomeV2: React.FC = () => {
             navigation.navigate("Login");
           }
         }}
-        isDarkMode={isDarkMode}
         isAdmin={isAdmin}
         isLoggedIn={isLoggedIn}
-        currentLanguage={currentLanguage}
       />
     </View>
   );
@@ -715,8 +657,32 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: 150,
+    height: 120,
     resizeMode: "cover",
+  },
+  imageContainer: {
+    position: "relative",
+  },
+  discountBadge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "#ff4444",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  discountBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  priceContainer: {
+    flex: 1,
+  },
+  originalPrice: {
+    fontSize: 12,
+    textDecorationLine: "line-through",
   },
   productInfo: {
     padding: 12,

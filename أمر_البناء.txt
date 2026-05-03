@@ -1,0 +1,26 @@
+أوامر البناء - T-REX Shop
+==================================
+
+1. بناء Preview (معاينة) - APK للاختبار:
+   eas build --platform android --profile preview
+
+2. بناء Production (إنتاج) - AAB للنشر على Google Play:
+   eas build --platform android --profile production
+
+3. بناء Development (تطوير) - APK مع Development Client:
+   eas build --platform android --profile development
+
+4. بناء iOS Preview:
+   eas build --platform ios --profile preview
+
+5. بناء iOS Production:
+   eas build --platform ios --profile production
+
+6. بناء كلا المنصتين (Android + iOS):
+   eas build --platform all --profile production
+
+
+ملاحظات:
+- البناء يستغرق حوالي 10-20 دقيقة
+- يمكنك متابعة التقدم على: https://expo.dev/accounts/trexshop/builds
+- بعد الانتهاء ستحصل على رابط تحميل مباشر

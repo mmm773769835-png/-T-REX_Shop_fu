@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.trexshop.app"],
+        "components": [
+          {
+            "/": "/product/*",
+            "comment": "Matches any product page"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.com.trexshop.app"]
+  }
+}

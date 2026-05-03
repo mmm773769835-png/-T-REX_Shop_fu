@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { getDefaultProductImage } from "../utils/imageUtils";
+import { ThemeContext } from '../contexts/ThemeContext';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface Order {
   id: string;
@@ -17,6 +20,8 @@ interface Order {
 }
 
 const OrderHistoryScreen = ({ navigation }: any) => {
+  const { isDarkMode, colors } = useContext(ThemeContext);
+  const { language } = useContext(LanguageContext);
   const [orders] = useState<Order[]>([
     {
       id: "1",
@@ -29,7 +34,7 @@ const OrderHistoryScreen = ({ navigation }: any) => {
           name: "منتج تجريبي",
           quantity: 2,
           price: 99.99,
-          image: "https://via.placeholder.com/80",
+          image: getDefaultProductImage(),
         },
       ],
     },
@@ -44,7 +49,7 @@ const OrderHistoryScreen = ({ navigation }: any) => {
           name: "منتج آخر",
           quantity: 1,
           price: 150.00,
-          image: "https://via.placeholder.com/80",
+          image: getDefaultProductImage(),
         },
       ],
     },
@@ -70,17 +75,17 @@ const OrderHistoryScreen = ({ navigation }: any) => {
   const getStatusText = (status: Order["status"]) => {
     switch (status) {
       case "delivered":
-        return "تم التسليم";
+        return language === "ar" ? "تم التسليم" : "Delivered";
       case "shipped":
-        return "قيد الشحن";
+        return language === "ar" ? "قيد الشحن" : "Shipped";
       case "processing":
-        return "قيد المعالجة";
+        return language === "ar" ? "قيد المعالجة" : "Processing";
       case "pending":
-        return "معلق";
+        return language === "ar" ? "معلق" : "Pending";
       case "cancelled":
-        return "ملغي";
+        return language === "ar" ? "ملغي" : "Cancelled";
       default:
-        return "غير معروف";
+        return language === "ar" ? "غير معروف" : "Unknown";
     }
   };
 
@@ -101,22 +106,24 @@ const OrderHistoryScreen = ({ navigation }: any) => {
     }
   };
 
+  const styles = getStyles(isDarkMode, colors);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color={isDarkMode ? "#fff" : "#333"} />
         </TouchableOpacity>
-        <Text style={styles.title}>📦 طلباتي</Text>
+        <Text style={styles.title}>{language === "ar" ? "📦 طلباتي" : "📦 My Orders"}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content}>
         {orders.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="bag-outline" size={64} color="#ccc" />
-            <Text style={styles.emptyText}>لا توجد طلبات</Text>
-            <Text style={styles.emptySubtext}>ابدأ التسوق الآن!</Text>
+            <Ionicons name="bag-outline" size={64} color={isDarkMode ? "#666" : "#ccc"} />
+            <Text style={styles.emptyText}>{language === "ar" ? "لا توجد طلبات" : "No orders yet"}</Text>
+            <Text style={styles.emptySubtext}>{language === "ar" ? "ابدأ التسوق الآن!" : "Start shopping now!"}</Text>
           </View>
         ) : (
           orders.map(order => (
@@ -144,28 +151,28 @@ const OrderHistoryScreen = ({ navigation }: any) => {
                     <Image source={{ uri: item.image }} style={styles.itemImage} />
                     <View style={styles.itemDetails}>
                       <Text style={styles.itemName}>{item.name}</Text>
-                      <Text style={styles.itemQuantity}>الكمية: {item.quantity}</Text>
+                      <Text style={styles.itemQuantity}>{language === "ar" ? "الكمية:" : "Quantity:"} {item.quantity}</Text>
                     </View>
-                    <Text style={styles.itemPrice}>{item.price} ر.س</Text>
+                    <Text style={styles.itemPrice}>{item.price} {language === "ar" ? "ر.ي" : "YER"}</Text>
                   </View>
                 ))}
               </View>
 
               <View style={styles.orderFooter}>
-                <Text style={styles.totalLabel}>المجموع:</Text>
-                <Text style={styles.totalAmount}>{order.total.toFixed(2)} ر.س</Text>
+                <Text style={styles.totalLabel}>{language === "ar" ? "المجموع:" : "Total:"}</Text>
+                <Text style={styles.totalAmount}>{order.total.toFixed(2)} {language === "ar" ? "ر.ي" : "YER"}</Text>
               </View>
 
               <View style={styles.orderActions}>
                 <TouchableOpacity style={styles.actionButton}>
                   <Ionicons name="eye-outline" size={18} color="#007bff" />
-                  <Text style={styles.actionButtonText}>عرض التفاصيل</Text>
+                  <Text style={styles.actionButtonText}>{language === "ar" ? "عرض التفاصيل" : "View Details"}</Text>
                 </TouchableOpacity>
                 {order.status === "delivered" && (
                   <TouchableOpacity style={[styles.actionButton, styles.primaryButton]}>
                     <Ionicons name="refresh-outline" size={18} color="#fff" />
                     <Text style={[styles.actionButtonText, styles.primaryButtonText]}>
-                      إعادة الطلب
+                      {language === "ar" ? "إعادة الطلب" : "Reorder"}
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -177,167 +184,5 @@ const OrderHistoryScreen = ({ navigation }: any) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  content: {
-    flex: 1,
-    padding: 15,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#999",
-    marginTop: 20,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: "#ccc",
-    marginTop: 8,
-  },
-  orderCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  orderHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  orderNumber: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  orderDate: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 4,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "bold",
-    marginLeft: 4,
-  },
-  orderItems: {
-    marginBottom: 15,
-  },
-  orderItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
-  },
-  itemDetails: {
-    flex: 1,
-    marginHorizontal: 12,
-  },
-  itemName: {
-    fontSize: 14,
-    color: "#333",
-    marginBottom: 4,
-  },
-  itemQuantity: {
-    fontSize: 12,
-    color: "#999",
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#007bff",
-  },
-  orderFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-    marginBottom: 15,
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  totalAmount: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#007bff",
-  },
-  orderActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#007bff",
-    marginHorizontal: 4,
-  },
-  actionButtonText: {
-    color: "#007bff",
-    fontSize: 14,
-    fontWeight: "bold",
-    marginLeft: 4,
-  },
-  primaryButton: {
-    backgroundColor: "#007bff",
-    borderColor: "#007bff",
-  },
-  primaryButtonText: {
-    color: "#fff",
-  },
-});
 
 export default OrderHistoryScreen;

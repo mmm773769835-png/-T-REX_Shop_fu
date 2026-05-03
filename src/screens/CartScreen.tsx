@@ -1,32 +1,67 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../shared/components/Button";
+import { ThemeContext } from '../contexts/ThemeContext';
+import { useCart } from '../contexts/CartContext';
+import { LanguageContext } from '../contexts/LanguageContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const CartScreen = ({ route, navigation }: any) => {
-  // Safely extract cartItems from route.params
-  const initialCart = route?.params?.cartItems || [];
-  const [cartItems, setCartItems] = useState(initialCart);
-
-  const total = cartItems.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
+  const { isDarkMode, colors } = useContext(ThemeContext);
+  const { language } = useContext(LanguageContext);
+  const { formatPrice } = useCurrency();
+  const { state, removeFromCart, updateQuantity } = useCart();
+  
+  // استخدام CartContext بدلاً من route.params
+  const cartItems = state.items;
+  const total = state.total;
+  
+  const styles = getStyles(isDarkMode, colors);
 
   const handleRemove = (id: string) => {
-    const updated = cartItems.filter((item: any) => item.id !== id);
-    setCartItems(updated);
+    removeFromCart(id);
   };
 
   const handleCheckout = () => {
-    // @ts-ignore
-    navigation.getParent().navigate("OrderConfirm", { cartItems });
-  };
 
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
     
-    const updated = cartItems.map((item: any) => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    );
-    setCartItems(updated);
+    if (cartItems.length === 0) {
+
+      Alert.alert(
+        language === "ar" ? "تحذير" : "Warning",
+        language === "ar" ? "السلة فارغة" : "Cart is empty"
+      );
+      return;
+    }
+    
+    // التنقل إلى شاشة تأكيد الطلب
+    // CartScreen موجود في Tab Navigator، و OrderConfirm موجود في Stack Navigator
+    // لذلك يجب استخدام getParent() للوصول إلى Stack Navigator
+    try {
+
+      
+      // الطريقة الأولى: استخدام getParent() للوصول إلى Stack Navigator
+      const stackNavigator = navigation.getParent();
+      
+      if (stackNavigator) {
+        
+        stackNavigator.navigate("OrderConfirm");
+        
+      } else {
+        // الطريقة البديلة: استخدام navigate مباشرة
+        
+        navigation.navigate("OrderConfirm");
+      }
+    } catch (error) {
+      console.error('❌ CartScreen: خطأ في التنقل:', error);
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" 
+          ? `حدث خطأ أثناء التنقل: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`
+          : `An error occurred while navigating: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   };
 
   const incrementQuantity = (id: string) => {
@@ -46,29 +81,29 @@ const CartScreen = ({ route, navigation }: any) => {
   const renderCartItem = ({ item }: any) => (
     <View style={styles.cartItem}>
       <Image 
-        source={{ uri: item.imageUrl }} 
+        source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} 
         style={styles.itemImage} 
       />
       
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>{item.price?.toFixed(2) || "0.00"} ر.ي</Text>
+        <Text style={styles.itemPrice}>{formatPrice(item.price || 0, (item.currency || 'YER') as any)}</Text>
         
         <View style={styles.quantityContainer}>
           <TouchableOpacity 
-            style={styles.quantityButton} 
+            style={styles.quantityButton}
             onPress={() => decrementQuantity(item.id)}
           >
-            <Ionicons name="remove" size={16} color="#000" />
+            <Ionicons name="remove" size={16} color={isDarkMode ? '#fff' : '#000'} />
           </TouchableOpacity>
           
           <Text style={styles.quantityText}>{item.quantity || 1}</Text>
           
           <TouchableOpacity 
-            style={styles.quantityButton} 
+            style={styles.quantityButton}
             onPress={() => incrementQuantity(item.id)}
           >
-            <Ionicons name="add" size={16} color="#000" />
+            <Ionicons name="add" size={16} color={isDarkMode ? '#fff' : '#000'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -86,21 +121,27 @@ const CartScreen = ({ route, navigation }: any) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={isDarkMode ? '#fff' : '#000'} />
         </TouchableOpacity>
-        <Text style={styles.title}>🛒 سلة المشتريات</Text>
+        <Text style={styles.title}>
+          {language === "ar" ? "🛒 سلة المشتريات" : "🛒 Shopping Cart"}
+        </Text>
         <View style={{ width: 40 }} />
       </View>
 
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="cart-outline" size={80} color="#ccc" />
-          <Text style={styles.emptyText}>سلة التسوق فارغة</Text>
-          <Text style={styles.emptySubtext}>ابدأ بإضافة منتجات إلى سلة التسوق</Text>
+          <Ionicons name="cart-outline" size={80} color={isDarkMode ? '#666' : '#ccc'} />
+          <Text style={styles.emptyText}>
+            {language === "ar" ? "سلة التسوق فارغة" : "Cart is empty"}
+          </Text>
+          <Text style={styles.emptySubtext}>
+            {language === "ar" ? "ابدأ بإضافة منتجات إلى سلة التسوق" : "Start adding products to your cart"}
+          </Text>
           
           <View style={styles.browseButton}>
             <Button 
-              title="تصفح المنتجات" 
+              title={language === "ar" ? "تصفح المنتجات" : "Browse Products"} 
               onPress={() => navigation.navigate("HomeV2")} 
             />
           </View>
@@ -116,13 +157,15 @@ const CartScreen = ({ route, navigation }: any) => {
           
           <View style={styles.footer}>
             <View style={styles.totalContainer}>
-              <Text style={styles.totalLabel}>الإجمالي:</Text>
-              <Text style={styles.totalAmount}>{total.toFixed(2)} ر.ي</Text>
+              <Text style={styles.totalLabel}>
+                {language === "ar" ? "الإجمالي:" : "Total:"}
+              </Text>
+              <Text style={styles.totalAmount}>{formatPrice(total)}</Text>
             </View>
             
             <View style={styles.checkoutButton}>
               <Button 
-                title="تأكيد الطلب" 
+                title={language === "ar" ? "تأكيد الطلب" : "Checkout"} 
                 onPress={handleCheckout} 
               />
             </View>
@@ -133,17 +176,17 @@ const CartScreen = ({ route, navigation }: any) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.header,
     elevation: 2,
   },
   backButton: {
@@ -152,6 +195,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    color: colors.text,
   },
   emptyContainer: {
     flex: 1,
@@ -164,10 +208,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
+    color: colors.text,
   },
   emptySubtext: {
     fontSize: 16,
-    color: "#666",
+    color: colors.textSecondary,
     marginBottom: 32,
     textAlign: "center",
   },
@@ -179,7 +224,7 @@ const styles = StyleSheet.create({
   },
   cartItem: {
     flexDirection: "row",
-    backgroundColor: "#f8f8f8",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -198,6 +243,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: "bold",
+    color: colors.text,
   },
   itemPrice: {
     fontSize: 18,
@@ -212,7 +258,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -220,15 +266,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginHorizontal: 12,
+    color: colors.text,
   },
   removeButton: {
     padding: 8,
   },
   footer: {
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.header,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
+    borderTopColor: colors.border,
   },
   totalContainer: {
     flexDirection: "row",
@@ -239,6 +286,7 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 18,
     fontWeight: "bold",
+    color: colors.text,
   },
   totalAmount: {
     fontSize: 24,

@@ -2,37 +2,68 @@ import React, { useState, useEffect } from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 import { CartProvider } from './src/contexts/CartContext';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ThemeProvider } from './src/contexts/ThemeContext';
+import { LanguageProvider } from './src/contexts/LanguageContext';
+import { CurrencyProvider } from './src/contexts/CurrencyContext';
+import { WishListProvider } from './src/contexts/WishListContext';
+import { DealsProvider } from './src/contexts/DealsContext';
+import { ReviewsProvider } from './src/contexts/ReviewsContext';
+import { AdvancedFiltersProvider } from './src/contexts/AdvancedFiltersContext';
+import { SearchProvider } from './src/contexts/SearchContext';
 import { ActivityIndicator, View, Text, StyleSheet, Alert } from 'react-native';
 import { useAuth } from './src/contexts/AuthContext';
 // Initialize Firebase early to prevent "No Firebase App '[DEFAULT]' has been created" error
-import './src/init/firebaseInit';
+// Firebase will be initialized in FirebaseAuthService.js only
+// import './src/init/firebaseInit';
+// Import AutoUpdateService for automatic updates
+import AutoUpdateService from './src/services/AutoUpdateService';
+// Import ErrorBoundary for error handling
+import ErrorBoundary from './src/components/ErrorBoundary';
+// Import ToastProvider for notifications
+import ToastProvider from './src/services/ToastService';
 
 export default function App() {
-  // #region agent log
+  // App component initialization
   console.log('[DEBUG] App component started');
-  // #endregion
   return (
-    <AuthProvider>
-      <CartProvider>
-        <AppWithLoader />
-      </CartProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <CurrencyProvider>
+            <WishListProvider>
+              <DealsProvider>
+                <ReviewsProvider>
+                  <AdvancedFiltersProvider>
+                    <SearchProvider>
+                      <ThemeProvider>
+                        <LanguageProvider>
+                          <ToastProvider>
+                            <AppWithLoader />
+                          </ToastProvider>
+                        </LanguageProvider>
+                      </ThemeProvider>
+                    </SearchProvider>
+                  </AdvancedFiltersProvider>
+                </ReviewsProvider>
+              </DealsProvider>
+            </WishListProvider>
+          </CurrencyProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
 const AppWithLoader = () => {
-  // #region agent log
+  // AppWithLoader component initialization
   console.log('[DEBUG] AppWithLoader component started');
-  // #endregion
   const { loading, error } = useAuth();
-  // #region agent log
+  // Log authentication state for debugging
   console.log('[DEBUG] useAuth result:', { loading, hasError: !!error, errorMessage: error?.message });
-  // #endregion
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
-    // #region agent log
-    // #endregion
+    // Environment check
     // Check if environment variables are set
     const checkEnvironment = () => {
       // In a real app, you might want to check critical env vars here
@@ -40,20 +71,28 @@ const AppWithLoader = () => {
     };
     
     if (checkEnvironment()) {
+      // AutoUpdateService disabled for web compatibility
+      // AppState is not available on web platform
+      // const autoUpdateService = AutoUpdateService.getInstance();
+      // autoUpdateService.startAutoUpdateMonitoring();
+      console.log('[DEBUG] AutoUpdateService disabled for web compatibility');
+      
       // Simulate app initialization delay
       const timer = setTimeout(() => {
-        // #region agent log
-        // #endregion
+        // Set app ready state
         setAppReady(true);
-      }, 1000);
+      }, 500);
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // Clean up AutoUpdateService when app unmounts
+        // autoUpdateService.stopAutoUpdateMonitoring();
+      };
     }
   }, []);
   
   if (loading || !appReady) {
-    // #region agent log
-    // #endregion
+    // Loading state
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007bff" />
@@ -63,8 +102,7 @@ const AppWithLoader = () => {
   }
   
   if (error) {
-    // #region agent log
-    // #endregion
+    // Error state
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>حدث خطأ في تحميل التطبيق</Text>
@@ -74,13 +112,11 @@ const AppWithLoader = () => {
     );
   }
   
-  // #region agent log
-  // #endregion
+  // Render navigator
   try {
     return <AppNavigator />;
   } catch (navError) {
-    // #region agent log
-    // #endregion
+    // Handle navigation errors
     throw navError;
   }
 };
@@ -90,36 +126,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000',
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: 10,
+    color: '#fff',
     fontSize: 16,
-    color: '#666',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000',
     padding: 20,
   },
   errorText: {
-    fontSize: 18,
+    color: '#ff6b6b',
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#ff4444',
     marginBottom: 10,
   },
   errorSubtext: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: '#fff',
+    fontSize: 16,
     marginBottom: 10,
   },
   errorHint: {
-    fontSize: 12,
-    color: '#999',
+    color: '#888',
+    fontSize: 14,
     textAlign: 'center',
-    fontStyle: 'italic',
   },
 });

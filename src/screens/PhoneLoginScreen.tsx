@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,22 +8,23 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-// @ts-ignore
-import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-import firebaseConfig from "../config/firebase.config";
-import { signInWithPhone, confirmPhoneSignIn } from "../../services/FirebaseAuthService";
+import { authService } from '../services/SupabaseService';
+import { LanguageContext } from '../contexts/LanguageContext';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 export default function PhoneLoginScreen({ navigation }: any) {
+  const { language } = useContext(LanguageContext);
+  const { isDarkMode, colors } = useContext(ThemeContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [verificationId, setVerificationId] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const recaptchaVerifier = useRef(null);
+
+  const styles = getStyles(isDarkMode, colors);
 
   const handleSendCode = async () => {
     if (!phoneNumber) {
-      Alert.alert("خطأ", "يرجى إدخال رقم الهاتف");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رقم الهاتف" : "Please enter phone number");
       return;
     }
 
@@ -35,17 +36,19 @@ export default function PhoneLoginScreen({ navigation }: any) {
         fullPhoneNumber = "+966" + phoneNumber; // افتراضيًا السعودية
       }
 
-      // @ts-ignore
-      const result: any = await signInWithPhone(fullPhoneNumber, recaptchaVerifier.current);
-      if (result.success) {
-        setVerificationId(result.confirmationResult);
-        setShowConfirmation(true);
-        Alert.alert("نجاح", "تم إرسال رمز التحقق إلى هاتفك");
+      // Supabase Phone Auth - إرسال رمز التحقق
+      const { data, error } = await authService.signInWithOtp({
+        phone: fullPhoneNumber,
+      });
+
+      if (error) {
+        Alert.alert(language === 'ar' ? "خطأ" : "Error", error.message);
       } else {
-        Alert.alert("خطأ", result.message);
+        setShowConfirmation(true);
+        Alert.alert(language === 'ar' ? "نجاح" : "Success", language === 'ar' ? "تم إرسال رمز التحقق إلى هاتفك" : "Verification code sent to your phone");
       }
     } catch (error) {
-      Alert.alert("خطأ", "فشل في إرسال رمز التحقق");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "فشل في إرسال رمز التحقق" : "Failed to send verification code");
     } finally {
       setLoading(false);
     }
@@ -53,25 +56,36 @@ export default function PhoneLoginScreen({ navigation }: any) {
 
   const handleVerifyCode = async () => {
     if (!verificationCode) {
-      Alert.alert("خطأ", "يرجى إدخال رمز التحقق");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "يرجى إدخال رمز التحقق" : "Please enter verification code");
       return;
     }
 
     setLoading(true);
     try {
-      // @ts-ignore
-      const result: any = await confirmPhoneSignIn(verificationId, verificationCode);
-      if (result.success) {
-        Alert.alert("نجاح", "تم التحقق بنجاح");
-        navigation.replace("Home", { 
+      // التأكد من أن رقم الهاتف يبدأ برمز البلد
+      let fullPhoneNumber = phoneNumber;
+      if (!phoneNumber.startsWith("+")) {
+        fullPhoneNumber = "+966" + phoneNumber;
+      }
+
+      // Supabase Phone Auth - التحقق من الرمز
+      const { data, error } = await authService.verifyOtp({
+        phone: fullPhoneNumber,
+        token: verificationCode,
+        type: 'sms',
+      });
+
+      if (error) {
+        Alert.alert(language === 'ar' ? "خطأ" : "Error", error.message);
+      } else {
+        Alert.alert(language === 'ar' ? "نجاح" : "Success", language === 'ar' ? "تم التحقق بنجاح" : "Verification successful");
+        navigation.replace("MainTabs", { 
           loggedIn: true,
           admin: false // سيتم التحقق من الدور لاحقًا
         });
-      } else {
-        Alert.alert("خطأ", result.message);
       }
     } catch (error) {
-      Alert.alert("خطأ", "فشل في التحقق من الرمز");
+      Alert.alert(language === 'ar' ? "خطأ" : "Error", language === 'ar' ? "فشل في التحقق من الرمز" : "Failed to verify code");
     } finally {
       setLoading(false);
     }
@@ -79,21 +93,17 @@ export default function PhoneLoginScreen({ navigation }: any) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* @ts-ignore */}
-      <FirebaseRecaptchaVerifierModal
-        ref={recaptchaVerifier}
-        firebaseConfig={firebaseConfig}
-      />
+      {/* Firebase Recaptcha removed - using direct authentication */}
       
       <View style={styles.form}>
-        <Text style={styles.title}>تسجيل الدخول برقم الهاتف</Text>
+        <Text style={styles.title}>{language === 'ar' ? "تسجيل الدخول برقم الهاتف" : "Phone Login"}</Text>
         
         {!showConfirmation ? (
           <>
-            <Text style={styles.label}>رقم الهاتف</Text>
+            <Text style={styles.label}>{language === 'ar' ? "رقم الهاتف" : "Phone Number"}</Text>
             <TextInput
               style={styles.input}
-              placeholder="أدخل رقم الهاتف مع رمز البلد"
+              placeholder={language === 'ar' ? "أدخل رقم الهاتف مع رمز البلد" : "Enter phone number with country code"}
               value={phoneNumber}
               onChangeText={setPhoneNumber}
               keyboardType="phone-pad"
@@ -105,16 +115,16 @@ export default function PhoneLoginScreen({ navigation }: any) {
               disabled={loading}
             >
               <Text style={styles.buttonText}>
-                {loading ? "جاري الإرسال..." : "إرسال رمز التحقق"}
+                {loading ? (language === 'ar' ? "جاري الإرسال..." : "Sending...") : (language === 'ar' ? "إرسال رمز التحقق" : "Send Verification Code")}
               </Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
-            <Text style={styles.label}>رمز التحقق</Text>
+            <Text style={styles.label}>{language === 'ar' ? "رمز التحقق" : "Verification Code"}</Text>
             <TextInput
               style={styles.input}
-              placeholder="أدخل رمز التحقق"
+              placeholder={language === 'ar' ? "أدخل رمز التحقق" : "Enter verification code"}
               value={verificationCode}
               onChangeText={setVerificationCode}
               keyboardType="number-pad"
@@ -126,7 +136,7 @@ export default function PhoneLoginScreen({ navigation }: any) {
               disabled={loading}
             >
               <Text style={styles.buttonText}>
-                {loading ? "جاري التحقق..." : "تحقق من الرمز"}
+                {loading ? (language === 'ar' ? "جاري التحقق..." : "Verifying...") : (language === 'ar' ? "تحقق من الرمز" : "Verify Code")}
               </Text>
             </TouchableOpacity>
           </>
@@ -136,26 +146,26 @@ export default function PhoneLoginScreen({ navigation }: any) {
           style={[styles.button, styles.backButton]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.buttonText}>العودة</Text>
+          <Text style={styles.buttonText}>{language === 'ar' ? "العودة" : "Back"}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.background,
   },
   form: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     padding: 20,
     borderRadius: 10,
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -165,25 +175,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#333",
+    color: colors.text,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: colors.text,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "#fafafa",
+    backgroundColor: colors.inputBackground,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: colors.button,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -196,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#6c757d",
   },
   buttonText: {
-    color: "#fff",
+    color: colors.buttonText,
     fontSize: 16,
     fontWeight: "bold",
   },

@@ -1,30 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Switch, Modal, ScrollView, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemeContext } from '../../contexts/ThemeContext';
+import { LanguageContext } from '../../contexts/LanguageContext';
 
 interface SidebarProps {
-  onToggleLanguage: () => void;
-  onToggleTheme: () => void;
   onAddProduct: () => void;
   onLoginLogout: () => void;
-  isDarkMode: boolean;
   isAdmin: boolean;
   isLoggedIn: boolean;
-  currentLanguage: "ar" | "en";
 }
 
 const SidebarV2: React.FC<SidebarProps> = ({
-  onToggleLanguage,
-  onToggleTheme,
   onAddProduct,
   onLoginLogout,
-  isDarkMode,
   isAdmin,
   isLoggedIn,
-  currentLanguage,
 }) => {
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const { language, switchLanguage } = useContext(LanguageContext);
   const [open, setOpen] = useState(false);
   const [showBankInfo, setShowBankInfo] = useState(false);
+
+  // Debug: التحقق من القيم
+  React.useEffect(() => {
+    console.log('🔍 SidebarV2: isDarkMode =', isDarkMode, ', language =', language);
+  }, [isDarkMode, language]);
 
   // 🏦 معلومات الحساب البنكي
   const BANK_INFO = {
@@ -57,7 +58,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
           >
             <Ionicons name="card-outline" size={22} color={isDarkMode ? "#fff" : "#000"} />
             <Text style={[styles.text, isDarkMode && styles.darkText]}>
-              {currentLanguage === "ar" ? "معلومات الحساب البنكي" : "Bank Account Info"}
+              {language === "ar" ? "معلومات الحساب البنكي" : "Bank Account Info"}
             </Text>
           </TouchableOpacity>
 
@@ -67,14 +68,14 @@ const SidebarV2: React.FC<SidebarProps> = ({
             onPress={() => {
               // هنا يمكن إضافة وظيفة إرسال إشعار الدفع
               Alert.alert(
-                currentLanguage === "ar" ? "إرسال إشعار دفع" : "Send Payment Notification",
-                currentLanguage === "ar" ? "يرجى إرفاق صورة الإيصال" : "Please attach payment receipt"
+                language === "ar" ? "إرسال إشعار دفع" : "Send Payment Notification",
+                language === "ar" ? "يرجى إرفاق صورة الإيصال" : "Please attach payment receipt"
               );
             }}
           >
             <Ionicons name="receipt-outline" size={22} color={isDarkMode ? "#fff" : "#000"} />
             <Text style={[styles.text, isDarkMode && styles.darkText]}>
-              {currentLanguage === "ar" ? "إرسال إشعار دفع" : "Send Payment Notification"}
+              {language === "ar" ? "إرسال إشعار دفع" : "Send Payment Notification"}
             </Text>
           </TouchableOpacity>
 
@@ -83,39 +84,59 @@ const SidebarV2: React.FC<SidebarProps> = ({
             <TouchableOpacity style={styles.option} onPress={onAddProduct}>
               <Ionicons name="add-circle-outline" size={22} color={isDarkMode ? "#fff" : "#000"} />
               <Text style={[styles.text, isDarkMode && styles.darkText]}>
-                {currentLanguage === "ar" ? "إضافة منتج جديد" : "Add Product"}
+                {language === "ar" ? "إضافة منتج جديد" : "Add Product"}
               </Text>
             </TouchableOpacity>
           )}
 
-          <View style={styles.option}>
+          <TouchableOpacity 
+            style={styles.option} 
+            onPress={() => {
+              console.log('🔄 SidebarV2: الضغط على زر تبديل اللغة');
+              switchLanguage();
+            }}
+            activeOpacity={0.7}
+          >
             <Ionicons name="language-outline" size={22} color={isDarkMode ? "#fff" : "#000"} />
             <Text style={[styles.text, isDarkMode && styles.darkText]}>
-              {currentLanguage === "ar" ? "اللغة: العربية" : "Language: English"}
+              {language === "ar" ? "اللغة: العربية" : "Language: English"}
             </Text>
-            <TouchableOpacity onPress={onToggleLanguage}>
-              <Text style={styles.link}>
-                {currentLanguage === "ar" ? "EN" : "AR"}
+            <View style={[styles.languageButton, isDarkMode && styles.darkLanguageButton]}>
+              <Text style={[styles.languageButtonText, isDarkMode && styles.darkLanguageButtonText]}>
+                {language === "ar" ? "EN" : "AR"}
               </Text>
+            </View>
             </TouchableOpacity>
-          </View>
 
           <View style={styles.option}>
-            <Ionicons name="moon-outline" size={22} color={isDarkMode ? "#fff" : "#000"} />
-            <Text style={[styles.text, isDarkMode && styles.darkText]}>
-              {currentLanguage === "ar" ? "الوضع الليلي" : "Dark Mode"}
-            </Text>
-            <Switch value={isDarkMode} onValueChange={onToggleTheme} />
-          </View>
-
-          <TouchableOpacity style={styles.option} onPress={onLoginLogout}>
             <Ionicons 
-              name={isLoggedIn ? "log-out-outline" : "log-in-outline"} 
+              name={isDarkMode ? "moon" : "moon-outline"} 
               size={22} 
               color={isDarkMode ? "#fff" : "#000"} 
             />
             <Text style={[styles.text, isDarkMode && styles.darkText]}>
-              {currentLanguage === "ar" 
+              {language === "ar" ? "الوضع الليلي" : "Dark Mode"}
+            </Text>
+            <Switch 
+              value={isDarkMode} 
+              onValueChange={(value) => {
+                console.log('🌙 SidebarV2: الضغط على زر الوضع الليلي، القيمة:', value);
+                toggleTheme();
+              }}
+              trackColor={{ false: '#767577', true: '#4da6ff' }}
+              thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.option} onPress={onLoginLogout}>
+            <Ionicons
+              name={isLoggedIn ? "log-out-outline" : "log-in-outline"}
+              size={22}
+              color={isDarkMode ? "#fff" : "#000"}
+            />
+            <Text style={[styles.text, isDarkMode && styles.darkText]}>
+              {language === "ar"
                 ? (isLoggedIn ? "تسجيل الخروج" : "تسجيل الدخول")
                 : (isLoggedIn ? "Logout" : "Login")}
             </Text>
@@ -134,7 +155,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
           <View style={[styles.modalContent, isDarkMode && styles.darkModalContent]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, isDarkMode && styles.darkModalTitle]}>
-                {currentLanguage === "ar" ? "معلومات الحساب البنكي" : "Bank Account Information"}
+                {language === "ar" ? "معلومات الحساب البنكي" : "Bank Account Information"}
               </Text>
               <TouchableOpacity onPress={() => setShowBankInfo(false)}>
                 <Ionicons name="close" size={24} color={isDarkMode ? "#fff" : "#000"} />
@@ -144,7 +165,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
             <ScrollView style={styles.bankInfoContainer}>
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {currentLanguage === "ar" ? "اسم البنك" : "Bank Name"}
+                  {language === "ar" ? "اسم البنك" : "Bank Name"}
                 </Text>
                 <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
                   {BANK_INFO.bankName}
@@ -153,7 +174,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
               
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {currentLanguage === "ar" ? "رقم الحساب" : "Account Number"}
+                  {language === "ar" ? "رقم الحساب" : "Account Number"}
                 </Text>
                 <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
                   {BANK_INFO.accountNumber}
@@ -162,7 +183,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
               
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {currentLanguage === "ar" ? "الآيبان" : "IBAN"}
+                  {language === "ar" ? "الآيبان" : "IBAN"}
                 </Text>
                 <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
                   {BANK_INFO.iban}
@@ -171,7 +192,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
               
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {currentLanguage === "ar" ? "اسم الحساب" : "Account Name"}
+                  {language === "ar" ? "اسم الحساب" : "Account Name"}
                 </Text>
                 <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
                   {BANK_INFO.accountName}
@@ -209,6 +230,7 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     alignSelf: "flex-start",
+    marginTop: -10,
   },
   darkToggleButton: {
     // يمكن إضافة أنماط إضافية للوضع الليلي
@@ -222,8 +244,9 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 12,
+    justifyContent: "flex-start",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
@@ -232,6 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginLeft: 12,
+    textAlign: "center",
   },
   darkText: {
     color: "#fff",
@@ -239,6 +263,25 @@ const styles = StyleSheet.create({
   link: {
     color: "#007bff",
     fontWeight: "bold",
+  },
+  languageButton: {
+    backgroundColor: "#007bff",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    minWidth: 40,
+    alignItems: "center",
+  },
+  darkLanguageButton: {
+    backgroundColor: "#4da6ff",
+  },
+  languageButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  darkLanguageButtonText: {
+    color: "#fff",
   },
   modalOverlay: {
     flex: 1,

@@ -121,7 +121,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [state, dispatch] = useReducer(cartReducer, initialState);
   
   const addToCart = (product: Product) => {
+    console.log('🛒 CartContext: إضافة منتج:', product);
     dispatch({ type: 'ADD_TO_CART', payload: product });
+    console.log('🛒 CartContext: تم إرسال action ADD_TO_CART');
   };
   
   const removeFromCart = (productId: string) => {
