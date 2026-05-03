@@ -2,165 +2,274 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر تي-ريكس - T-REX Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>T-REX Shop - متجر تي-ريكس</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Cairo', sans-serif;
+            background: #f5f5f5;
             min-height: 100vh;
-            color: #fff;
+            padding-bottom: 80px;
         }
-        .header {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            padding: 20px;
+        /* Header Style */
+        .app-header {
+            background: linear-gradient(135deg, #FF6600 0%, #FF8C00 100%);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dino-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .app-title {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Search Bar */
+        .search-container {
+            position: relative;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background: #fff;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        .search-btn {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #FF6600;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+        /* Banner */
+        .banner {
+            margin: 15px;
+            height: 150px;
+            background: linear-gradient(135deg, #FF6600, #FF8C00, #FFD700);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner-content {
+            text-align: center;
+            color: #fff;
+            z-index: 2;
+        }
+        .banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .banner p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .banner-dino {
+            position: absolute;
+            font-size: 100px;
+            opacity: 0.3;
+            right: -20px;
+            bottom: -20px;
+        }
+        /* Categories */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+        .category-item {
+            text-align: center;
+            padding: 10px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF6600, #FF8C00);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 8px;
+        }
+        .category-name {
+            font-size: 0.75rem;
+            color: #333;
+            font-weight: 600;
+        }
+        /* Products Section */
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,215,0,0.2);
-        }
-        .logo {
-            font-size: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-text {
-            color: #ffd700;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            color: #1a1a2e;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-        }
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-        .container {
-            padding: 40px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 0 15px;
+            margin-bottom: 15px;
         }
         .section-title {
-            text-align: center;
-            font-size: 2rem;
-            color: #ffd700;
-            margin-bottom: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+        .view-all {
+            color: #FF6600;
+            font-size: 0.85rem;
+            text-decoration: none;
         }
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 15px;
         }
         .product-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
+            background: #fff;
+            border-radius: 12px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,215,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
-            border-color: rgba(255,215,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 140px;
             object-fit: cover;
-            background: #0a0a1a;
+            background: #f0f0f0;
         }
         .product-info {
-            padding: 20px;
+            padding: 12px;
         }
         .product-name {
-            font-size: 1.2rem;
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-        .product-description {
-            color: #ccc;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            line-height: 1.5;
+            font-size: 0.85rem;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            height: 2.4em;
+            overflow: hidden;
         }
         .product-price {
-            font-size: 1.5rem;
-            color: #00ff88;
-            font-weight: bold;
+            font-size: 1.1rem;
+            color: #FF6600;
+            font-weight: 700;
         }
-        .product-category {
+        .product-old-price {
+            font-size: 0.75rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+        .product-tag {
             display: inline-block;
-            background: rgba(255,215,0,0.2);
-            color: #ffd700;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 10px;
+            background: #FF6600;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-top: 5px;
         }
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .nav-item {
+            text-align: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 0.7rem;
+        }
+        .nav-item.active {
+            color: #FF6600;
+        }
+        .nav-icon {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 3px;
+        }
+        /* Loading & Empty States */
         .loading {
             text-align: center;
             padding: 50px;
-            font-size: 1.2rem;
-        }
-        .error {
-            text-align: center;
-            padding: 50px;
-            color: #ff4444;
+            color: #666;
         }
         .empty {
             text-align: center;
-            padding: 50px;
-            color: #888;
+            padding: 50px 20px;
+            color: #666;
         }
-        /* Admin Panel Styles */
-        .admin-panel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(26, 26, 46, 0.98);
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #ffd700;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            z-index: 1000;
-            min-width: 400px;
-            max-width: 90vw;
-            max-height: 90vh;
-            overflow-y: auto;
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
         }
-        .admin-panel.active {
-            display: block;
-        }
+        /* Admin Panels */
         .overlay {
             display: none;
             position: fixed;
@@ -168,195 +277,273 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 999;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
         }
         .overlay.active {
             display: block;
         }
-        .form-group {
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 2001;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+        .panel-header {
+            text-align: center;
             margin-bottom: 20px;
+        }
+        .panel-title {
+            font-size: 1.3rem;
+            color: #FF6600;
+            font-weight: 700;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #ffd700;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(255,215,0,0.3);
+            padding: 12px 15px;
+            border: 1px solid #ddd;
             border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
         }
         .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-group textarea:focus {
             outline: none;
-            border-color: #ffd700;
+            border-color: #FF6600;
         }
-        .close-btn {
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FF6600, #FF8C00);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        /* Admin Badge */
+        .admin-badge {
             position: absolute;
             top: 15px;
             left: 15px;
-            background: none;
-            border: none;
-            color: #ff4444;
-            font-size: 1.5rem;
-            cursor: pointer;
+            background: #00C851;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: none;
         }
-        .admin-badge {
-            background: #00ff88;
-            color: #1a1a2e;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-right: 10px;
-        }
-        .login-form {
-            max-width: 400px;
-            margin: 100px auto;
-            background: rgba(255,255,255,0.05);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,215,0,0.2);
-        }
-        .success-message {
-            background: rgba(0,255,136,0.2);
-            color: #00ff88;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .error-message {
-            background: rgba(255,68,68,0.2);
-            color: #ff4444;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #888;
-            border-top: 1px solid rgba(255,215,0,0.1);
-            margin-top: 50px;
-        }
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
+        .admin-badge.show {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Admin Login Panel -->
+    <!-- Admin Badge -->
+    <div class="admin-badge" id="adminBadge">👤 أدمن</div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closePanels()"></div>
+
+    <!-- Login Panel -->
     <div class="admin-panel" id="loginPanel">
-        <button class="close-btn" onclick="closePanels()">✕</button>
-        <h2 style="color: #ffd700; margin-bottom: 30px; text-align: center;">🔐 تسجيل دخول الأدمن</h2>
+        <button class="close-btn" onclick="closePanels()">×</button>
+        <div class="panel-header">
+            <div class="dino-icon" style="margin: 0 auto 10px;">🦖</div>
+            <h3 class="panel-title">تسجيل دخول الأدمن</h3>
+        </div>
         <div id="loginMessages"></div>
-        <form id="adminLoginForm">
+        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
             <div class="form-group">
                 <label>البريد الإلكتروني</label>
-                <input type="email" id="adminEmail" required placeholder="admin@trex-shop.com">
+                <input type="email" id="adminEmail" required placeholder="admin@trex.com">
             </div>
             <div class="form-group">
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassword" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">تسجيل الدخول</button>
+            <button type="submit" class="btn-submit">دخول</button>
         </form>
     </div>
 
     <!-- Add Product Panel -->
     <div class="admin-panel" id="productPanel">
-        <button class="close-btn" onclick="closePanels()">✕</button>
-        <h2 style="color: #ffd700; margin-bottom: 30px; text-align: center;">➕ إضافة منتج جديد</h2>
+        <button class="close-btn" onclick="closePanels()">×</button>
+        <div class="panel-header">
+            <div class="dino-icon" style="margin: 0 auto 10px;">➕</div>
+            <h3 class="panel-title">إضافة منتج جديد</h3>
+        </div>
         <div id="productMessages"></div>
-        <form id="addProductForm">
+        <form id="addProductForm" onsubmit="handleAddProduct(event)">
             <div class="form-group">
                 <label>اسم المنتج *</label>
-                <input type="text" id="productName" required placeholder="مثال: هاتف iPhone 15">
+                <input type="text" id="productName" required>
             </div>
             <div class="form-group">
                 <label>السعر *</label>
-                <input type="number" id="productPrice" required min="0" step="0.01" placeholder="299.99">
+                <input type="number" id="productPrice" required min="0" step="0.01">
             </div>
             <div class="form-group">
                 <label>الوصف</label>
-                <textarea id="productDescription" rows="3" placeholder="وصف المنتج..."></textarea>
+                <textarea id="productDescription" rows="2"></textarea>
             </div>
             <div class="form-group">
                 <label>رابط الصورة</label>
-                <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                <input type="url" id="productImage" placeholder="https://...">
             </div>
             <div class="form-group">
                 <label>القسم</label>
                 <select id="productCategory">
-                    <option value="إلكترونيات">📱 إلكترونيات</option>
-                    <option value="ملابس">👕 ملابس</option>
-                    <option value="أحذية">👟 أحذية</option>
-                    <option value="إكسسوارات">⌚ إكسسوارات</option>
-                    <option value="كتب">📚 كتب</option>
-                    <option value="منزل">🏠 منزل</option>
+                    <option value="إلكترونيات">إلكترونيات</option>
+                    <option value="ملابس">ملابس</option>
+                    <option value="أحذية">أحذية</option>
+                    <option value="إكسسوارات">إكسسوارات</option>
+                    <option value="منزل">منزل</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>طريقة الدفع</label>
-                <select id="productPayment">
-                    <option value="cash">💵 نقدي</option>
-                    <option value="transfer">🏦 تحويل بنكي</option>
-                    <option value="online">💳 إلكتروني</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">إضافة المنتج</button>
+            <button type="submit" class="btn-submit">إضافة المنتج</button>
         </form>
     </div>
 
-    <div class="header">
-        <div class="logo">
-            🦖
-            <span class="logo-text">T-REX Shop</span>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-top">
+            <div class="app-logo">
+                <div class="dino-icon">🦖</div>
+                <span class="app-title">T-REX Shop</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="showLoginPanel()" id="loginBtn">👤</button>
+                <button class="icon-btn" onclick="logoutAdmin()" id="logoutBtn" style="display: none;">�</button>
+            </div>
         </div>
-        <div class="nav-buttons">
-            <span id="adminBadge" class="admin-badge" style="display: none;">👤 الأدمن</span>
-            <button class="btn btn-secondary" id="loginBtn" onclick="showLoginPanel()">🔐 دخول الأدمن</button>
-            <button class="btn btn-primary" id="addProductBtn" onclick="showProductPanel()" style="display: none;">➕ إضافة منتج</button>
-            <button class="btn btn-secondary" id="logoutBtn" onclick="logoutAdmin()" style="display: none;">🚪 خروج</button>
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="ابحث عن منتجات...">
+            <button class="search-btn">🔍</button>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <div class="banner">
+        <div class="banner-dino">🦖</div>
+        <div class="banner-content">
+            <h2>عروض تي-ريكس</h2>
+            <p>خصومات تصل إلى 50%</p>
         </div>
     </div>
 
-    <div class="container">
-        <h2 class="section-title">🛍️ منتجاتنا</h2>
-        <div id="productsContainer">
-            <div class="loading">⏳ جاري تحميل المنتجات...</div>
+    <!-- Categories -->
+    <div class="categories">
+        <div class="category-item">
+            <div class="category-icon">📱</div>
+            <div class="category-name">إلكترونيات</div>
+        </div>
+        <div class="category-item">
+            <div class="category-icon">👕</div>
+            <div class="category-name">ملابس</div>
+        </div>
+        <div class="category-item">
+            <div class="category-icon">👟</div>
+            <div class="category-name">أحذية</div>
+        </div>
+        <div class="category-item">
+            <div class="category-icon">⌚</div>
+            <div class="category-name">إكسسوارات</div>
         </div>
     </div>
 
-    <footer>
-        <p>© 2025 متجر تي-ريكس - T-REX Shop. جميع الحقوق محفوظة.</p>
-        <p style="margin-top: 10px; font-size: 0.8rem;">🔗 متصل بـ Supabase | 🔐 آمن ومشفر</p>
-    </footer>
+    <!-- Products Section -->
+    <div class="section-header">
+        <h3 class="section-title">� منتجات مميزة</h3>
+        <a href="#" class="view-all">عرض الكل</a>
+    </div>
+    <div id="productsContainer">
+        <div class="loading">⏳ جاري التحميل...</div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📂</span>
+            <span>الأقسام</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showProductPanel(); return false;" id="addProductNav" style="display: none;">
+            <span class="nav-icon">➕</span>
+            <span>إضافة</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🛒</span>
+            <span>السلة</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span>حسابي</span>
+        </a>
+    </nav>
 
     <script>
-        // Supabase Configuration - من متغيرات البيئة أو الإعدادات
-        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'https://udqnrsrwzifrzseixrcj.supabase.co';
-        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'sb_publishable_cNZtDBzqP3gGDMxJsvcvuA_iYOO-d4e';
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://udqnrsrwzifrzseixrcj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_cNZtDBzqP3gGDMxJsvcvuA_iYOO-d4e';
         
         // Initialize Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentAdmin = null;
         
@@ -371,26 +558,24 @@
             const container = document.getElementById('productsContainer');
             
             try {
-                const { data: products, error } = await supabase
+                const { data: products, error } = await supabaseClient
                     .from('products')
                     .select('*')
                     .order('created_at', { ascending: false });
                 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
                 
                 if (!products || products.length === 0) {
                     container.innerHTML = `
                         <div class="empty">
-                            <p>🛒 لا توجد منتجات حالياً</p>
-                            <p style="margin-top: 10px;">سيتم إضافة منتجات قريباً!</p>
+                            <div class="empty-icon">🛒</div>
+                            <p>لا توجد منتجات حالياً</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">سيتم إضافة منتجات قريباً!</p>
                         </div>
                     `;
                     return;
                 }
                 
-                // Render products grid
                 container.innerHTML = `
                     <div class="products-grid">
                         ${products.map(product => `
@@ -401,27 +586,25 @@
                                      onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                                 <div class="product-info">
                                     <h3 class="product-name">${product.name}</h3>
-                                    <p class="product-description">${product.description || 'لا يوجد وصف'}</p>
+                                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">${product.description || ''}</p>
                                     <div class="product-price">
                                         ${product.price} ${product.currency || 'ر.ي'}
                                     </div>
-                                    <span class="product-category">${product.category || 'غير مصنف'}</span>
+                                    ${product.original_price ? `<div class="product-old-price">${product.original_price} ر.ي</div>` : ''}
+                                    <span class="product-tag">${product.category || 'عام'}</span>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    <p style="text-align: center; margin-top: 30px; color: #888;">
-                        📦 ${products.length} منتج متوفر
-                    </p>
                 `;
                 
             } catch (error) {
                 console.error('Error loading products:', error);
                 container.innerHTML = `
-                    <div class="error">
-                        <p>❌ حدث خطأ في تحميل المنتجات</p>
-                        <p style="font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
-                        <button onclick="loadProducts()" class="btn btn-primary" style="margin-top: 20px;">
+                    <div class="empty">
+                        <div class="empty-icon">⚠️</div>
+                        <p>حدث خطأ في تحميل المنتجات</p>
+                        <button onclick="loadProducts()" class="btn-submit" style="margin-top: 15px; width: auto; padding: 10px 30px;">
                             🔄 إعادة المحاولة
                         </button>
                     </div>
@@ -429,7 +612,7 @@
             }
         }
         
-        // Show/Hide Panels
+        // Panel Functions
         function showLoginPanel() {
             document.getElementById('overlay').classList.add('active');
             document.getElementById('loginPanel').classList.add('active');
@@ -437,7 +620,7 @@
         
         function showProductPanel() {
             if (!currentAdmin) {
-                showMessage('loginMessages', 'يجب تسجيل الدخول كأدمن أولاً', 'error');
+                showMessage('loginMessages', '⚠️ يجب تسجيل الدخول كأدمن أولاً', 'error');
                 showLoginPanel();
                 return;
             }
@@ -447,36 +630,35 @@
         
         function closePanels() {
             document.getElementById('overlay').classList.remove('active');
-            document.querySelectorAll('.admin-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
+            document.getElementById('loginPanel').classList.remove('active');
+            document.getElementById('productPanel').classList.remove('active');
         }
         
-        // Admin Login
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+        // Admin Login Handler
+        async function handleAdminLogin(e) {
             e.preventDefault();
             
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
             
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
                 });
                 
                 if (error) throw error;
                 
-                // Check if user is admin
-                const { data: userData, error: userError } = await supabase
+                // Verify admin role
+                const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('role')
                     .eq('email', email)
                     .single();
                 
                 if (userError || userData?.role !== 'admin') {
-                    await supabase.auth.signOut();
-                    throw new Error('غير مصرح. هذا الحساب ليس له صلاحية الأدمن.');
+                    await supabaseClient.auth.signOut();
+                    throw new Error('هذا الحساب ليس لديه صلاحية الأدمن');
                 }
                 
                 currentAdmin = data.user;
@@ -489,16 +671,16 @@
                 
             } catch (error) {
                 console.error('Login error:', error);
-                showMessage('loginMessages', error.message, 'error');
+                showMessage('loginMessages', '❌ ' + error.message, 'error');
             }
-        });
+        }
         
-        // Add Product
-        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+        // Add Product Handler
+        async function handleAddProduct(e) {
             e.preventDefault();
             
             if (!currentAdmin) {
-                showMessage('productMessages', 'يجب تسجيل الدخول أولاً', 'error');
+                showMessage('productMessages', '⚠️ يجب تسجيل الدخول أولاً', 'error');
                 return;
             }
             
@@ -508,17 +690,16 @@
                 description: document.getElementById('productDescription').value,
                 image_url: document.getElementById('productImage').value,
                 category: document.getElementById('productCategory').value,
-                payment_method: document.getElementById('productPayment').value,
+                payment_method: 'cash',
                 currency: 'YER',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
             
             try {
-                const { data, error } = await supabase
+                const { error } = await supabaseClient
                     .from('products')
-                    .insert([productData])
-                    .select();
+                    .insert([productData]);
                 
                 if (error) throw error;
                 
@@ -527,58 +708,47 @@
                 
                 setTimeout(() => {
                     closePanels();
-                    loadProducts(); // Refresh products
+                    loadProducts();
                 }, 1500);
                 
             } catch (error) {
                 console.error('Error adding product:', error);
-                showMessage('productMessages', error.message, 'error');
+                showMessage('productMessages', '❌ ' + error.message, 'error');
             }
-        });
+        }
         
-        // Update UI for Admin
+        // Update UI
         function updateUIForAdmin() {
-            document.getElementById('adminBadge').style.display = 'inline-block';
+            document.getElementById('adminBadge').classList.add('show');
             document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('addProductBtn').style.display = 'inline-block';
-            document.getElementById('logoutBtn').style.display = 'inline-block';
+            document.getElementById('logoutBtn').style.display = 'flex';
+            document.getElementById('addProductNav').style.display = 'block';
         }
         
         // Logout
         async function logoutAdmin() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             currentAdmin = null;
-            document.getElementById('adminBadge').style.display = 'none';
-            document.getElementById('loginBtn').style.display = 'inline-block';
-            document.getElementById('addProductBtn').style.display = 'none';
+            document.getElementById('adminBadge').classList.remove('show');
+            document.getElementById('loginBtn').style.display = 'flex';
             document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('addProductNav').style.display = 'none';
+            alert('✅ تم تسجيل الخروج بنجاح');
         }
         
-        // Check existing session
+        // Check session
         async function checkAdminSession() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
                 currentAdmin = user;
                 updateUIForAdmin();
             }
         }
         
-        // Show messages
+        // Show message
         function showMessage(containerId, message, type) {
             const container = document.getElementById(containerId);
-            container.innerHTML = `
-                <div class="${type === 'success' ? 'success-message' : 'error-message'}">
-                    ${message}
-                </div>
-            `;
-        }
-        
-        // Close panels on overlay click
-        document.getElementById('overlay').addEventListener('click', closePanels);
-        
-        // Load env variables from window.ENV (set by Vercel or server)
-        if (typeof window.ENV === 'undefined') {
-            window.ENV = {};
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
         }
     </script>
 </body>
