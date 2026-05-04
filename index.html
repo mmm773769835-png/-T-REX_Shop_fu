@@ -1635,6 +1635,8 @@
                     errorMsg = 'هذا البريد مسجل بالفعل!';
                 } else if (errorMsg.includes('weak_password')) {
                     errorMsg = 'كلمة المرور ضعيفة جداً. يجب أن تكون 8 أحرف على الأقل.';
+                } else if (errorMsg.includes('rate limit') || errorMsg.includes('over_email_send_rate_limit') || errorMsg.includes('عدد رسائل')) {
+                    errorMsg = '⏳ تم تجاوز الحد الأقصى لعدد رسائل البريد الإلكتروني. يرجى الانتظار 60 ثانية قبل المحاولة مرة أخرى.';
                 }
 
                 showMessage('signupMessages', '❌ ' + errorMsg, 'error');
