@@ -1600,12 +1600,97 @@
                     </div>
                 </div>
 
+                <!-- إعدادات الحساب -->
+                <div style="background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <h4 style="color: #333; margin-bottom: 15px; border-bottom: 2px solid #FFD700; padding-bottom: 10px;">⚙️ إعدادات الحساب</h4>
+
+                    <!-- تغيير كلمة المرور -->
+                    <div id="passwordChangeSection">
+                        <button onclick="togglePasswordForm()" class="btn-submit" style="background: linear-gradient(135deg, #667eea, #764ba2); width: 100%; margin-bottom: 15px;">
+                            🔐 تغيير كلمة المرور
+                        </button>
+
+                        <div id="passwordForm" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: block; margin-bottom: 5px; color: #666; font-size: 0.9rem;">كلمة المرور الحالية</label>
+                                <input type="password" id="currentPassword" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;" placeholder="••••••••">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: block; margin-bottom: 5px; color: #666; font-size: 0.9rem;">كلمة المرور الجديدة</label>
+                                <input type="password" id="newPassword" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;" placeholder="••••••••">
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; color: #666; font-size: 0.9rem;">تأكيد كلمة المرور الجديدة</label>
+                                <input type="password" id="confirmNewPassword" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;" placeholder="••••••••">
+                            </div>
+                            <div id="passwordChangeMessage" style="margin-bottom: 10px;"></div>
+                            <button onclick="handlePasswordChange()" class="btn-submit" style="background: linear-gradient(135deg, #4CAF50, #45a049); width: 100%;">
+                                💾 حفظ التغييرات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="margin-top: 20px;">
                     <button onclick="signOut()" class="btn-submit" style="background: linear-gradient(135deg, #ff4444, #cc0000); width: 100%;">
                         🚪 تسجيل الخروج
                     </button>
                 </div>
             `;
+        }
+
+        // Toggle password change form
+        function togglePasswordForm() {
+            const form = document.getElementById('passwordForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        // Handle password change
+        async function handlePasswordChange() {
+            const currentPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmNewPassword').value;
+            const msgDiv = document.getElementById('passwordChangeMessage');
+
+            if (!newPass || newPass.length < 6) {
+                msgDiv.innerHTML = '<p style="color: #ff4444;">❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل</p>';
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                msgDiv.innerHTML = '<p style="color: #ff4444;">❌ كلمتا المرور غير متطابقتين</p>';
+                return;
+            }
+
+            try {
+                msgDiv.innerHTML = '<p style="color: #666;">⏳ جاري تغيير كلمة المرور...</p>';
+
+                const { error } = await supabaseClient.auth.updateUser({
+                    password: newPass
+                });
+
+                if (error) throw error;
+
+                msgDiv.innerHTML = '<p style="color: #4CAF50;">✅ تم تغيير كلمة المرور بنجاح!</p>';
+
+                // Clear inputs
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
+
+                setTimeout(() => {
+                    togglePasswordForm();
+                    msgDiv.innerHTML = '';
+                }, 2000);
+
+            } catch (error) {
+                console.error('❌ Password change error:', error);
+                msgDiv.innerHTML = `<p style="color: #ff4444;">❌ ${error.message || 'فشل تغيير كلمة المرور'}</p>`;
+            }
         }
         
         async function checkUserSession() {
