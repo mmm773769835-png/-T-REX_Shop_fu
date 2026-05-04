@@ -1473,23 +1473,47 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
             const name = document.getElementById('signupName').value;
-            
+
             try {
                 showMessage('signupMessages', '⏳ جاري إنشاء حسابك...', 'info');
-                const { data, error } = await supabaseClient.auth.signUp({ 
-                    email, 
+                console.log('🔍 Attempting signup for:', email);
+
+                if (!supabaseClient) {
+                    throw new Error('Supabase client not initialized. Please refresh the page.');
+                }
+
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
                     password,
                     options: { data: { full_name: name } }
                 });
-                if (error) throw error;
-                
+
+                console.log('📊 Signup response:', { data, error });
+
+                if (error) {
+                    console.error('❌ Signup error details:', error);
+                    throw error;
+                }
+
                 showMessage('signupMessages', '✅ تم إنشاء حسابك بنجاح! تحقق من بريدك لتفعيل الحساب', 'success');
                 setTimeout(() => {
                     closePanels();
                     showUserLoginPanel();
                 }, 2000);
             } catch (error) {
-                showMessage('signupMessages', '❌ ' + error.message, 'error');
+                console.error('❌ Signup exception:', error);
+                let errorMsg = error.message || 'حدث خطأ غير متوقع';
+
+                // Translate common errors
+                if (errorMsg.includes('Invalid API key')) {
+                    errorMsg = 'مفتاح API غير صالح. يرجى التحقق من إعدادات Supabase.';
+                } else if (errorMsg.includes('User already registered')) {
+                    errorMsg = 'هذا البريد مسجل بالفعل!';
+                } else if (errorMsg.includes('weak_password')) {
+                    errorMsg = 'كلمة المرور ضعيفة جداً. يجب أن تكون 6 أحرف على الأقل.';
+                }
+
+                showMessage('signupMessages', '❌ ' + errorMsg, 'error');
             }
         }
         
