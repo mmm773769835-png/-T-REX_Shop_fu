@@ -1617,11 +1617,12 @@
                     throw error;
                 }
 
-                showMessage('signupMessages', '✅ تم إنشاء حسابك بنجاح! 📧 تم إرسال كود التحقق إلى بريدك الإلكتروني. يرجى التحقق من بريدك وتفعيل الحساب.', 'success');
+                showMessage('signupMessages', '✅ تم إنشاء حسابك بنجاح! 📧 تم إرسال رابط التفعيل إلى بريدك الإلكتروني. يرجى الضغط على الرابط في البريد لتفعيل حسابك.', 'success');
 
-                // عرض لوحة إدخال كود التحقق
+                // Magic Link - لا يحتاج إلى إدخال كود، فقط اضغط الرابط في البريد
                 setTimeout(() => {
-                    showVerificationPanel(email);
+                    closePanels();
+                    showNotification('📧 افحص بريدك واضغط على رابط التفعيل', 'info', 8000);
                 }, 2000);
 
             } catch (error) {
