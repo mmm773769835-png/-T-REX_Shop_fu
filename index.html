@@ -977,18 +977,71 @@
             }
         }
 
-        // Handle Google Sign-In callback
+        // Handle Google Sign-In and Magic Link callback
         async function handleAuthCallback() {
             try {
                 console.log('🔍 Checking for auth callback...');
 
-                // Parse hash parameters from URL
+                // Parse hash parameters from URL (for Google OAuth)
                 const hashParams = new URLSearchParams(window.location.hash.substring(1));
                 const accessToken = hashParams.get('access_token');
                 const refreshToken = hashParams.get('refresh_token');
 
+                // Parse query parameters from URL (for Magic Link)
+                const queryParams = new URLSearchParams(window.location.search);
+                const token = queryParams.get('token');
+                const type = queryParams.get('type');
+
+                console.log('📊 URL params:', {
+                    hashAccessToken: accessToken ? 'found' : 'not found',
+                    queryToken: token ? 'found' : 'not found',
+                    type: type
+                });
+
+                // Handle Magic Link (from email)
+                if (token && type === 'signup') {
+                    console.log('✅ Magic Link token found for signup');
+                    showNotification('🔐 جاري تفعيل حسابك...', 'info');
+
+                    // Verify the OTP token
+                    const { data, error } = await supabaseClient.auth.verifyOtp({
+                        token_hash: token,
+                        type: 'signup'
+                    });
+
+                    if (error) {
+                        console.error('❌ Magic Link verification error:', error);
+                        showNotification('❌ رابط التفعيل غير صالح أو منتهي', 'error');
+                        return;
+                    }
+
+                    if (data.session) {
+                        console.log('✅ Magic Link session established:', data.session.user);
+                        currentUser = data.session.user;
+
+                        // Save session to localStorage
+                        localStorage.setItem('trex_session', JSON.stringify({
+                            access_token: data.session.access_token,
+                            refresh_token: data.session.refresh_token,
+                            expires_at: data.session.expires_at
+                        }));
+                        localStorage.setItem('trex_user', JSON.stringify(data.session.user));
+
+                        updateUIForLoggedInUser(data.session.user);
+                        showNotification('🎉 تم تفعيل حسابك بنجاح! أهلاً بك', 'success');
+
+                        // Clean up URL
+                        window.history.replaceState({}, document.title, window.location.pathname);
+
+                        // Close login panel if open
+                        closePanels();
+                    }
+                    return;
+                }
+
+                // Handle Google OAuth
                 if (accessToken) {
-                    console.log('✅ Access token found in URL');
+                    console.log('✅ Access token found in URL (Google OAuth)');
 
                     // Set the session with the tokens
                     const { data, error } = await supabaseClient.auth.setSession({
