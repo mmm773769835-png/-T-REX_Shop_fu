@@ -1680,18 +1680,37 @@
 
             } catch (error) {
                 console.error('❌ Signup exception:', error);
-                let errorMsg = error.message || 'حدث خطأ غير متوقع';
+
+                // Handle different error types
+                let errorMsg = 'حدث خطأ غير متوقع';
+
+                if (error && error.message) {
+                    errorMsg = error.message;
+                } else if (typeof error === 'string') {
+                    errorMsg = error;
+                } else if (error && error.error_description) {
+                    errorMsg = error.error_description;
+                } else if (error && error.msg) {
+                    errorMsg = error.msg;
+                }
 
                 // Translate common errors
                 if (errorMsg.includes('Invalid API key')) {
                     errorMsg = 'مفتاح API غير صالح. يرجى التحقق من إعدادات Supabase.';
                 } else if (errorMsg.includes('User already registered')) {
-                    errorMsg = 'هذا البريد مسجل بالفعل!';
+                    errorMsg = 'هذا البريد مسجل بالفعل! جرب تسجيل الدخول.';
                 } else if (errorMsg.includes('weak_password')) {
-                    errorMsg = 'كلمة المرور ضعيفة جداً. يجب أن تكون 8 أحرف على الأقل.';
-                } else if (errorMsg.includes('rate limit') || errorMsg.includes('over_email_send_rate_limit') || errorMsg.includes('عدد رسائل')) {
-                    errorMsg = '⏳ تم تجاوز الحد الأقصى لعدد رسائل البريد الإلكتروني. يرجى الانتظار 60 ثانية قبل المحاولة مرة أخرى.';
+                    errorMsg = 'كلمة المرور ضعيفة. يجب أن تحتوي على أحرف كبيرة وصغيرة وأرقام ورموز.';
+                } else if (errorMsg.includes('rate_limit') || errorMsg.includes('over_email_send_rate_limit')) {
+                    errorMsg = '⏳ تم تجاوز الحد الأقصى للبريد. انتظر 1 ساعة ثم حاول مجدداً.';
+                } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
+                    errorMsg = 'مشكلة في الاتصال بالإنترنت. تأكد من اتصالك وحاول مرة أخرى.';
+                } else if (errorMsg.includes('invalid email')) {
+                    errorMsg = 'صيغة البريد الإلكتروني غير صحيحة.';
                 }
+
+                // Log full error for debugging
+                console.log('Full error object:', JSON.stringify(error, null, 2));
 
                 showMessage('signupMessages', '❌ ' + errorMsg, 'error');
             }
