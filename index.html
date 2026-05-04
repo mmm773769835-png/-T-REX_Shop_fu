@@ -857,19 +857,23 @@
         let currentCategory = 'all';
 
         // Initialize App
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('🦖 T-REX Shop Loading...');
             initSupabase();
-            checkUserSession();
+
+            // Handle auth callback FIRST if present
+            if (window.location.hash.includes('access_token') ||
+                window.location.search.includes('code=')) {
+                console.log('🔑 Auth callback detected, handling...');
+                await handleAuthCallback();
+            } else {
+                // Otherwise check existing session
+                await checkUserSession();
+            }
+
             loadProducts();
             checkAdminSession();
             loadCart();
-
-            // Handle auth callback if present
-            if (window.location.hash.includes('access_token') ||
-                window.location.search.includes('code=')) {
-                handleAuthCallback();
-            }
         });
         
         // Initialize Supabase
