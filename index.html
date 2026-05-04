@@ -891,15 +891,28 @@
         // GOOGLE SIGN-IN FUNCTIONS
         // ==========================================
 
+        // Get the correct redirect URL based on current environment
+        function getRedirectUrl() {
+            // If on localhost, use production URL
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'https://trexshopmax.com';
+            }
+            // Otherwise use current origin
+            return window.location.origin;
+        }
+
         // Google Sign-In using Supabase Auth
         async function signInWithGoogle() {
             try {
                 console.log('🔵 Starting Google Sign-In...');
 
+                const redirectUrl = getRedirectUrl();
+                console.log('📍 Redirect URL:', redirectUrl);
+
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: 'https://trexshopmax.com/auth/callback',
+                        redirectTo: redirectUrl,
                         queryParams: {
                             access_type: 'offline',
                             prompt: 'consent'
