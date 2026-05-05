@@ -41,6 +41,8 @@ tmp/
 **/private/*.json
 firebase-service-account.json
 *service-account*.json
+supabase-config.js
+config.js
 
 # Expo Router
 .expo/types/
