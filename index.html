@@ -190,36 +190,63 @@
             border: 3px solid #FFD700;
             box-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
-        /* Categories - Dark */
-        .categories {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        /* Categories - Horizontal Scroll */
+        .categories-container {
+            position: relative;
             padding: 0 15px;
             margin-bottom: 20px;
         }
+        .categories {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            margin-bottom: 5px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE */
+        }
+        .categories::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
         .category-item {
+            flex: 0 0 auto;
             text-align: center;
-            padding: 10px;
+            padding: 12px 20px;
+            min-width: 90px;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0 2px 8px rgba(255,215,0,0.1);
             border: 1px solid rgba(255,215,0,0.2);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         .category-item:hover {
             border-color: rgba(255,215,0,0.5);
             box-shadow: 0 4px 15px rgba(255,215,0,0.2);
+            transform: translateY(-3px);
+        }
+        .category-item.active {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-color: #FFD700;
+        }
+        .category-item.active .category-icon {
+            background: #0a0a0a;
+            color: #FFD700;
+        }
+        .category-item.active .category-name {
+            color: #0a0a0a;
+            font-weight: 700;
         }
         .category-icon {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             margin: 0 auto 8px;
             box-shadow: 0 3px 10px rgba(255,215,0,0.3);
         }
@@ -227,6 +254,13 @@
             font-size: 0.75rem;
             color: #FFD700;
             font-weight: 600;
+            white-space: nowrap;
+        }
+        .scroll-hint {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 5px;
         }
         /* Products Section - Dark */
         .section-header {
@@ -848,63 +882,63 @@
         </div>
     </div>
 
-    <!-- Admin Link -->
-    <div style="background: #0a0a0a; padding: 10px; text-align: center; border-bottom: 1px solid #333;">
-        <a href="admin.html" style="color: #FFD700; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
-            ⚙️ لوحة تحكم المتجر (للمشرفين)
-        </a>
-    </div>
 
     <!-- Categories -->
-    <div class="categories" id="categoriesSection">
-        <div class="category-item" onclick="loadProducts('إلكترونيات')" data-category="إلكترونيات">
-            <div class="category-icon">📱</div>
-            <div class="category-name">إلكترونيات</div>
+    <div class="section-header">
+        <h3 class="section-title">📂 تسوق حسب القسم</h3>
+    </div>
+    <div class="categories-container">
+        <div class="categories" id="categoriesSection">
+            <div class="category-item active" onclick="loadProducts('all'); setActiveCategory(this)" data-category="all">
+                <div class="category-icon">🌟</div>
+                <div class="category-name">الكل</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('إلكترونيات'); setActiveCategory(this)" data-category="إلكترونيات">
+                <div class="category-icon">📱</div>
+                <div class="category-name">إلكترونيات</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('ملابس'); setActiveCategory(this)" data-category="ملابس">
+                <div class="category-icon">👕</div>
+                <div class="category-name">ملابس</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('أحذية'); setActiveCategory(this)" data-category="أحذية">
+                <div class="category-icon">👟</div>
+                <div class="category-name">أحذية</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('إكسسوارات'); setActiveCategory(this)" data-category="إكسسوارات">
+                <div class="category-icon">⌚</div>
+                <div class="category-name">إكسسوارات</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('منزل'); setActiveCategory(this)" data-category="منزل">
+                <div class="category-icon">🏠</div>
+                <div class="category-name">منزل</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('رياضة'); setActiveCategory(this)" data-category="رياضة">
+                <div class="category-icon">⚽</div>
+                <div class="category-name">رياضة</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('صحة وجمال'); setActiveCategory(this)" data-category="صحة وجمال">
+                <div class="category-icon">💄</div>
+                <div class="category-name">صحة وجمال</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('كتب'); setActiveCategory(this)" data-category="كتب">
+                <div class="category-icon">📚</div>
+                <div class="category-name">كتب</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('ألعاب'); setActiveCategory(this)" data-category="ألعاب">
+                <div class="category-icon">🎮</div>
+                <div class="category-name">ألعاب</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('طعام'); setActiveCategory(this)" data-category="طعام">
+                <div class="category-icon">🍔</div>
+                <div class="category-name">طعام</div>
+            </div>
+            <div class="category-item" onclick="loadProducts('سيارات'); setActiveCategory(this)" data-category="سيارات">
+                <div class="category-icon">🚗</div>
+                <div class="category-name">سيارات</div>
+            </div>
         </div>
-        <div class="category-item" onclick="loadProducts('ملابس')" data-category="ملابس">
-            <div class="category-icon">👕</div>
-            <div class="category-name">ملابس</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('أحذية')" data-category="أحذية">
-            <div class="category-icon">👟</div>
-            <div class="category-name">أحذية</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('إكسسوارات')" data-category="إكسسوارات">
-            <div class="category-icon">⌚</div>
-            <div class="category-name">إكسسوارات</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('منزل')" data-category="منزل">
-            <div class="category-icon">🏠</div>
-            <div class="category-name">منزل</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('رياضة')" data-category="رياضة">
-            <div class="category-icon">⚽</div>
-            <div class="category-name">رياضة</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('صحة وجمال')" data-category="صحة وجمال">
-            <div class="category-icon">�</div>
-            <div class="category-name">صحة وجمال</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('كتب')" data-category="كتب">
-            <div class="category-icon">📚</div>
-            <div class="category-name">كتب</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('ألعاب')" data-category="ألعاب">
-            <div class="category-icon">🎮</div>
-            <div class="category-name">ألعاب</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('طعام')" data-category="طعام">
-            <div class="category-icon">🍔</div>
-            <div class="category-name">طعام</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('سيارات')" data-category="سيارات">
-            <div class="category-icon">🚗</div>
-            <div class="category-name">سيارات</div>
-        </div>
-        <div class="category-item" onclick="loadProducts('all')" data-category="all">
-            <div class="category-icon">🌟</div>
-            <div class="category-name">الكل</div>
-        </div>
+        <p class="scroll-hint">← اسحب لليمين لرؤية المزيد →</p>
     </div>
 
     <!-- Products Section -->
@@ -1440,7 +1474,15 @@
         function filterCategory(category) {
             loadProducts(category);
         }
-        
+
+        // Set active category (for visual highlighting)
+        function setActiveCategory(element) {
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
         // View product details
         function viewProduct(productId) {
             showNotification(`عرض تفاصيل المنتج #${productId}`, 'info');
