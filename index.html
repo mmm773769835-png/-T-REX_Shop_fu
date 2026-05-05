@@ -827,23 +827,83 @@
         </div>
     </div>
 
+    <!-- Currency Selector -->
+    <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 15px; text-align: center; border-bottom: 2px solid #FFD700;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <span style="color: #FFD700; font-weight: bold;">💱 اختر العملة:</span>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="setCurrency('SAR')" class="currency-btn active" id="curr-SAR" style="background: #FFD700; color: #000; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                    🇸🇦 ر.س
+                </button>
+                <button onclick="setCurrency('OMR')" class="currency-btn" id="curr-OMR" style="background: transparent; color: #FFD700; border: 2px solid #FFD700; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                    🇴🇲 ر.ع
+                </button>
+                <button onclick="setCurrency('AED')" class="currency-btn" id="curr-AED" style="background: transparent; color: #FFD700; border: 2px solid #FFD700; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                    🇦🇪 د.إ
+                </button>
+                <button onclick="setCurrency('USD')" class="currency-btn" id="curr-USD" style="background: transparent; color: #FFD700; border: 2px solid #FFD700; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                    🇺🇸 $
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Link -->
+    <div style="background: #0a0a0a; padding: 10px; text-align: center; border-bottom: 1px solid #333;">
+        <a href="admin.html" style="color: #FFD700; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
+            ⚙️ لوحة تحكم المتجر (للمشرفين)
+        </a>
+    </div>
+
     <!-- Categories -->
-    <div class="categories">
-        <div class="category-item" onclick="loadProducts('إلكترونيات')" style="cursor: pointer;">
+    <div class="categories" id="categoriesSection">
+        <div class="category-item" onclick="loadProducts('إلكترونيات')" data-category="إلكترونيات">
             <div class="category-icon">📱</div>
             <div class="category-name">إلكترونيات</div>
         </div>
-        <div class="category-item" onclick="loadProducts('ملابس')" style="cursor: pointer;">
+        <div class="category-item" onclick="loadProducts('ملابس')" data-category="ملابس">
             <div class="category-icon">👕</div>
             <div class="category-name">ملابس</div>
         </div>
-        <div class="category-item" onclick="loadProducts('أحذية')" style="cursor: pointer;">
+        <div class="category-item" onclick="loadProducts('أحذية')" data-category="أحذية">
             <div class="category-icon">👟</div>
             <div class="category-name">أحذية</div>
         </div>
-        <div class="category-item" onclick="loadProducts('إكسسوارات')" style="cursor: pointer;">
+        <div class="category-item" onclick="loadProducts('إكسسوارات')" data-category="إكسسوارات">
             <div class="category-icon">⌚</div>
             <div class="category-name">إكسسوارات</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('منزل')" data-category="منزل">
+            <div class="category-icon">🏠</div>
+            <div class="category-name">منزل</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('رياضة')" data-category="رياضة">
+            <div class="category-icon">⚽</div>
+            <div class="category-name">رياضة</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('صحة وجمال')" data-category="صحة وجمال">
+            <div class="category-icon">�</div>
+            <div class="category-name">صحة وجمال</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('كتب')" data-category="كتب">
+            <div class="category-icon">📚</div>
+            <div class="category-name">كتب</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('ألعاب')" data-category="ألعاب">
+            <div class="category-icon">🎮</div>
+            <div class="category-name">ألعاب</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('طعام')" data-category="طعام">
+            <div class="category-icon">🍔</div>
+            <div class="category-name">طعام</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('سيارات')" data-category="سيارات">
+            <div class="category-icon">🚗</div>
+            <div class="category-name">سيارات</div>
+        </div>
+        <div class="category-item" onclick="loadProducts('all')" data-category="all">
+            <div class="category-icon">🌟</div>
+            <div class="category-name">الكل</div>
         </div>
     </div>
 
@@ -1304,11 +1364,19 @@
             }
         }
         
-        // Render product card
+        // Render product card with rating and currency
         function renderProductCard(product) {
             const discount = product.original_price && product.original_price > product.price 
                 ? Math.round((1 - product.price / product.original_price) * 100) 
                 : 0;
+            
+            // Convert price to selected currency
+            const displayPrice = convertPrice(product.price, product.currency || 'OMR');
+            const displayOriginalPrice = product.original_price ? convertPrice(product.original_price, product.currency || 'OMR') : null;
+            
+            // Rating (random between 3-5 for demo, or from product.rating)
+            const rating = product.rating || (3 + Math.random() * 2);
+            const reviewCount = product.review_count || Math.floor(Math.random() * 50) + 5;
             
             return `
                 <div class="product-card" onclick="viewProduct(${product.id})">
@@ -1322,24 +1390,44 @@
                                 -${discount}%
                             </span>
                         ` : ''}
+                        ${product.is_new ? `
+                            <span style="position: absolute; top: 10px; left: 10px; background: #4CAF50; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: bold;">
+                                جديد
+                            </span>
+                        ` : ''}
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
+                        
+                        <!-- Rating -->
+                        <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 8px;">
+                            <span style="font-size: 0.85rem;">${renderRating(rating)}</span>
+                            <span style="font-size: 0.75rem; color: #666;">(${reviewCount})</span>
+                        </div>
+                        
                         <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px; line-height: 1.4;">
                             ${product.description ? product.description.substring(0, 50) + '...' : 'لا يوجد وصف'}
                         </p>
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                            <span class="product-price">${product.price} ${product.currency || 'ر.ي'}</span>
-                            ${product.original_price ? `
+                        
+                        <!-- Price with currency conversion -->
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                            <span class="product-price" style="font-size: 1rem;">
+                                ${displayPrice} ${currencySymbols[currentCurrency]}
+                            </span>
+                            ${displayOriginalPrice ? `
                                 <span style="text-decoration: line-through; color: #999; font-size: 0.85rem;">
-                                    ${product.original_price} ر.ي
+                                    ${displayOriginalPrice} ${currencySymbols[currentCurrency]}
                                 </span>
                             ` : ''}
                         </div>
+                        
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span class="product-tag">${product.category || 'عام'}</span>
                             <button onclick="event.stopPropagation(); addToCart(${product.id})" 
-                                    style="background: #FF6600; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">
+                                    style="background: linear-gradient(135deg, #FF6600, #FF4500); 
+                                           color: white; border: none; padding: 8px 15px; 
+                                           border-radius: 20px; font-size: 0.8rem; cursor: pointer;
+                                           box-shadow: 0 2px 5px rgba(255,102,0,0.3);">
                                 🛒 أضف
                             </button>
                         </div>
@@ -1363,7 +1451,65 @@
         // ==========================================
         
         let allProducts = [];
-        
+        let currentCurrency = localStorage.getItem('trex_currency') || 'OMR';
+        let exchangeRates = {
+            'OMR': 1,
+            'SAR': 9.75,
+            'AED': 9.54,
+            'USD': 2.60
+        };
+        let currencySymbols = {
+            'OMR': 'ر.ع',
+            'SAR': 'ر.س',
+            'AED': 'د.إ',
+            'USD': '$'
+        };
+
+        // Set currency function
+        function setCurrency(currency) {
+            currentCurrency = currency;
+            localStorage.setItem('trex_currency', currency);
+
+            // Update UI
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = '#FFD700';
+            });
+
+            const activeBtn = document.getElementById('curr-' + currency);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.style.background = '#FFD700';
+                activeBtn.style.color = '#000';
+            }
+
+            // Reload products to show new currency
+            loadProducts(currentCategory);
+            showNotification(`💱 تم تغيير العملة إلى ${currencySymbols[currency]}`, 'success');
+        }
+
+        // Convert price function
+        function convertPrice(price, fromCurrency = 'OMR') {
+            if (!price) return 0;
+            const rate = exchangeRates[currentCurrency] / exchangeRates[fromCurrency];
+            return (price * rate).toFixed(2);
+        }
+
+        // Render star rating
+        function renderRating(rating = 0) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            let stars = '';
+            for (let i = 0; i < fullStars; i++) stars += '⭐';
+            if (hasHalfStar) stars += '✨';
+            for (let i = 0; i < emptyStars; i++) stars += '☆';
+
+            return stars;
+        }
+
         function addToCart(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) {
