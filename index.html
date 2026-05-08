@@ -2750,6 +2750,8 @@
 
         // Update User UI
         function updateUserUI() {
+            console.log('updateUserUI called, currentUser:', currentUser);
+            
             const loginBtn = document.getElementById('loginBtn');
             const userProfile = document.getElementById('userProfile');
             const userAvatar = document.getElementById('userAvatar');
@@ -2758,43 +2760,89 @@
             const userEmail = document.getElementById('userEmail');
 
             if (currentUser) {
-                // User is logged in
-                loginBtn.style.display = 'none';
-                userProfile.style.display = 'block';
+                console.log('User is logged in:', currentUser.email);
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userProfile) userProfile.style.display = 'flex';
                 
                 // Update user info
-                const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'https://via.placeholder.com/150/1a1a1a/FFD700?text=U';
-                const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'مستخدم';
-                const email = currentUser.email || 'no-email@example.com';
+                const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.email || 'User') + '&background=FFD700&color=000';
+                const name = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'مستخدم';
+                const email = currentUser.email || '';
                 
-                userAvatar.src = avatarUrl;
-                userAvatarLarge.src = avatarUrl;
-                userName.textContent = name;
-                userEmail.textContent = email;
+                if (userAvatar) userAvatar.src = avatarUrl;
+                if (userAvatarLarge) userAvatarLarge.src = avatarUrl;
+                if (userName) userName.textContent = name;
+                if (userEmail) userEmail.textContent = email;
+                
+                // Show persistent welcome banner
+                showWelcomeBanner(name, avatarUrl);
                 
                 console.log('User logged in:', currentUser);
             } else {
-                // User is logged out
-                loginBtn.style.display = 'flex';
-                userProfile.style.display = 'none';
+                console.log('No user logged in');
+                if (loginBtn) loginBtn.style.display = 'flex';
+                if (userProfile) userProfile.style.display = 'none';
+                hideWelcomeBanner();
             }
+        }
+        
+        function showWelcomeBanner(name, avatarUrl) {
+            let banner = document.getElementById('welcomeBanner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'welcomeBanner';
+                banner.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;padding:15px 25px;border-radius:50px;box-shadow:0 5px 20px rgba(255,215,0,0.5);z-index:9998;display:flex;align-items:center;gap:12px;font-weight:bold;animation:slideInRight 0.5s;';
+                document.body.appendChild(banner);
+            }
+            banner.innerHTML = `
+                <img src="${avatarUrl}" style="width:40px;height:40px;border-radius:50%;border:2px solid #000;">
+                <div>
+                    <div style="font-size:12px;opacity:0.7;">✅ تم تسجيل الدخول</div>
+                    <div style="font-size:14px;">أهلاً ${name} 👋</div>
+                </div>
+                <button onclick="hideWelcomeBanner()" style="background:none;border:none;cursor:pointer;font-size:18px;margin-right:5px;">×</button>
+            `;
+            banner.style.display = 'flex';
+        }
+        
+        function hideWelcomeBanner() {
+            const banner = document.getElementById('welcomeBanner');
+            if (banner) banner.style.display = 'none';
         }
 
         // Check Auth State
         async function checkAuthState() {
             try {
+                // Log URL hash for debugging OAuth callback
+                if (window.location.hash) {
+                    console.log('URL hash detected:', window.location.hash.substring(0, 50) + '...');
+                }
+                
                 const { data: { session }, error } = await supabase.auth.getSession();
                 
                 if (error) throw error;
                 
                 if (session) {
                     currentUser = session.user;
-                    console.log('Session found:', session);
+                    console.log('✅ Session found on load:', currentUser.email);
+                    updateUserUI();
+                    showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || ''));
                 } else {
+                    console.log('❌ No session on load. URL:', window.location.href);
                     currentUser = null;
+                    updateUserUI();
+                    
+                    // Retry after delay (OAuth hash may still be processing)
+                    setTimeout(async () => {
+                        const { data: { session: retrySession } } = await supabase.auth.getSession();
+                        if (retrySession && !currentUser) {
+                            currentUser = retrySession.user;
+                            console.log('✅ Session found on retry:', currentUser.email);
+                            updateUserUI();
+                            showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || ''));
+                        }
+                    }, 1500);
                 }
-                
-                updateUserUI();
                 
             } catch (error) {
                 console.error('Error checking auth state:', error);
@@ -2807,11 +2855,17 @@
             
             if (event === 'SIGNED_IN' && session) {
                 currentUser = session.user;
-                updateUserUI();
-                showNotification('أهلاً بك! ' + (currentUser.user_metadata?.full_name || '') + ' 🎉');
+                console.log('User signed in:', currentUser);
+                
+                // Force immediate UI update
+                setTimeout(() => {
+                    updateUserUI();
+                    showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
+                }, 100);
             } else if (event === 'SIGNED_OUT') {
                 currentUser = null;
                 updateUserUI();
+                showNotification('تم تسجيل الخروج! 👋');
             }
         });
 
@@ -2821,6 +2875,8 @@
             if (session) {
                 currentUser = session.user;
                 updateUserUI();
+                showNotification('تم تسجيل الدخول بنجاح عبر Google! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
+                console.log('OAuth login successful:', currentUser);
             }
         }
 
