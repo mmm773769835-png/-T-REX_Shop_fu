@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  command = "echo 'Static site - no build needed'"
+  command = "echo 'Static site deployment'"
 
 [[redirects]]
   from = "/admin/*"
@@ -13,15 +13,7 @@
   status = 200
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   force = false
-
-[build.environment]
-  NODE_VERSION = "18"
