@@ -1773,6 +1773,81 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(255,215,0,0.3);
         }
+
+        /* Review Modal Styles */
+        .review-modal-content {
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .review-form {
+            padding: 20px;
+        }
+        .star-rating-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 36px;
+        }
+        .star-rating-input .star {
+            color: #444;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .star-rating-input .star:hover,
+        .star-rating-input .star.active {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        .star-rating-input .star:hover ~ .star {
+            color: #444;
+        }
+        .review-textarea {
+            width: 100%;
+            background: var(--dark);
+            border: 2px solid #333;
+            padding: 15px;
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 120px;
+        }
+        .review-textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .btn-submit-review {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-submit-review:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+        .btn-submit-review:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .rating-hint {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -2005,7 +2080,7 @@
                     <div class="rating-count">بناءً على 256 تقييم</div>
                 </div>
             </div>
-            <button class="btn-add-review" onclick="showNotification('سيتم إضافة التقييم قريباً! ⭐')">
+            <button class="btn-add-review" onclick="openReviewModal()">
                 <i class="fas fa-star"></i> أضف تقييمك
             </button>
         </div>
@@ -3683,6 +3758,181 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         }
 
         // ============================================
+        // Review Management
+        // ============================================
+        let currentRating = 0;
+
+        function openReviewModal() {
+            if (!currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً! 🔒');
+                return;
+            }
+            
+            // Reset form
+            currentRating = 0;
+            document.getElementById('reviewText').value = '';
+            updateStarDisplay();
+            document.getElementById('ratingHint').textContent = 'اضغط على النجوم للتقييم';
+            document.getElementById('submitReviewBtn').disabled = false;
+            
+            document.getElementById('reviewModal').classList.add('show');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.remove('show');
+        }
+
+        function setRating(rating) {
+            currentRating = rating;
+            updateStarDisplay();
+            
+            const hints = ['', 'ضعيف', 'مقبول', 'جيد', 'جيد جداً', 'ممتاز'];
+            document.getElementById('ratingHint').textContent = hints[rating];
+        }
+
+        function updateStarDisplay() {
+            const stars = document.querySelectorAll('#starRatingInput .star');
+            stars.forEach((star, index) => {
+                star.classList.toggle('active', index < currentRating);
+            });
+        }
+
+        async function submitReview(event) {
+            event.preventDefault();
+            
+            if (currentRating === 0) {
+                showNotification('الرجاء اختيار تقييم! ⭐');
+                return;
+            }
+            
+            const reviewText = document.getElementById('reviewText').value.trim();
+            const submitBtn = document.getElementById('submitReviewBtn');
+            
+            // Disable button to prevent double submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            
+            try {
+                // Get existing reviews
+                let reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+                
+                // Check if user already reviewed
+                const existingReviewIndex = reviews.findIndex(r => r.user_id === currentUser.id);
+                
+                const reviewData = {
+                    id: existingReviewIndex >= 0 ? reviews[existingReviewIndex].id : Date.now(),
+                    user_id: currentUser.id,
+                    user_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'مستخدم',
+                    user_avatar: currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.email || 'U')}&background=FFD700&color=000`,
+                    rating: currentRating,
+                    text: reviewText,
+                    date: new Date().toISOString()
+                };
+                
+                if (existingReviewIndex >= 0) {
+                    // Update existing review
+                    reviews[existingReviewIndex] = reviewData;
+                    showNotification('تم تحديث تقييمك بنجاح! ⭐');
+                } else {
+                    // Add new review
+                    reviews.unshift(reviewData);
+                    showNotification('شكراً لتقييمك! ⭐ تم إضافته بنجاح');
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('trex_reviews', JSON.stringify(reviews));
+                
+                // Close modal and refresh reviews display
+                closeReviewModal();
+                loadAndDisplayReviews();
+                
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showNotification('حدث خطأ أثناء إرسال التقييم! ❌');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال التقييم';
+            }
+        }
+
+        function loadAndDisplayReviews() {
+            const reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+            const reviewsList = document.querySelector('.reviews-list');
+            
+            if (reviews.length === 0) {
+                // Keep default reviews if no user reviews
+                return;
+            }
+            
+            // Combine default reviews with user reviews
+            const defaultReviews = reviewsList.innerHTML;
+            
+            // Build user reviews HTML
+            const userReviewsHtml = reviews.map(review => {
+                const date = new Date(review.date);
+                const timeAgo = getTimeAgo(date);
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                
+                return `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <img src="${review.user_avatar}" alt="${review.user_name}" class="reviewer-avatar">
+                                <div>
+                                    <div class="reviewer-name">${review.user_name}</div>
+                                    <div class="review-date">${timeAgo}</div>
+                                </div>
+                            </div>
+                            <div class="review-rating" style="color: var(--primary);">${stars}</div>
+                        </div>
+                        ${review.text ? `<div class="review-text">${review.text}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            // Update reviews list
+            reviewsList.innerHTML = userReviewsHtml + reviewsList.innerHTML;
+            
+            // Update rating summary
+            const totalReviews = reviews.length + 256; // Add default count
+            const avgRating = calculateAverageRating(reviews);
+            
+            document.querySelector('.rating-big').textContent = avgRating.toFixed(1);
+            document.querySelector('.rating-count').textContent = `بناءً على ${totalReviews} تقييم`;
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 30) {
+                return 'منذ ' + Math.floor(diffDays / 30) + ' شهر';
+            } else if (diffDays > 0) {
+                return 'منذ ' + diffDays + ' يوم';
+            } else if (diffHours > 0) {
+                return 'منذ ' + diffHours + ' ساعة';
+            } else if (diffMins > 0) {
+                return 'منذ ' + diffMins + ' دقيقة';
+            } else {
+                return 'الآن';
+            }
+        }
+
+        function calculateAverageRating(reviews) {
+            if (reviews.length === 0) return 4.8;
+            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+            return ((sum + 4.8 * 256) / (reviews.length + 256));
+        }
+
+        // Close review modal on outside click
+        document.getElementById('reviewModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeReviewModal();
+        });
+
+        // ============================================
         // Initialize
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
@@ -3692,6 +3942,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             loadSettings();
             startCountdown();
             showPushBanner();
+            loadAndDisplayReviews();
             
             // Update stats every 10 seconds
             setInterval(updateStats, 10000);
@@ -3861,6 +4112,38 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 <button type="submit" class="btn-submit-order" style="margin-top: 10px;">
                     <i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal-content review-modal-content">
+            <button class="modal-close" onclick="closeReviewModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header" style="padding: 20px; border-bottom: 2px solid var(--primary);">
+                <h2 style="margin: 0; color: var(--primary);"><i class="fas fa-star"></i> أضف تقييمك</h2>
+            </div>
+            <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">اختر تقييمك:</label>
+                    <div class="star-rating-input" id="starRatingInput">
+                        <span class="star" data-rating="1" onclick="setRating(1)">★</span>
+                        <span class="star" data-rating="2" onclick="setRating(2)">★</span>
+                        <span class="star" data-rating="3" onclick="setRating(3)">★</span>
+                        <span class="star" data-rating="4" onclick="setRating(4)">★</span>
+                        <span class="star" data-rating="5" onclick="setRating(5)">★</span>
+                    </div>
+                    <div class="rating-hint" id="ratingHint">اضغط على النجوم للتقييم</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label><i class="fas fa-comment"></i> رأيك بالمتجر (اختياري)</label>
+                    <textarea class="review-textarea" id="reviewText" placeholder="شاركنا تجربتك مع المتجر..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit-review" id="submitReviewBtn">
+                    <i class="fas fa-paper-plane"></i> إرسال التقييم
                 </button>
             </form>
         </div>
