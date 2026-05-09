@@ -3413,22 +3413,54 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
         // Handle OAuth callback
         async function handleOAuthCallback() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                updateUserUI();
+            // Check if we have OAuth tokens in URL
+            const hasAuthHash = window.location.hash && (
+                window.location.hash.includes('access_token=') ||
+                window.location.hash.includes('refresh_token=')
+            );
+            
+            if (hasAuthHash) {
+                console.log('🔑 OAuth tokens detected in URL, processing...');
                 
-                // Clear URL hash to prevent reload issues
-                if (window.location.hash) {
-                    history.replaceState(null, null, window.location.pathname + window.location.search);
-                    console.log('✅ URL hash cleared after OAuth');
+                // Wait for Supabase to exchange the token for a session
+                // Try multiple times with delays
+                let attempts = 0;
+                const maxAttempts = 5;
+                
+                while (attempts < maxAttempts) {
+                    const { data: { session }, error } = await supabase.auth.getSession();
+                    
+                    if (session) {
+                        console.log('✅ Session established on attempt', attempts + 1);
+                        currentUser = session.user;
+                        updateUserUI();
+                        
+                        // Clear URL hash to prevent reload issues
+                        history.replaceState(null, null, window.location.pathname + window.location.search);
+                        console.log('✅ URL hash cleared after OAuth');
+                        
+                        // Reload products to ensure they display correctly
+                        await loadProducts();
+                        
+                        showNotification('تم تسجيل الدخول بنجاح عبر Google! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
+                        console.log('OAuth login successful:', currentUser);
+                        return;
+                    }
+                    
+                    if (error) {
+                        console.error('❌ Session error:', error);
+                    }
+                    
+                    attempts++;
+                    console.log(`⏳ Attempt ${attempts}/${maxAttempts} - waiting for session...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
                 
-                // Reload products to ensure they display correctly
-                await loadProducts();
+                console.error('❌ Failed to establish session after all attempts');
+                showNotification('فشل تسجيل الدخول. الرجاء المحاولة مرة أخرى! ❌');
                 
-                showNotification('تم تسجيل الدخول بنجاح عبر Google! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
-                console.log('OAuth login successful:', currentUser);
+                // Clear the hash anyway to prevent issues
+                history.replaceState(null, null, window.location.pathname + window.location.search);
             }
         }
 
