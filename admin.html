@@ -380,9 +380,28 @@
                     <textarea id="productDescription" placeholder="وصف تفصيلي للمنتج..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>صورة المنتج (URL أو رفع ملف)</label>
-                    <input type="file" id="productImageFile" accept="image/*" style="padding:10px; border:1px solid rgba(255,215,0,0.3); border-radius:10px; background:#0f0f0f; color:#fff; margin-bottom:10px;">
-                    <input type="url" id="productImageUrl" placeholder="https://example.com/image.jpg">
+                    <label>صور المنتج (1-3 صور)</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+                        <div class="image-upload-box">
+                            <label style="font-size: 12px; color: #aaa; margin-bottom: 5px; display: block;">الصورة الرئيسية *</label>
+                            <input type="file" id="productImageFile1" accept="image/*" style="padding:8px; border:1px solid rgba(255,215,0,0.3); border-radius:8px; background:#0f0f0f; color:#fff; width: 100%; font-size: 12px;">
+                            <input type="url" id="productImageUrl1" placeholder="رابط الصورة 1" style="margin-top: 5px; padding: 8px; width: 100%;">
+                            <div id="imagePreview1" style="margin-top: 5px; height: 60px; border-radius: 5px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
+                        </div>
+                        <div class="image-upload-box">
+                            <label style="font-size: 12px; color: #aaa; margin-bottom: 5px; display: block;">صورة إضافية 2</label>
+                            <input type="file" id="productImageFile2" accept="image/*" style="padding:8px; border:1px solid rgba(255,215,0,0.3); border-radius:8px; background:#0f0f0f; color:#fff; width: 100%; font-size: 12px;">
+                            <input type="url" id="productImageUrl2" placeholder="رابط الصورة 2" style="margin-top: 5px; padding: 8px; width: 100%;">
+                            <div id="imagePreview2" style="margin-top: 5px; height: 60px; border-radius: 5px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
+                        </div>
+                        <div class="image-upload-box">
+                            <label style="font-size: 12px; color: #aaa; margin-bottom: 5px; display: block;">صورة إضافية 3</label>
+                            <input type="file" id="productImageFile3" accept="image/*" style="padding:8px; border:1px solid rgba(255,215,0,0.3); border-radius:8px; background:#0f0f0f; color:#fff; width: 100%; font-size: 12px;">
+                            <input type="url" id="productImageUrl3" placeholder="رابط الصورة 3" style="margin-top: 5px; padding: 8px; width: 100%;">
+                            <div id="imagePreview3" style="margin-top: 5px; height: 60px; border-radius: 5px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: #888; margin-top: 5px;">يمكنك رفع صورة واحدة على الأقل (الصورة الرئيسية). الصورتان الإضافيتان اختياريتان.</p>
                 </div>
                 <button type="submit" class="btn-submit" id="submitBtn">إضافة المنتج</button>
                 <button type="button" class="btn-submit" id="cancelBtn" onclick="resetForm()" style="background:linear-gradient(135deg, #666, #444); margin-right:10px; display:none;">إلغاء</button>
@@ -584,27 +603,39 @@
                     updated_at: new Date().toISOString()
                 };
                 
-                // Handle image upload
-                const fileInput = document.getElementById('productImageFile');
-                const imageUrl = document.getElementById('productImageUrl').value;
+                // Handle multiple image uploads
+                const imageUrls = [];
                 
-                if (fileInput.files && fileInput.files[0]) {
-                    const file = fileInput.files[0];
-                    const fileName = `${Date.now()}_${file.name}`;
+                for (let i = 1; i <= 3; i++) {
+                    const fileInput = document.getElementById(`productImageFile${i}`);
+                    const imageUrlInput = document.getElementById(`productImageUrl${i}`);
+                    const imageUrl = imageUrlInput.value.trim();
                     
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('products')
-                        .upload(fileName, file);
-                    
-                    if (uploadError) throw uploadError;
-                    
-                    const { data: { publicUrl } } = supabase.storage
-                        .from('products')
-                        .getPublicUrl(fileName);
-                    
-                    productData.image_url = publicUrl;
-                } else if (imageUrl) {
-                    productData.image_url = imageUrl;
+                    if (fileInput.files && fileInput.files[0]) {
+                        const file = fileInput.files[0];
+                        const fileName = `${Date.now()}_${i}_${file.name}`;
+                        
+                        const { data: uploadData, error: uploadError } = await supabase.storage
+                            .from('products')
+                            .upload(fileName, file);
+                        
+                        if (uploadError) throw uploadError;
+                        
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('products')
+                            .getPublicUrl(fileName);
+                        
+                        imageUrls.push(publicUrl);
+                    } else if (imageUrl) {
+                        imageUrls.push(imageUrl);
+                    }
+                }
+                
+                // Set main image and additional images
+                if (imageUrls.length > 0) {
+                    productData.image_url = imageUrls[0];
+                    productData.image_url_2 = imageUrls[1] || null;
+                    productData.image_url_3 = imageUrls[2] || null;
                 }
                 
                 let result;
@@ -653,7 +684,16 @@
                 document.getElementById('paymentMethod').value = product.payment_method || 'cash';
                 document.getElementById('currency').value = product.currency || 'YER';
                 document.getElementById('productDescription').value = product.description || '';
-                document.getElementById('productImageUrl').value = product.image_url || '';
+                
+                // Load multiple images
+                document.getElementById('productImageUrl1').value = product.image_url || '';
+                document.getElementById('productImageUrl2').value = product.image_url_2 || '';
+                document.getElementById('productImageUrl3').value = product.image_url_3 || '';
+                
+                // Show image previews
+                updateImagePreview('imagePreview1', product.image_url);
+                updateImagePreview('imagePreview2', product.image_url_2);
+                updateImagePreview('imagePreview3', product.image_url_3);
                 
                 document.getElementById('submitBtn').textContent = 'تحديث المنتج';
                 document.getElementById('cancelBtn').style.display = 'inline-block';
@@ -686,6 +726,35 @@
             document.getElementById('productForm').reset();
             document.getElementById('submitBtn').textContent = 'إضافة المنتج';
             document.getElementById('cancelBtn').style.display = 'none';
+            
+            // Clear image previews
+            updateImagePreview('imagePreview1', null);
+            updateImagePreview('imagePreview2', null);
+            updateImagePreview('imagePreview3', null);
+        }
+
+        function updateImagePreview(previewId, imageUrl) {
+            const previewDiv = document.getElementById(previewId);
+            if (previewDiv) {
+                if (imageUrl) {
+                    previewDiv.innerHTML = `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px;">`;
+                } else {
+                    previewDiv.innerHTML = '<span style="color: #666; font-size: 12px;">لا توجد صورة</span>';
+                }
+            }
+        }
+
+        // Add file input change listeners for previews
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`productImageFile${i}`)?.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        updateImagePreview(`imagePreview${i}`, event.target.result);
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
         }
 
         // Check auth on load
