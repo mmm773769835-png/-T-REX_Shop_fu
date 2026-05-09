@@ -2797,39 +2797,122 @@
                         `).join('')}
                     </div>
                 </div>
-                <div class="modal-info">
+                <div class="modal-info" style="max-height: 70vh; overflow-y: auto;">
                     <h2>${product.name}</h2>
-                    <div class="product-rating">
-                        ${'★'.repeat(Math.floor(product.rating || 0))}${'☆'.repeat(5 - Math.floor(product.rating || 0))}
-                        <span>(${product.rating || 0}/5)</span>
+                    <div class="product-rating" style="font-size: 18px; margin-bottom: 15px;">
+                        ${renderStars(product.rating || 0)}
+                        <span style="color: #aaa; font-size: 14px;">(${product.rating || 0}/5 - ${product.reviews_count || 0} تقييم)</span>
                     </div>
-                    <div class="modal-price">${formatPrice(product.price)}</div>
-                    <p class="modal-description">${product.description || 'لا يوجد وصف'}</p>
-                    <div style="margin-bottom: 20px;">
-                        <strong>الفئة:</strong> ${product.category || 'غير محدد'}<br>
-                        <strong>متوفر:</strong> ${product.stock > 0 ? '✅ نعم' : '❌ لا'}
+                    <div class="modal-price" style="font-size: 24px; margin-bottom: 15px;">${formatPrice(product.price)}</div>
+                    <p class="modal-description" style="margin-bottom: 15px; line-height: 1.6;">${product.description || 'لا يوجد وصف'}</p>
+                    <div style="margin-bottom: 20px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 8px;">
+                        <strong>📁 الفئة:</strong> ${product.category || 'غير محدد'}<br>
+                        <strong>📦 المخزون:</strong> ${product.stock > 0 ? '✅ متوفر' : '❌ غير متوفر'}
                     </div>
 
                     <!-- Quantity Selector -->
-                    <div class="quantity-selector">
+                    <div class="quantity-selector" style="margin-bottom: 20px;">
+                        <span style="margin-left: 10px; font-weight: bold;">الكمية:</span>
                         <button class="qty-btn" onclick="updateQuantity(-1)"><i class="fas fa-minus"></i></button>
                         <span class="qty-display" id="qtyDisplay">1</span>
                         <button class="qty-btn" onclick="updateQuantity(1)"><i class="fas fa-plus"></i></button>
                     </div>
 
-                    <div class="modal-actions">
-                        <button class="btn-buy-now" onclick="openOrderModal()">
-                            <i class="fas fa-whatsapp"></i> اشتري الآن
-                        </button>
-                        <button class="add-to-cart" onclick="addToCartWithQuantity(${JSON.stringify(product).replace(/"/g, '&quot;')}); closeModal();">
+                    <!-- Order Form in Product Modal -->
+                    <div style="border-top: 2px solid var(--primary); padding-top: 20px; margin-top: 20px;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 18px;">
+                            <i class="fas fa-shopping-bag"></i> إتمام الطلب مباشرة
+                        </h3>
+                        <form id="quickOrderForm" onsubmit="submitQuickOrder(event)">
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-user"></i> الاسم الكامل *</label>
+                                <input type="text" id="quickCustomerName" required placeholder="أدخل اسمك الكامل" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-phone"></i> رقم الواتساب *</label>
+                                <input type="tel" id="quickCustomerPhone" required placeholder="مثال: +967773769835" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-globe"></i> الدولة *</label>
+                                <select id="quickCustomerCountry" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
+                                    <option value="">اختر الدولة</option>
+                                    <option value="اليمن">اليمن 🇾🇪</option>
+                                    <option value="السعودية">السعودية 🇸🇦</option>
+                                    <option value="الإمارات">الإمارات 🇦🇪</option>
+                                    <option value="الكويت">الكويت 🇰🇼</option>
+                                    <option value="قطر">قطر 🇶🇦</option>
+                                    <option value="البحرين">البحرين 🇧🇭</option>
+                                    <option value="عمان">عمان 🇴🇲</option>
+                                    <option value="مصر">مصر 🇪🇬</option>
+                                    <option value="الأردن">الأردن 🇯🇴</option>
+                                    <option value="لبنان">لبنان 🇱🇧</option>
+                                    <option value="العراق">العراق 🇮🇶</option>
+                                    <option value="سوريا">سوريا 🇸🇾</option>
+                                    <option value="السودان">السودان 🇸🇩</option>
+                                    <option value="المغرب">المغرب 🇲🇦</option>
+                                    <option value="تونس">تونس 🇹🇳</option>
+                                    <option value="الجزائر">الجزائر 🇩🇿</option>
+                                    <option value="ليبيا">ليبيا 🇱🇾</option>
+                                    <option value="أخرى">أخرى 🌍</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-map-marker-alt"></i> العنوان التفصيلي *</label>
+                                <textarea id="quickCustomerAddress" rows="2" required placeholder="المدينة، الحي، الشارع..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff; resize: vertical;"></textarea>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-comment"></i> ملاحظات (اختياري)</label>
+                                <textarea id="quickOrderNotes" rows="2" placeholder="أي ملاحظات خاصة بالطلب..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff; resize: vertical;"></textarea>
+                            </div>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span>المنتج:</span>
+                                    <span style="color: var(--primary);">${product.name}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span>الكمية:</span>
+                                    <span id="quickOrderQtyDisplay" style="color: #fff;">1</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-top: 1px solid #444; padding-top: 8px; margin-top: 8px; font-weight: bold; font-size: 16px;">
+                                    <span>الإجمالي:</span>
+                                    <span id="quickOrderTotal" style="color: #25D366;">${formatPrice(product.price)}</span>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn-buy-now" style="width: 100%; font-size: 16px; padding: 14px;">
+                                <i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="modal-actions" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
+                        <button class="add-to-cart" onclick="addToCartWithQuantity(${JSON.stringify(product).replace(/"/g, '&quot;')}); closeModal();" style="flex: 1;">
                             <i class="fas fa-shopping-cart"></i> أضف للسلة
                         </button>
-                        <button class="btn-quick-view" onclick="toggleWishlist(${product.id}); closeModal();">
+                        <button class="btn-quick-view" onclick="toggleWishlist(${product.id});" style="width: 50px;" title="إضافة للمفضلة">
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
                 </div>
             `;
+            
+            // Update quantity display in order summary when quantity changes
+            const originalUpdateQuantity = window.updateQuantity;
+            window.updateQuantity = function(change) {
+                currentQuantity = Math.max(1, currentQuantity + change);
+                const qtyDisplay = document.getElementById('qtyDisplay');
+                const quickOrderQtyDisplay = document.getElementById('quickOrderQtyDisplay');
+                const quickOrderTotal = document.getElementById('quickOrderTotal');
+                
+                if (qtyDisplay) qtyDisplay.textContent = currentQuantity;
+                if (quickOrderQtyDisplay) quickOrderQtyDisplay.textContent = currentQuantity;
+                if (quickOrderTotal) quickOrderTotal.textContent = formatPrice(product.price * currentQuantity);
+            };
 
             modal.classList.add('show');
         }
@@ -2852,6 +2935,58 @@
                 addToCart(product);
             }
             showNotification(`تم إضافة ${currentQuantity} ${product.name} للسلة! 🛒`);
+        }
+
+        // Submit quick order from product modal
+        function submitQuickOrder(event) {
+            event.preventDefault();
+            
+            if (!currentProduct) {
+                showNotification('خطأ: لا يوجد منتج محدد! ❌');
+                return;
+            }
+            
+            const name = document.getElementById('quickCustomerName').value.trim();
+            const phone = document.getElementById('quickCustomerPhone').value.trim();
+            const country = document.getElementById('quickCustomerCountry').value;
+            const address = document.getElementById('quickCustomerAddress').value.trim();
+            const notes = document.getElementById('quickOrderNotes').value.trim();
+            
+            // Validate required fields
+            if (!name || !phone || !country || !address) {
+                showNotification('الرجاء ملء جميع الحقول المطلوبة! ⚠️');
+                return;
+            }
+            
+            // Calculate total
+            const total = currentProduct.price * currentQuantity;
+            
+            // Build WhatsApp message
+            const message = `
+🛒 *طلب جديد من T-REX Shop*
+
+📦 *المنتج:* ${currentProduct.name}
+💰 *السعر:* ${formatPrice(currentProduct.price)}
+🔢 *الكمية:* ${currentQuantity}
+💵 *الإجمالي:* ${formatPrice(total)}
+
+👤 *العميل:* ${name}
+📱 *الهاتف:* ${phone}
+🌍 *الدولة:* ${country}
+📍 *العنوان:* ${address}
+${notes ? `📝 *ملاحظات:* ${notes}` : ''}
+
+✅ يرجى تأكيد الطلب
+            `.trim();
+            
+            // Open WhatsApp
+            const whatsappUrl = `https://wa.me/+967773769835?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showNotification('تم فتح واتساب لإرسال الطلب! ✅');
+            
+            // Close modal and reset
+            closeModal();
         }
 
         function closeModal() {
@@ -3159,7 +3294,14 @@
                         if (retrySession && !currentUser) {
                             currentUser = retrySession.user;
                             console.log('✅ Session found on retry:', currentUser.email);
+                            
+                            // Clear hash and reload products
+                            if (window.location.hash) {
+                                history.replaceState(null, null, window.location.pathname + window.location.search);
+                            }
+                            
                             updateUserUI();
+                            await loadProducts();
                             showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || ''));
                         }
                     }, 1500);
@@ -3171,18 +3313,22 @@
         }
 
         // Listen for auth changes
-        supabase.auth.onAuthStateChange((event, session) => {
+        supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('Auth state changed:', event, session);
             
             if (event === 'SIGNED_IN' && session) {
                 currentUser = session.user;
-                console.log('User signed in:', currentUser);
+                console.log('✅ User signed in:', currentUser.email);
                 
-                // Force immediate UI update
-                setTimeout(() => {
-                    updateUserUI();
-                    showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
-                }, 100);
+                // Clear URL hash to prevent issues
+                if (window.location.hash) {
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                }
+                
+                // Force immediate UI update and reload products
+                updateUserUI();
+                await loadProducts();
+                showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
             } else if (event === 'SIGNED_OUT') {
                 currentUser = null;
                 updateUserUI();
@@ -3196,6 +3342,16 @@
             if (session) {
                 currentUser = session.user;
                 updateUserUI();
+                
+                // Clear URL hash to prevent reload issues
+                if (window.location.hash) {
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                    console.log('✅ URL hash cleared after OAuth');
+                }
+                
+                // Reload products to ensure they display correctly
+                await loadProducts();
+                
                 showNotification('تم تسجيل الدخول بنجاح عبر Google! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
                 console.log('OAuth login successful:', currentUser);
             }
