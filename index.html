@@ -52,16 +52,20 @@
             text-decoration: none;
         }
         .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FF4500 100%);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.6),
+                0 0 40px rgba(255, 107, 53, 0.4),
+                inset 0 2px 4px rgba(255,255,255,0.3);
             position: relative;
             overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
         }
         .logo-icon::before {
             content: '';
@@ -70,18 +74,32 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
             transform: rotate(45deg);
-            animation: shimmer 3s infinite;
+            animation: shimmer 2s infinite;
+        }
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+            pointer-events: none;
         }
         @keyframes shimmer {
             0% { transform: translateX(-100%) rotate(45deg); }
+            50% { transform: translateX(0%) rotate(45deg); }
             100% { transform: translateX(100%) rotate(45deg); }
         }
         .trex-emoji {
-            font-size: 32px;
+            font-size: 28px;
             z-index: 1;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            animation: bounce 2s ease infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         .logo-text {
             display: flex;
@@ -89,20 +107,23 @@
             line-height: 1.2;
         }
         .logo-title {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 900;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, #FFD700 0%, #FF6B35 50%, #FF4500 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         .logo-subtitle {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-light);
-            letter-spacing: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #FFD700;
+            letter-spacing: 5px;
             text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
         .nav-links {
             display: flex;
@@ -2248,8 +2269,108 @@
                 showNotification('السلة فارغة! 🛒');
                 return;
             }
-            showNotification('جاري تحويلك لصفحة الدفع... 💳');
-            // Here you would integrate with payment gateway
+            // Open cart order modal with all items
+            openCartOrderModal();
+        }
+
+        // Cart Order Modal Functions
+        function openCartOrderModal() {
+            const modal = document.getElementById('cartOrderModal');
+            const itemsList = document.getElementById('cartOrderItems');
+            const totalElement = document.getElementById('cartOrderTotal');
+            
+            // Build cart items list
+            let itemsHtml = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                itemsHtml += `
+                    <div class="cart-order-item" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px; margin-bottom: 10px;">
+                        <img src="${item.image_url || 'https://via.placeholder.com/50x50/1a1a1a/FFD700?text=No+Image'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #FFD700;">${item.name}</div>
+                            <div style="font-size: 12px; color: #aaa;">${formatPrice(item.price)} × ${item.quantity}</div>
+                        </div>
+                        <div style="font-weight: bold; color: #fff;">${formatPrice(itemTotal)}</div>
+                        <button type="button" onclick="removeCartItem(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            itemsList.innerHTML = itemsHtml || '<p>السلة فارغة</p>';
+            totalElement.textContent = formatPrice(total);
+            
+            modal.classList.add('show');
+        }
+
+        function closeCartOrderModal() {
+            document.getElementById('cartOrderModal').classList.remove('show');
+        }
+
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartDisplay();
+            openCartOrderModal(); // Refresh modal
+            showNotification('تم إزالة المنتج من السلة 🗑️');
+        }
+
+        function submitCartOrder(event) {
+            event.preventDefault();
+            
+            if (cart.length === 0) {
+                showNotification('السلة فارغة! أضف منتجات أولاً 🛒');
+                return;
+            }
+            
+            const name = document.getElementById('cartCustomerName').value;
+            const phone = document.getElementById('cartCustomerPhone').value;
+            const country = document.getElementById('cartCustomerCountry').value;
+            const address = document.getElementById('cartCustomerAddress').value;
+            const notes = document.getElementById('cartOrderNotes').value;
+            
+            // Calculate total
+            let total = 0;
+            let itemsList = '';
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                itemsList += `📦 ${item.name} - ${formatPrice(item.price)} × ${item.quantity} = ${formatPrice(itemTotal)}\n`;
+            });
+            
+            // Build WhatsApp message
+            let message = `🛍️ *طلب جديد من T-REX Shop* 🦖\n\n`;
+            message += `*المنتجات:*\n${itemsList}\n`;
+            message += `💰 *الإجمالي:* ${formatPrice(total)}\n\n`;
+            message += `👤 *معلومات العميل:*\n`;
+            message += `• الاسم: ${name}\n`;
+            message += `• الهاتف: ${phone}\n`;
+            message += `• الدولة: ${country}\n`;
+            message += `• العنوان: ${address}\n`;
+            if (notes) {
+                message += `📝 *ملاحظات:* ${notes}\n`;
+            }
+            message += `\n🕐 *تاريخ الطلب:* ${new Date().toLocaleString('ar-SA')}`;
+            
+            // WhatsApp number (your number)
+            const whatsappNumber = '967773769835';
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+            
+            // Show success message
+            showNotification('تم فتح واتساب لإرسال الطلب! ✅');
+            
+            // Clear cart and close modal
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartDisplay();
+            closeCartOrderModal();
+            document.getElementById('cartOrderForm').reset();
         }
 
         // Wishlist Management
@@ -2284,38 +2405,58 @@
             renderProducts();
         }
 
-        // Notification System
+        // Notification System - Enhanced
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed !important;
-                top: 100px !important;
+                top: 20px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
-                background: linear-gradient(135deg, #FFD700 0%, #FF6B35 100%) !important;
+                background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF4500 100%) !important;
                 color: #000 !important;
-                padding: 18px 35px !important;
-                border-radius: 50px !important;
-                font-weight: 700 !important;
+                padding: 20px 40px !important;
+                border-radius: 16px !important;
+                font-weight: 800 !important;
                 font-size: 16px !important;
-                z-index: 99999 !important;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+                z-index: 999999 !important;
+                box-shadow: 
+                    0 0 20px rgba(255, 215, 0, 0.6),
+                    0 10px 40px rgba(0,0,0,0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.3) !important;
                 text-align: center !important;
                 white-space: pre-line !important;
                 max-width: 90vw !important;
-                line-height: 1.5 !important;
-                border: 2px solid #fff !important;
-                animation: slideDown 0.3s ease !important;
+                min-width: 300px !important;
+                line-height: 1.6 !important;
+                border: 3px solid #FFD700 !important;
+                animation: slideDownBounce 0.5s ease !important;
+                font-family: 'Cairo', sans-serif !important;
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.5s';
-                setTimeout(() => notification.remove(), 500);
+                notification.style.animation = 'slideUpFade 0.4s ease forwards !important';
+                setTimeout(() => notification.remove(), 400);
             }, 4000);
         }
+        
+        // Add notification animations
+        const notificationStyles = document.createElement('style');
+        notificationStyles.textContent = `
+            @keyframes slideDownBounce {
+                0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+                60% { transform: translateX(-50%) translateY(10px); opacity: 1; }
+                80% { transform: translateX(-50%) translateY(-5px); }
+                100% { transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes slideUpFade {
+                0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+                100% { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(notificationStyles);
 
         // Search Functionality
         function searchProducts() {
@@ -3307,6 +3448,87 @@
                 <div class="form-group">
                     <label><i class="fas fa-comment"></i> ملاحظات (اختياري)</label>
                     <textarea id="orderNotes" rows="2" placeholder="أي ملاحظات خاصة بالطلب..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit-order">
+                    <i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Order Modal (for checkout from cart) -->
+    <div class="modal-overlay" id="cartOrderModal">
+        <div class="modal-container order-modal-content">
+            <button class="modal-close" onclick="closeCartOrderModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <h2><i class="fas fa-shopping-cart"></i> إتمام طلب السلة</h2>
+            </div>
+            
+            <!-- Cart Items Summary -->
+            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <div id="cartOrderItems">
+                    <!-- Items will be loaded here dynamically -->
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px; border-top: 2px solid #FFD700; margin-top: 10px; font-weight: bold; font-size: 18px;">
+                    <span>الإجمالي:</span>
+                    <span id="cartOrderTotal" style="color: #FFD700;">0 ر.س</span>
+                </div>
+            </div>
+            
+            <form class="order-form" id="cartOrderForm" onsubmit="submitCartOrder(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> الاسم الكامل *</label>
+                    <input type="text" id="cartCustomerName" required placeholder="أدخل اسمك الكامل">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> رقم الواتساب *</label>
+                    <input type="tel" id="cartCustomerPhone" required placeholder="مثال: +967777777777" pattern="[\+\d\s\-\(\)]{8,20}">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-globe"></i> الدولة *</label>
+                    <select id="cartCustomerCountry" required>
+                        <option value="">اختر الدولة</option>
+                        <option value="اليمن">اليمن 🇾🇪</option>
+                        <option value="السعودية">السعودية 🇸🇦</option>
+                        <option value="الإمارات">الإمارات 🇦🇪</option>
+                        <option value="الكويت">الكويت 🇰🇼</option>
+                        <option value="قطر">قطر 🇶🇦</option>
+                        <option value="البحرين">البحرين 🇧🇭</option>
+                        <option value="عمان">عمان 🇴🇲</option>
+                        <option value="مصر">مصر 🇪🇬</option>
+                        <option value="الأردن">الأردن 🇯🇴</option>
+                        <option value="لبنان">لبنان 🇱🇧</option>
+                        <option value="العراق">العراق 🇮🇶</option>
+                        <option value="سوريا">سوريا 🇸🇾</option>
+                        <option value="السودان">السودان 🇸🇩</option>
+                        <option value="المغرب">المغرب 🇲🇦</option>
+                        <option value="تونس">تونس 🇹🇳</option>
+                        <option value="الجزائر">الجزائر 🇩🇿</option>
+                        <option value="ليبيا">ليبيا 🇱🇾</option>
+                        <option value="الولايات المتحدة">الولايات المتحدة 🇺🇸</option>
+                        <option value="المملكة المتحدة">المملكة المتحدة 🇬🇧</option>
+                        <option value="كندا">كندا 🇨🇦</option>
+                        <option value="أستراليا">أستراليا 🇦🇺</option>
+                        <option value="ألمانيا">ألمانيا 🇩🇪</option>
+                        <option value="فرنسا">فرنسا 🇫🇷</option>
+                        <option value="تركيا">تركيا 🇹🇷</option>
+                        <option value="أخرى">أخرى 🌍</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> العنوان التفصيلي *</label>
+                    <textarea id="cartCustomerAddress" rows="3" required placeholder="المدينة، الحي، الشارع، رقم المبنى..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-comment"></i> ملاحظات (اختياري)</label>
+                    <textarea id="cartOrderNotes" rows="2" placeholder="أي ملاحظات خاصة بالطلب..."></textarea>
                 </div>
                 
                 <button type="submit" class="btn-submit-order">
