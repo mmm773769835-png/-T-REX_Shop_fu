@@ -1950,21 +1950,6 @@
 
     <!-- Cart Overlay -->
     <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
-            </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>المجموع:</span>
-                <span id="cartTotal">0 ر.س</span>
-            </div>
-            <button class="btn-checkout" onclick="checkout()">
-                <i class="fas fa-credit-card"></i> إتمام الشراء
-            </button>
-        </div>
-    </div>
-
-    <!-- Cart Overlay -->
-    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
     
     <!-- Cart Sidebar -->
     <div class="cart-sidebar" id="cartSidebar">
@@ -3459,26 +3444,26 @@
 
     <!-- Cart Order Modal (for checkout from cart) -->
     <div class="modal-overlay" id="cartOrderModal">
-        <div class="modal-container order-modal-content">
+        <div class="modal-content order-modal-content" style="max-width: 550px; max-height: 85vh; overflow-y: auto;">
             <button class="modal-close" onclick="closeCartOrderModal()">
                 <i class="fas fa-times"></i>
             </button>
-            <div class="modal-header">
-                <h2><i class="fas fa-shopping-cart"></i> إتمام طلب السلة</h2>
+            <div class="modal-header" style="padding: 20px; border-bottom: 2px solid var(--primary);">
+                <h2 style="margin: 0; color: var(--primary);"><i class="fas fa-shopping-cart"></i> إتمام طلب السلة</h2>
             </div>
             
             <!-- Cart Items Summary -->
-            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+            <div style="max-height: 180px; overflow-y: auto; margin: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid #333;">
                 <div id="cartOrderItems">
                     <!-- Items will be loaded here dynamically -->
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 10px; border-top: 2px solid #FFD700; margin-top: 10px; font-weight: bold; font-size: 18px;">
+                <div style="display: flex; justify-content: space-between; padding: 15px 10px 5px; border-top: 2px solid #FFD700; margin-top: 10px; font-weight: bold; font-size: 18px;">
                     <span>الإجمالي:</span>
                     <span id="cartOrderTotal" style="color: #FFD700;">0 ر.س</span>
                 </div>
             </div>
             
-            <form class="order-form" id="cartOrderForm" onsubmit="submitCartOrder(event)">
+            <form class="order-form" id="cartOrderForm" onsubmit="submitCartOrder(event)" style="padding: 0 20px 20px;">
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> الاسم الكامل *</label>
                     <input type="text" id="cartCustomerName" required placeholder="أدخل اسمك الكامل">
@@ -3523,7 +3508,7 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-map-marker-alt"></i> العنوان التفصيلي *</label>
-                    <textarea id="cartCustomerAddress" rows="3" required placeholder="المدينة، الحي، الشارع، رقم المبنى..."></textarea>
+                    <textarea id="cartCustomerAddress" rows="2" required placeholder="المدينة، الحي، الشارع، رقم المبنى..."></textarea>
                 </div>
                 
                 <div class="form-group">
@@ -3531,7 +3516,7 @@
                     <textarea id="cartOrderNotes" rows="2" placeholder="أي ملاحظات خاصة بالطلب..."></textarea>
                 </div>
                 
-                <button type="submit" class="btn-submit-order">
+                <button type="submit" class="btn-submit-order" style="margin-top: 10px;">
                     <i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب
                 </button>
             </form>
