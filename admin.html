@@ -611,14 +611,19 @@
             messageDiv.innerHTML = '';
             
             try {
-                // Only include columns that exist in the products table
+                // Columns confirmed in products table: name, price, original_price, category,
+                // payment_method, currency, description, is_new, is_active, image_url, updated_at, created_at
                 const productData = {
                     name: document.getElementById('productName').value,
                     price: parseFloat(document.getElementById('productPrice').value),
+                    original_price: parseFloat(document.getElementById('productOldPrice').value) || null,
                     category: document.getElementById('productCategory').value,
+                    payment_method: document.getElementById('paymentMethod').value,
                     currency: document.getElementById('currency').value,
                     description: document.getElementById('productDescription').value,
-                    is_active: document.getElementById('isActive').checked
+                    is_new: document.getElementById('isNew').checked || document.getElementById('isFeatured').checked,
+                    is_active: document.getElementById('isActive').checked,
+                    updated_at: new Date().toISOString()
                 };
                 
                 // Handle multiple image uploads
