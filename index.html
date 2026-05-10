@@ -1921,7 +1921,7 @@
                         <div class="currency-option" onclick="changeCurrency('AED', '🇦🇪 د.إ', 3.67)">
                             <span class="currency-flag">🇦🇪</span> درهم إماراتي
                         </div>
-                        <div class="currency-option" onclick="changeCurrency('YER', '🇾🇪 ر.ي', 150.15)">
+                        <div class="currency-option" onclick="changeCurrency('YER', '🇾🇪 ر.ي', 140)">
                             <span class="currency-flag">🇾🇪</span> ريال يمني
                         </div>
                         <div class="currency-option" onclick="changeCurrency('EUR', '🇪🇺 €', 4.07)">
@@ -2474,7 +2474,7 @@
                         <div class="cart-item-price">${formatPrice(item.price * item.quantity)}</div>
                     </div>
                     <div class="cart-item-actions">
-                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})" title="حذف">
+                        <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="حذف">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
