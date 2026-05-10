@@ -3243,12 +3243,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Sign In with Google
         async function signInWithGoogle() {
             try {
-                // Always use main domain for consistent OAuth flow
-                const MAIN_DOMAIN = 'https://trexshopmax.com';
+                // Use current origin for flexibility (works on both main domain and preview URLs)
                 const timestamp = Date.now();
-                const redirectUrl = `${MAIN_DOMAIN}/?nocache=${timestamp}`;
+                const redirectUrl = `${window.location.origin}/?nocache=${timestamp}`;
                 
                 console.log('OAuth redirect URL:', redirectUrl);
+                logDebug('🔗 OAuth redirect: ' + redirectUrl);
                 
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
@@ -3264,9 +3264,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 if (error) throw error;
                 
                 console.log('Redirecting to Google...', data);
+                logDebug('⏳ Redirecting to Google...');
                 
             } catch (error) {
                 console.error('Error signing in with Google:', error);
+                logDebug('❌ OAuth error: ' + error.message);
                 showNotification('حدث خطأ في تسجيل الدخول! ❌');
             }
         }
