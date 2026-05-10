@@ -3287,6 +3287,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
         // Update User UI
         function updateUserUI() {
+            logDebug('🎨 updateUserUI called');
+            logDebug('👤 currentUser: ' + (currentUser ? currentUser.email : 'null'));
             console.log('updateUserUI called, currentUser:', currentUser);
             
             const loginBtn = document.getElementById('loginBtn');
@@ -3349,6 +3351,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
         // Check Auth State
         async function checkAuthState() {
+            logDebug('🔄 checkAuthState called');
             try {
                 // Log URL hash for debugging OAuth callback
                 if (window.location.hash) {
@@ -3356,15 +3359,18 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 }
                 
                 const { data: { session }, error } = await supabase.auth.getSession();
+                logDebug('📊 getSession result: ' + (session ? 'HAS SESSION' : 'NO SESSION'));
                 
                 if (error) throw error;
                 
                 if (session) {
                     currentUser = session.user;
+                    logDebug('✅ Session found: ' + currentUser.email);
                     console.log('✅ Session found on load:', currentUser.email);
                     updateUserUI();
                     showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || ''));
                 } else {
+                    logDebug('❌ No session found');
                     console.log('❌ No session on load. URL:', window.location.href);
                     currentUser = null;
                     updateUserUI();
@@ -3421,21 +3427,32 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Returns: true if session was established, false otherwise
         async function handleOAuthCallback() {
             const hash = window.location.hash;
-            if (!hash || !hash.includes('access_token=')) return false;
+            logDebug('🔄 handleOAuthCallback called');
+            logDebug('📍 Hash: ' + (hash ? hash.substring(0, 50) + '...' : 'NONE'));
+            
+            if (!hash || !hash.includes('access_token=')) {
+                logDebug('❌ No access_token in hash');
+                return false;
+            }
             
             console.log('🔑 Parsing OAuth tokens from URL...');
+            logDebug('🔑 Parsing tokens...');
             
             // Parse tokens directly from URL hash
             const params = new URLSearchParams(hash.substring(1));
             const access_token = params.get('access_token');
             const refresh_token = params.get('refresh_token');
             
+            logDebug('📇 Token found: ' + (access_token ? 'YES' : 'NO'));
+            
             if (!access_token) {
                 console.error('❌ No access_token found in URL');
+                logDebug('❌ Token extraction failed');
                 return false;
             }
             
             try {
+                logDebug('⏳ Calling setSession...');
                 // Set session manually with the tokens from URL
                 const { data, error } = await supabase.auth.setSession({
                     access_token: access_token,
@@ -3444,6 +3461,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 if (error) {
                     console.error('❌ Error setting session:', error);
+                    logDebug('❌ setSession error: ' + error.message);
                     showNotification('فشل في تسجيل الدخول. جرب مرة أخرى! ❌');
                     return false;
                 }
@@ -3451,6 +3469,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 if (data.session) {
                     currentUser = data.session.user;
                     console.log('✅ Session set successfully:', currentUser.email);
+                    logDebug('✅ Session set: ' + currentUser.email);
                     
                     // Store login state before reload
                     localStorage.setItem('oauth_just_completed', 'true');
@@ -3460,13 +3479,16 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     const cleanUrl = window.location.pathname;
                     history.replaceState(null, null, cleanUrl);
                     
+                    logDebug('🔄 Reloading page...');
                     // Force reload to avoid cached old version
                     window.location.href = cleanUrl;
                     return true;
                 }
+                logDebug('❌ No session data returned');
                 return false;
             } catch (err) {
                 console.error('❌ Exception in handleOAuthCallback:', err);
+                logDebug('❌ Exception: ' + err.message);
                 return false;
             }
         }
@@ -3975,18 +3997,31 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Initialize
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('=== PAGE LOAD START ===');
+            console.log('Current URL:', window.location.href);
+            console.log('Origin:', window.location.origin);
+            console.log('Hash present:', window.location.hash ? 'YES' : 'NO');
+            
+            // Create debug panel
+            createDebugPanel();
+            logDebug('🚀 Page loaded');
+            logDebug('📍 URL: ' + window.location.href);
+            
             // Check OAuth first (if user is returning from Google login)
             const hasOAuthTokens = window.location.hash && window.location.hash.includes('access_token=');
+            logDebug('🔑 OAuth tokens in URL: ' + (hasOAuthTokens ? 'YES' : 'NO'));
             
             if (hasOAuthTokens) {
+                logDebug('⏳ Processing OAuth callback...');
                 // Process OAuth login first
                 const oauthSuccess = await handleOAuthCallback();
+                logDebug('✅ OAuth result: ' + (oauthSuccess ? 'SUCCESS' : 'FAILED'));
                 if (!oauthSuccess) {
-                    // If OAuth failed, try normal auth check
+                    logDebug('⚠️ Falling back to checkAuthState');
                     await checkAuthState();
                 }
             } else {
-                // Normal page load - check existing session
+                logDebug('⏳ Checking auth state...');
                 await checkAuthState();
             }
             
@@ -3998,15 +4033,54 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             // Check if we just completed OAuth (after reload)
             if (localStorage.getItem('oauth_just_completed') === 'true') {
+                logDebug('🎉 OAuth completed (after reload)');
                 localStorage.removeItem('oauth_just_completed');
                 const userName = localStorage.getItem('oauth_user_name') || '';
                 localStorage.removeItem('oauth_user_name');
                 showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + userName + ' 👋');
             }
             
+            logDebug('👤 User: ' + (currentUser ? currentUser.email : 'Not logged in'));
+            console.log('=== PAGE LOAD END ===');
+            
             // Update stats every 10 seconds
             setInterval(updateStats, 10000);
         });
+        
+        // Debug Panel Functions
+        function createDebugPanel() {
+            const panel = document.createElement('div');
+            panel.id = 'debugPanel';
+            panel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 300px;
+                max-height: 400px;
+                background: rgba(0,0,0,0.9);
+                border: 2px solid #FFD700;
+                border-radius: 10px;
+                padding: 10px;
+                font-family: monospace;
+                font-size: 12px;
+                color: #FFD700;
+                z-index: 99999;
+                overflow-y: auto;
+                direction: ltr;
+                text-align: left;
+            `;
+            panel.innerHTML = '<div style="font-weight:bold; margin-bottom:5px;">🔧 DEBUG LOG</div><div id="debugLog"></div>';
+            document.body.appendChild(panel);
+        }
+        
+        function logDebug(message) {
+            console.log('[DEBUG]', message);
+            const log = document.getElementById('debugLog');
+            if (log) {
+                const time = new Date().toLocaleTimeString();
+                log.innerHTML += `<div style="border-bottom:1px solid #333; padding:2px 0;">[${time}] ${message}</div>`;
+            }
+        }
     </script>
 
     <!-- Order Form Modal -->
