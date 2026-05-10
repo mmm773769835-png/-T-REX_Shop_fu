@@ -3412,9 +3412,10 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         });
 
         // Handle OAuth callback - Parse tokens directly from URL
+        // Returns: true if session was established, false otherwise
         async function handleOAuthCallback() {
             const hash = window.location.hash;
-            if (!hash || !hash.includes('access_token=')) return;
+            if (!hash || !hash.includes('access_token=')) return false;
             
             console.log('🔑 Parsing OAuth tokens from URL...');
             
@@ -3425,7 +3426,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             if (!access_token) {
                 console.error('❌ No access_token found in URL');
-                return;
+                return false;
             }
             
             try {
@@ -3438,7 +3439,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 if (error) {
                     console.error('❌ Error setting session:', error);
                     showNotification('فشل في تسجيل الدخول. جرب مرة أخرى! ❌');
-                    return;
+                    return false;
                 }
                 
                 if (data.session) {
@@ -3453,9 +3454,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     await loadProducts();
                     
                     showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
+                    return true;
                 }
+                return false;
             } catch (err) {
                 console.error('❌ Exception in handleOAuthCallback:', err);
+                return false;
             }
         }
 
@@ -3963,9 +3967,22 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Initialize
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuthState();
+            // Check OAuth first (if user is returning from Google login)
+            const hasOAuthTokens = window.location.hash && window.location.hash.includes('access_token=');
+            
+            if (hasOAuthTokens) {
+                // Process OAuth login first
+                const oauthSuccess = await handleOAuthCallback();
+                if (!oauthSuccess) {
+                    // If OAuth failed, try normal auth check
+                    await checkAuthState();
+                }
+            } else {
+                // Normal page load - check existing session
+                await checkAuthState();
+            }
+            
             await loadProducts();
-            handleOAuthCallback();
             loadSettings();
             startCountdown();
             showPushBanner();
