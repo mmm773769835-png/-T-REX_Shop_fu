@@ -3188,19 +3188,32 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             try {
                 console.log('[PRODUCTS] Loading products from Supabase...');
                 logDebug('📦 Loading products...');
-                console.log('[PRODUCTS] API Key type:', SUPABASE_KEY.substring(0, 15) + '...');
                 
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('[PRODUCTS] Supabase error:', JSON.stringify(error));
-                    logDebug('❌ Products error: ' + error.message);
-                    throw error;
+                // Use direct fetch with timeout as fallback
+                const apiUrl = SUPABASE_URL + '/rest/v1/products?select=*&order=created_at.desc';
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    logDebug('❌ Products API error: ' + response.status + ' ' + errorText);
+                    throw new Error('API error: ' + response.status + ' - ' + errorText);
                 }
-
+                
+                const products = await response.json();
+                
                 console.log('[PRODUCTS] Loaded:', products?.length || 0, 'products');
                 logDebug('✅ Products loaded: ' + (products?.length || 0));
                 
@@ -3213,7 +3226,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
             } catch (error) {
                 console.error('[PRODUCTS] Error loading products:', error);
-                console.error('[PRODUCTS] Error details:', error?.message, error?.code, error?.hint);
+                logDebug('❌ Products error: ' + error.message);
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
@@ -3287,14 +3300,26 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Sign Out
         async function signOut() {
             try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-                
+                logDebug('🚪 Signing out...');
                 currentUser = null;
                 updateUserUI();
+                
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    console.error('SignOut error:', error);
+                    logDebug('❌ SignOut error: ' + error.message);
+                }
+                
                 showNotification('تم تسجيل الخروج بنجاح! 👋');
+                logDebug('✅ Signed out');
+                await loadProducts();
             } catch (error) {
                 console.error('Error signing out:', error);
+                logDebug('❌ SignOut exception: ' + error.message);
+                // Force logout even if Supabase fails
+                currentUser = null;
+                updateUserUI();
+                showNotification('تم تسجيل الخروج! 👋');
             }
         }
 
