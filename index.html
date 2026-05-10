@@ -3446,14 +3446,15 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     currentUser = data.session.user;
                     console.log('✅ Session set successfully:', currentUser.email);
                     
-                    // Clear URL hash
+                    // Store login state before reload
+                    localStorage.setItem('oauth_just_completed', 'true');
+                    localStorage.setItem('oauth_user_name', currentUser.user_metadata?.full_name || currentUser.email || '');
+                    
+                    // Clear URL hash and reload to get fresh page
                     history.replaceState(null, null, window.location.pathname + window.location.search);
                     
-                    // Update UI
-                    updateUserUI();
-                    await loadProducts();
-                    
-                    showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
+                    // Force reload to avoid cached old version
+                    window.location.reload();
                     return true;
                 }
                 return false;
@@ -3987,6 +3988,14 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             startCountdown();
             showPushBanner();
             loadAndDisplayReviews();
+            
+            // Check if we just completed OAuth (after reload)
+            if (localStorage.getItem('oauth_just_completed') === 'true') {
+                localStorage.removeItem('oauth_just_completed');
+                const userName = localStorage.getItem('oauth_user_name') || '';
+                localStorage.removeItem('oauth_user_name');
+                showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + userName + ' 👋');
+            }
             
             // Update stats every 10 seconds
             setInterval(updateStats, 10000);
