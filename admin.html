@@ -459,13 +459,8 @@
         // ==========================================
         // SUPABASE CONFIGURATION - Using Environment Variables
         // ==========================================
-        const SUPABASE_URL = window.location.hostname === 'localhost' 
-            ? 'https://udqnrsrwzifrzseixrcj.supabase.co'
-            : (window.ENV?.NEXT_PUBLIC_SUPABASE_URL || 'https://udqnrsrwzifrzseixrcj.supabase.co');
-            
-        const SUPABASE_KEY = window.location.hostname === 'localhost'
-            ? 'sb_publishable_cNZtDBzqP3gGDMxJsvcvuA_iYOO-d4e'
-            : (window.ENV?.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_cNZtDBzqP3gGDMxJsvcvuA_iYOO-d4e');
+        const SUPABASE_URL = 'https://udqnrsrwzifrzseixrcj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkcW5yc3J3emlmcnpzZWl4cmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTk5MzQsImV4cCI6MjA5MzMzNTkzNH0.dh2SotKNPpIjttwERWph243yfeV_6rlnkKVfcoEbcGM';
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
@@ -641,7 +636,14 @@
                     
                     if (fileInput.files && fileInput.files[0]) {
                         const file = fileInput.files[0];
-                        const fileName = `${Date.now()}_${i}_${file.name}`;
+                        // Sanitize filename: remove Arabic/special chars, spaces, invisible unicode
+                        const ext = file.name.split('.').pop().toLowerCase();
+                        const safeName = file.name
+                            .replace(/[^\x20-\x7E]/g, '') // Remove non-ASCII
+                            .replace(/\s+/g, '_')          // Spaces to underscores
+                            .replace(/[^a-zA-Z0-9_.\-]/g, '') // Keep only safe chars
+                            || 'image';                     // Fallback if empty
+                        const fileName = `${Date.now()}_${i}_${safeName}.${ext}`;
                         
                         const { data: uploadData, error: uploadError } = await supabase.storage
                             .from('products')
