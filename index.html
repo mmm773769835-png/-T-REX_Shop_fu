@@ -3187,6 +3187,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             try {
                 console.log('[PRODUCTS] Loading products from Supabase...');
+                logDebug('📦 Loading products...');
                 console.log('[PRODUCTS] API Key type:', SUPABASE_KEY.substring(0, 15) + '...');
                 
                 const { data: products, error } = await supabase
@@ -3197,10 +3198,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
                 if (error) {
                     console.error('[PRODUCTS] Supabase error:', JSON.stringify(error));
+                    logDebug('❌ Products error: ' + error.message);
                     throw error;
                 }
 
                 console.log('[PRODUCTS] Loaded:', products?.length || 0, 'products');
+                logDebug('✅ Products loaded: ' + (products?.length || 0));
                 
                 allProducts = products || [];
                 filteredProducts = [...allProducts];
@@ -3482,17 +3485,17 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     console.log('✅ Session set successfully:', currentUser.email);
                     logDebug('✅ Session set: ' + currentUser.email);
                     
-                    // Store login state before reload
-                    localStorage.setItem('oauth_just_completed', 'true');
-                    localStorage.setItem('oauth_user_name', currentUser.user_metadata?.full_name || currentUser.email || '');
+                    // Clean URL - remove hash
+                    history.replaceState(null, null, window.location.pathname);
+                    logDebug('✅ URL cleaned');
                     
-                    // Clean URL - remove hash and nocache query param
-                    const cleanUrl = window.location.pathname;
-                    history.replaceState(null, null, cleanUrl);
+                    // Update UI and load products directly (no page reload)
+                    updateUserUI();
+                    logDebug('⏳ Loading products...');
+                    await loadProducts();
+                    logDebug('✅ Products loaded');
                     
-                    logDebug('🔄 Reloading page...');
-                    // Force reload to avoid cached old version
-                    window.location.href = cleanUrl;
+                    showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
                     return true;
                 }
                 logDebug('❌ No session data returned');
