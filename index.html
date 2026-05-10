@@ -3187,14 +3187,22 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             const container = document.getElementById('products-container');
             
             try {
+                console.log('[PRODUCTS] Loading products from Supabase...');
+                console.log('[PRODUCTS] API Key type:', SUPABASE_KEY.substring(0, 15) + '...');
+                
                 const { data: products, error } = await supabase
                     .from('products')
                     .select('*')
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('[PRODUCTS] Supabase error:', JSON.stringify(error));
+                    throw error;
+                }
 
+                console.log('[PRODUCTS] Loaded:', products?.length || 0, 'products');
+                
                 allProducts = products || [];
                 filteredProducts = [...allProducts];
                 
@@ -3203,12 +3211,13 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 updateCartDisplay();
 
             } catch (error) {
-                console.error('Error loading products:', error);
+                console.error('[PRODUCTS] Error loading products:', error);
+                console.error('[PRODUCTS] Error details:', error?.message, error?.code, error?.hint);
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
                         <h3>حدث خطأ في تحميل المنتجات</h3>
-                        <p>يرجى المحاولة مرة أخرى لاحقاً</p>
+                        <p>${error?.message || 'يرجى المحاولة مرة أخرى لاحقاً'}</p>
                     </div>
                 `;
             }
