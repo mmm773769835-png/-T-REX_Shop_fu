@@ -137,6 +137,11 @@
             transition: color 0.3s;
         }
         .nav-links a:hover { color: var(--primary); }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .cart-btn {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: var(--dark) !important;
@@ -1647,11 +1652,13 @@
             .trex-emoji { font-size: 22px; }
             .header { padding: 10px 0; }
             .user-dropdown { min-width: 250px; left: auto; right: 0; }
-            .currency-selector { margin-left: 8px; }
+            .header-actions { gap: 6px; }
+            .currency-selector { margin-left: 0; }
             .currency-btn { padding: 6px 10px; font-size: 13px; }
-            .settings-btn { width: 36px; height: 36px; font-size: 15px; margin-right: 5px; }
+            .settings-btn { width: 36px; height: 36px; font-size: 15px; margin-right: 0; }
             .login-btn { padding: 8px 14px; font-size: 13px; }
             .cart-btn { padding: 8px 14px; font-size: 13px; }
+            .user-auth { margin-left: 0; }
             .product-image { height: 160px; }
             .main-image { height: 280px; }
             .thumbnail { width: 60px; height: 60px; }
@@ -1696,12 +1703,15 @@
             .trex-emoji { font-size: 18px; }
             .logo { gap: 8px; }
             .header-content { padding: 0 10px; }
+            .header-actions { gap: 4px; }
             .currency-btn { padding: 5px 8px; font-size: 12px; }
             .currency-btn i { display: none; }
-            .settings-btn { width: 32px; height: 32px; font-size: 14px; margin-right: 4px; }
-            .login-btn { padding: 7px 12px; font-size: 12px; }
+            .settings-btn { width: 30px; height: 30px; font-size: 13px; margin-right: 0; }
+            .login-btn { padding: 7px 10px; font-size: 12px; }
             .login-btn span { display: none; }
-            .cart-btn { padding: 7px 12px; font-size: 12px; }
+            .cart-btn { padding: 7px 10px; font-size: 12px; }
+            .user-auth { margin-left: 0; }
+            .user-avatar { width: 32px; height: 32px; }
             .cart-count { width: 18px; height: 18px; font-size: 10px; top: -5px; right: -5px; }
             .footer-links { gap: 10px; font-size: 13px; }
             .copyright { font-size: 12px; }
@@ -1994,39 +2004,10 @@
             <nav class="nav-links">
                 <a href="/">الرئيسية</a>
                 <a href="#products">المنتجات</a>
-                <a href="#" class="cart-btn" onclick="toggleCart(); return false;" title="سلة التسوق" aria-label="سلة التسوق">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cartCount" data-count="0">0</span>
-                </a>
-                <!-- User Auth -->
-                <div class="user-auth" id="userAuth">
-                    <button class="login-btn" onclick="signInWithGoogle()" id="loginBtn">
-                        <i class="fab fa-google"></i> تسجيل الدخول
-                    </button>
-                    <div class="user-profile" id="userProfile" style="display: none;">
-                        <img src="" alt="Profile" class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
-                        <div class="user-dropdown" id="userDropdown">
-                            <div class="user-info">
-                                <img src="" alt="Profile" class="user-avatar-large" id="userAvatarLarge">
-                                <h4 id="userName">User Name</h4>
-                                <p id="userEmail">email@example.com</p>
-                            </div>
-                            <div class="user-menu-items">
-                                <a href="#" onclick="showOrders()"><i class="fas fa-shopping-bag"></i> طلباتي</a>
-                                <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> المفضلة</a>
-                                <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> الملف الشخصي</a>
-                                <div class="divider"></div>
-                                <a href="#" onclick="signOut()" class="logout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </nav>
 
-                <!-- Settings Gear -->
-                <button class="settings-btn" onclick="openSettings()" title="الإعدادات" aria-label="الإعدادات">
-                    <i class="fas fa-cog"></i>
-                </button>
-
+            <!-- Header Actions - Always visible -->
+            <div class="header-actions">
                 <!-- Currency Selector -->
                 <div class="currency-selector">
                     <button class="currency-btn" onclick="toggleCurrency()">
@@ -2057,7 +2038,42 @@
                         </div>
                     </div>
                 </div>
-            </nav>
+
+                <!-- Settings Gear -->
+                <button class="settings-btn" onclick="openSettings()" title="الإعدادات" aria-label="الإعدادات">
+                    <i class="fas fa-cog"></i>
+                </button>
+
+                <!-- User Auth -->
+                <div class="user-auth" id="userAuth">
+                    <button class="login-btn" onclick="signInWithGoogle()" id="loginBtn">
+                        <i class="fab fa-google"></i> <span>تسجيل الدخول</span>
+                    </button>
+                    <div class="user-profile" id="userProfile" style="display: none;">
+                        <img src="" alt="Profile" class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-info">
+                                <img src="" alt="Profile" class="user-avatar-large" id="userAvatarLarge">
+                                <h4 id="userName">User Name</h4>
+                                <p id="userEmail">email@example.com</p>
+                            </div>
+                            <div class="user-menu-items">
+                                <a href="#" onclick="showOrders()"><i class="fas fa-shopping-bag"></i> طلباتي</a>
+                                <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> المفضلة</a>
+                                <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> الملف الشخصي</a>
+                                <div class="divider"></div>
+                                <a href="#" onclick="signOut()" class="logout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart -->
+                <a href="#" class="cart-btn" onclick="toggleCart(); return false;" title="سلة التسوق" aria-label="سلة التسوق">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount" data-count="0">0</span>
+                </a>
+            </div>
         </div>
     </header>
 
