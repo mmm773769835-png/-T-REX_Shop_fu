@@ -3243,10 +3243,15 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Sign In with Google
         async function signInWithGoogle() {
             try {
+                // Use explicit redirect URL to avoid caching issues
+                // Add cache-busting timestamp to force fresh load
+                const timestamp = Date.now();
+                const redirectUrl = `${window.location.origin}/?nocache=${timestamp}`;
+                
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin,
+                        redirectTo: redirectUrl,
                         queryParams: {
                             access_type: 'offline',
                             prompt: 'consent',
@@ -3258,6 +3263,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 // The user will be redirected to Google
                 console.log('Redirecting to Google...', data);
+                console.log('Will return to:', redirectUrl);
                 
             } catch (error) {
                 console.error('Error signing in with Google:', error);
@@ -3450,11 +3456,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     localStorage.setItem('oauth_just_completed', 'true');
                     localStorage.setItem('oauth_user_name', currentUser.user_metadata?.full_name || currentUser.email || '');
                     
-                    // Clear URL hash and reload to get fresh page
-                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                    // Clean URL - remove hash and nocache query param
+                    const cleanUrl = window.location.pathname;
+                    history.replaceState(null, null, cleanUrl);
                     
                     // Force reload to avoid cached old version
-                    window.location.reload();
+                    window.location.href = cleanUrl;
                     return true;
                 }
                 return false;
