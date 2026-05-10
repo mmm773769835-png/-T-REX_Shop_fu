@@ -661,11 +661,10 @@
                     }
                 }
                 
-                // Set main image and additional images
+                // Set main image and images array
                 if (imageUrls.length > 0) {
                     productData.image_url = imageUrls[0];
-                    productData.image_url_2 = imageUrls[1] || null;
-                    productData.image_url_3 = imageUrls[2] || null;
+                    productData.images = imageUrls;
                 }
                 
                 let result;
@@ -721,15 +720,16 @@
                 document.getElementById('isNew').checked = product.is_new || false;
                 document.getElementById('isActive').checked = product.is_active !== false; // Default true
                 
-                // Load multiple images
-                document.getElementById('productImageUrl1').value = product.image_url || '';
-                document.getElementById('productImageUrl2').value = product.image_url_2 || '';
-                document.getElementById('productImageUrl3').value = product.image_url_3 || '';
+                // Load multiple images from images array
+                const imgs = product.images || [product.image_url];
+                document.getElementById('productImageUrl1').value = imgs[0] || product.image_url || '';
+                document.getElementById('productImageUrl2').value = imgs[1] || '';
+                document.getElementById('productImageUrl3').value = imgs[2] || '';
                 
                 // Show image previews
-                updateImagePreview('imagePreview1', product.image_url);
-                updateImagePreview('imagePreview2', product.image_url_2);
-                updateImagePreview('imagePreview3', product.image_url_3);
+                updateImagePreview('imagePreview1', imgs[0] || product.image_url);
+                updateImagePreview('imagePreview2', imgs[1]);
+                updateImagePreview('imagePreview3', imgs[2]);
                 
                 document.getElementById('submitBtn').textContent = 'تحديث المنتج';
                 document.getElementById('cancelBtn').style.display = 'inline-block';
