@@ -1902,8 +1902,8 @@
             font-weight: bold;
         }
         .btn-submit-order {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: var(--dark);
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
             border: none;
             padding: 18px;
             border-radius: 10px;
@@ -1915,10 +1915,11 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
         .btn-submit-order:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
         }
 
         /* Review Modal Styles */
@@ -2527,9 +2528,10 @@
         };
 
         // Live exchange rates (SAR as base = 1)
+        // YER uses special rate for Sana'a (approximate market rate)
         let exchangeRates = {
             'SAR': 1, 'USD': 0.2667, 'KWD': 0.0815, 'JOD': 0.1889,
-            'AED': 0.9793, 'YER': 66.73, 'EUR': 0.2457
+            'AED': 0.9793, 'YER': 145.0, 'EUR': 0.2457
         };
 
         // Fetch live exchange rates from API
@@ -2560,6 +2562,10 @@
                         newRates[code] = data.rates[code];
                     }
                 }
+                
+                // Yemeni Rial (YER) - Use special market rate for Sana'a
+                // Official rate is different from market rate, using approximate market rate
+                newRates['YER'] = 145.0; // 1 SAR = ~145 YER (Sana'a market rate)
                 
                 exchangeRates = newRates;
                 
