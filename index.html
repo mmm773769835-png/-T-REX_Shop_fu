@@ -2835,12 +2835,14 @@
 
         // Wishlist Management
         function toggleWishlist(productId) {
-            const index = wishlist.indexOf(productId);
+            // Ensure string comparison for UUIDs
+            const id = String(productId);
+            const index = wishlist.findIndex(wId => String(wId) === id);
             if (index > -1) {
                 wishlist.splice(index, 1);
                 showNotification('تم إزالة المنتج من المفضلة 💔');
             } else {
-                wishlist.push(productId);
+                wishlist.push(id);
                 showNotification('تم إضافة المنتج للمفضلة ❤️');
             }
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
@@ -3326,18 +3328,20 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             }
             
             container.innerHTML = filteredProducts.map(product => {
-                const isWishlisted = wishlist.includes(product.id);
+                // Ensure string comparison for wishlist
+                const productId = String(product.id);
+                const isWishlisted = wishlist.some(id => String(id) === productId);
                 const isCompared = compareList.find(p => p.id === product.id);
                 const hasDiscount = product.original_price && product.original_price > product.price;
                 const discountPercent = hasDiscount ? Math.round((1 - product.price / product.original_price) * 100) : 0;
-                
+
                 return `
                     <div class="product-card">
                         ${product.is_new ? '<span class="product-badge new">جديد</span>' : ''}
                         ${product.is_hot ? '<span class="product-badge hot">الأكثر مبيعاً</span>' : ''}
                         ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
-                        
-                        <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${product.id})" title="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
+
+                        <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${productId}')" title="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
                             <i class="fas fa-heart ${isWishlisted ? 'text-danger' : ''}"></i>
                         </button>
                         
