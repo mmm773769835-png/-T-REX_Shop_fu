@@ -2603,7 +2603,6 @@
                 }));
                 
                 console.log('✅ Live exchange rates loaded:', exchangeRates);
-                logDebug('💱 تم تحديث أسعار الصرف');
                 
                 // Re-render if currency is not SAR
                 if (currentCurrency.code !== 'SAR') {
@@ -3457,7 +3456,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             try {
                 console.log('[PRODUCTS] Loading products from Supabase...');
-                logDebug('📦 Loading products...');
                 
                 // Use direct fetch with timeout as fallback
                 const apiUrl = SUPABASE_URL + '/rest/v1/products?select=*&order=created_at.desc';
@@ -3478,14 +3476,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    logDebug('❌ Products API error: ' + response.status + ' ' + errorText);
                     throw new Error('API error: ' + response.status + ' - ' + errorText);
                 }
                 
                 const products = await response.json();
                 
                 console.log('[PRODUCTS] Loaded:', products?.length || 0, 'products');
-                logDebug('✅ Products loaded: ' + (products?.length || 0));
                 
                 allProducts = products || [];
                 filteredProducts = [...allProducts];
@@ -3496,7 +3492,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
             } catch (error) {
                 console.error('[PRODUCTS] Error loading products:', error);
-                logDebug('❌ Products error: ' + error.message);
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
@@ -3542,7 +3537,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 const redirectUrl = `${window.location.origin}/?nocache=${timestamp}`;
                 
                 console.log('OAuth redirect URL:', redirectUrl);
-                logDebug('🔗 OAuth redirect: ' + redirectUrl);
                 
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
@@ -3558,11 +3552,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 if (error) throw error;
                 
                 console.log('Redirecting to Google...', data);
-                logDebug('⏳ Redirecting to Google...');
                 
             } catch (error) {
                 console.error('Error signing in with Google:', error);
-                logDebug('❌ OAuth error: ' + error.message);
                 showNotification('حدث خطأ في تسجيل الدخول! ❌');
             }
         }
@@ -3570,22 +3562,18 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Sign Out
         async function signOut() {
             try {
-                logDebug('🚪 Signing out...');
                 currentUser = null;
                 updateUserUI();
                 
                 const { error } = await supabase.auth.signOut();
                 if (error) {
                     console.error('SignOut error:', error);
-                    logDebug('❌ SignOut error: ' + error.message);
                 }
                 
                 showNotification('تم تسجيل الخروج بنجاح! 👋');
-                logDebug('✅ Signed out');
                 await loadProducts();
             } catch (error) {
                 console.error('Error signing out:', error);
-                logDebug('❌ SignOut exception: ' + error.message);
                 // Force logout even if Supabase fails
                 currentUser = null;
                 updateUserUI();
@@ -3595,8 +3583,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
         // Update User UI
         function updateUserUI() {
-            logDebug('🎨 updateUserUI called');
-            logDebug('👤 currentUser: ' + (currentUser ? currentUser.email : 'null'));
             console.log('updateUserUI called, currentUser:', currentUser);
             
             const loginBtn = document.getElementById('loginBtn');
@@ -3659,7 +3645,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
         // Check Auth State
         async function checkAuthState() {
-            logDebug('🔄 checkAuthState called');
             try {
                 // Log URL hash for debugging OAuth callback
                 if (window.location.hash) {
@@ -3667,18 +3652,15 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 }
                 
                 const { data: { session }, error } = await supabase.auth.getSession();
-                logDebug('📊 getSession result: ' + (session ? 'HAS SESSION' : 'NO SESSION'));
                 
                 if (error) throw error;
                 
                 if (session) {
                     currentUser = session.user;
-                    logDebug('✅ Session found: ' + currentUser.email);
                     console.log('✅ Session found on load:', currentUser.email);
                     updateUserUI();
                     showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || ''));
                 } else {
-                    logDebug('❌ No session found');
                     console.log('❌ No session on load. URL:', window.location.href);
                     currentUser = null;
                     updateUserUI();
@@ -3735,32 +3717,25 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Returns: true if session was established, false otherwise
         async function handleOAuthCallback() {
             const hash = window.location.hash;
-            logDebug('🔄 handleOAuthCallback called');
-            logDebug('📍 Hash: ' + (hash ? hash.substring(0, 50) + '...' : 'NONE'));
             
             if (!hash || !hash.includes('access_token=')) {
-                logDebug('❌ No access_token in hash');
                 return false;
             }
             
             console.log('🔑 Parsing OAuth tokens from URL...');
-            logDebug('🔑 Parsing tokens...');
             
             // Parse tokens directly from URL hash
             const params = new URLSearchParams(hash.substring(1));
             const access_token = params.get('access_token');
             const refresh_token = params.get('refresh_token');
             
-            logDebug('📇 Token found: ' + (access_token ? 'YES' : 'NO'));
             
             if (!access_token) {
                 console.error('❌ No access_token found in URL');
-                logDebug('❌ Token extraction failed');
                 return false;
             }
             
             try {
-                logDebug('⏳ Calling setSession...');
                 // Set session manually with the tokens from URL
                 const { data, error } = await supabase.auth.setSession({
                     access_token: access_token,
@@ -3769,34 +3744,27 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 if (error) {
                     console.error('❌ Error setting session:', error);
-                    logDebug('❌ setSession error: ' + error.message);
-                    showNotification('فشل في تسجيل الدخول. جرب مرة أخرى! ❌');
+                        showNotification('فشل في تسجيل الدخول. جرب مرة أخرى! ❌');
                     return false;
                 }
                 
                 if (data.session) {
                     currentUser = data.session.user;
                     console.log('✅ Session set successfully:', currentUser.email);
-                    logDebug('✅ Session set: ' + currentUser.email);
                     
                     // Clean URL - remove hash
                     history.replaceState(null, null, window.location.pathname);
-                    logDebug('✅ URL cleaned');
                     
                     // Update UI and load products directly (no page reload)
                     updateUserUI();
-                    logDebug('⏳ Loading products...');
                     await loadProducts();
-                    logDebug('✅ Products loaded');
                     
                     showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + (currentUser.user_metadata?.full_name || currentUser.email || '') + ' 👋');
                     return true;
                 }
-                logDebug('❌ No session data returned');
                 return false;
             } catch (err) {
                 console.error('❌ Exception in handleOAuthCallback:', err);
-                logDebug('❌ Exception: ' + err.message);
                 return false;
             }
         }
@@ -4310,26 +4278,16 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             console.log('Origin:', window.location.origin);
             console.log('Hash present:', window.location.hash ? 'YES' : 'NO');
             
-            // Create debug panel
-            createDebugPanel();
-            logDebug('🚀 Page loaded');
-            logDebug('📍 URL: ' + window.location.href);
-            
             // Check OAuth first (if user is returning from Google login)
             const hasOAuthTokens = window.location.hash && window.location.hash.includes('access_token=');
-            logDebug('🔑 OAuth tokens in URL: ' + (hasOAuthTokens ? 'YES' : 'NO'));
             
             if (hasOAuthTokens) {
-                logDebug('⏳ Processing OAuth callback...');
                 // Process OAuth login first
                 const oauthSuccess = await handleOAuthCallback();
-                logDebug('✅ OAuth result: ' + (oauthSuccess ? 'SUCCESS' : 'FAILED'));
                 if (!oauthSuccess) {
-                    logDebug('⚠️ Falling back to checkAuthState');
                     await checkAuthState();
                 }
             } else {
-                logDebug('⏳ Checking auth state...');
                 await checkAuthState();
             }
             
@@ -4342,54 +4300,18 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             // Check if we just completed OAuth (after reload)
             if (localStorage.getItem('oauth_just_completed') === 'true') {
-                logDebug('🎉 OAuth completed (after reload)');
                 localStorage.removeItem('oauth_just_completed');
                 const userName = localStorage.getItem('oauth_user_name') || '';
                 localStorage.removeItem('oauth_user_name');
                 showNotification('تم تسجيل الدخول بنجاح! 🎉\nأهلاً بك ' + userName + ' 👋');
             }
             
-            logDebug('👤 User: ' + (currentUser ? currentUser.email : 'Not logged in'));
             console.log('=== PAGE LOAD END ===');
             
             // Update stats every 10 seconds
             setInterval(updateStats, 10000);
         });
         
-        // Debug Panel Functions
-        function createDebugPanel() {
-            const panel = document.createElement('div');
-            panel.id = 'debugPanel';
-            panel.style.cssText = `
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                width: 300px;
-                max-height: 400px;
-                background: rgba(0,0,0,0.9);
-                border: 2px solid #FFD700;
-                border-radius: 10px;
-                padding: 10px;
-                font-family: monospace;
-                font-size: 12px;
-                color: #FFD700;
-                z-index: 99999;
-                overflow-y: auto;
-                direction: ltr;
-                text-align: left;
-            `;
-            panel.innerHTML = '<div style="font-weight:bold; margin-bottom:5px;">🔧 DEBUG LOG</div><div id="debugLog"></div>';
-            document.body.appendChild(panel);
-        }
-        
-        function logDebug(message) {
-            console.log('[DEBUG]', message);
-            const log = document.getElementById('debugLog');
-            if (log) {
-                const time = new Date().toLocaleTimeString();
-                log.innerHTML += `<div style="border-bottom:1px solid #333; padding:2px 0;">[${time}] ${message}</div>`;
-            }
-        }
     </script>
 
     <!-- Order Form Modal -->
