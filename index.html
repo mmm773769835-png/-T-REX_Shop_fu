@@ -3058,9 +3058,23 @@
         }
 
         function hideSearchDropdown() {
-            setTimeout(() => {
-                document.getElementById('searchDropdown').classList.remove('active');
-            }, 200);
+            // Don't auto-hide to allow clicking on results
+        }
+
+        function showAllSearchResults() {
+            event.stopPropagation();
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            document.getElementById('searchDropdown').classList.remove('active');
+            
+            filteredProducts = allProducts.filter(product =>
+                product.name.toLowerCase().includes(query) ||
+                (product.description && product.description.toLowerCase().includes(query)) ||
+                (product.category && product.category.toLowerCase().includes(query))
+            );
+            renderProducts();
+            
+            // Scroll to products
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
         }
 
         function searchProductsDropdown() {
@@ -3082,21 +3096,27 @@
                 dropdown.innerHTML = '<div class="search-dropdown-empty">لا توجد نتائج للبحث</div>';
             } else {
                 dropdown.innerHTML = results.map(product => `
-                    <div class="search-dropdown-item" onclick="selectSearchResult('${product.id}')">
+                    <div class="search-dropdown-item" onclick="selectSearchResult('${product.id}'); return false;" data-id="${product.id}">
                         <img src="${product.image_url || 'placeholder.jpg'}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
                         <div class="search-dropdown-item-info">
                             <h4>${product.name}</h4>
                             <p>${formatPrice(product.price)}</p>
                         </div>
                     </div>
-                `).join('');
+                `).join('') + `
+                    <div style="padding: 10px; text-align: center; border-top: 1px solid #333; cursor: pointer; color: var(--primary);" onclick="showAllSearchResults(); return false;">
+                        عرض كل النتائج (${results.length})
+                    </div>
+                `;
             }
             
             dropdown.classList.add('active');
         }
 
         function selectSearchResult(productId) {
-            const product = allProducts.find(p => p.id === productId);
+            event.stopPropagation(); // Prevent closing immediately
+            const id = String(productId);
+            const product = allProducts.find(p => String(p.id) === id);
             if (product) {
                 openProductModal(product);
                 document.getElementById('searchDropdown').classList.remove('active');
@@ -3108,7 +3128,7 @@
         document.addEventListener('click', function(e) {
             const searchBox = document.querySelector('.search-box');
             const dropdown = document.getElementById('searchDropdown');
-            if (!searchBox.contains(e.target)) {
+            if (dropdown && searchBox && !searchBox.contains(e.target)) {
                 dropdown.classList.remove('active');
             }
         });
