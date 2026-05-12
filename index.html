@@ -3493,7 +3493,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             document.getElementById('productModal').classList.remove('show');
         }
 
-        // Render Products
+        // Render Products with SEO
         function renderProducts() {
             const container = document.getElementById('products-container');
             const resultsCount = document.getElementById('resultsCount');
@@ -3518,47 +3518,95 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 const isCompared = compareList.find(p => p.id === product.id);
                 const hasDiscount = product.original_price && product.original_price > product.price;
                 const discountPercent = hasDiscount ? Math.round((1 - product.price / product.original_price) * 100) : 0;
+                
+                // SEO: Create structured data for product
+                const productSchema = {
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    "name": product.name,
+                    "description": product.description || 'منتج ' + product.name + ' من فئة ' + (product.category || 'عام'),
+                    "image": product.image_url || 'https://trexshopmax.com/logo.png',
+                    "offers": {
+                        "@type": "Offer",
+                        "price": product.price,
+                        "priceCurrency": product.currency || 'YER',
+                        "availability": "https://schema.org/InStock",
+                        "url": 'https://trexshopmax.com/?product=' + productId
+                    },
+                    "category": product.category || 'منتجات عامة',
+                    "brand": {
+                        "@type": "Brand",
+                        "name": "T-REX Shop"
+                    }
+                };
+                
+                if (product.rating) {
+                    productSchema.aggregateRating = {
+                        "@type": "AggregateRating",
+                        "ratingValue": product.rating,
+                        "reviewCount": product.reviews_count || 0
+                    };
+                }
+                
+                const schemaScript = '<scr' + 'ipt type="application/ld+json">' + JSON.stringify(productSchema) + '</scr' + 'ipt>';
 
                 return `
-                    <div class="product-card">
+                    <div class="product-card" itemscope itemtype="https://schema.org/Product" data-product-id="${productId}">
+                        ${schemaScript}
                         ${product.is_new ? '<span class="product-badge new">جديد</span>' : ''}
                         ${product.is_hot ? '<span class="product-badge hot">الأكثر مبيعاً</span>' : ''}
                         ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
 
-                        <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${productId}')" title="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
+                        <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" 
+                                onclick="event.stopPropagation(); toggleWishlist('${productId}')" 
+                                title="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}"
+                                aria-label="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
                             <i class="fas fa-heart ${isWishlisted ? 'text-danger' : ''}"></i>
                         </button>
                         
                         <img src="${product.image_url || 'https://via.placeholder.com/300x200/1a1a1a/FFD700?text=No+Image'}" 
-                             alt="${product.name}" 
+                             alt="${product.name} - ${product.category || 'منتج'} بسعر ${formatPrice(product.price)}" 
                              class="product-image"
+                             itemprop="image"
+                             loading="lazy"
                              onerror="this.src='https://via.placeholder.com/300x200/1a1a1a/FFD700?text=No+Image'"
                              onclick="openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
                         
-                        <div class="product-info">
+                        <div class="product-info" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="price" content="${product.price}">
+                            <meta itemprop="priceCurrency" content="${product.currency || 'YER'}">
+                            <meta itemprop="availability" content="https://schema.org/InStock">
+                            
                             <div class="product-rating" title="تقييم ${product.rating || 0} من 5 نجوم">
                                 ${renderStars(product.rating || 0)}
                                 <span>(${product.reviews_count || 0} تقييم)</span>
                             </div>
-                            <h3 class="product-name">${product.name}</h3>
+                            <h3 class="product-name" itemprop="name">${product.name}</h3>
+                            <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
-                                    ${formatPrice(product.original_price)}
+                                    <span itemprop="price" content="${product.original_price}">${formatPrice(product.original_price)}</span>
                                     <span class="product-discount">-${discountPercent}%</span>
                                 </p>
                             ` : ''}
-                            <p class="product-price">${formatPrice(product.price)}</p>
+                            <p class="product-price" itemprop="price">${formatPrice(product.price)}</p>
                             <div class="card-actions">
-                                <button class="add-to-cart" onclick="event.stopPropagation(); addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                <button class="add-to-cart" 
+                                        onclick="event.stopPropagation(); addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                                        aria-label="أضف ${product.name} للسلة">
                                     <i class="fas fa-cart-plus"></i> أضف للسلة
                                 </button>
-                                <button class="btn-buy-now" onclick="event.stopPropagation(); openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                <button class="btn-buy-now" 
+                                        onclick="event.stopPropagation(); openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                                        aria-label="اشتري ${product.name} الآن">
                                     <i class="fab fa-whatsapp"></i> اشتري الآن
                                 </button>
                             </div>
                         </div>
                         
-                        <button class="compare-btn ${isCompared ? 'active' : ''}" onclick="toggleCompare(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                        <button class="compare-btn ${isCompared ? 'active' : ''}" 
+                                onclick="toggleCompare(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                                aria-label="قارن ${product.name}">
                             <i class="fas fa-exchange-alt"></i> مقارنة
                         </button>
                     </div>
