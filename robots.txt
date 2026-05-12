@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trexshopmax.com/sitemap.xml
+
+# Disallow admin panel from search engines
+Disallow: /admin.html
