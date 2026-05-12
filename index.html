@@ -856,6 +856,61 @@
         }
         .search-btn:hover { opacity: 0.9; }
         
+        /* Search Dropdown Results */
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border: 1px solid #333;
+            border-radius: 15px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+        }
+        .search-dropdown.active { display: block; }
+        .search-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-dropdown-item:hover {
+            background: rgba(255,215,0,0.1);
+        }
+        .search-dropdown-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .search-dropdown-item-info {
+            flex: 1;
+        }
+        .search-dropdown-item-info h4 {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+        .search-dropdown-item-info p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: var(--primary);
+        }
+        .search-dropdown-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .search-box { position: relative; }
+        
         /* Filters */
         .filters-section {
             max-width: 1400px;
@@ -2128,10 +2183,12 @@
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)" oninput="searchProductsDropdown()" onfocus="showSearchDropdown()">
             <button class="search-btn" onclick="searchProducts()">
                 <i class="fas fa-search"></i> بحث
             </button>
+            <!-- Search Results Dropdown -->
+            <div class="search-dropdown" id="searchDropdown"></div>
         </div>
     </div>
 
@@ -2990,6 +3047,71 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', searchProducts);
+
+        // Search Dropdown Functions
+        function showSearchDropdown() {
+            const dropdown = document.getElementById('searchDropdown');
+            const query = document.getElementById('searchInput').value.trim();
+            if (query.length > 0) {
+                searchProductsDropdown();
+            }
+        }
+
+        function hideSearchDropdown() {
+            setTimeout(() => {
+                document.getElementById('searchDropdown').classList.remove('active');
+            }, 200);
+        }
+
+        function searchProductsDropdown() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const dropdown = document.getElementById('searchDropdown');
+            
+            if (!query) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            
+            const results = allProducts.filter(product =>
+                product.name.toLowerCase().includes(query) ||
+                (product.description && product.description.toLowerCase().includes(query)) ||
+                (product.category && product.category.toLowerCase().includes(query))
+            ).slice(0, 5); // Show max 5 results
+            
+            if (results.length === 0) {
+                dropdown.innerHTML = '<div class="search-dropdown-empty">لا توجد نتائج للبحث</div>';
+            } else {
+                dropdown.innerHTML = results.map(product => `
+                    <div class="search-dropdown-item" onclick="selectSearchResult('${product.id}')">
+                        <img src="${product.image_url || 'placeholder.jpg'}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
+                        <div class="search-dropdown-item-info">
+                            <h4>${product.name}</h4>
+                            <p>${formatPrice(product.price)}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            dropdown.classList.add('active');
+        }
+
+        function selectSearchResult(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product) {
+                openProductModal(product);
+                document.getElementById('searchDropdown').classList.remove('active');
+                document.getElementById('searchInput').value = '';
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchBox = document.querySelector('.search-box');
+            const dropdown = document.getElementById('searchDropdown');
+            if (!searchBox.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
 
         // Filter by Category
         function filterByCategory(category) {
