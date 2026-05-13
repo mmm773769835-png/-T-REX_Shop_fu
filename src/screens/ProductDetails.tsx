@@ -117,10 +117,10 @@ export default function ProductDetails({ route, navigation }: any) {
     );
   }
   
-  // التعامل مع الصور - دعم الصورة الواحدة القديمة ومصفوفة الصور الجديدة
-  const productImages = currentProduct?.images || (currentProduct?.imageUrl ? [currentProduct.imageUrl] : []);
-  console.log('📷 الصور المتاحة للمنتج:', productImages);
-  console.log('📷 مؤشر الصورة الحالية:', currentImageIndex);
+  // التعامل مع الصور - دعم image_url من Supabase أيضاً
+  const productImages = currentProduct?.images || 
+    (currentProduct?.image_url ? [currentProduct.image_url] : 
+    (currentProduct?.imageUrl ? [currentProduct.imageUrl] : []));
   const currentImage = imageFailed ? getDefaultProductImage() : sanitizeImageUrl(productImages[currentImageIndex] || productImages[0]);
 
   const handleAddToCart = () => {
@@ -208,8 +208,8 @@ export default function ProductDetails({ route, navigation }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={isDarkMode ? "#fff" : "#333"} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <Text style={styles.title}>
           {language === "ar" ? "تفاصيل المنتج" : "Product Details"}
@@ -218,7 +218,7 @@ export default function ProductDetails({ route, navigation }: any) {
           <Ionicons 
             name={isInWishList(currentProduct?.id) ? "heart" : "heart-outline"} 
             size={24} 
-            color={isInWishList(currentProduct?.id) ? "#e91e63" : (isDarkMode ? "#fff" : "#333")} 
+            color={isInWishList(currentProduct?.id) ? "#FF3B3B" : "#FFD700"} 
           />
         </TouchableOpacity>
       </View>
@@ -264,11 +264,14 @@ export default function ProductDetails({ route, navigation }: any) {
       
       <ScrollView style={styles.contentScroll}>
         <View style={styles.productInfo}>
+          {/* Name & Price */}
           <Text style={styles.productName}>{currentProduct.name}</Text>
           <View style={styles.priceContainer}>
             {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
               <>
-                <Text style={styles.originalPrice}>{formatPrice(currentProduct.originalPrice, (currentProduct.currency || 'YER') as any)}</Text>
+                <Text style={styles.originalPrice}>
+                  {(currentProduct.originalPrice).toLocaleString()} {currentProduct.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+                </Text>
                 <View style={styles.discountBadge}>
                   <Text style={styles.discountBadgeText}>
                     -{Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}%
@@ -276,53 +279,51 @@ export default function ProductDetails({ route, navigation }: any) {
                 </View>
               </>
             )}
-            <Text style={styles.productPrice}>{formatPrice(currentProduct.price, (currentProduct.currency || 'YER') as any)}</Text>
+            <Text style={styles.productPrice}>
+              {(currentProduct.price).toLocaleString()} {currentProduct.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+            </Text>
           </View>
-          <Text style={styles.productDescription}>{currentProduct.description}</Text>
-          
+
+          {/* Category chip */}
           {currentProduct.category && (
             <View style={styles.chip}>
+              <Ionicons name="pricetag-outline" size={12} color="#1a1a1a" />
               <Text style={styles.chipText}>{currentProduct.category}</Text>
             </View>
           )}
-          
-          {currentProduct.attribute && (
-            <View style={[styles.chip, styles.attributeChip]}>
-              <Text style={styles.chipText}>{currentProduct.attribute}</Text>
-            </View>
-          )}
-          
+
+          {/* Description */}
+          <Text style={styles.productDescription}>{currentProduct.description}</Text>
+
+          {/* Action Buttons */}
           <View style={styles.buttonsContainer}>
-            <View style={styles.buttonWrapper}>
-              <Button 
-                title={language === "ar" ? "🛒 إضافة إلى السلة" : "🛒 Add to Cart"} 
-                onPress={handleAddToCart}
-                variant="primary"
-                block
-              />
-            </View>
-            <View style={styles.buttonWrapper}>
-              <Button 
-                title={language === "ar" ? "✅ تأكيد الطلب" : "✅ Confirm Order"} 
-                onPress={handleCheckout}
-                variant="success"
-                block
-              />
-            </View>
+            <TouchableOpacity style={styles.cartBtn} onPress={handleAddToCart}>
+              <Ionicons name="cart-outline" size={20} color="#1a1a1a" />
+              <Text style={styles.cartBtnText}>
+                {language === "ar" ? "إضافة للسلة" : "Add to Cart"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buyBtn} onPress={handleCheckout}>
+              <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+              <Text style={styles.buyBtnText}>
+                {language === "ar" ? "اطلب الآن" : "Order Now"}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Reviews Section */}
+          {/* Reviews */}
           <TouchableOpacity 
             style={styles.reviewsButton}
             onPress={() => navigation.navigate('Reviews', { product: currentProduct })}
           >
             <View style={styles.reviewsHeader}>
               <Text style={styles.reviewsTitle}>
-                {language === "ar" ? "⭐ المراجعات" : "⭐ Reviews"}
+                {language === "ar" ? "المراجعات" : "Reviews"}
               </Text>
               <View style={styles.ratingContainer}>
                 <Text style={styles.averageRating}>{getAverageRating(currentProduct.id).toFixed(1)}</Text>
                 <Ionicons name="star" size={16} color="#FFD700" />
+                <Ionicons name="chevron-forward" size={16} color="#888" />
               </View>
             </View>
             <Text style={styles.reviewsCount}>
@@ -336,199 +337,104 @@ export default function ProductDetails({ route, navigation }: any) {
 }
 
 const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  contentScroll: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: isDarkMode ? "#111" : "#f0f0f0" },
+  contentScroll: { flex: 1 },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 16, paddingTop: 44, paddingBottom: 12,
+    backgroundColor: "#1a1a1a",
+    borderBottomWidth: 1, borderBottomColor: "#2a2a2a",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.text,
-  },
-  productImage: {
-    width: "100%",
-    height: 300,
-    resizeMode: "cover",
-  },
-  productInfo: {
-    padding: 20,
-    backgroundColor: colors.surface,
-    margin: 16,
-    borderRadius: 12,
-    elevation: 1,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  productName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.text,
-    marginBottom: 8,
-  },
-  productPrice: {
-    fontSize: 20,
-    color: colors.gold, // لون ذهبي للسعر
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  originalPrice: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textDecorationLine: 'line-through',
-    marginRight: 8,
-  },
-  discountBadge: {
-    backgroundColor: '#ff4444',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: 8,
-  },
-  discountBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  productDescription: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    lineHeight: 24,
-    marginBottom: 16,
-  },
-  chip: {
-    backgroundColor: colors.primary, // لون ذهبي
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    alignSelf: "flex-start",
-    marginBottom: 8,
-  },
-  attributeChip: {
-    backgroundColor: colors.success,
-  },
-  chipText: {
-    color: colors.buttonText, // نص داكن على خلفية ذهبية
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  buttonsContainer: {
-    marginTop: 20,
-    gap: 12,
-  },
-  buttonWrapper: {
-    width: "100%",
-  },
-  // أنماط معرض الصور
-  imageSwiper: {
-    width: '100%',
-    height: 300,
-    backgroundColor: 'transparent',
-  },
+  backBtn: { padding: 6 },
+  title: { fontSize: 17, fontWeight: "800", color: "#FFD700", letterSpacing: 1 },
+  wishlistButton: { padding: 6 },
+  productImage: { width: "100%", height: 300, resizeMode: "cover" },
+  imageSwiper: { width: '100%', height: 300 },
   imageSlide: {
-    width: Dimensions.get('window').width,
-    height: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: Dimensions.get('window').width, height: 300,
+    justifyContent: 'center', alignItems: 'center',
+    backgroundColor: isDarkMode ? "#1a1a1a" : "#000",
   },
   imageIndicators: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 10,
-    gap: 8,
+    flexDirection: 'row', justifyContent: 'center',
+    alignItems: 'center', paddingVertical: 10, gap: 6,
+    backgroundColor: isDarkMode ? "#111" : "#f0f0f0",
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    width: 7, height: 7, borderRadius: 4,
+    backgroundColor: isDarkMode ? "#444" : "#ccc",
   },
-  activeIndicator: {
-    backgroundColor: colors.primary,
-    width: 20,
+  activeIndicator: { backgroundColor: "#FFD700", width: 22, borderRadius: 4 },
+  imageGallery: { padding: 10, backgroundColor: colors.surface },
+  thumbnail: { width: 60, height: 60, borderRadius: 8, marginHorizontal: 5, borderWidth: 2, borderColor: 'transparent' },
+  activeThumbnail: { borderColor: "#FFD700" },
+  thumbnailImage: { width: '100%', height: '100%', borderRadius: 6 },
+  productInfo: {
+    padding: 18,
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    margin: 14, borderRadius: 18,
+    elevation: 3, shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5,
   },
-  imageGallery: {
-    padding: 10,
-    backgroundColor: colors.surface,
+  productName: {
+    fontSize: 20, fontWeight: "800",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
+    marginBottom: 10, lineHeight: 28,
   },
-  thumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginHorizontal: 5,
-    borderWidth: 2,
-    borderColor: 'transparent',
+  priceContainer: {
+    flexDirection: 'row', alignItems: 'center',
+    marginBottom: 14, flexWrap: 'wrap', gap: 8,
   },
-  activeThumbnail: {
-    borderColor: colors.gold, // لون ذهبي للصورة النشطة
+  productPrice: { fontSize: 24, color: "#FFD700", fontWeight: "900" },
+  originalPrice: {
+    fontSize: 15, color: "#888",
+    textDecorationLine: 'line-through',
   },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 6,
+  discountBadge: {
+    backgroundColor: '#FF3B3B',
+    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8,
   },
-  wishlistButton: {
-    padding: 8,
+  discountBadgeText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  chip: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "#FFD700",
+    borderRadius: 20, paddingVertical: 5, paddingHorizontal: 12,
+    alignSelf: "flex-start", marginBottom: 12,
   },
+  chipText: { color: "#1a1a1a", fontSize: 13, fontWeight: "700" },
+  attributeChip: { backgroundColor: "#4CAF50" },
+  productDescription: {
+    fontSize: 15, color: isDarkMode ? "#bbb" : "#555",
+    lineHeight: 24, marginBottom: 18,
+  },
+  buttonsContainer: {
+    flexDirection: 'row', gap: 10, marginTop: 4,
+  },
+  cartBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: "#FFD700", borderRadius: 14,
+    paddingVertical: 14, gap: 6,
+  },
+  cartBtnText: { color: "#1a1a1a", fontWeight: "800", fontSize: 14 },
+  buyBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: "#25D366", borderRadius: 14,
+    paddingVertical: 14, gap: 6,
+  },
+  buyBtnText: { color: "#fff", fontWeight: "800", fontSize: 14 },
+  buttonWrapper: { width: "100%" },
   reviewsButton: {
-    backgroundColor: colors.surface,
-    padding: 16,
-    marginTop: 16,
-    borderRadius: 12,
-    elevation: 1,
+    backgroundColor: isDarkMode ? "#2a2a2a" : "#f5f5f5",
+    padding: 14, marginTop: 16, borderRadius: 14,
   },
   reviewsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', marginBottom: 4,
   },
-  reviewsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  averageRating: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginRight: 4,
-  },
-  reviewsCount: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
+  reviewsTitle: { fontSize: 16, fontWeight: '700', color: isDarkMode ? "#fff" : "#1a1a1a" },
+  ratingContainer: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  averageRating: { fontSize: 16, fontWeight: '800', color: isDarkMode ? "#fff" : "#1a1a1a" },
+  reviewsCount: { fontSize: 13, color: "#888" },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 16, fontSize: 16, color: colors.textSecondary },
 });
