@@ -132,51 +132,82 @@ const ProfileScreen = ({ navigation }: any) => {
     navigation.navigate(screen);
   };
 
+  const isGuest = !authUser;
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{language === "ar" ? "حسابي" : "My Profile"}</Text>
       </View>
 
-      <View style={styles.profileSection}>
-        <TouchableOpacity onPress={pickImage} style={styles.profileImageContainer}>
-          <Image 
-            source={{ uri: localUser.profileImage }} 
-            style={styles.profileImage} 
-          />
-          <View style={styles.cameraIcon}>
-            <Ionicons name="camera" size={16} color="#fff" />
+      {/* Profile Card */}
+      <View style={styles.profileCard}>
+        {isGuest ? (
+          <View style={styles.guestSection}>
+            <View style={styles.guestIconWrapper}>
+              <Ionicons name="person-outline" size={50} color="#FFD700" />
+            </View>
+            <Text style={styles.guestTitle}>
+              {language === "ar" ? "مرحباً بك 👋" : "Welcome 👋"}
+            </Text>
+            <Text style={styles.guestSub}>
+              {language === "ar" ? "سجل دخولك للوصول لحسابك" : "Sign in to access your account"}
+            </Text>
+            <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate("Login" as never)}>
+              <Ionicons name="log-in-outline" size={20} color="#1a1a1a" />
+              <Text style={styles.loginBtnText}>
+                {language === "ar" ? "تسجيل الدخول" : "Sign In"}
+              </Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-        
-        <Text style={styles.userName}>{localUser.name}</Text>
-        <Text style={styles.userEmail}>{localUser.email}</Text>
-        <Text style={styles.userPhone}>{localUser.phone}</Text>
+        ) : (
+          <View style={styles.userSection}>
+            <TouchableOpacity onPress={pickImage} style={styles.profileImageContainer}>
+              <Image source={{ uri: localUser.profileImage }} style={styles.profileImage} />
+              <View style={styles.cameraIcon}>
+                <Ionicons name="camera" size={14} color="#1a1a1a" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.userName}>{localUser.name}</Text>
+            <Text style={styles.userEmail}>{localUser.email}</Text>
+            {localUser.phone !== "غير متوفر" && (
+              <Text style={styles.userPhone}>{localUser.phone}</Text>
+            )}
+          </View>
+        )}
       </View>
 
+      {/* Menu Items */}
       <View style={styles.menuSection}>
-        {menuItems.map((item) => (
+        {menuItems.map((item, index) => (
           <TouchableOpacity
             key={item.id}
-            style={styles.menuItem}
+            style={[styles.menuItem, index === menuItems.length - 1 && { borderBottomWidth: 0 }]}
             onPress={() => handleMenuItemPress(item.screen)}
           >
             <View style={styles.menuItemLeft}>
-              <Ionicons name={item.icon as any} size={24} color={isDarkMode ? '#4da6ff' : '#007bff'} />
+              <View style={styles.menuIconWrapper}>
+                <Ionicons name={item.icon as any} size={20} color="#FFD700" />
+              </View>
               <Text style={styles.menuItemText}>{item.title}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={isDarkMode ? '#999' : '#999'} />
+            <Ionicons name="chevron-forward" size={18} color="#555" />
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={styles.logoutSection}>
-        <Button 
-          title={language === "ar" ? "تسجيل الخروج" : "Logout"} 
-          onPress={handleLogout} 
-          variant="outline" 
-        />
-      </View>
+      {/* Logout */}
+      {!isGuest && (
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color="#FF3B3B" />
+          <Text style={styles.logoutBtnText}>
+            {language === "ar" ? "تسجيل الخروج" : "Logout"}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 };
@@ -184,84 +215,172 @@ const ProfileScreen = ({ navigation }: any) => {
 const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: isDarkMode ? "#111" : "#f0f0f0",
   },
   header: {
-    backgroundColor: colors.header,
-    padding: 20,
+    backgroundColor: "#1a1a1a",
+    paddingTop: 50,
+    paddingBottom: 16,
     alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#2a2a2a",
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.text,
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#FFD700",
+    letterSpacing: 1,
   },
-  profileSection: {
-    backgroundColor: colors.card,
-    padding: 20,
+  profileCard: {
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+  },
+  guestSection: {
     alignItems: "center",
-    marginBottom: 16,
+    padding: 28,
+  },
+  guestIconWrapper: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: isDarkMode ? "#2a2a2a" : "#f5f5f5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 14,
+    borderWidth: 2,
+    borderColor: "#FFD700",
+  },
+  guestTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
+    marginBottom: 6,
+  },
+  guestSub: {
+    fontSize: 13,
+    color: "#888",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  loginBtn: {
+    backgroundColor: "#FFD700",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 14,
+    gap: 8,
+  },
+  loginBtnText: {
+    color: "#1a1a1a",
+    fontWeight: "800",
+    fontSize: 15,
+  },
+  userSection: {
+    alignItems: "center",
+    padding: 24,
   },
   profileImageContainer: {
     position: "relative",
+    marginBottom: 14,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 16,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 3,
+    borderColor: "#FFD700",
   },
   cameraIcon: {
     position: "absolute",
-    bottom: 16,
+    bottom: 0,
     right: 0,
-    backgroundColor: colors.primary,
-    borderRadius: 15,
-    width: 30,
-    height: 30,
+    backgroundColor: "#FFD700",
+    borderRadius: 12,
+    width: 26,
+    height: 26,
     justifyContent: "center",
     alignItems: "center",
   },
   userName: {
     fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: colors.text,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: colors.textSecondary,
+    fontWeight: "800",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
     marginBottom: 4,
   },
+  userEmail: {
+    fontSize: 13,
+    color: "#888",
+    marginBottom: 2,
+  },
   userPhone: {
-    fontSize: 16,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: "#888",
   },
   menuSection: {
-    backgroundColor: colors.card,
-    margin: 16,
-    borderRadius: 12,
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    marginHorizontal: 16,
+    marginTop: 14,
+    borderRadius: 20,
     overflow: "hidden",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
   menuItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: isDarkMode ? "#2a2a2a" : "#f0f0f0",
   },
   menuItemLeft: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 12,
+  },
+  menuIconWrapper: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: isDarkMode ? "#2a2a2a" : "#f5f5f5",
+    justifyContent: "center",
+    alignItems: "center",
   },
   menuItemText: {
-    fontSize: 16,
-    marginRight: 16,
-    color: colors.text,
+    fontSize: 15,
+    fontWeight: "600",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
   },
-  logoutSection: {
-    margin: 16,
+  logoutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 16,
+    marginTop: 14,
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    borderRadius: 16,
+    paddingVertical: 16,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#FF3B3B",
+  },
+  logoutBtnText: {
+    color: "#FF3B3B",
+    fontSize: 15,
+    fontWeight: "700",
   },
 });
 

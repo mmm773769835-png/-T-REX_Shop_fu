@@ -84,67 +84,63 @@ const CartScreen = ({ route, navigation }: any) => {
         source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} 
         style={styles.itemImage} 
       />
-      
       <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>{formatPrice(item.price || 0, (item.currency || 'YER') as any)}</Text>
-        
+        <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
+        <Text style={styles.itemPrice}>
+          {(item.price || 0).toLocaleString()} {item.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+        </Text>
         <View style={styles.quantityContainer}>
-          <TouchableOpacity 
-            style={styles.quantityButton}
-            onPress={() => decrementQuantity(item.id)}
-          >
-            <Ionicons name="remove" size={16} color={isDarkMode ? '#fff' : '#000'} />
+          <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
+            <Ionicons name="remove" size={16} color="#1a1a1a" />
           </TouchableOpacity>
-          
           <Text style={styles.quantityText}>{item.quantity || 1}</Text>
-          
-          <TouchableOpacity 
-            style={styles.quantityButton}
-            onPress={() => incrementQuantity(item.id)}
-          >
-            <Ionicons name="add" size={16} color={isDarkMode ? '#fff' : '#000'} />
+          <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
+            <Ionicons name="add" size={16} color="#1a1a1a" />
           </TouchableOpacity>
         </View>
       </View>
-      
-      <TouchableOpacity 
-        style={styles.removeButton} 
-        onPress={() => handleRemove(item.id)}
-      >
-        <Ionicons name="close" size={20} color="#ff4444" />
-      </TouchableOpacity>
+      <View style={styles.itemRight}>
+        <TouchableOpacity style={styles.removeButton} onPress={() => handleRemove(item.id)}>
+          <Ionicons name="trash-outline" size={20} color="#FF3B3B" />
+        </TouchableOpacity>
+        <Text style={styles.itemTotal}>
+          {((item.price || 0) * (item.quantity || 1)).toLocaleString()}
+        </Text>
+      </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={isDarkMode ? '#fff' : '#000'} />
+          <Ionicons name="arrow-back" size={24} color="#FFD700" />
         </TouchableOpacity>
         <Text style={styles.title}>
-          {language === "ar" ? "🛒 سلة المشتريات" : "🛒 Shopping Cart"}
+          {language === "ar" ? "سلة المشتريات" : "Shopping Cart"}
         </Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.cartBadge}>
+          <Text style={styles.cartBadgeText}>{cartItems.length}</Text>
+        </View>
       </View>
 
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="cart-outline" size={80} color={isDarkMode ? '#666' : '#ccc'} />
+          <View style={styles.emptyIconWrapper}>
+            <Ionicons name="cart-outline" size={60} color="#FFD700" />
+          </View>
           <Text style={styles.emptyText}>
-            {language === "ar" ? "سلة التسوق فارغة" : "Cart is empty"}
+            {language === "ar" ? "السلة فارغة" : "Cart is empty"}
           </Text>
           <Text style={styles.emptySubtext}>
-            {language === "ar" ? "ابدأ بإضافة منتجات إلى سلة التسوق" : "Start adding products to your cart"}
+            {language === "ar" ? "أضف منتجات لتبدأ التسوق" : "Add products to start shopping"}
           </Text>
-          
-          <View style={styles.browseButton}>
-            <Button 
-              title={language === "ar" ? "تصفح المنتجات" : "Browse Products"} 
-              onPress={() => navigation.navigate("HomeV2")} 
-            />
-          </View>
+          <TouchableOpacity style={styles.browseBtn} onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.browseBtnText}>
+              {language === "ar" ? "تصفح المنتجات" : "Browse Products"}
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <>
@@ -153,22 +149,38 @@ const CartScreen = ({ route, navigation }: any) => {
             keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
             renderItem={renderCartItem}
             contentContainerStyle={styles.cartList}
+            showsVerticalScrollIndicator={false}
           />
           
+          {/* Footer Summary */}
           <View style={styles.footer}>
-            <View style={styles.totalContainer}>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>
+                {language === "ar" ? `المنتجات (${cartItems.length})` : `Items (${cartItems.length})`}
+              </Text>
+              <Text style={styles.summaryValue}>{formatPrice(total)}</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>
+                {language === "ar" ? "الشحن" : "Shipping"}
+              </Text>
+              <Text style={styles.shippingFree}>
+                {language === "ar" ? "مجاني" : "Free"}
+              </Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>
-                {language === "ar" ? "الإجمالي:" : "Total:"}
+                {language === "ar" ? "الإجمالي" : "Total"}
               </Text>
               <Text style={styles.totalAmount}>{formatPrice(total)}</Text>
             </View>
-            
-            <View style={styles.checkoutButton}>
-              <Button 
-                title={language === "ar" ? "تأكيد الطلب" : "Checkout"} 
-                onPress={handleCheckout} 
-              />
-            </View>
+            <TouchableOpacity style={styles.checkoutBtn} onPress={handleCheckout}>
+              <Ionicons name="checkmark-circle-outline" size={22} color="#1a1a1a" />
+              <Text style={styles.checkoutBtnText}>
+                {language === "ar" ? "تأكيد الطلب" : "Checkout"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </>
       )}
@@ -179,23 +191,39 @@ const CartScreen = ({ route, navigation }: any) => {
 const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: isDarkMode ? "#111" : "#f0f0f0",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    backgroundColor: colors.header,
-    elevation: 2,
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 14,
+    backgroundColor: "#1a1a1a",
+    borderBottomWidth: 1,
+    borderBottomColor: "#2a2a2a",
   },
-  backButton: {
-    padding: 8,
-  },
+  backButton: { padding: 6 },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.text,
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#FFD700",
+    letterSpacing: 1,
+  },
+  cartBadge: {
+    backgroundColor: "#FFD700",
+    borderRadius: 12,
+    minWidth: 26,
+    height: 26,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  cartBadgeText: {
+    color: "#1a1a1a",
+    fontSize: 13,
+    fontWeight: "800",
   },
   emptyContainer: {
     flex: 1,
@@ -203,99 +231,177 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     alignItems: "center",
     padding: 32,
   },
+  emptyIconWrapper: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "#FFD700",
+  },
   emptyText: {
     fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 16,
+    fontWeight: "800",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
     marginBottom: 8,
-    color: colors.text,
   },
   emptySubtext: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 32,
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 28,
     textAlign: "center",
   },
-  browseButton: {
-    width: "80%",
+  browseBtn: {
+    backgroundColor: "#FFD700",
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  browseBtnText: {
+    color: "#1a1a1a",
+    fontWeight: "800",
+    fontSize: 15,
   },
   cartList: {
-    padding: 16,
+    padding: 14,
+    paddingBottom: 6,
   },
   cartItem: {
     flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
+    borderRadius: 16,
     padding: 12,
     marginBottom: 12,
-    elevation: 1,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    alignItems: "center",
   },
   itemImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 75,
+    height: 75,
+    borderRadius: 12,
     marginRight: 12,
+    backgroundColor: "#2a2a2a",
   },
   itemDetails: {
     flex: 1,
-    justifyContent: "space-between",
   },
   itemName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.text,
+    fontSize: 14,
+    fontWeight: "700",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
+    marginBottom: 4,
   },
   itemPrice: {
-    fontSize: 18,
-    color: "#e91e63",
-    fontWeight: "bold",
+    fontSize: 14,
+    color: "#FFD700",
+    fontWeight: "700",
+    marginBottom: 8,
   },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   quantityButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.border,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: "#FFD700",
     justifyContent: "center",
     alignItems: "center",
   },
   quantityText: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "800",
     marginHorizontal: 12,
-    color: colors.text,
+    color: isDarkMode ? "#fff" : "#1a1a1a",
+  },
+  itemRight: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 70,
+    marginLeft: 8,
   },
   removeButton: {
-    padding: 8,
+    padding: 4,
+  },
+  itemTotal: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: isDarkMode ? "#aaa" : "#666",
   },
   footer: {
-    padding: 16,
-    backgroundColor: colors.header,
+    backgroundColor: isDarkMode ? "#1a1a1a" : "#fff",
+    padding: 18,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: isDarkMode ? "#2a2a2a" : "#eee",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
-  totalContainer: {
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: "#888",
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: isDarkMode ? "#ccc" : "#333",
+    fontWeight: "600",
+  },
+  shippingFree: {
+    fontSize: 14,
+    color: "#4CAF50",
+    fontWeight: "700",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: isDarkMode ? "#2a2a2a" : "#eee",
+    marginVertical: 10,
+  },
+  totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
   },
   totalLabel: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.text,
+    fontSize: 17,
+    fontWeight: "800",
+    color: isDarkMode ? "#fff" : "#1a1a1a",
   },
   totalAmount: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#e91e63",
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFD700",
   },
-  checkoutButton: {
-    // رفع الزر أعلى قليلاً
-    marginTop: 10,
+  checkoutBtn: {
+    backgroundColor: "#FFD700",
+    borderRadius: 16,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    gap: 8,
+  },
+  checkoutBtnText: {
+    color: "#1a1a1a",
+    fontSize: 17,
+    fontWeight: "900",
   },
 });
 
