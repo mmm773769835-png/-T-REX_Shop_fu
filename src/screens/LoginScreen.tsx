@@ -155,21 +155,6 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
         
-        {/* قسم تسجيل الدخول برقم الهاتف */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {language === "ar" ? "تسجيل الدخول برقم الهاتف" : "Phone Login"}
-          </Text>
-          <TouchableOpacity 
-            style={[styles.button, styles.phoneButton]}
-            onPress={handlePhoneLogin}
-          >
-            <Text style={styles.buttonText}>
-              {language === "ar" ? "تسجيل الدخول برقم الهاتف" : "Login with Phone"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         {/* قسم تسجيل الدخول عبر Google */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
@@ -210,24 +195,6 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
         
-        {/* فاصل للوصول إلى لوحة التحكم */}
-        <View style={styles.adminDivider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.adminDividerText}>
-            {language === "ar" ? "للمديرين" : "For Administrators"}
-          </Text>
-          <View style={styles.dividerLine} />
-        </View>
-        
-        {/* زر الوصول إلى لوحة تحكم المدير */}
-        <TouchableOpacity 
-          style={[styles.button, styles.adminButton]}
-          onPress={() => navigation.navigate("AdminLogin")}
-        >
-          <Text style={styles.buttonText}>
-            {language === "ar" ? "دخول لوحة التحكم" : "Admin Panel"}
-          </Text>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );

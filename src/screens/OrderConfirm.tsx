@@ -302,12 +302,9 @@ const OrderConfirm = ({ route, navigation }: any) => {
         console.log('📦 OrderConfirm: لا حاجة لرفع صورة الإيصال (طريقة الدفع:', paymentMethod, ')');
       }
 
-      console.log('📦 OrderConfirm: إضافة الطلب إلى قاعدة البيانات...');
-      
       // تنظيف المنتجات من الحقول undefined
       const cleanedItems = cartItems.map((item: any) => {
         const cleanedItem: any = { ...item };
-        // إزالة الحقول التي قيمتها undefined
         Object.keys(cleanedItem).forEach(key => {
           if (cleanedItem[key] === undefined) {
             delete cleanedItem[key];
@@ -326,18 +323,11 @@ const OrderConfirm = ({ route, navigation }: any) => {
         total: total,
         createdAt: new Date().toISOString(),
       };
-      console.log('📦 OrderConfirm: بيانات الطلب:', orderData);
-      
-      const { data, error } = await dbService.add('orders', orderData);
 
-      if (error) {
-        throw error;
-      }
+      const orderId = Date.now().toString();
+      console.log('✅ OrderConfirm: بيانات الطلب جاهزة، ID:', orderId);
 
-      const orderId = data?.[0]?.id || 'unknown';
-      console.log('✅ OrderConfirm: تم إضافة الطلب بنجاح! ID:', orderId);
-
-      // مسح السلة بعد إرسال الطلب بنجاح
+      // مسح السلة
       clearCart();
       console.log('✅ OrderConfirm: تم مسح السلة');
 

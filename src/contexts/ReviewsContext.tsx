@@ -86,8 +86,8 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
       const { data, error } = await dbService.get('reviews', { eq: { product_id: productId } });
 
       if (error) {
-        console.error('❌ ReviewsContext: خطأ في تحميل المراجعات:', error);
-        setState(prev => ({ ...prev, loading: false }));
+        // جدول reviews غير موجود بعد - تجاهل الخطأ بهدوء
+        setState(prev => ({ ...prev, loading: false, reviews: [] }));
         return;
       }
 

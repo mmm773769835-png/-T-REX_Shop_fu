@@ -45,10 +45,9 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       setState(prev => ({ ...prev, loading: true }));
 
-      // Get products with discount field from Supabase
+      // Get products that have original_price (discounted products)
       const { data, error } = await dbService.get('products', {
-        gt: { discount: 0 },
-        order: { column: 'discount', ascending: false },
+        order: { column: 'created_at', ascending: false },
         limit: 20
       });
 
@@ -62,19 +61,21 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (data) {
         data.forEach((item: any) => {
-          if (item.discount && item.discount > 0) {
+          // منتجات العروض هي التي لها سعر أصلي أعلى من السعر الحالي
+          if (item.original_price && item.original_price > item.price) {
+            const discountPercent = Math.round((1 - item.price / item.original_price) * 100);
             deals.push({
               id: item.id,
               productId: item.id,
               name: item.name || '',
               price: item.price || 0,
               originalPrice: item.original_price || item.price || 0,
-              discount: item.discount || 0,
+              discount: discountPercent,
               imageUrl: item.image_url || '',
               description: item.description || '',
               category: item.category,
               attribute: item.attribute,
-              validUntil: item.valid_until ? new Date(item.valid_until) : undefined,
+              validUntil: undefined,
             });
           }
         });
