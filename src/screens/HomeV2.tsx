@@ -254,79 +254,84 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   };
 
   // 🎨 عرض القسم
-  const renderCategory = ({ item }: { item: typeof CATEGORIES[0] }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryButton,
-        selectedCategory === (language === "ar" ? item.nameAr : item.name) && styles.selectedCategory,
-        { backgroundColor: isDarkMode ? "#333" : "#e0e0e0" }
-      ]}
-      onPress={() => setSelectedCategory(language === "ar" ? item.nameAr : item.name)}
-    >
-      <Ionicons 
-        name={item.icon as any} 
-        size={20} 
-        color={selectedCategory === (language === "ar" ? item.nameAr : item.name) ? "#007bff" : (isDarkMode ? "#fff" : "#333")} 
-      />
-      <Text style={[
-        styles.categoryText,
-        selectedCategory === (language === "ar" ? item.nameAr : item.name) && styles.selectedCategoryText,
-        { color: isDarkMode ? "#fff" : "#333" }
-      ]}>
-        {language === "ar" ? item.nameAr : item.name}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderCategory = ({ item }: { item: typeof CATEGORIES[0] }) => {
+    const isSelected = selectedCategory === (language === "ar" ? item.nameAr : item.name);
+    return (
+      <TouchableOpacity
+        style={[
+          styles.categoryButton,
+          isSelected ? styles.selectedCategory : { backgroundColor: isDarkMode ? "#2a2a2a" : "#f0f0f0" }
+        ]}
+        onPress={() => setSelectedCategory(language === "ar" ? item.nameAr : item.name)}
+      >
+        <Ionicons 
+          name={item.icon as any} 
+          size={16} 
+          color={isSelected ? "#1a1a1a" : (isDarkMode ? "#FFD700" : "#555")} 
+        />
+        <Text style={[
+          styles.categoryText,
+          { color: isSelected ? "#1a1a1a" : (isDarkMode ? "#ccc" : "#555") }
+        ]}>
+          {language === "ar" ? item.nameAr : item.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   // 📦 عرض المنتج
   const renderProduct = ({ item }: { item: Product }) => {
     const discountPercent = item.originalPrice && item.originalPrice > item.price
       ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)
       : 0;
+    const currencySymbol = item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي';
 
     return (
       <TouchableOpacity
-        style={[styles.productCard, { backgroundColor: isDarkMode ? "#333" : "#fff" }]}
+        style={[styles.productCard, { backgroundColor: isDarkMode ? "#1e1e1e" : "#fff" }]}
+        activeOpacity={0.9}
         onPress={() => {
           // @ts-ignore
           navigation.navigate('ProductDetails', { product: item });
         }}
       >
         <View style={styles.imageContainer}>
-          <Image source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} style={styles.productImage} />
+          <Image 
+            source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} 
+            style={styles.productImage}
+            defaultSource={{ uri: 'https://via.placeholder.com/300x200/1a1a1a/FFD700?text=T-REX' }}
+          />
+          {/* Gradient overlay */}
+          <View style={styles.imageOverlay} />
           {discountPercent > 0 && (
             <View style={styles.discountBadge}>
               <Text style={styles.discountBadgeText}>-{discountPercent}%</Text>
             </View>
           )}
+          {/* زر الإضافة للسلة فوق الصورة */}
+          <TouchableOpacity
+            style={styles.quickAddButton}
+            onPress={() => handleAddToCart(item)}
+          >
+            <Ionicons name="cart-outline" size={18} color="#1a1a1a" />
+          </TouchableOpacity>
         </View>
+
         <View style={styles.productInfo}>
-          <Text style={[styles.productName, { color: isDarkMode ? "#fff" : "#333" }]} numberOfLines={1}>
+          <Text style={[styles.productName, { color: isDarkMode ? "#fff" : "#1a1a1a" }]} numberOfLines={2}>
             {item.name}
-          </Text>
-          <Text style={[styles.productDescription, { color: isDarkMode ? "#ccc" : "#666" }]} numberOfLines={2}>
-            {item.description}
           </Text>
           <View style={styles.productFooter}>
             <View style={styles.priceContainer}>
               {item.originalPrice && item.originalPrice > item.price && (
-                <Text style={[styles.originalPrice, { color: isDarkMode ? "#999" : "#999" }]}>
-                  {item.originalPrice.toFixed(2)} {(item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي')}
+                <Text style={styles.originalPrice}>
+                  {item.originalPrice.toLocaleString()} {currencySymbol}
                 </Text>
               )}
-              <Text style={[styles.productPrice, { color: isDarkMode ? "#4da6ff" : "#007bff" }]}>
-                {item.price.toFixed(2)} {(item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي')}
+              <Text style={styles.productPrice}>
+                {item.price.toLocaleString()} {currencySymbol}
               </Text>
             </View>
-            <TouchableOpacity
-              style={styles.addToCartButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                handleAddToCart(item);
-              }}
-            >
-              <Ionicons name="add" size={20} color="#fff" />
-            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -351,19 +356,19 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
 
   // 🎨 عرض الشريط العلوي
   const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: isDarkMode ? "#222" : "#007bff" }]}>
-      {/* زر الإعدادات */}
+    <View style={[styles.header, { backgroundColor: isDarkMode ? "#1a1a1a" : "#1a1a1a" }]}>
       <TouchableOpacity 
         style={styles.settingsButton}
         onPress={() => setSidebarVisible(true)}
       >
-        <Ionicons name="settings" size={24} color="#fff" />
+        <Ionicons name="menu" size={26} color="#FFD700" />
       </TouchableOpacity>
       
-      {/* شعار التطبيق */}
-      <Text style={styles.headerTitle}>🏪 متجر T-REX</Text>
+      <View style={styles.headerCenter}>
+        <Text style={styles.headerLogo}>T-REX</Text>
+        <Text style={styles.headerSubtitle}>{language === "ar" ? "المتجر" : "SHOP"}</Text>
+      </View>
       
-      {/* زر البحث */}
       <TouchableOpacity 
         style={styles.searchButton}
         onPress={() => {
@@ -371,30 +376,29 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
           navigation.navigate('Search');
         }}
       >
-        <Ionicons name="search" size={24} color="#fff" />
+        <Ionicons name="search" size={24} color="#FFD700" />
       </TouchableOpacity>
     </View>
   );
 
   // 🎨 عرض شريط البحث
   const renderSearchBar = () => (
-    <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? "#333" : "#f0f0f0" }]}>
-      <Ionicons name="search" size={20} color={isDarkMode ? "#ccc" : "#666"} style={styles.searchIcon} />
-      <TextInput
-        style={[styles.searchInput, {
-          backgroundColor: isDarkMode ? "#444" : "#fff",
-          color: isDarkMode ? "#fff" : "#333"
-        }]}
-        placeholder={language === "ar" ? "ابحث عن منتجات..." : "Search for products..."}
-        placeholderTextColor={isDarkMode ? "#aaa" : "#999"}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      {searchQuery ? (
-        <TouchableOpacity onPress={() => setSearchQuery("")}>
-          <Ionicons name="close" size={20} color={isDarkMode ? "#ccc" : "#666"} />
-        </TouchableOpacity>
-      ) : null}
+    <View style={[styles.searchWrapper, { backgroundColor: isDarkMode ? "#1a1a1a" : "#1a1a1a" }]}>
+      <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? "#2a2a2a" : "#2a2a2a" }]}>
+        <Ionicons name="search" size={18} color="#FFD700" style={styles.searchIcon} />
+        <TextInput
+          style={[styles.searchInput, { color: "#fff" }]}
+          placeholder={language === "ar" ? "ابحث عن منتجات..." : "Search for products..."}
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery ? (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <Ionicons name="close-circle" size={20} color="#888" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
     </View>
   );
 
@@ -469,10 +473,20 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? "#111" : "#f5f5f5" }]}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
       {renderHeader()}
       {renderSearchBar()}
       {renderCategories()}
+
+      {/* عنوان المنتجات */}
+      <View style={[styles.sectionHeader, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
+        <Text style={[styles.sectionTitle, { color: isDarkMode ? "#FFD700" : "#1a1a1a" }]}>
+          {language === "ar" ? "🛍️ المنتجات" : "🛍️ Products"}
+        </Text>
+        <Text style={[styles.sectionCount, { color: isDarkMode ? "#888" : "#888" }]}>
+          {filteredProducts.length} {language === "ar" ? "منتج" : "items"}
+        </Text>
+      </View>
       
       <View style={styles.content}>
         {renderProducts()}
@@ -525,8 +539,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    paddingTop: 40,
+    paddingHorizontal: 16,
+    paddingTop: 44,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: "#2a2a2a",
+  },
+  headerCenter: {
+    alignItems: "center",
+  },
+  headerLogo: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFD700",
+    letterSpacing: 3,
+  },
+  headerSubtitle: {
+    fontSize: 10,
+    color: "#888",
+    letterSpacing: 4,
+    marginTop: -2,
   },
   settingsButton: {
     padding: 8,
@@ -534,52 +566,72 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#FFD700",
   },
   searchButton: {
     padding: 8,
   },
+  searchWrapper: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    margin: 16,
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: "#333",
   },
   searchIcon: {
     marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    fontSize: 15,
+    paddingVertical: 0,
   },
   categoriesContainer: {
-    height: 80,
+    height: 52,
+    backgroundColor: "transparent",
   },
   categoriesList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
+    alignItems: "center",
   },
   categoryButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
     borderRadius: 20,
     marginRight: 8,
   },
   selectedCategory: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#FFD700",
   },
   categoryText: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginLeft: 8,
+    fontSize: 13,
+    fontWeight: "600",
+    marginLeft: 5,
   },
   selectedCategoryText: {
-    color: "#fff",
+    color: "#1a1a1a",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  sectionCount: {
+    fontSize: 13,
   },
   content: {
     flex: 1,
@@ -639,58 +691,85 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   productsList: {
-    padding: 8,
+    padding: 10,
+    paddingBottom: 30,
   },
   columnWrapper: {
     justifyContent: "space-between",
   },
   productCard: {
     flex: 0.48,
-    borderRadius: 12,
-    margin: 4,
+    borderRadius: 16,
+    margin: 5,
     overflow: "hidden",
-    elevation: 3,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   productImage: {
     width: "100%",
-    height: 120,
+    height: 160,
     resizeMode: "cover",
   },
   imageContainer: {
     position: "relative",
   },
+  imageOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: "transparent",
+  },
   discountBadge: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    backgroundColor: "#ff4444",
+    top: 10,
+    left: 10,
+    backgroundColor: "#FF3B3B",
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   discountBadgeText: {
     color: "#fff",
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  quickAddButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "#FFD700",
+    borderRadius: 20,
+    width: 34,
+    height: 34,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   priceContainer: {
     flex: 1,
   },
   originalPrice: {
-    fontSize: 12,
+    fontSize: 11,
     textDecorationLine: "line-through",
+    color: "#999",
   },
   productInfo: {
-    padding: 12,
+    padding: 10,
   },
   productName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 6,
+    lineHeight: 20,
   },
   productDescription: {
     fontSize: 12,
@@ -701,13 +780,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 2,
   },
   productPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#FFD700",
   },
   addToCartButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#FFD700",
     borderRadius: 20,
     width: 32,
     height: 32,
