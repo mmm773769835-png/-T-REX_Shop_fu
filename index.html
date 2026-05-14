@@ -2044,6 +2044,24 @@
             .logo-icon { width: 32px; height: 32px; }
         }
         
+        /* Force hide any debug panels */
+        [id*="debug"], [class*="debug"], [id*="log"], [class*="log"],
+        div[style*="DEBUG"], div:contains("🔧 DEBUG"),
+        div[style*="fixed"][style*="top"][style*="right"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        /* Extra rule for any element containing DEBUG LOG text */
+        *:has(> div:first-child:contains("DEBUG LOG")),
+        div:has(> div:contains("Page loaded")),
+        div:has(> div:contains("OAuth tokens")),
+        div:has(> div:contains("auth state")) {
+            display: none !important;
+        }
+        
         /* Product Image Gallery */
         .product-gallery {
             display: flex;
@@ -2293,6 +2311,20 @@
     </style>
 </head>
 <body>
+    <!-- Immediately hide any debug panels -->
+    <script>
+        (function() {
+            function removeDebug() {
+                var panels = document.querySelectorAll('[id*="debug"], [class*="debug"], [id*="log"], [class*="log"]');
+                for (var i = 0; i < panels.length; i++) {
+                    panels[i].style.display = 'none';
+                    panels[i].remove();
+                }
+            }
+            removeDebug();
+            setInterval(removeDebug, 100);
+        })();
+    </script>
     <!-- Header -->
     <header class="header">
         <div class="header-content">
@@ -4758,6 +4790,29 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Initialize
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
+            // Remove any debug panels immediately and continuously
+            function removeDebugPanels() {
+                const debugPanels = document.querySelectorAll('[id*="debug"], [class*="debug"], [id*="log"], [class*="log"]');
+                debugPanels.forEach(panel => panel.remove());
+                // Also check for any fixed position panels in top-right that might be debug panels
+                const allDivs = document.querySelectorAll('div');
+                allDivs.forEach(div => {
+                    const style = window.getComputedStyle(div);
+                    if (style.position === 'fixed' && 
+                        style.top === '10px' && 
+                        style.right === '10px' &&
+                        style.backgroundColor.includes('0, 0, 0')) {
+                        div.remove();
+                    }
+                });
+            }
+            removeDebugPanels();
+            // Check every 100ms for first 3 seconds, then every second
+            for (let i = 0; i < 30; i++) {
+                setTimeout(removeDebugPanels, i * 100);
+            }
+            setInterval(removeDebugPanels, 1000);
+            
             console.log('=== PAGE LOAD START ===');
             console.log('Current URL:', window.location.href);
             console.log('Origin:', window.location.origin);
