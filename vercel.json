@@ -9,6 +9,14 @@
     {
       "src": "admin.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "privacy-policy.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "terms-of-use.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -19,6 +27,14 @@
     {
       "src": "/robots.txt",
       "dest": "/robots.txt"
+    },
+    {
+      "src": "/privacy-policy.html",
+      "dest": "/privacy-policy.html"
+    },
+    {
+      "src": "/terms-of-use.html",
+      "dest": "/terms-of-use.html"
     },
     {
       "src": "/admin.html",
