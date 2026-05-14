@@ -469,6 +469,9 @@
         }
         .user-profile {
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .user-avatar {
             width: 40px;
@@ -477,6 +480,8 @@
             cursor: pointer;
             border: 2px solid var(--primary);
             transition: transform 0.3s;
+            object-fit: cover;
+            background: #2a2a2a;
         }
         .user-avatar:hover {
             transform: scale(1.1);
@@ -2310,23 +2315,9 @@
         </select>
     </div>
 
-    <!-- Stats Bar -->
+    <!-- Stats Bar - Real Data Only -->
     <div class="stats-bar">
         <div class="stats-content">
-            <div class="stat-item">
-                <i class="fas fa-users"></i>
-                <div>
-                    <span class="stat-value" id="visitorsCount">42</span>
-                    <span class="stat-label">زائر اليوم</span>
-                </div>
-            </div>
-            <div class="stat-item">
-                <i class="fas fa-shopping-bag"></i>
-                <div>
-                    <span class="stat-value" id="ordersCount">5</span>
-                    <span class="stat-label">طلب اليوم</span>
-                </div>
-            </div>
             <div class="stat-item">
                 <i class="fas fa-box"></i>
                 <div>
@@ -2335,10 +2326,24 @@
                 </div>
             </div>
             <div class="stat-item">
-                <i class="fas fa-star"></i>
+                <i class="fas fa-shipping-fast"></i>
                 <div>
-                    <span class="stat-value">4.8</span>
-                    <span class="stat-label">تقييم المتجر</span>
+                    <span class="stat-value">24-48</span>
+                    <span class="stat-label">ساعة توصيل</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-headset"></i>
+                <div>
+                    <span class="stat-value">24/7</span>
+                    <span class="stat-label">دعم فني</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <span class="stat-value">صنعاء</span>
+                    <span class="stat-label">موقع المتجر</span>
                 </div>
             </div>
         </div>
@@ -4359,61 +4364,14 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         }
 
         // ============================================
-        // Stats Tracking - Real Data
+        // Stats Tracking - Real Data Only
         // ============================================
         function updateStats() {
-            // Update products count with real data
+            // Update products count with real data from Supabase
             const productsCountEl = document.getElementById('productsCountStat');
             if (productsCountEl && allProducts) {
                 productsCountEl.textContent = allProducts.length;
             }
-            
-            // Get today's visitors from localStorage (unique per day)
-            const visitorsEl = document.getElementById('visitorsCount');
-            if (visitorsEl) {
-                const today = new Date().toDateString();
-                const storedDate = localStorage.getItem('statsDate');
-                let visitors = parseInt(localStorage.getItem('todayVisitors') || '0');
-                
-                if (storedDate !== today) {
-                    // New day, reset counter with base value
-                    visitors = Math.floor(Math.random() * 50) + 20; // 20-70 base
-                    localStorage.setItem('statsDate', today);
-                }
-                
-                // Increment occasionally
-                if (Math.random() > 0.8) {
-                    visitors += 1;
-                    localStorage.setItem('todayVisitors', visitors);
-                }
-                
-                visitorsEl.textContent = visitors.toLocaleString('ar-SA');
-            }
-            
-            // Get today's orders from cart history (simulated real tracking)
-            const ordersEl = document.getElementById('ordersCount');
-            if (ordersEl) {
-                const today = new Date().toDateString();
-                const orderHistory = JSON.parse(localStorage.getItem('orderHistory') || '{}');
-                const todayOrders = orderHistory[today] || Math.floor(Math.random() * 8) + 3; // 3-11 base
-                
-                // Occasionally add new order
-                if (Math.random() > 0.85) {
-                    orderHistory[today] = todayOrders + 1;
-                    localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
-                }
-                
-                ordersEl.textContent = todayOrders;
-            }
-        }
-        
-        // Track order when user completes purchase
-        function trackOrder() {
-            const today = new Date().toDateString();
-            const orderHistory = JSON.parse(localStorage.getItem('orderHistory') || '{}');
-            orderHistory[today] = (orderHistory[today] || 0) + 1;
-            localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
-            updateStats();
         }
 
         // ============================================
