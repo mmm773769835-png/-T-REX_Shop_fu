@@ -54,6 +54,8 @@ const MainTabs = () => {
           return 'البحث';
         case 'Cart':
           return 'السلة';
+        case 'WishList':
+          return 'المفضلة';
         case 'Profile':
           return 'حسابي';
         default:
@@ -69,6 +71,8 @@ const MainTabs = () => {
         return 'Search';
       case 'Cart':
         return 'Cart';
+      case 'WishList':
+        return 'Wishlist';
       case 'Profile':
         return 'Profile';
       default:
@@ -92,6 +96,8 @@ const MainTabs = () => {
             iconName = focused ? 'search' : 'search-outline';
           } else if (route.name === 'Cart') {
             iconName = focused ? 'cart' : 'cart-outline';
+          } else if (route.name === 'WishList') {
+            iconName = focused ? 'heart' : 'heart-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -157,6 +163,14 @@ const MainTabs = () => {
         options={{ 
           headerShown: false,
           tabBarLabel: language === 'ar' ? 'السلة' : 'Cart'
+        }} 
+      />
+      <Tab.Screen 
+        name='WishList' 
+        component={WishlistScreen} 
+        options={{ 
+          headerShown: false,
+          tabBarLabel: language === 'ar' ? 'المفضلة' : 'Wishlist'
         }} 
       />
       <Tab.Screen 
