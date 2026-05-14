@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="شروط الاستخدام لمتجر T-REX SHOP - القواعد والأحكام القانونية">
+    <title>شروط الاستخدام | متجر T-REX SHOP</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF6B35;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --card: #1a1a1a;
+            --text: #ffffff;
+            --text-muted: #888;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1f1f1f 100%);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--dark);
+        }
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        .back-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 20px 60px;
+        }
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-title h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .terms-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #2a2a2a;
+        }
+        .terms-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .terms-section h3 i {
+            font-size: 18px;
+        }
+        .terms-section h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .terms-section p, .terms-section li {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .terms-section ul, .terms-section ol {
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+        .terms-section li {
+            margin-bottom: 10px;
+        }
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .warning-box {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .warning-box h4 {
+            color: var(--secondary);
+            margin-top: 0;
+        }
+        .contact-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,107,53,0.1) 100%);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .contact-box h4 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .contact-box p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .contact-box a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer {
+            background: var(--dark);
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+        .footer p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 100px 15px 40px; }
+            .page-title h2 { font-size: 24px; }
+            .terms-section { padding: 20px; }
+            .logo-text h1 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>T-REX SHOP</h1>
+                </div>
+            </a>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                العودة للرئيسية
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h2><i class="fas fa-file-contract"></i> شروط الاستخدام</h2>
+            <p>آخر تحديث: 14 مايو 2026</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-handshake"></i> قبول الشروط</h3>
+            <p>باستخدامك لموقع <span class="highlight">متجر T-REX SHOP</span> وخدماته، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي جزء من هذه الشروط، يجب عليك عدم استخدام موقعنا.</p>
+            <p>نحتفظ بالحق في تعديل هذه الشروط في أي وقت. استمرارك في استخدام الموقع بعد أي تغييرات يعني قبولك للشروط المُعدَّلة.</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-user-check"></i> الأهلية</h3>
+            <p>لاستخدام موقعنا وإجراء عمليات الشراء، يجب أن:</p>
+            <ul>
+                <li>تكون قد بلغت 18 عاماً على الأقل</li>
+                <li>تمتلك القدرة القانونية على إبرام عقود ملزمة</li>
+                <li>تقدم معلومات صحيحة ودقيقة وكاملة</li>
+                <li>تكون مسؤولاً عن الحفاظ على سرية حسابك وكلمة المرور</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-shopping-bag"></i> الطلبات والدفع</h3>
+            <h4>1. إجراء الطلبات</h4>
+            <p>عند تقديم طلب، فإنك تقدم عرضاً لشراء المنتج بسعر محدد. نحتفظ بالحق في قبول أو رفض أي طلب لأي سبب، بما في ذلك:</p>
+            <ul>
+                <li>عدم توفر المنتج في المخزون</li>
+                <li>خطأ في وصف أو سعر المنتج</li>
+                <li>مشاكل في معلومات الشحن أو الدفع</li>
+            </ul>
+            
+            <h4>2. الأسعار والدفع</h4>
+            <ul>
+                <li>جميع الأسعار مُعلنة بالريال اليمني (YER) أو الريال السعودي (SAR) حسب اختيارك</li>
+                <li>قد تُضاف رسوم الشحن حسب المنطقة والوزن</li>
+                <li>الدفع يكون عند الاستلام أو عبر التحويل البنكي</li>
+                <li>نحتفظ بالحق في تغيير الأسعار دون إشعار مسبق</li>
+            </ul>
+            
+            <h4>3. التأكيد والإلغاء</h4>
+            <p>سنرسل إليك تأكيداً عبر البريد الإلكتروني أو واتساب بعد استلام طلبك. يمكنك إلغاء الطلب خلال <span class="highlight">30 دقيقة</span> من تقديمه. بعد ذلك، قد لا يكون الإلغاء ممكناً إذا تم بدء معالجة الطلب.</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-truck"></i> الشحن والتوصيل</h3>
+            <h4>1. مناطق التوصيل</h4>
+            <p>نقوم بالتوصيل داخل صنعاء والمحافظات المجاورة. يتم تحديد رسوم الشحن أثناء إتمام الطلب بناءً على:</p>
+            <ul>
+                <li>الموقع الجغرافي</li>
+                <li>وزن وعدد المنتجات</li>
+                <li>وقت التوصيل المطلوب</li>
+            </ul>
+            
+            <h4>2. أوقات التوصيل</h4>
+            <ul>
+                <li>صنعاء: 24-48 ساعة</li>
+                <li>المحافظات: 2-5 أيام عمل</li>
+                <li>قد تتأخر الطلبات في المناسبات والعطلات</li>
+            </ul>
+            
+            <h4>3. استلام الطلب</h4>
+            <p>يجب على العميل أو من يفوضه التحقق من المنتج عند الاستلام. أي أضرار أو نواقص يجب الإبلاغ عنها خلال <span class="highlight">24 ساعة</span> من الاستلام.</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-undo-alt"></i> سياسة الإرجاع والاستبدال</h3>
+            <p>نحن نسعى لرضا عملائنا الكامل. يمكنك إرجاع أو استبدال المنتجات وفق الشروط التالية:</p>
+            <ul>
+                <li>فترة الإرجاع: <span class="highlight">7 أيام</span> من تاريخ الاستلام</li>
+                <li>يجب أن يكون المنتج في حالته الأصلية وغير مستخدم</li>
+                <li>يجب إرفاق الفاتورة الأصلية</li>
+                <li>لا يُقبل إرجاع المنتجات المخصصة أو القابلة للتلف سريعاً</li>
+                <li>رسوم الشحن للإرجاع تكون على العميل إلا في حالة عيب مصنعي</li>
+            </ul>
+            <p>لطلب الإرجاع، تواصل معنا عبر واتساب أو البريد الإلكتروني مع رقم الطلب وسبب الإرجاع.</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-exclamation-triangle"></i> المسؤولية</h3>
+            <div class="warning-box">
+                <h4><i class="fas fa-info-circle"></i> تحديد المسؤولية</h4>
+                <p>نحن نقدم الموقع والخدمات "كما هي" دون أي ضمانات صريحة أو ضمنية. نحن غير مسؤولين عن:</p>
+                <ul>
+                    <li>أي أضرار مباشرة أو غير مباشرة ناتجة عن استخدام الموقع</li>
+                    <li>تأخير أو فشل في التوصيل بسبب ظروف خارجة عن إرادتنا (طقس، حظر مرور، إلخ)</li>
+                    <li>دقة أو اكتمال محتوى الموقع</li>
+                    <li>أي خسارة في الأرباح أو البيانات أو الفرص التجارية</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-copyright"></i> الملكية الفكرية</h3>
+            <p>جميع المحتويات على الموقع، بما في ذلك النصوص والصور والشعارات والتصاميم، هي ملك لـ <span class="highlight">T-REX SHOP</span> أو مرخصة لنا. لا يجوز:</p>
+            <ul>
+                <li>نسخ أو إعادة إنتاج أي جزء من الموقع دون إذن كتابي</li>
+                <li>استخدام اسمنا أو شعارنا دون موافقة مسبقة</li>
+                <li>إنشاء روابط عميقة لأي جزء من الموقع دون إذن</li>
+                <li>استخدام تقنيات استخراج البيانات (scraping) على الموقع</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-ban"></i> الاستخدام الممنوع</h3>
+            <p>يُحظر استخدام موقعنا للأغراض التالية:</p>
+            <ul>
+                <li>أي غرض غير قانوني أو احتيالي</li>
+                <li>نشر محتوى تشهيري أو مسيء أو غير أخلاقي</li>
+                <li>محاولة اختراق أو تعطيل أمان الموقع</li>
+                <li>جمع معلومات المستخدمين دون موافقتهم</li>
+                <li>إرسال رسائل غير مرغوب فيها (spam)</li>
+                <li>انتحال شخصية أي طرف</li>
+            </ul>
+            <p>نحتفظ بالحق في تعليق أو إنهاء حسابك فوراً عند انتهاك هذه الشروط.</p>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-gavel"></i> القانون والاختصاص</h3>
+            <p>تخضع هذه الشروط والأحكام لقوانين <span class="highlight">الجمهورية اليمنية</span>. أي نزاع ينشأ عن استخدام الموقع سيُحل من خلال:</p>
+            <ul>
+                <li>المحاولة الأولى: التفاوض الودي</li>
+                <li>المحاولة الثانية: التحكيم في صنعاء</li>
+                <li>المحكمة المختصة في صنعاء إذا فشل التحكيم</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3><i class="fas fa-question-circle"></i> تواصل معنا</h3>
+            <p>لأي استفسارات حول هذه الشروط:</p>
+            <ul>
+                <li><i class="fas fa-envelope"></i> البريد: <a href="mailto:trexshopmax@gmail.com">trexshopmax@gmail.com</a></li>
+                <li><i class="fab fa-whatsapp"></i> واتساب: <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">+967 773 769 835</a></li>
+                <li><i class="fas fa-map-marker-alt"></i> العنوان: صنعاء – سعوان، شارع الأربعين</li>
+            </ul>
+        </div>
+
+        <div class="contact-box">
+            <h4><i class="fas fa-check-circle"></i> باستخدامك للموقع، فإنك توافق على جميع الشروط والأحكام المذكورة أعلاه</h4>
+            <p>© 2026 T-REX Shop. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 T-REX Shop. جميع الحقوق محفوظة. | <a href="/" style="color: var(--primary); text-decoration: none;">العودة للرئيسية</a></p>
+    </footer>
+</body>
+</html>

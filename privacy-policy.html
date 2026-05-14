@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="سياسة الخصوصية لمتجر T-REX SHOP - كيف نحمي بياناتك الشخصية">
+    <title>سياسة الخصوصية | متجر T-REX SHOP</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF6B35;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --card: #1a1a1a;
+            --text: #ffffff;
+            --text-muted: #888;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1f1f1f 100%);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--dark);
+        }
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        .back-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 20px 60px;
+        }
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-title h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .policy-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #2a2a2a;
+        }
+        .policy-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .policy-section h3 i {
+            font-size: 18px;
+        }
+        .policy-section p, .policy-section li {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .policy-section ul {
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+        .policy-section li {
+            margin-bottom: 10px;
+        }
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .contact-box {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,107,53,0.1) 100%);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .contact-box h4 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .contact-box p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .contact-box a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer {
+            background: var(--dark);
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+        .footer p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 100px 15px 40px; }
+            .page-title h2 { font-size: 24px; }
+            .policy-section { padding: 20px; }
+            .logo-text h1 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>T-REX SHOP</h1>
+                </div>
+            </a>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                العودة للرئيسية
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h2><i class="fas fa-shield-alt"></i> سياسة الخصوصية</h2>
+            <p>آخر تحديث: 14 مايو 2026</p>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-info-circle"></i> مقدمة</h3>
+            <p>مرحباً بك في <span class="highlight">متجر T-REX SHOP</span>. نحن نلتزم بحماية خصوصيتك وأمان بياناتك الشخصية. تُوضح هذه السياسة كيف نقوم بجمع معلوماتك واستخدامها وحمايتها عند استخدامك لموقعنا الإلكتروني.</p>
+            <p>باستخدامك لموقعنا، فإنك توافق على ممارسات جمع واستخدام البيانات الموضحة في هذه السياسة.</p>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-database"></i> المعلومات التي نجمعها</h3>
+            <p>قد نقوم بجمع المعلومات التالية:</p>
+            <ul>
+                <li><strong>معلومات التعريف الشخصية:</strong> الاسم، رقم الهاتف، عنوان البريد الإلكتروني، عنوان الشحن</li>
+                <li><strong>معلومات الطلب:</strong> المنتجات المطلوبة، سجل المشتريات، طرق الدفع المفضلة</li>
+                <li><strong>معلومات تقنية:</strong> عنوان IP، نوع المتصفح، نوع الجهاز، نظام التشغيل</li>
+                <li><strong>معلومات الاستخدام:</strong> الصفحات التي تزورها، الوقت المستغرق على الموقع</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-lock"></i> كيف نستخدم معلوماتك</h3>
+            <p>نستخدم معلوماتك للأغراض التالية:</p>
+            <ul>
+                <li>معالجة وتوصيل طلباتك</li>
+                <li>التواصل معك بشأن طلباتك واستفساراتك</li>
+                <li>تحسين تجربة المستخدم على الموقع</li>
+                <li>إرسال العروض الترويجية والتحديثات (بموافقتك)</li>
+                <li>منع الاحتيال وضمان الأمان</li>
+                <li>الالتزام بالمتطلبات القانونية</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-shield-alt"></i> حماية البيانات</h3>
+            <p>نحن نتخذ إجراءات أمنية مناسبة لحماية معلوماتك من الوصول غير المصرح به أو التغيير أو الإفصاح أو التدمير. تشمل هذه الإجراءات:</p>
+            <ul>
+                <li>استخدام بروتوكول HTTPS لتشفير البيانات المنقولة</li>
+                <li>تخزين البيانات في خوادم آمنة</li>
+                <li>عدم مشاركة بياناتك مع أطراف ثالثة إلا عند الضرورة (مثل شركات الشحن)</li>
+                <li>مراقبة مستمرة للأمان وتحديثات دورية</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-cookie-bite"></i> ملفات تعريف الارتباط (Cookies)</h3>
+            <p>نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. هذه الملفات الصغيرة تُخزن على جهازك وتساعدنا في:</p>
+            <ul>
+                <li>تذكر تفضيلاتك وإعداداتك</li>
+                <li>الحفاظ على محتويات سلة التسوق</li>
+                <li>تحليل كيفية استخدامك للموقع</li>
+                <li>تقديم محتوى مخصص لك</li>
+            </ul>
+            <p>يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، لكن هذا قد يؤثر على وظائف الموقع.</p>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-user-shield"></i> حقوقك</h3>
+            <p>لديك الحقوق التالية بخصوص بياناتك الشخصية:</p>
+            <ul>
+                <li><strong>الحق في الوصول:</strong> طلب نسخة من بياناتك الشخصية</li>
+                <li><strong>الحق في التصحيح:</strong> تحديث أو تصحيح معلوماتك غير الدقيقة</li>
+                <li><strong>الحق في الحذف:</strong> طلب حذف بياناتك (مع استثناءات قانونية)</li>
+                <li><strong>الحق في الاعتراض:</strong> الاعتراض على معالجة بياناتك لأغراض تسويقية</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-children"></i> حماية الأطفال</h3>
+            <p>موقعنا غير مخصص للأطفال دون سن 13 عاماً. نحن لا نقوم بجمع معلومات شخصية من الأطفال عمداً. إذا اكتشفنا أننا جمعنا بيانات من طفل دون 13 عاماً، سنقوم بحذفها فوراً.</p>
+        </div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-edit"></i> تغييرات على السياسة</h3>
+            <p>قد نقوم بتحديث هذه السياسة من وقت لآخر. سنُعلمك بأي تغييرات جوهرية عبر نشر إشعار بارز على موقعنا أو عبر البريد الإلكتروني.</p>
+        </div>
+
+        <div class="contact-box">
+            <h4><i class="fas fa-envelope"></i> تواصل معنا</h4>
+            <p>إذا كان لديك أي أسئلة أو استفسارات حول سياسة الخصوصية، يمكنك التواصل معنا:</p>
+            <p><i class="fas fa-envelope"></i> البريد: <a href="mailto:trexshopmax@gmail.com">trexshopmax@gmail.com</a></p>
+            <p><i class="fab fa-whatsapp"></i> واتساب: <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">+967 773 769 835</a></p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 T-REX Shop. جميع الحقوق محفوظة. | <a href="/" style="color: var(--primary); text-decoration: none;">العودة للرئيسية</a></p>
+    </footer>
+</body>
+</html>
