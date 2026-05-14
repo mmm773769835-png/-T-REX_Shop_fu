@@ -2312,20 +2312,6 @@
     </style>
 </head>
 <body>
-    <!-- Immediately hide any debug panels -->
-    <script>
-        (function() {
-            function removeDebug() {
-                var panels = document.querySelectorAll('[id*="debug"], [class*="debug"], [id*="log"], [class*="log"]');
-                for (var i = 0; i < panels.length; i++) {
-                    panels[i].style.display = 'none';
-                    panels[i].remove();
-                }
-            }
-            removeDebug();
-            setInterval(removeDebug, 100);
-        })();
-    </script>
     <!-- Header -->
     <header class="header">
         <div class="header-content">
