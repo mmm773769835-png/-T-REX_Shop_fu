@@ -2574,7 +2574,7 @@
             <div class="review-card">
                 <div class="review-header">
                     <div class="reviewer-info">
-                        <img src="https://via.placeholder.com/150/1a1a1a/FFD700?text=A" alt="Ahmed" class="reviewer-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%231a1a1a' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFD700' font-size='60'%3Eأ%3C/text%3E%3C/svg%3E" alt="Ahmed" class="reviewer-avatar">
                         <div>
                             <div class="reviewer-name">أحمد محمد</div>
                             <div class="review-date">منذ 3 أيام</div>
@@ -2590,7 +2590,7 @@
             <div class="review-card">
                 <div class="review-header">
                     <div class="reviewer-info">
-                        <img src="https://via.placeholder.com/150/1a1a1a/FFD700?text=S" alt="Sara" class="reviewer-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/150/1a1a1a/FFD700?text=S" alt="Sara" class="reviewer-avatar">
                         <div>
                             <div class="reviewer-name">سارة أحمد</div>
                             <div class="review-date">منذ أسبوع</div>
@@ -2606,7 +2606,7 @@
             <div class="review-card">
                 <div class="review-header">
                     <div class="reviewer-info">
-                        <img src="https://via.placeholder.com/150/1a1a1a/FFD700?text=M" alt="Mohammed" class="reviewer-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/150/1a1a1a/FFD700?text=M" alt="Mohammed" class="reviewer-avatar">
                         <div>
                             <div class="reviewer-name">محمد عبدالله</div>
                             <div class="review-date">منذ شهر</div>
@@ -3040,7 +3040,7 @@
             
             cartItems.innerHTML = cart.map((item, index) => `
                 <div class="cart-item">
-                    <img src="${item.image_url || 'https://via.placeholder.com/300x200/1a1a1a/FFD700?text=No+Image'}" alt="${item.name}">
+                    <img src="${item.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/300x200/1a1a1a/FFD700?text=No+Image'}" alt="${item.name}">
                     <div class="cart-item-info">
                         <div class="cart-item-title">${item.name}</div>
                         <div class="cart-item-controls">
@@ -3089,7 +3089,7 @@
                 total += itemTotal;
                 itemsHtml += `
                     <div class="cart-order-item" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px; margin-bottom: 10px;">
-                        <img src="${item.image_url || 'https://via.placeholder.com/50x50/1a1a1a/FFD700?text=No+Image'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                        <img src="${item.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/50x50/1a1a1a/FFD700?text=No+Image'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                         <div style="flex: 1;">
                             <div style="font-weight: bold; color: #FFD700;">${item.name}</div>
                             <div style="font-size: 12px; color: #aaa;">${formatPrice(item.price)} × ${item.quantity}</div>
@@ -3448,7 +3448,7 @@
             const orderModal = document.getElementById('orderModal');
             
             // Populate order summary
-            document.getElementById('orderProductImage').src = currentProduct.image_url || 'https://via.placeholder.com/80x80/1a1a1a/FFD700?text=No+Image';
+            document.getElementById('orderProductImage').src = currentProduct.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/80x80/1a1a1a/FFD700?text=No+Image';
             document.getElementById('orderProductName').textContent = currentProduct.name;
             document.getElementById('orderProductPrice').textContent = formatPrice(currentProduct.price);
             document.getElementById('orderQuantity').textContent = currentQuantity;
@@ -3527,12 +3527,12 @@
             currentImageIndex = 0;
 
             // Generate multiple images (main + thumbnails)
-            const mainImage = product.image_url || 'https://via.placeholder.com/600x400/1a1a1a/FFD700?text=No+Image';
+            const mainImage = product.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/600x400/1a1a1a/FFD700?text=No+Image';
             const thumbnails = [
-                product.image_url || 'https://via.placeholder.com/80x80/1a1a1a/FFD700?text=1',
-                product.image_url ? product.image_url.replace('300x200', '80x80') : 'https://via.placeholder.com/80x80/2a2a2a/FFD700?text=2',
-                'https://via.placeholder.com/80x80/3a3a3a/FFD700?text=3',
-                'https://via.placeholder.com/80x80/4a4a4a/FFD700?text=4'
+                product.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/80x80/1a1a1a/FFD700?text=1',
+                product.image_url ? product.image_url.replace('300x200', '80x80') : 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/80x80/2a2a2a/FFD700?text=2',
+                'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/80x80/3a3a3a/FFD700?text=3',
+                'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/80x80/4a4a4a/FFD700?text=4'
             ];
 
             modalBody.innerHTML = `
@@ -3816,12 +3816,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             <i class="fas fa-heart ${isWishlisted ? 'text-danger' : ''}"></i>
                         </button>
                         
-                        <img src="${product.image_url || 'https://via.placeholder.com/300x200/1a1a1a/FFD700?text=No+Image'}" 
+                        <img src="${product.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/300x200/1a1a1a/FFD700?text=No+Image'}" 
                              alt="${product.name} - ${product.category || 'منتج'} بسعر ${formatPrice(product.price)}" 
                              class="product-image"
                              itemprop="image"
                              loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/300x200/1a1a1a/FFD700?text=No+Image'"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/300x200/1a1a1a/FFD700?text=No+Image'"
                              onclick="openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
                         
                         <div class="product-info" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
@@ -3875,7 +3875,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             container.innerHTML = featured.map(product => `
                 <div class="swiper-slide" onclick="openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-                    <img src="${product.image_url || 'https://via.placeholder.com/300x250/1a1a1a/FFD700?text=No+Image'}" alt="${product.name}">
+                    <img src="${product.image_url || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/300x250/1a1a1a/FFD700?text=No+Image'}" alt="${product.name}">
                     <div class="swiper-slide-content">
                         <h3 class="swiper-slide-title">${product.name}</h3>
                         <p class="swiper-slide-price">${formatPrice(product.price)}</p>
@@ -4258,7 +4258,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             modalBody.innerHTML = `
                 <div style="text-align: center; padding: 40px;">
-                    <img src="${currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'https://via.placeholder.com/150/1a1a1a/FFD700?text=U'}" 
+                    <img src="${currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/150/1a1a1a/FFD700?text=U'}" 
                          style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); margin-bottom: 20px;">
                     <h2>${currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || 'مستخدم'}</h2>
                     <p style="color: var(--text-muted); margin-bottom: 30px;">${currentUser.email}</p>
@@ -4319,7 +4319,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             // Load current user data
             if (currentUser) {
-                document.getElementById('editAvatarPreview').src = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'https://via.placeholder.com/150/1a1a1a/FFD700?text=U';
+                document.getElementById('editAvatarPreview').src = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/150/1a1a1a/FFD700?text=U';
                 document.getElementById('editName').value = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || '';
             }
         }
@@ -4480,7 +4480,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                         // Send welcome notification
                         new Notification('T-REX Shop 🦖', {
                             body: 'مرحباً بك! ستحصل على أحدث العروض والخصومات',
-                            icon: 'https://via.placeholder.com/100x100/FFD700/000000?text=T-REX'
+                            icon: 'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E/100x100/FFD700/000000?text=T-REX'
                         });
                     }
                 });
@@ -4584,23 +4584,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         }
         
         // Fetch real rates from yementdy.com API (when available)
+        // Note: API disabled due to CORS restrictions on custom domain
         async function fetchYemenTDYRates() {
-            try {
-                // Attempt to fetch from yementdy.com
-                // Note: This may require CORS proxy or their API key
-                const response = await fetch('https://yementdy.com/api/rates', {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    return data;
-                }
-            } catch (error) {
-                // API unavailable - using default rates
-            }
-            return null;
+            return null; // Using default rates only
         }
 
         // ============================================
