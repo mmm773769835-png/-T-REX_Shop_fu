@@ -488,9 +488,10 @@
         }
         .user-dropdown {
             position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 10px;
+            top: calc(100% + 10px);
+            right: 0;
+            left: auto;
+            margin-top: 0;
             background: var(--card);
             border: 1px solid #333;
             border-radius: 15px;
@@ -499,8 +500,15 @@
             z-index: 1002;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             overflow: hidden;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 0;
+            transform: translateY(-10px);
         }
-        .user-dropdown.show { display: block; }
+        .user-dropdown.show { 
+            display: block; 
+            opacity: 1;
+            transform: translateY(0);
+        }
         .user-info {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             padding: 20px;
