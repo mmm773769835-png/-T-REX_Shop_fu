@@ -2920,8 +2920,6 @@
                     timestamp: Date.now()
                 }));
                 
-                console.log('✅ Live exchange rates loaded:', exchangeRates);
-                
                 // Re-render if currency is not SAR
                 if (currentCurrency.code !== 'SAR') {
                     currentCurrency.rate = exchangeRates[currentCurrency.code] || 1;
@@ -4582,7 +4580,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             if (aedSell) aedSell.textContent = rates.AED.sell.toFixed(2);
             
             // Add timestamp
-            console.log('Exchange rates updated from Sanaa at:', new Date().toLocaleTimeString('ar-YE'));
+            // Exchange rates updated (silent)
         }
         
         // Fetch real rates from yementdy.com API (when available)
@@ -4597,12 +4595,10 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 if (response.ok) {
                     const data = await response.json();
-                    // Parse and update rates
-                    console.log('Live rates from yementdy.com:', data);
                     return data;
                 }
             } catch (error) {
-                console.log('Using default rates - yementdy.com API unavailable:', error.message);
+                // API unavailable - using default rates
             }
             return null;
         }
