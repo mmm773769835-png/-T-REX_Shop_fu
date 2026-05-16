@@ -4244,9 +4244,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Render Featured Carousel
         function renderFeatured(products) {
             const container = document.getElementById('featuredContainer');
-            const featured = products.filter(p => p.is_featured || p.is_hot || p.is_new).slice(0, 8);
+            const featured = products.filter(p => p.is_featured === true || p.is_featured === 'true' || p.is_featured === 1).slice(0, 8);
             
-            if (featured.length === 0) return;
+            if (featured.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
             
             container.innerHTML = featured.map(product => `
                 <div class="swiper-slide" onclick="openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
