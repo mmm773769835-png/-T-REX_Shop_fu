@@ -263,6 +263,15 @@
             color: #e6003c;
             filter: drop-shadow(0 2px 3px rgba(230,0,60,0.25));
         }
+        .wishlist-heart-symbol {
+            color: #e6003c;
+            font-size: 27px;
+            line-height: 1;
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            transform: translateY(1px);
+            text-shadow: 0 2px 4px rgba(230,0,60,0.22);
+        }
         .cart-count {
             position: absolute;
             top: -8px;
@@ -1573,6 +1582,15 @@
             transition: all 0.2s;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
         }
+        .qty-symbol {
+            display: block;
+            color: inherit;
+            font-family: Arial, sans-serif;
+            font-size: 21px;
+            font-weight: 900;
+            line-height: 1;
+            transform: translateY(-1px);
+        }
         .cart-qty-btn:hover {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #000;
@@ -2583,7 +2601,7 @@
 
                 <!-- Wishlist -->
                 <a href="#" class="cart-btn wishlist-header-btn" onclick="openWishlistModal(); return false;" title="المفضلة" aria-label="المفضلة">
-                    <i class="fas fa-heart"></i>
+                    <span class="wishlist-heart-symbol" aria-hidden="true">♥</span>
                     <span class="cart-count" id="wishlistCount" data-count="0">0</span>
                 </a>
 
@@ -3274,11 +3292,11 @@
                         <div class="cart-item-title">${item.name}</div>
                         <div class="cart-item-controls">
                             <button class="cart-qty-btn decrease ${item.quantity <= 1 ? 'is-min' : ''}" onclick="updateCartQty(${index}, -1)" title="تقليل الكمية" aria-label="تقليل كمية ${item.name}">
-                                <i class="fas fa-minus"></i>
+                                <span class="qty-symbol" aria-hidden="true">−</span>
                             </button>
                             <span class="cart-qty">${item.quantity}</span>
                             <button class="cart-qty-btn increase" onclick="updateCartQty(${index}, 1)" title="زيادة الكمية" aria-label="زيادة كمية ${item.name}">
-                                <i class="fas fa-plus"></i>
+                                <span class="qty-symbol" aria-hidden="true">+</span>
                             </button>
                         </div>
                         <div class="cart-item-price">${formatPrice(item.price * item.quantity, item.currency || 'SAR')}</div>
