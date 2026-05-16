@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   category TEXT DEFAULT 'إلكترونيات',
   description TEXT,
   image_url TEXT,
+  images JSONB DEFAULT '[]'::jsonb,
   currency TEXT DEFAULT 'SAR',
   is_new BOOLEAN DEFAULT true,
   rating DECIMAL(2, 1) DEFAULT 0,
@@ -14,6 +15,9 @@ CREATE TABLE IF NOT EXISTS public.products (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 
 -- إنشاء Bucket للصور في Storage
 INSERT INTO storage.buckets (id, name, public)

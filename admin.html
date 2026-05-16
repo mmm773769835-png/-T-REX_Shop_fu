@@ -669,6 +669,7 @@
                 // Set main image
                 if (imageUrls.length > 0) {
                     productData.image_url = imageUrls[0];
+                    productData.images = imageUrls;
                 }
                 
                 let result;
@@ -724,15 +725,18 @@
                 document.getElementById('isNew').checked = product.is_new || false;
                 document.getElementById('isActive').checked = product.is_active !== false; // Default true
                 
-                // Load image
-                document.getElementById('productImageUrl1').value = product.image_url || '';
-                document.getElementById('productImageUrl2').value = '';
-                document.getElementById('productImageUrl3').value = '';
+                // Load images
+                const productImages = Array.isArray(product.images) && product.images.length
+                    ? product.images
+                    : (product.image_url ? [product.image_url] : []);
+                document.getElementById('productImageUrl1').value = productImages[0] || '';
+                document.getElementById('productImageUrl2').value = productImages[1] || '';
+                document.getElementById('productImageUrl3').value = productImages[2] || '';
                 
                 // Show image preview
-                updateImagePreview('imagePreview1', product.image_url);
-                updateImagePreview('imagePreview2', null);
-                updateImagePreview('imagePreview3', null);
+                updateImagePreview('imagePreview1', productImages[0]);
+                updateImagePreview('imagePreview2', productImages[1]);
+                updateImagePreview('imagePreview3', productImages[2]);
                 
                 document.getElementById('submitBtn').textContent = 'تحديث المنتج';
                 document.getElementById('cancelBtn').style.display = 'inline-block';

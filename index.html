@@ -3886,6 +3886,28 @@
         let currentQuantity = 1;
         let currentImageIndex = 0;
 
+        function getProductImages(product) {
+            const sources = [product.images, product.image_urls, product.imageUrls];
+            for (const source of sources) {
+                if (Array.isArray(source)) {
+                    const validImages = source.filter(Boolean);
+                    if (validImages.length) return validImages;
+                }
+                if (typeof source === 'string') {
+                    try {
+                        const parsed = JSON.parse(source);
+                        if (Array.isArray(parsed)) {
+                            const validImages = parsed.filter(Boolean);
+                            if (validImages.length) return validImages;
+                        }
+                    } catch (error) {
+                        if (source.trim()) return [source.trim()];
+                    }
+                }
+            }
+            return product.image_url ? [product.image_url] : [NO_IMAGE];
+        }
+
         function openQuickView(product) {
             const modal = document.getElementById('productModal');
             const modalContent = modal.querySelector('.modal-content');
@@ -3896,14 +3918,8 @@
             currentQuantity = 1;
             currentImageIndex = 0;
 
-            // Generate multiple images (main + thumbnails)
-            const mainImage = product.image_url || NO_IMAGE;
-            const thumbnails = [
-                product.image_url || NO_IMAGE,
-                product.image_url || NO_IMAGE,
-                product.image_url || NO_IMAGE,
-                product.image_url || NO_IMAGE
-            ];
+            const thumbnails = getProductImages(product);
+            const mainImage = thumbnails[0] || NO_IMAGE;
 
             modalBody.innerHTML = `
                 <div class="product-gallery">
