@@ -2881,6 +2881,12 @@
             'SAR': 1, 'USD': 0.2667, 'KWD': 0.0815, 'JOD': 0.1889,
             'AED': 0.9793, 'YER': 145.0, 'EUR': 0.2457
         };
+        const EXCHANGE_SELL_MARGIN = 0.0345;
+
+        function getSellRate(code) {
+            const rate = exchangeRates[code] || 1;
+            return code === 'SAR' ? 1 : rate * (1 + EXCHANGE_SELL_MARGIN);
+        }
 
         // Fetch live exchange rates from API
         async function fetchExchangeRates() {
@@ -2925,7 +2931,7 @@
                 
                 // Re-render if currency is not SAR
                 if (currentCurrency.code !== 'SAR') {
-                    currentCurrency.rate = exchangeRates[currentCurrency.code] || 1;
+                    currentCurrency.rate = getSellRate(currentCurrency.code);
                     localStorage.setItem('currency', JSON.stringify(currentCurrency));
                     renderProducts();
                     updateCartDisplay();
@@ -2944,7 +2950,7 @@
         function selectCurrency(code) {
             const info = currencyInfo[code];
             if (!info) return;
-            const rate = exchangeRates[code] || 1;
+            const rate = getSellRate(code);
             changeCurrency(code, info.symbol, rate);
         }
 
@@ -2959,14 +2965,14 @@
         }
 
         function formatPrice(price, sourceCurrency = 'SAR') {
-            const sourceRate = exchangeRates[sourceCurrency] || 1;
+            const sourceRate = getSellRate(sourceCurrency);
             const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
-            const convertedPrice = (priceInSar * currentCurrency.rate).toFixed(2);
+            const convertedPrice = (priceInSar * getSellRate(currentCurrency.code)).toFixed(2);
             return `${convertedPrice} ${currentCurrency.symbol}`;
         }
 
         function toSar(price, sourceCurrency = 'SAR') {
-            const sourceRate = exchangeRates[sourceCurrency] || 1;
+            const sourceRate = getSellRate(sourceCurrency);
             return sourceCurrency === 'SAR' ? price : price / sourceRate;
         }
 
@@ -2975,7 +2981,7 @@
         if (savedCurrency) {
             const parsed = JSON.parse(savedCurrency);
             // Update rate from live rates if available
-            parsed.rate = exchangeRates[parsed.code] || parsed.rate;
+            parsed.rate = getSellRate(parsed.code);
             currentCurrency = parsed;
             document.getElementById('currentCurrency').textContent = currentCurrency.symbol;
         }
