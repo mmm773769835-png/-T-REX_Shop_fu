@@ -461,7 +461,7 @@
             cursor: pointer;
             font-weight: 600;
             font-family: 'Cairo', sans-serif;
-            display: flex !important;
+            display: flex;
             align-items: center;
             gap: 8px;
             transition: transform 0.3s, box-shadow 0.3s;
@@ -2057,7 +2057,7 @@
         }
         
         /* Force hide any debug panels */
-        [id*="debug"], [class*="debug"], [id*="log"], [class*="log"],
+        [id*="debug"], [class*="debug"], [id*="debug-log"], [class*="debug-log"],
         div[style*="DEBUG"], div:contains("🔧 DEBUG"),
         div[style*="fixed"][style*="top"][style*="right"] {
             display: none !important;
@@ -4776,7 +4776,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         document.addEventListener('DOMContentLoaded', async () => {
             // Remove any debug panels immediately and continuously
             function removeDebugPanels() {
-                const debugPanels = document.querySelectorAll('[id*="debug"], [class*="debug"], [id*="log"], [class*="log"]');
+                const debugPanels = document.querySelectorAll('[id*="debug"], [class*="debug"], [id*="debug-log"], [class*="debug-log"]');
                 debugPanels.forEach(panel => panel.remove());
                 // Also check for any fixed position panels in top-right that might be debug panels
                 const allDivs = document.querySelectorAll('div');
