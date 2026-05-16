@@ -1186,31 +1186,39 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            color: #ff1744;
+            color: #fff;
             cursor: pointer;
             transition: all 0.3s;
             z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 24px;
             box-shadow: 0 4px 14px rgba(255, 65, 108, 0.45);
         }
         .wishlist-btn:hover {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ffe5ec 100%);
             border-color: #f44336;
-            color: white;
+            color: #fff;
             transform: scale(1.1);
         }
         .wishlist-btn.active {
             background: #f44336;
             border-color: #f44336;
-            color: white;
+            color: #ff1744;
         }
-        .wishlist-btn i {
+        .product-heart-symbol {
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.45), 0 0 1px #ff416c;
             transition: all 0.3s;
         }
-        .wishlist-btn.active i {
+        .wishlist-btn.active .product-heart-symbol {
+            color: #ff1744;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: heartBeat 0.5s ease;
         }
         .settings-btn {
@@ -1484,9 +1492,9 @@
             padding: 18px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             display: flex;
-            justify-content: space-between;
             align-items: center;
             background: rgba(255,255,255,0.03);
+            position: relative;
         }
         .cart-header h3 {
             display: flex;
@@ -1494,15 +1502,17 @@
             gap: 10px;
             color: #fff;
             font-size: 18px;
+            padding-left: 52px;
+            margin: 0;
         }
         .cart-close {
             background: transparent;
             border: none;
             color: #ff4444;
-            font-size: 28px;
+            font-size: 34px;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -1510,10 +1520,18 @@
             transition: all 0.25s;
             box-shadow: none;
             text-shadow: 0 2px 8px rgba(255, 68, 68, 0.55);
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            line-height: 1;
         }
         .cart-close:hover {
             color: #ff7777;
-            transform: scale(1.12);
+            transform: translateY(-50%) scale(1.12);
             box-shadow: none;
         }
         .cart-items {
@@ -2872,7 +2890,7 @@
         <div class="cart-header">
             <h3><i class="fas fa-shopping-cart"></i> سلة التسوق</h3>
             <button class="cart-close" onclick="toggleCart()" title="إغلاق" aria-label="إغلاق السلة">
-                <i class="fas fa-times"></i>
+                ×
             </button>
         </div>
         <div class="cart-items" id="cartItems">
@@ -4165,7 +4183,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 onclick="event.stopPropagation(); toggleWishlist('${productId}')" 
                                 title="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}"
                                 aria-label="${isWishlisted ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
-                            <i class="fas fa-heart ${isWishlisted ? 'text-danger' : ''}"></i>
+                            <span class="product-heart-symbol" aria-hidden="true">♥</span>
                         </button>
                         
                         <img src="${product.image_url || NO_IMAGE}" 
