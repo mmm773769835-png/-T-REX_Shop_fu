@@ -246,6 +246,12 @@
             border-radius: 25px;
             position: relative;
         }
+        .wishlist-header-btn {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white !important;
+            min-width: 42px;
+            justify-content: center;
+        }
         .cart-count {
             position: absolute;
             top: -8px;
@@ -469,6 +475,19 @@
         .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
+        }
+        .google-mark {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            color: #4285F4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
         }
         .user-profile {
             position: relative;
@@ -1168,6 +1187,16 @@
         }
         .wishlist-btn.active i {
             animation: heartBeat 0.5s ease;
+        }
+        .settings-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            border: 2px solid rgba(255,255,255,0.9) !important;
+            color: var(--dark) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.55) !important;
+        }
+        .settings-btn:hover {
+            background: #ffffff !important;
+            color: var(--dark) !important;
         }
         @keyframes heartBeat {
             0%, 100% { transform: scale(1); }
@@ -2379,10 +2408,16 @@
                     <i class="fas fa-cog"></i>
                 </button>
 
+                <!-- Wishlist -->
+                <a href="#" class="cart-btn wishlist-header-btn" onclick="openWishlistModal(); return false;" title="المفضلة" aria-label="المفضلة">
+                    <i class="fas fa-heart"></i>
+                    <span class="cart-count" id="wishlistCount" data-count="0">0</span>
+                </a>
+
                 <!-- User Auth -->
                 <div class="user-auth" id="userAuth">
                     <button class="login-btn" onclick="signInWithGoogle()" id="loginBtn">
-                        <i class="fab fa-google"></i> <span>تسجيل الدخول</span>
+                        <span class="google-mark">G</span> <span>تسجيل الدخول</span>
                     </button>
                     <div class="user-profile" id="userProfile" style="display: none;">
                         <img src="" alt="Profile" class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
@@ -2885,7 +2920,7 @@
 
         function getSellRate(code) {
             const rate = exchangeRates[code] || 1;
-            return code === 'SAR' ? 1 : rate * (1 + EXCHANGE_SELL_MARGIN);
+            return rate * (1 + EXCHANGE_SELL_MARGIN);
         }
 
         // Fetch live exchange rates from API
@@ -2965,15 +3000,18 @@
         }
 
         function formatPrice(price, sourceCurrency = 'SAR') {
-            const sourceRate = getSellRate(sourceCurrency);
+            const sourceRate = exchangeRates[sourceCurrency] || 1;
             const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
-            const convertedPrice = (priceInSar * getSellRate(currentCurrency.code)).toFixed(2);
+            const targetRate = exchangeRates[currentCurrency.code] || 1;
+            const rawConvertedPrice = priceInSar * targetRate;
+            const convertedPrice = (sourceCurrency === currentCurrency.code ? rawConvertedPrice : rawConvertedPrice * (1 + EXCHANGE_SELL_MARGIN)).toFixed(2);
             return `${convertedPrice} ${currentCurrency.symbol}`;
         }
 
         function toSar(price, sourceCurrency = 'SAR') {
-            const sourceRate = getSellRate(sourceCurrency);
-            return sourceCurrency === 'SAR' ? price : price / sourceRate;
+            const sourceRate = exchangeRates[sourceCurrency] || 1;
+            const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
+            return sourceCurrency === 'SAR' ? priceInSar : priceInSar * (1 + EXCHANGE_SELL_MARGIN);
         }
 
         // Load Currency from Storage
@@ -3081,6 +3119,13 @@
             
             const totalSar = cart.reduce((sum, item) => sum + toSar(item.price * item.quantity, item.currency || 'SAR'), 0);
             cartTotal.textContent = formatPrice(totalSar, 'SAR');
+        }
+
+        function updateWishlistCount() {
+            const wishlistCount = document.getElementById('wishlistCount');
+            if (!wishlistCount) return;
+            wishlistCount.textContent = wishlist.length;
+            wishlistCount.style.display = wishlist.length > 0 ? 'flex' : 'none';
         }
 
         function checkout() {
@@ -3208,7 +3253,77 @@
                 showNotification('تم إضافة المنتج للمفضلة ❤️');
             }
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
             renderProducts();
+        }
+
+        function getWishlistProducts() {
+            return allProducts.filter(product => wishlist.some(id => String(id) === String(product.id)));
+        }
+
+        function openWishlistModal() {
+            const modal = document.getElementById('productModal');
+            const modalBody = document.getElementById('modalBody');
+            const items = getWishlistProducts();
+
+            if (items.length === 0) {
+                modalBody.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart" style="font-size: 60px; color: #ff416c;"></i>
+                        <h3>المفضلة فارغة</h3>
+                        <p>أضف منتجات للمفضلة ثم يمكنك الشراء منها مباشرة</p>
+                    </div>
+                `;
+                modal.classList.add('show');
+                return;
+            }
+
+            modalBody.innerHTML = `
+                <h2 style="color: var(--primary); margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-heart"></i> المفضلة
+                </h2>
+                <div style="display: grid; gap: 15px;">
+                    ${items.map(product => `
+                        <div style="display: flex; gap: 12px; align-items: center; background: var(--dark); border: 1px solid #333; border-radius: 12px; padding: 12px;">
+                            <img src="${product.image_url || NO_IMAGE}" alt="${product.name}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px;">
+                            <div style="flex: 1;">
+                                <h4 style="color: var(--text); margin-bottom: 6px;">${product.name}</h4>
+                                <div style="color: var(--primary); font-weight: 800;">${formatPrice(product.price, product.currency || 'SAR')}</div>
+                            </div>
+                            <button class="add-to-cart" onclick='addToCart(${JSON.stringify(product).replace(/'/g, '&#39;')})' style="width: auto; padding: 10px 14px;">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                            <button class="btn-buy-now" onclick='openQuickView(${JSON.stringify(product).replace(/'/g, '&#39;')})' style="width: auto; padding: 10px 14px;">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn-checkout" onclick="addWishlistToCart()" style="margin-top: 20px; width: 100%;">
+                    <i class="fas fa-shopping-cart"></i> أضف كل المفضلة للسلة وإتمام الشراء
+                </button>
+            `;
+            modal.classList.add('show');
+        }
+
+        function addWishlistToCart() {
+            const items = getWishlistProducts();
+            if (items.length === 0) {
+                showNotification('المفضلة فارغة! ❤️');
+                return;
+            }
+            items.forEach(product => {
+                const existingItem = cart.find(item => String(item.id) === String(product.id));
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ ...product, quantity: 1 });
+                }
+            });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartDisplay();
+            closeModal();
+            openCartOrderModal();
         }
 
         // Compare Management
@@ -3967,6 +4082,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 renderProducts();
                 renderFeatured(allProducts);
                 updateCartDisplay();
+                updateWishlistCount();
 
             } catch (error) {
                 console.error('[PRODUCTS] Error loading products:', error);
@@ -4261,9 +4377,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 showNotification('يجب تسجيل الدخول أولاً! 🔒');
                 return;
             }
-            // Scroll to products and filter wishlist
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-            showNotification('عرض المفضلة ❤️');
+            openWishlistModal();
+            document.getElementById('userDropdown').classList.remove('show');
         }
 
         function showProfile() {
