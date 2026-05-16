@@ -2954,12 +2954,20 @@
             document.getElementById('currencyDropdown').classList.remove('show');
             localStorage.setItem('currency', JSON.stringify(currentCurrency));
             renderProducts();
+            renderFeatured(allProducts);
             updateCartDisplay();
         }
 
-        function formatPrice(price) {
-            const convertedPrice = (price * currentCurrency.rate).toFixed(2);
+        function formatPrice(price, sourceCurrency = 'SAR') {
+            const sourceRate = exchangeRates[sourceCurrency] || 1;
+            const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
+            const convertedPrice = (priceInSar * currentCurrency.rate).toFixed(2);
             return `${convertedPrice} ${currentCurrency.symbol}`;
+        }
+
+        function toSar(price, sourceCurrency = 'SAR') {
+            const sourceRate = exchangeRates[sourceCurrency] || 1;
+            return sourceCurrency === 'SAR' ? price : price / sourceRate;
         }
 
         // Load Currency from Storage
@@ -3055,7 +3063,7 @@
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
-                        <div class="cart-item-price">${formatPrice(item.price * item.quantity)}</div>
+                        <div class="cart-item-price">${formatPrice(item.price * item.quantity, item.currency || 'SAR')}</div>
                     </div>
                     <div class="cart-item-actions">
                         <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="حذف">
@@ -3065,8 +3073,8 @@
                 </div>
             `).join('');
             
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotal.textContent = formatPrice(total);
+            const totalSar = cart.reduce((sum, item) => sum + toSar(item.price * item.quantity, item.currency || 'SAR'), 0);
+            cartTotal.textContent = formatPrice(totalSar, 'SAR');
         }
 
         function checkout() {
@@ -3086,18 +3094,18 @@
             
             // Build cart items list
             let itemsHtml = '';
-            let total = 0;
+            let totalSar = 0;
             cart.forEach((item, index) => {
                 const itemTotal = item.price * item.quantity;
-                total += itemTotal;
+                totalSar += toSar(itemTotal, item.currency || 'SAR');
                 itemsHtml += `
                     <div class="cart-order-item" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px; margin-bottom: 10px;">
                         <img src="${item.image_url || NO_IMAGE}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                         <div style="flex: 1;">
                             <div style="font-weight: bold; color: #FFD700;">${item.name}</div>
-                            <div style="font-size: 12px; color: #aaa;">${formatPrice(item.price)} × ${item.quantity}</div>
+                            <div style="font-size: 12px; color: #aaa;">${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity}</div>
                         </div>
-                        <div style="font-weight: bold; color: #fff;">${formatPrice(itemTotal)}</div>
+                        <div style="font-weight: bold; color: #fff;">${formatPrice(itemTotal, item.currency || 'SAR')}</div>
                         <button type="button" onclick="removeCartItem(${index})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -3106,7 +3114,7 @@
             });
             
             itemsList.innerHTML = itemsHtml || '<p>السلة فارغة</p>';
-            totalElement.textContent = formatPrice(total);
+            totalElement.textContent = formatPrice(totalSar, 'SAR');
             
             modal.classList.add('show');
         }
@@ -3138,18 +3146,18 @@
             const notes = document.getElementById('cartOrderNotes').value;
             
             // Calculate total
-            let total = 0;
+            let totalSar = 0;
             let itemsList = '';
             cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                itemsList += `📦 ${item.name} - ${formatPrice(item.price)} × ${item.quantity} = ${formatPrice(itemTotal)}\n`;
+                totalSar += toSar(itemTotal, item.currency || 'SAR');
+                itemsList += `📦 ${item.name} - ${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity} = ${formatPrice(itemTotal, item.currency || 'SAR')}\n`;
             });
             
             // Build WhatsApp message
             let message = `🛍️ *طلب جديد من T-REX Shop* 🦖\n\n`;
             message += `*المنتجات:*\n${itemsList}\n`;
-            message += `💰 *الإجمالي:* ${formatPrice(total)}\n\n`;
+            message += `💰 *الإجمالي:* ${formatPrice(totalSar, 'SAR')}\n\n`;
             message += `👤 *معلومات العميل:*\n`;
             message += `• الاسم: ${name}\n`;
             message += `• الهاتف: ${phone}\n`;
@@ -3363,7 +3371,7 @@
                         <img src="${product.image_url || 'placeholder.jpg'}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
                         <div class="search-dropdown-item-info">
                             <h4>${product.name}</h4>
-                            <p>${formatPrice(product.price)}</p>
+                            <p>${formatPrice(product.price, product.currency || 'SAR')}</p>
                         </div>
                     </div>
                 `).join('') + `
@@ -3453,9 +3461,9 @@
             // Populate order summary
             document.getElementById('orderProductImage').src = currentProduct.image_url || NO_IMAGE;
             document.getElementById('orderProductName').textContent = currentProduct.name;
-            document.getElementById('orderProductPrice').textContent = formatPrice(currentProduct.price);
+            document.getElementById('orderProductPrice').textContent = formatPrice(currentProduct.price, currentProduct.currency || 'SAR');
             document.getElementById('orderQuantity').textContent = currentQuantity;
-            document.getElementById('orderTotalPrice').textContent = formatPrice(currentProduct.price * currentQuantity);
+            document.getElementById('orderTotalPrice').textContent = formatPrice(currentProduct.price * currentQuantity, currentProduct.currency || 'SAR');
             
             // Close product modal and open order modal
             closeModal();
@@ -3486,9 +3494,9 @@
             // Build WhatsApp message
             let message = `🛍️ *طلب جديد من T-REX Shop* 🦖\n\n`;
             message += `📦 *المنتج:* ${currentProduct.name}\n`;
-            message += `💰 *السعر:* ${formatPrice(currentProduct.price)}\n`;
+            message += `💰 *السعر:* ${formatPrice(currentProduct.price, currentProduct.currency || 'SAR')}\n`;
             message += `📊 *الكمية:* ${currentQuantity}\n`;
-            message += `💵 *الإجمالي:* ${formatPrice(total)}\n\n`;
+            message += `💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}\n\n`;
             message += `👤 *معلومات العميل:*\n`;
             message += `• الاسم: ${name}\n`;
             message += `• الهاتف: ${phone}\n`;
@@ -3558,7 +3566,7 @@
                         ${renderStars(product.rating || 0)}
                         <span style="color: #aaa; font-size: 14px;">(${product.rating || 0}/5 - ${product.reviews_count || 0} تقييم)</span>
                     </div>
-                    <div class="modal-price" style="font-size: 24px; margin-bottom: 15px;">${formatPrice(product.price)}</div>
+                    <div class="modal-price" style="font-size: 24px; margin-bottom: 15px;">${formatPrice(product.price, product.currency || 'SAR')}</div>
                     <p class="modal-description" style="margin-bottom: 15px; line-height: 1.6;">${product.description || 'لا يوجد وصف'}</p>
                     <div style="margin-bottom: 20px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 8px;">
                         <strong>📁 الفئة:</strong> ${product.category || 'غير محدد'}<br>
@@ -3635,7 +3643,7 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between; border-top: 1px solid #444; padding-top: 8px; margin-top: 8px; font-weight: bold; font-size: 16px;">
                                     <span>الإجمالي:</span>
-                                    <span id="quickOrderTotal" style="color: #25D366;">${formatPrice(product.price)}</span>
+                                    <span id="quickOrderTotal" style="color: #25D366;">${formatPrice(product.price, product.currency || 'SAR')}</span>
                                 </div>
                             </div>
                             
@@ -3666,7 +3674,7 @@
                 
                 if (qtyDisplay) qtyDisplay.textContent = currentQuantity;
                 if (quickOrderQtyDisplay) quickOrderQtyDisplay.textContent = currentQuantity;
-                if (quickOrderTotal) quickOrderTotal.textContent = formatPrice(product.price * currentQuantity);
+                if (quickOrderTotal) quickOrderTotal.textContent = formatPrice(product.price * currentQuantity, product.currency || 'SAR');
             };
 
             modal.classList.add('show');
@@ -3721,9 +3729,9 @@
 🛒 *طلب جديد من T-REX Shop*
 
 📦 *المنتج:* ${currentProduct.name}
-💰 *السعر:* ${formatPrice(currentProduct.price)}
+💰 *السعر:* ${formatPrice(currentProduct.price, currentProduct.currency || 'SAR')}
 🔢 *الكمية:* ${currentQuantity}
-💵 *الإجمالي:* ${formatPrice(total)}
+💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}
 
 👤 *العميل:* ${name}
 📱 *الهاتف:* ${phone}
@@ -3823,7 +3831,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                         </button>
                         
                         <img src="${product.image_url || NO_IMAGE}" 
-                             alt="${product.name} - ${product.category || 'منتج'} بسعر ${formatPrice(product.price)}" 
+                             alt="${product.name} - ${product.category || 'منتج'} بسعر ${formatPrice(product.price, product.currency || 'SAR')}" 
                              class="product-image"
                              itemprop="image"
                              loading="lazy"
@@ -3843,11 +3851,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
-                                    <span itemprop="price" content="${product.original_price}">${formatPrice(product.original_price)}</span>
+                                    <span itemprop="price" content="${product.original_price}">${formatPrice(product.original_price, product.currency || 'SAR')}</span>
                                     <span class="product-discount">-${discountPercent}%</span>
                                 </p>
                             ` : ''}
-                            <p class="product-price" itemprop="price">${formatPrice(product.price)}</p>
+                            <p class="product-price" itemprop="price">${formatPrice(product.price, product.currency || 'SAR')}</p>
                             <div class="card-actions">
                                 <button class="add-to-cart" 
                                         onclick="event.stopPropagation(); addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})"
@@ -3884,7 +3892,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                     <img src="${product.image_url || NO_IMAGE}" alt="${product.name}">
                     <div class="swiper-slide-content">
                         <h3 class="swiper-slide-title">${product.name}</h3>
-                        <p class="swiper-slide-price">${formatPrice(product.price)}</p>
+                        <p class="swiper-slide-price">${formatPrice(product.price, product.currency || 'SAR')}</p>
                     </div>
                 </div>
             `).join('');
