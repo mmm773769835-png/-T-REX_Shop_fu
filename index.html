@@ -1157,12 +1157,12 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0,0,0,0.6);
-            border: 2px solid rgba(255,255,255,0.3);
-            width: 42px;
-            height: 42px;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe5ec 100%);
+            border: 2px solid #ff416c;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            color: white;
+            color: #ff1744;
             cursor: pointer;
             transition: all 0.3s;
             z-index: 10;
@@ -1170,11 +1170,12 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 14px rgba(255, 65, 108, 0.45);
         }
         .wishlist-btn:hover {
-            background: rgba(244, 67, 54, 0.8);
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
             border-color: #f44336;
+            color: white;
             transform: scale(1.1);
         }
         .wishlist-btn.active {
@@ -1197,6 +1198,12 @@
         .settings-btn:hover {
             background: #ffffff !important;
             color: var(--dark) !important;
+        }
+        .header-actions .cart-btn,
+        .header-actions .settings-btn,
+        .header-actions .login-btn,
+        .header-actions .currency-btn {
+            min-height: 42px;
         }
         @keyframes heartBeat {
             0%, 100% { transform: scale(1); }
@@ -1319,6 +1326,44 @@
             gap: 30px;
             padding: 30px;
         }
+        .wishlist-modal-content {
+            margin-top: 90px;
+            max-height: calc(100vh - 120px);
+            max-width: 760px;
+        }
+        .wishlist-modal-body {
+            display: block;
+            padding: 28px;
+        }
+        .wishlist-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: linear-gradient(135deg, #151515 0%, #0b0b0b 100%);
+            border: 1px solid rgba(255, 215, 0, 0.22);
+            border-radius: 14px;
+            padding: 12px;
+        }
+        .wishlist-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .icon-action-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+        }
+        .icon-action-btn.cart-action { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--dark); }
+        .icon-action-btn.buy-action { background: linear-gradient(135deg, #25D366, #128C7E); }
+        .icon-action-btn.remove-action { background: linear-gradient(135deg, #ff4444, #b00020); }
         .modal-image {
             width: 100%;
             border-radius: 15px;
@@ -2001,6 +2046,10 @@
             .exchange-flag { font-size: 24px; }
             .exchange-title { font-size: 14px; }
             .exchange-rates { font-size: 11px; }
+            .wishlist-modal-content { margin-top: 78px; max-height: calc(100vh - 95px); }
+            .wishlist-modal-body { padding: 18px; }
+            .wishlist-row { align-items: flex-start; }
+            .wishlist-actions { flex-wrap: wrap; justify-content: flex-end; }
         }
 
         /* Responsive - Small Mobile */
@@ -2050,8 +2099,8 @@
             .settings-btn { width: 30px; height: 30px; font-size: 13px; margin-right: 0; }
             .login-btn { padding: 7px 10px; font-size: 12px; min-width: 36px; }
             .login-btn span { display: none; }
-            .login-btn i { display: inline-block !important; font-size: 14px; }
-            .cart-btn { padding: 7px 10px; font-size: 12px; }
+            .google-mark { display: inline-flex !important; width: 20px; height: 20px; font-size: 14px; }
+            .cart-btn { width: 34px; height: 34px; min-width: 34px; padding: 0; justify-content: center; font-size: 14px; }
             .user-auth { margin-left: 0; }
             .user-avatar { width: 32px; height: 32px; }
             .cart-count { width: 18px; height: 18px; font-size: 10px; top: -5px; right: -5px; }
@@ -2060,6 +2109,13 @@
             .cart-item img { width: 55px; height: 55px; }
             .cart-item-title { font-size: 13px; }
             .cart-header h3 { font-size: 16px; }
+            .user-dropdown { min-width: 220px; right: -80px; }
+            .currency-dropdown { left: -50px; min-width: 130px; }
+            .wishlist-modal-content { margin-top: 72px; max-height: calc(100vh - 85px); }
+            .wishlist-row { flex-wrap: wrap; }
+            .wishlist-row img { width: 62px !important; height: 62px !important; }
+            .wishlist-actions { width: 100%; justify-content: space-between; }
+            .icon-action-btn { width: 38px; height: 38px; }
             .user-dropdown { min-width: 220px; }
             .user-info h4 { font-size: 15px; }
             .user-avatar-large { width: 60px; height: 60px; }
@@ -3263,8 +3319,11 @@
 
         function openWishlistModal() {
             const modal = document.getElementById('productModal');
+            const modalContent = modal.querySelector('.modal-content');
             const modalBody = document.getElementById('modalBody');
             const items = getWishlistProducts();
+            modalContent.classList.add('wishlist-modal-content');
+            modalBody.classList.add('wishlist-modal-body');
 
             if (items.length === 0) {
                 modalBody.innerHTML = `
@@ -3284,18 +3343,23 @@
                 </h2>
                 <div style="display: grid; gap: 15px;">
                     ${items.map(product => `
-                        <div style="display: flex; gap: 12px; align-items: center; background: var(--dark); border: 1px solid #333; border-radius: 12px; padding: 12px;">
+                        <div class="wishlist-row">
                             <img src="${product.image_url || NO_IMAGE}" alt="${product.name}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px;">
                             <div style="flex: 1;">
                                 <h4 style="color: var(--text); margin-bottom: 6px;">${product.name}</h4>
                                 <div style="color: var(--primary); font-weight: 800;">${formatPrice(product.price, product.currency || 'SAR')}</div>
                             </div>
-                            <button class="add-to-cart" onclick='addToCart(${JSON.stringify(product).replace(/'/g, '&#39;')})' style="width: auto; padding: 10px 14px;">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                            <button class="btn-buy-now" onclick='openQuickView(${JSON.stringify(product).replace(/'/g, '&#39;')})' style="width: auto; padding: 10px 14px;">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
+                            <div class="wishlist-actions">
+                                <button class="icon-action-btn cart-action" onclick='addToCart(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="أضف للسلة" aria-label="أضف للسلة">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                                <button class="icon-action-btn buy-action" onclick='openQuickView(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="شراء" aria-label="شراء">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <button class="icon-action-btn remove-action" onclick="removeWishlistItem('${product.id}')" title="إزالة من المفضلة" aria-label="إزالة من المفضلة">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
@@ -3304,6 +3368,15 @@
                 </button>
             `;
             modal.classList.add('show');
+        }
+
+        function removeWishlistItem(productId) {
+            wishlist = wishlist.filter(id => String(id) !== String(productId));
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+            renderProducts();
+            openWishlistModal();
+            showNotification('تم إزالة المنتج من المفضلة 💔');
         }
 
         function addWishlistToCart() {
@@ -3656,7 +3729,10 @@
 
         function openQuickView(product) {
             const modal = document.getElementById('productModal');
+            const modalContent = modal.querySelector('.modal-content');
             const modalBody = document.getElementById('modalBody');
+            modalContent.classList.remove('wishlist-modal-content');
+            modalBody.classList.remove('wishlist-modal-body');
             currentProduct = product;
             currentQuantity = 1;
             currentImageIndex = 0;
@@ -3877,7 +3953,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         }
 
         function closeModal() {
-            document.getElementById('productModal').classList.remove('show');
+            const modal = document.getElementById('productModal');
+            const modalContent = modal.querySelector('.modal-content');
+            const modalBody = document.getElementById('modalBody');
+            modal.classList.remove('show');
+            modalContent.classList.remove('wishlist-modal-content');
+            modalBody.classList.remove('wishlist-modal-body');
         }
 
         // Render Products with SEO
