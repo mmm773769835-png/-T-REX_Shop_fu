@@ -626,7 +626,9 @@
                     payment_method: document.getElementById('paymentMethod').value,
                     currency: document.getElementById('currency').value,
                     description: document.getElementById('productDescription').value,
-                    is_new: document.getElementById('isNew').checked || document.getElementById('isFeatured').checked,
+                    is_featured: document.getElementById('isFeatured').checked,
+                    is_hot: document.getElementById('isHot').checked,
+                    is_new: document.getElementById('isNew').checked,
                     is_active: document.getElementById('isActive').checked,
                     updated_at: new Date().toISOString()
                 };

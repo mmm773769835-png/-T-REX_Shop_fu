@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS public.products (
   image_url TEXT,
   images JSONB DEFAULT '[]'::jsonb,
   currency TEXT DEFAULT 'SAR',
+  is_featured BOOLEAN DEFAULT false,
+  is_hot BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
   is_new BOOLEAN DEFAULT true,
   rating DECIMAL(2, 1) DEFAULT 0,
   review_count INTEGER DEFAULT 0,
@@ -18,6 +21,15 @@ CREATE TABLE IF NOT EXISTS public.products (
 
 ALTER TABLE public.products
 ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
+
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS is_hot BOOLEAN DEFAULT false;
+
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
 -- إنشاء Bucket للصور في Storage
 INSERT INTO storage.buckets (id, name, public)

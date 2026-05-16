@@ -3888,24 +3888,27 @@
 
         function getProductImages(product) {
             const sources = [product.images, product.image_urls, product.imageUrls];
+            const images = [];
+            if (product.image_url) images.push(product.image_url);
             for (const source of sources) {
                 if (Array.isArray(source)) {
                     const validImages = source.filter(Boolean);
-                    if (validImages.length) return validImages;
+                    images.push(...validImages);
                 }
                 if (typeof source === 'string') {
                     try {
                         const parsed = JSON.parse(source);
                         if (Array.isArray(parsed)) {
                             const validImages = parsed.filter(Boolean);
-                            if (validImages.length) return validImages;
+                            images.push(...validImages);
                         }
                     } catch (error) {
-                        if (source.trim()) return [source.trim()];
+                        if (source.trim()) images.push(source.trim());
                     }
                 }
             }
-            return product.image_url ? [product.image_url] : [NO_IMAGE];
+            const uniqueImages = [...new Set(images)];
+            return uniqueImages.length ? uniqueImages : [NO_IMAGE];
         }
 
         function openQuickView(product) {
@@ -4260,7 +4263,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Render Featured Carousel
         function renderFeatured(products) {
             const container = document.getElementById('featuredContainer');
-            const featured = products.filter(p => p.is_featured === true || p.is_featured === 'true' || p.is_featured === 1).slice(0, 8);
+            const featured = products.filter(p => p.is_featured === true || p.is_featured === 'true' || p.is_featured === 1 || p.is_featured === '1').slice(0, 8);
             
             if (featured.length === 0) {
                 container.innerHTML = '';
