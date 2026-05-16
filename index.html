@@ -247,20 +247,21 @@
             position: relative;
         }
         .wishlist-header-btn {
-            background: radial-gradient(circle at 30% 25%, #ff7aa2 0%, #ff416c 42%, #b0003a 100%);
-            color: white !important;
+            background: #fff;
+            color: #e6003c !important;
             min-width: 46px;
             width: 46px;
             height: 46px;
             padding: 0;
-            border: 2px solid rgba(255,255,255,0.85);
-            box-shadow: 0 10px 24px rgba(255, 65, 108, 0.38), inset 0 2px 4px rgba(255,255,255,0.26);
+            border: 2px solid #ff416c;
+            box-shadow: 0 10px 24px rgba(255, 65, 108, 0.32), inset 0 2px 4px rgba(255,255,255,0.85);
             justify-content: center;
             overflow: visible;
         }
         .wishlist-header-btn i {
-            font-size: 20px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.45));
+            font-size: 22px;
+            color: #e6003c;
+            filter: drop-shadow(0 2px 3px rgba(230,0,60,0.25));
         }
         .cart-count {
             position: absolute;
@@ -1486,23 +1487,25 @@
             font-size: 18px;
         }
         .cart-close {
-            background: linear-gradient(135deg, #ff4b4b 0%, #b00020 100%);
-            border: 2px solid rgba(255,255,255,0.65);
-            color: #fff;
-            font-size: 18px;
+            background: transparent;
+            border: none;
+            color: #ff4444;
+            font-size: 28px;
             cursor: pointer;
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.25s;
-            box-shadow: 0 8px 20px rgba(255, 68, 68, 0.35);
+            box-shadow: none;
+            text-shadow: 0 2px 8px rgba(255, 68, 68, 0.55);
         }
         .cart-close:hover {
-            transform: scale(1.08) rotate(90deg);
-            box-shadow: 0 10px 26px rgba(255, 68, 68, 0.55);
+            color: #ff7777;
+            transform: scale(1.12);
+            box-shadow: none;
         }
         .cart-items {
             flex: 1;
@@ -1559,14 +1562,14 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            border: 1px solid rgba(255,215,0,0.38);
-            background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,107,53,0.13));
-            color: var(--primary);
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 15px;
             transition: all 0.2s;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
         }
@@ -1576,18 +1579,26 @@
             transform: translateY(-1px);
         }
         .cart-qty-btn.decrease {
-            color: #ffb3b3;
-            border-color: rgba(255, 68, 68, 0.35);
-            background: rgba(255, 68, 68, 0.1);
+            color: #fff;
+            border-color: rgba(255, 68, 68, 0.65);
+            background: rgba(255, 68, 68, 0.22);
         }
         .cart-qty-btn.increase {
-            color: #b9ffda;
-            border-color: rgba(37, 211, 102, 0.38);
-            background: rgba(37, 211, 102, 0.1);
+            color: #fff;
+            border-color: rgba(37, 211, 102, 0.65);
+            background: rgba(37, 211, 102, 0.22);
         }
         .cart-qty-btn.decrease:hover {
             background: linear-gradient(135deg, #ff5c5c, #b00020);
             color: #fff;
+        }
+        .cart-qty-btn.decrease.is-min {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .cart-qty-btn.decrease.is-min:hover {
+            background: rgba(255, 68, 68, 0.22);
+            transform: none;
         }
         .cart-qty-btn.increase:hover {
             background: linear-gradient(135deg, #25D366, #128C7E);
@@ -3220,8 +3231,9 @@
             const newQty = item.quantity + change;
             
             if (newQty < 1) {
-                // If quantity becomes 0, remove the item
-                removeFromCart(item.id);
+                item.quantity = 1;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartDisplay();
                 return;
             }
             
@@ -3261,7 +3273,7 @@
                     <div class="cart-item-info">
                         <div class="cart-item-title">${item.name}</div>
                         <div class="cart-item-controls">
-                            <button class="cart-qty-btn decrease" onclick="updateCartQty(${index}, -1)" title="تقليل الكمية" aria-label="تقليل كمية ${item.name}">
+                            <button class="cart-qty-btn decrease ${item.quantity <= 1 ? 'is-min' : ''}" onclick="updateCartQty(${index}, -1)" title="تقليل الكمية" aria-label="تقليل كمية ${item.name}">
                                 <i class="fas fa-minus"></i>
                             </button>
                             <span class="cart-qty">${item.quantity}</span>
