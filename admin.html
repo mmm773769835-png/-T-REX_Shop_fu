@@ -197,6 +197,95 @@
             min-height: 100px;
             resize: vertical;
         }
+        .product-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .product-option-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 78px;
+            padding: 14px 52px 14px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.25);
+            background: rgba(255,255,255,0.035);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .product-option-card.option-featured {
+            --option-color: #FFD700;
+        }
+        .product-option-card.option-hot {
+            --option-color: #f44336;
+        }
+        .product-option-card.option-new {
+            --option-color: #4CAF50;
+        }
+        .product-option-card.option-active {
+            --option-color: #2196F3;
+        }
+        .product-option-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,215,0,0.65);
+            background: rgba(255,215,0,0.08);
+        }
+        .product-option-card input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .option-checkmark {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            width: 26px;
+            height: 26px;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.45);
+            background: rgba(0,0,0,0.25);
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .option-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        .option-title {
+            color: #fff;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+        .option-desc {
+            color: #aaa;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            margin-top: 3px;
+        }
+        .product-option-card:has(input:checked) {
+            border-color: var(--option-color, #FFD700);
+            background: color-mix(in srgb, var(--option-color, #FFD700) 18%, transparent);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--option-color, #FFD700) 45%, transparent), 0 10px 24px rgba(0,0,0,0.25);
+        }
+        .product-option-card:has(input:checked) .option-checkmark {
+            border-color: var(--option-color, #FFD700);
+            background: var(--option-color, #FFD700);
+            color: #0a0a0a;
+        }
+        @media (max-width: 700px) {
+            .product-options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .btn-submit {
             background: linear-gradient(135deg, #FFD700, #FFA500);
             color: #0a0a0a;
@@ -388,22 +477,42 @@
                 <!-- Product Status & Featured Options -->
                 <div class="form-group">
                     <label>خيارات المنتج</label>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
-                            <input type="checkbox" id="isFeatured" style="width: 18px; height: 18px; accent-color: #FFD700;">
-                            <span>⭐ منتج مميز (يظهر في السلايدر)</span>
+                    <div class="product-options-grid">
+                        <label class="product-option-card option-featured">
+                            <input type="checkbox" id="isFeatured">
+                            <span class="option-checkmark">✓</span>
+                            <span class="option-icon">⭐</span>
+                            <span>
+                                <span class="option-title">منتج مميز</span>
+                                <span class="option-desc">يظهر في سلايدر المنتجات المميزة</span>
+                            </span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: rgba(244,67,54,0.1); border-radius: 8px; border: 1px solid rgba(244,67,54,0.3);">
-                            <input type="checkbox" id="isHot" style="width: 18px; height: 18px; accent-color: #f44336;">
-                            <span>🔥 الأكثر مبيعاً</span>
+                        <label class="product-option-card option-hot">
+                            <input type="checkbox" id="isHot">
+                            <span class="option-checkmark">✓</span>
+                            <span class="option-icon">🔥</span>
+                            <span>
+                                <span class="option-title">الأكثر مبيعاً</span>
+                                <span class="option-desc">تظهر عليه علامة الأكثر مبيعاً</span>
+                            </span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: rgba(76,175,80,0.1); border-radius: 8px; border: 1px solid rgba(76,175,80,0.3);">
-                            <input type="checkbox" id="isNew" style="width: 18px; height: 18px; accent-color: #4CAF50;">
-                            <span>🆕 منتج جديد</span>
+                        <label class="product-option-card option-new">
+                            <input type="checkbox" id="isNew">
+                            <span class="option-checkmark">✓</span>
+                            <span class="option-icon">🆕</span>
+                            <span>
+                                <span class="option-title">منتج جديد</span>
+                                <span class="option-desc">تظهر عليه علامة جديد في المنتجات</span>
+                            </span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: rgba(33,150,243,0.1); border-radius: 8px; border: 1px solid rgba(33,150,243,0.3);">
-                            <input type="checkbox" id="isActive" checked style="width: 18px; height: 18px; accent-color: #2196F3;">
-                            <span>✅ نشط (متاح للبيع)</span>
+                        <label class="product-option-card option-active">
+                            <input type="checkbox" id="isActive" checked>
+                            <span class="option-checkmark">✓</span>
+                            <span class="option-icon">✅</span>
+                            <span>
+                                <span class="option-title">نشط</span>
+                                <span class="option-desc">متاح للبيع ويظهر في المتجر</span>
+                            </span>
                         </label>
                     </div>
                 </div>
