@@ -31,10 +31,38 @@ ADD COLUMN IF NOT EXISTS is_hot BOOLEAN DEFAULT false;
 ALTER TABLE public.products
 ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS rating DECIMAL(2, 1) DEFAULT 0;
+
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0;
+
 UPDATE public.products
 SET images = jsonb_build_array(image_url)
 WHERE image_url IS NOT NULL
 AND (images IS NULL OR jsonb_array_length(images) = 0);
+
+NOTIFY pgrst, 'reload schema';
+
+CREATE TABLE IF NOT EXISTS public.product_reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+  customer_name TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  is_visible BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.product_reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Product reviews are viewable by everyone"
+ON public.product_reviews FOR SELECT
+USING (is_visible = true);
+
+CREATE POLICY "Anyone can insert product reviews"
+ON public.product_reviews FOR INSERT
+WITH CHECK (rating BETWEEN 1 AND 5);
 
 NOTIFY pgrst, 'reload schema';
 

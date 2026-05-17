@@ -1221,6 +1221,98 @@
             text-shadow: 0 2px 5px rgba(0,0,0,0.55);
             animation: heartBeat 0.5s ease;
         }
+        .reviews-section {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #333;
+        }
+        .reviews-section h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        .review-form {
+            background: rgba(255,215,0,0.06);
+            border: 1px solid rgba(255,215,0,0.22);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .review-form input,
+        .review-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .rating-picker {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .rating-picker button {
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .rating-picker button.active,
+        .rating-picker button:hover,
+        .rating-picker button:hover ~ button {
+            color: #FFD700;
+            transform: scale(1.08);
+        }
+        .review-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .review-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .review-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+            color: #fff;
+            font-weight: 800;
+        }
+        .review-date {
+            color: #888;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        .review-comment {
+            color: #ccc;
+            line-height: 1.6;
+            margin-top: 6px;
+        }
+        .reviews-empty {
+            color: #aaa;
+            text-align: center;
+            padding: 12px;
+        }
         .settings-btn {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
             border: 2px solid rgba(255,255,255,0.9) !important;
@@ -3915,6 +4007,107 @@
             return value === true || value === 'true' || value === 1 || value === '1';
         }
 
+        let selectedReviewRating = 0;
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function setReviewRating(rating) {
+            selectedReviewRating = rating;
+            document.querySelectorAll('.rating-picker button').forEach(button => {
+                button.classList.toggle('active', Number(button.dataset.rating) <= rating);
+            });
+        }
+
+        async function loadProductReviews(productId) {
+            const reviewsList = document.getElementById('productReviewsList');
+            if (!reviewsList) return;
+            reviewsList.innerHTML = '<div class="reviews-empty">جاري تحميل التقييمات...</div>';
+            const { data, error } = await supabase
+                .from('product_reviews')
+                .select('*')
+                .eq('product_id', productId)
+                .eq('is_visible', true)
+                .order('created_at', { ascending: false })
+                .limit(8);
+            if (error) {
+                reviewsList.innerHTML = '<div class="reviews-empty">لم يتم تفعيل جدول التقييمات بعد.</div>';
+                return;
+            }
+            if (!data || data.length === 0) {
+                reviewsList.innerHTML = '<div class="reviews-empty">لا توجد تقييمات بعد. كن أول من يقيّم المنتج.</div>';
+                return;
+            }
+            reviewsList.innerHTML = data.map(review => `
+                <div class="review-item">
+                    <div class="review-head">
+                        <span>${escapeHtml(review.customer_name)}</span>
+                        <span class="review-date">${new Date(review.created_at).toLocaleDateString('ar-SA')}</span>
+                    </div>
+                    <div>${renderStars(review.rating || 0)}</div>
+                    ${review.comment ? `<div class="review-comment">${escapeHtml(review.comment)}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function submitProductReview(event, productId) {
+            event.preventDefault();
+            const nameInput = document.getElementById('reviewCustomerName');
+            const commentInput = document.getElementById('reviewComment');
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const customerName = nameInput.value.trim();
+            const comment = commentInput.value.trim();
+            if (!customerName || selectedReviewRating < 1) {
+                showNotification('اكتب اسمك واختر عدد النجوم من 1 إلى 5 ⭐');
+                return;
+            }
+            submitButton.disabled = true;
+            try {
+                const { error } = await supabase.from('product_reviews').insert([{
+                    product_id: productId,
+                    customer_name: customerName,
+                    rating: selectedReviewRating,
+                    comment
+                }]);
+                if (error) throw error;
+                const { data: reviews, error: reviewError } = await supabase
+                    .from('product_reviews')
+                    .select('rating')
+                    .eq('product_id', productId)
+                    .eq('is_visible', true);
+                if (!reviewError && reviews && reviews.length) {
+                    const average = reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviews.length;
+                    await supabase
+                        .from('products')
+                        .update({ rating: Math.round(average * 10) / 10, review_count: reviews.length })
+                        .eq('id', productId);
+                    const product = allProducts.find(item => String(item.id) === String(productId));
+                    if (product) {
+                        product.rating = Math.round(average * 10) / 10;
+                        product.review_count = reviews.length;
+                        product.reviews_count = reviews.length;
+                    }
+                    renderProducts();
+                    renderFeatured(allProducts);
+                }
+                nameInput.value = '';
+                commentInput.value = '';
+                setReviewRating(0);
+                await loadProductReviews(productId);
+                showNotification('تم إضافة تقييمك بنجاح ✅');
+            } catch (error) {
+                showNotification('تعذر حفظ التقييم. تأكد من تشغيل كود جدول التقييمات في Supabase ❌');
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
         function openQuickView(product) {
             const modal = document.getElementById('productModal');
             const modalContent = modal.querySelector('.modal-content');
@@ -4040,6 +4233,20 @@
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
+                    <div class="reviews-section">
+                        <h3>⭐ تقييمات العملاء</h3>
+                        <form class="review-form" onsubmit="submitProductReview(event, '${product.id}')">
+                            <input type="text" id="reviewCustomerName" maxlength="50" required placeholder="اسمك">
+                            <div class="rating-picker" aria-label="اختر التقييم">
+                                ${[5, 4, 3, 2, 1].map(rating => `<button type="button" data-rating="${rating}" onclick="setReviewRating(${rating})">★</button>`).join('')}
+                            </div>
+                            <textarea id="reviewComment" rows="3" maxlength="300" placeholder="اكتب رأيك في المنتج (اختياري)"></textarea>
+                            <button class="review-submit" type="submit">إرسال التقييم</button>
+                        </form>
+                        <div class="reviews-list" id="productReviewsList">
+                            <div class="reviews-empty">جاري تحميل التقييمات...</div>
+                        </div>
+                    </div>
                 </div>
             `;
             
@@ -4057,6 +4264,8 @@
             };
 
             modal.classList.add('show');
+            selectedReviewRating = 0;
+            loadProductReviews(product.id);
         }
 
         function changeProductImage(imageSrc, index) {
