@@ -31,6 +31,13 @@ ADD COLUMN IF NOT EXISTS is_hot BOOLEAN DEFAULT false;
 ALTER TABLE public.products
 ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
+UPDATE public.products
+SET images = jsonb_build_array(image_url)
+WHERE image_url IS NOT NULL
+AND (images IS NULL OR jsonb_array_length(images) = 0);
+
+NOTIFY pgrst, 'reload schema';
+
 -- إنشاء Bucket للصور في Storage
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('product-images', 'product-images', true)

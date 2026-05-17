@@ -785,31 +785,14 @@
                 
                 if (!editingProductId) productData.created_at = new Date().toISOString();
                 let result;
-                const optionalColumns = ['images', 'is_featured', 'is_hot'];
-                const missingOptionalColumns = [];
                 const saveProduct = async () => editingProductId
                     ? await supabase.from('products').update(productData).eq('id', editingProductId)
                     : await supabase.from('products').insert([productData]);
-                for (let attempt = 0; attempt <= optionalColumns.length; attempt++) {
-                    result = await saveProduct();
-                    if (!result.error || !result.error.message || !result.error.message.includes('schema cache')) break;
-                    const missingColumn = optionalColumns.find(column => result.error.message.includes(`'${column}'`));
-                    if (!missingColumn) break;
-                    missingOptionalColumns.push(missingColumn);
-                    delete productData[missingColumn];
-                }
+                result = await saveProduct();
                 
                 if (result.error) throw result.error;
                 
-                const missingColumnLabels = {
-                    images: 'الصور المتعددة',
-                    is_featured: 'منتج مميز',
-                    is_hot: 'الأكثر مبيعاً'
-                };
-                const warningMessage = missingOptionalColumns.length
-                    ? `<div class="error-message show">⚠️ تم حفظ المنتج، لكن لم تُحفظ: ${missingOptionalColumns.map(column => missingColumnLabels[column]).join('، ')}. يجب إضافة الأعمدة في Supabase.</div>`
-                    : '';
-                messageDiv.innerHTML = `<div class="success-message">✅ تم ${editingProductId ? 'تحديث' : 'إضافة'} المنتج بنجاح!</div>${warningMessage}`;
+                messageDiv.innerHTML = `<div class="success-message">✅ تم ${editingProductId ? 'تحديث' : 'إضافة'} المنتج بنجاح!</div>`;
                 resetForm();
                 loadProducts();
                 loadStats();
@@ -817,7 +800,10 @@
                 setTimeout(() => messageDiv.innerHTML = '', 3000);
                 
             } catch (error) {
-                messageDiv.innerHTML = `<div class="error-message show">❌ خطأ: ${error.message}</div>`;
+                const schemaHelp = error.message && error.message.includes('schema cache')
+                    ? `<div class="error-message show">❌ قاعدة البيانات ناقص فيها أعمدة الصور والمميزات. افتح Supabase SQL Editor وشغّل أوامر ALTER TABLE الموجودة في ملف create-products-table.sql ثم أعد حفظ المنتج.</div>`
+                    : '';
+                messageDiv.innerHTML = `<div class="error-message show">❌ خطأ: ${error.message}</div>${schemaHelp}`;
             } finally {
                 submitBtn.disabled = false;
             }
