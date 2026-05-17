@@ -3911,6 +3911,10 @@
             return uniqueImages.length ? uniqueImages : [NO_IMAGE];
         }
 
+        function isEnabled(value) {
+            return value === true || value === 'true' || value === 1 || value === '1';
+        }
+
         function openQuickView(product) {
             const modal = document.getElementById('productModal');
             const modalContent = modal.querySelector('.modal-content');
@@ -4199,8 +4203,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 return `
                     <div class="product-card" itemscope itemtype="https://schema.org/Product" data-product-id="${productId}">
                         ${schemaScript}
-                        ${product.is_new ? '<span class="product-badge new">جديد</span>' : ''}
-                        ${product.is_hot ? '<span class="product-badge hot">الأكثر مبيعاً</span>' : ''}
+                        ${isEnabled(product.is_new) ? '<span class="product-badge new">جديد</span>' : ''}
+                        ${isEnabled(product.is_hot) ? '<span class="product-badge hot">الأكثر مبيعاً</span>' : ''}
                         ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
 
                         <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" 
@@ -4263,7 +4267,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // Render Featured Carousel
         function renderFeatured(products) {
             const container = document.getElementById('featuredContainer');
-            const featured = products.filter(p => p.is_featured === true || p.is_featured === 'true' || p.is_featured === 1 || p.is_featured === '1').slice(0, 8);
+            const featured = products.filter(p => isEnabled(p.is_featured)).slice(0, 8);
             
             if (featured.length === 0) {
                 container.innerHTML = '';
