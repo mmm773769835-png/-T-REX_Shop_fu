@@ -674,15 +674,18 @@
                     productData.images = imageUrls;
                 }
                 
+                if (!editingProductId) productData.created_at = new Date().toISOString();
                 let result;
-                if (editingProductId) {
-                    result = await supabase
-                        .from('products')
-                        .update(productData)
-                        .eq('id', editingProductId);
-                } else {
-                    productData.created_at = new Date().toISOString();
-                    result = await supabase.from('products').insert([productData]);
+                const optionalColumns = ['images', 'is_featured', 'is_hot'];
+                const saveProduct = async () => editingProductId
+                    ? await supabase.from('products').update(productData).eq('id', editingProductId)
+                    : await supabase.from('products').insert([productData]);
+                for (let attempt = 0; attempt <= optionalColumns.length; attempt++) {
+                    result = await saveProduct();
+                    if (!result.error || !result.error.message || !result.error.message.includes('schema cache')) break;
+                    const missingColumn = optionalColumns.find(column => result.error.message.includes(`'${column}'`));
+                    if (!missingColumn) break;
+                    delete productData[missingColumn];
                 }
                 
                 if (result.error) throw result.error;
