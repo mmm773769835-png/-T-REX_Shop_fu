@@ -2871,7 +2871,7 @@
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)" oninput="searchProductsDropdown()" onfocus="showSearchDropdown()">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)" oninput="searchProductsDropdown()" onfocus="showSearchDropdown()" onkeydown="if(event.key === 'Enter') searchProducts()">
             <button class="search-btn" onclick="searchProducts()">
                 <i class="fas fa-search"></i> بحث
             </button>
@@ -3853,20 +3853,21 @@
 
         // Search Functionality
         function searchProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const query = normalizeSearchText(document.getElementById('searchInput').value);
+            const dropdown = document.getElementById('searchDropdown');
             if (!query) {
                 filteredProducts = [...allProducts];
             } else {
                 filteredProducts = allProducts.filter(product =>
-                    product.name.toLowerCase().includes(query) ||
-                    (product.description && product.description.toLowerCase().includes(query)) ||
-                    (product.category && product.category.toLowerCase().includes(query))
+                    getSearchableText(product).includes(query)
                 );
             }
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
             renderProducts();
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
-        document.getElementById('searchInput').addEventListener('input', searchProducts);
 
         // Search Dropdown Functions
         function showSearchDropdown() {
