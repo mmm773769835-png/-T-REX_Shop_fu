@@ -958,13 +958,15 @@
             max-width: 1400px;
             margin: 20px auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 50;
         }
         .search-box {
             display: flex;
             background: var(--card);
             border: 1px solid #333;
             border-radius: 50px;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .search-input {
@@ -986,6 +988,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: opacity 0.3s;
+            border-radius: 50px 0 0 50px;
         }
         .search-btn:hover { opacity: 0.9; }
         
