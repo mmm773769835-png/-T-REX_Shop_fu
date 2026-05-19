@@ -1962,25 +1962,36 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
         .share-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            min-width: 92px;
+            height: 42px;
+            padding: 0 12px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
+            font-weight: 800;
             color: white;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .share-btn:hover {
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
         }
         .share-whatsapp { background: #25D366; }
         .share-facebook { background: #1877F2; }
         .share-twitter { background: #1DA1F2; }
         .share-telegram { background: #0088cc; }
-        .share-copy { background: #666; }
+        .share-copy {
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: #111;
+        }
         .product-share-action {
             width: 100%;
             margin-top: 10px;
@@ -4285,16 +4296,16 @@
                         <h4><i class="fas fa-share-alt"></i> مشاركة المنتج</h4>
                         <div class="social-share">
                             <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
-                                <i class="fab fa-whatsapp"></i>
+                                <i class="fab fa-whatsapp"></i><span>واتساب</span>
                             </button>
                             <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
-                                <i class="fab fa-facebook-f"></i>
+                                <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                             </button>
                             <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
-                                <i class="fab fa-telegram-plane"></i>
+                                <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                             </button>
                             <button class="share-btn share-copy" onclick="copyProductLink('https://trexshopmax.com/?product=${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
-                                <i class="fas fa-link"></i>
+                                <i class="fas fa-copy"></i><span>نسخ الرابط</span>
                             </button>
                         </div>
                     </div>
