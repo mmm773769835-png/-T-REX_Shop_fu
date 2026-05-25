@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Linking } from 'react-native';
 import { authService } from '../services/SupabaseService';
 
 // Define types
@@ -25,6 +26,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const handleAuthCallback = async (url: string | null) => {
+      if (!url || !url.startsWith('trexshop://auth/callback')) {
+        return;
+      }
+
+      setLoading(true);
+      const { error } = await authService.exchangeCodeForSession(url);
+      if (error) {
+        console.error('[DEBUG] AuthContext: Failed to exchange auth code', error);
+        setLoading(false);
+      }
+    };
+
+    Linking.getInitialURL().then(handleAuthCallback).catch(() => setLoading(false));
+    const linkingSubscription = Linking.addEventListener('url', ({ url }) => {
+      handleAuthCallback(url);
+    });
+
+    authService.getCurrentSession().then(({ session }) => {
+      if (session?.user) {
+        const metadata = session.user.user_metadata || {};
+        setUser({
+          uid: session.user.id,
+          email: session.user.email || null,
+          displayName: metadata.full_name || metadata.name || metadata.displayName || null,
+          phoneNumber: session.user.phone || metadata.phone || null,
+          photoURL: metadata.avatar_url || metadata.picture || metadata.photo_url || metadata.photoURL || null,
+        });
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
+
     // Listen for auth state changes
     console.log('[DEBUG] AuthContext: Setting up auth state listener');
     const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
@@ -48,6 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Cleanup subscription on unmount
     return () => {
+      linkingSubscription.remove();
       subscription.unsubscribe();
     };
   }, []);

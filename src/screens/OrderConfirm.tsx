@@ -23,6 +23,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const finalTotal = total;
 
   const styles = getStyles(isDarkMode, colors);
 
@@ -127,8 +128,12 @@ const OrderConfirm = ({ route, navigation }: any) => {
       }
       
       message += language === "ar"
-        ? `\n💰 الإجمالي: ${total.toFixed(2)} ر.ي\n`
-        : `\n💰 Total: ${total.toFixed(2)} SAR\n`;
+        ? `\n🚚 الشحن: حسب المسافة ويتم الاتفاق عليه عبر واتساب\n`
+        : `\n🚚 Shipping: Based on distance and confirmed via WhatsApp\n`;
+
+      message += language === "ar"
+        ? `💰 الإجمالي: ${finalTotal.toFixed(2)} ر.ي\n`
+        : `💰 Total: ${finalTotal.toFixed(2)} YER\n`;
       
       // إضافة التاريخ والوقت
       const now = new Date();
@@ -320,7 +325,10 @@ const OrderConfirm = ({ route, navigation }: any) => {
         paymentMethod,
         receiptUrl: receiptUrl || "",
         items: cleanedItems,
-        total: total,
+        subtotal: total,
+        shippingFee: null,
+        shippingMethod: "distance_whatsapp_negotiation",
+        total: finalTotal,
         createdAt: new Date().toISOString(),
       };
 
@@ -421,12 +429,14 @@ const OrderConfirm = ({ route, navigation }: any) => {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>{language === "ar" ? "الشحن" : "Shipping"}</Text>
-            <Text style={styles.freeText}>{language === "ar" ? "مجاني" : "Free"}</Text>
+            <Text style={styles.summaryValue}>
+              {language === "ar" ? "حسب المسافة عبر واتساب" : "By distance via WhatsApp"}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>{language === "ar" ? "الإجمالي" : "Total"}</Text>
-            <Text style={styles.totalAmount}>{total.toLocaleString()} {language === "ar" ? "ر.ي" : "YER"}</Text>
+            <Text style={styles.totalAmount}>{finalTotal.toLocaleString()} {language === "ar" ? "ر.ي" : "YER"}</Text>
           </View>
         </View>
       </View>

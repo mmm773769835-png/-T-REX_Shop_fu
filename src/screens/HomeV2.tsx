@@ -79,6 +79,25 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
   const { state: filterState } = useAdvancedFilters();
+  const searchDropdownResults = useMemo(() => {
+    const normalizedSearch = normalizeText(searchQuery);
+    if (!normalizedSearch) {
+      return [];
+    }
+
+    return products
+      .filter(product =>
+        normalizeText([
+          product.name,
+          product.description,
+          product.category,
+          product.attribute,
+          product.currency,
+          product.price,
+        ].filter(Boolean).join(' ')).includes(normalizedSearch)
+      )
+      .slice(0, 8);
+  }, [products, searchQuery]);
 
   // التحقق من دور المشرف عند تحميل الشاشة
   useEffect(() => {
@@ -440,6 +459,51 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
           </TouchableOpacity>
         ) : null}
       </View>
+      {!!searchQuery.trim() && (
+        <View style={styles.searchDropdown}>
+          {searchDropdownResults.length === 0 ? (
+            <Text style={styles.searchDropdownEmpty}>
+              {language === "ar" ? "لا توجد نتائج للبحث" : "No search results"}
+            </Text>
+          ) : (
+            <>
+              {searchDropdownResults.map(product => (
+                <TouchableOpacity
+                  key={product.id}
+                  style={styles.searchDropdownItem}
+                  onPress={() => {
+                    setSearchQuery(product.name);
+                    navigation.navigate('ProductDetails', { product });
+                  }}
+                >
+                  <Image
+                    source={{ uri: (product.images && product.images.length > 0) ? product.images[0] : product.imageUrl }}
+                    style={styles.searchDropdownImage}
+                  />
+                  <View style={styles.searchDropdownInfo}>
+                    <Text style={styles.searchDropdownName} numberOfLines={1}>{product.name}</Text>
+                    <Text style={styles.searchDropdownPrice}>
+                      {product.price.toLocaleString()} {product.currency === 'SAR' ? 'ر.س' : product.currency === 'USD' ? '$' : 'ر.ي'}
+                    </Text>
+                    {!!product.category && (
+                      <Text style={styles.searchDropdownCategory} numberOfLines={1}>{product.category}</Text>
+                    )}
+                  </View>
+                  <Ionicons name="arrow-back" size={18} color="#FFD700" />
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                style={styles.searchDropdownFooter}
+                onPress={() => navigation.navigate('Search')}
+              >
+                <Text style={styles.searchDropdownFooterText}>
+                  {language === "ar" ? "عرض كل النتائج المشابهة" : "Show all similar results"}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      )}
     </View>
   );
 
@@ -643,6 +707,61 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     paddingVertical: 0,
+  },
+  searchDropdown: {
+    marginTop: 8,
+    backgroundColor: "#202020",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#333",
+    overflow: "hidden",
+  },
+  searchDropdownEmpty: {
+    color: "#888",
+    padding: 14,
+    textAlign: "center",
+  },
+  searchDropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  searchDropdownImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    marginRight: 10,
+    backgroundColor: "#111",
+  },
+  searchDropdownInfo: {
+    flex: 1,
+  },
+  searchDropdownName: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  searchDropdownPrice: {
+    color: "#FFD700",
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  searchDropdownCategory: {
+    color: "#aaa",
+    fontSize: 11,
+    marginTop: 2,
+  },
+  searchDropdownFooter: {
+    padding: 12,
+    alignItems: "center",
+  },
+  searchDropdownFooterText: {
+    color: "#FFD700",
+    fontSize: 13,
+    fontWeight: "800",
   },
   categoriesContainer: {
     height: 52,

@@ -165,7 +165,7 @@ const CartScreen = ({ route, navigation }: any) => {
                 {language === "ar" ? "الشحن" : "Shipping"}
               </Text>
               <Text style={styles.shippingFree}>
-                {language === "ar" ? "مجاني" : "Free"}
+                {language === "ar" ? "حسب المسافة عبر واتساب" : "By distance via WhatsApp"}
               </Text>
             </View>
             <View style={styles.divider} />

@@ -125,6 +125,7 @@ export default function LoginScreen({ navigation }: any) {
         setLoading(false);
       } else if (data?.url) {
         await Linking.openURL(data.url);
+        setLoading(false);
       }
     } catch (error) {
       Alert.alert(

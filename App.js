@@ -16,8 +16,6 @@ import { useAuth } from './src/contexts/AuthContext';
 // Initialize Firebase early to prevent "No Firebase App '[DEFAULT]' has been created" error
 // Firebase will be initialized in FirebaseAuthService.js only
 // import './src/init/firebaseInit';
-// Import AutoUpdateService for automatic updates
-import AutoUpdateService from './src/services/AutoUpdateService';
 // Import ErrorBoundary for error handling
 import ErrorBoundary from './src/components/ErrorBoundary';
 // Import ToastProvider for notifications
