@@ -3,13 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Plat
 import * as ImagePicker from "expo-image-picker";
 import { getDefaultUserImage } from "../utils/imageUtils";
 import { LanguageContext } from '../contexts/LanguageContext';
+import { useAuth } from "../contexts/AuthContext";
 import { dbService, storageService } from '../services/SupabaseService';
 
 const EditProfile = ({ navigation, route }: any) => {
   const { language } = useContext(LanguageContext);
+  const { user } = useAuth();
   const [name, setName] = useState(route.params?.name || "");
   const [phone, setPhone] = useState(route.params?.phone || "");
-  const [image, setImage] = useState(route.params?.photoURL || null);
+  const [image, setImage] = useState(route.params?.photoURL || route.params?.profileImage || null);
   const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
@@ -42,7 +44,7 @@ const EditProfile = ({ navigation, route }: any) => {
         const blob = await response.blob();
 
         // رفع الصورة إلى Supabase Storage
-        const filename = `profiles/${phone}.jpg`;
+        const filename = `profiles/${user?.uid || phone}.jpg`;
         const { data, error } = await storageService.upload('profile-images', filename, blob);
 
         if (error) {
@@ -52,8 +54,20 @@ const EditProfile = ({ navigation, route }: any) => {
         photoURL = storageService.getPublicUrl('profile-images', filename);
       }
 
+      if (!user?.uid) {
+        throw new Error('Missing user id');
+      }
+
       // حفظ بيانات المستخدم في Supabase
-      const { error } = await dbService.add('users', { name, phone, photo_url: photoURL });
+      const { error } = await dbService.upsert('users', {
+        id: user.uid,
+        name,
+        email: user.email,
+        phone,
+        photo_url: photoURL || getDefaultUserImage(),
+        role: 'customer',
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) {
         throw error;

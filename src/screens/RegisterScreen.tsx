@@ -13,7 +13,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { Ionicons } from "@expo/vector-icons";
-import { authService, storageService } from '../services/SupabaseService';
+import { authService, dbService, storageService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { getDefaultUserImage } from '../utils/imageUtils';
@@ -194,11 +194,13 @@ export default function RegisterScreen({ navigation }: any) {
         name: name.trim(),
         phone: phone.trim() || "",
         photoURL: photoURL,
+        photo_url: photoURL,
         displayName: name.trim(),
+        full_name: name.trim(),
         createdAt: new Date().toISOString(),
       };
 
-      const { data, error } = await authService.signUp(email, password);
+      const { data, error } = await authService.signUp(email.trim(), password, additionalData);
       if (error) {
         // عرض رسالة خطأ واضحة
         let errorMessage = error.message;
@@ -223,6 +225,17 @@ export default function RegisterScreen({ navigation }: any) {
           ]
         );
       } else {
+        if (data?.user?.id) {
+          await dbService.upsert('users', {
+            id: data.user.id,
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone.trim() || "",
+            photo_url: photoURL,
+            role: 'customer',
+            created_at: new Date().toISOString(),
+          });
+        }
         Alert.alert(
           language === "ar" ? "نجاح" : "Success",
           language === "ar" ? "تم إنشاء الحساب بنجاح" : "Account created successfully",

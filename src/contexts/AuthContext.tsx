@@ -30,11 +30,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
       console.log('[DEBUG] AuthContext: Auth state changed', event, session);
       if (session?.user) {
+        const metadata = session.user.user_metadata || {};
         setUser({
           uid: session.user.id,
           email: session.user.email || null,
-          displayName: session.user.user_metadata?.full_name || null,
-          phoneNumber: session.user.phone || null,
+          displayName: metadata.full_name || metadata.name || metadata.displayName || null,
+          phoneNumber: session.user.phone || metadata.phone || null,
+          photoURL: metadata.avatar_url || metadata.picture || metadata.photo_url || metadata.photoURL || null,
           // Add any other user properties you want to track
         });
       } else {

@@ -28,10 +28,13 @@ export default supabase;
 // Authentication functions
 export const authService = {
   // Sign up with email and password
-  signUp: async (email: string, password: string) => {
+  signUp: async (email: string, password: string, userData: any = {}) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: userData,
+      },
     });
     return { data, error };
   },
@@ -75,6 +78,16 @@ export const authService = {
         }
       }
     });
+    return { data, error };
+  },
+
+  exchangeCodeForSession: async (url: string) => {
+    const parsedUrl = new URL(url);
+    const code = parsedUrl.searchParams.get('code');
+    if (!code) {
+      return { data: null, error: new Error('Missing auth code') };
+    }
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     return { data, error };
   },
 
@@ -166,6 +179,11 @@ export const dbService = {
     return { data: result, error };
   },
 
+  upsert: async (table: string, data: any, onConflict = 'id') => {
+    const { data: result, error } = await supabase.from(table).upsert(data, { onConflict }).select();
+    return { data: result, error };
+  },
+
   // Update data in a table
   update: async (table: string, id: string, data: any) => {
     const { data: result, error } = await supabase.from(table).update(data).eq('id', id).select();
@@ -191,7 +209,7 @@ export const dbService = {
 export const storageService = {
   // Upload file
   upload: async (bucket: string, path: string, file: any) => {
-    const { data, error } = await supabase.storage.from(bucket).upload(path, file);
+    const { data, error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
     return { data, error };
   },
 

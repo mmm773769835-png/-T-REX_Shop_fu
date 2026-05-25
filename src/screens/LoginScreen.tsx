@@ -10,7 +10,6 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as SecureStore from 'expo-secure-store';
 import { authService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -79,13 +78,39 @@ export default function LoginScreen({ navigation }: any) {
 
   // مراقبة التغييرات في حالة المصادقة (للعودة بعد Google)
   useEffect(() => {
+    const handleAuthCallback = async (url: string) => {
+      if (!url.startsWith('trexshop://auth/callback')) {
+        return;
+      }
+      const { error } = await authService.exchangeCodeForSession(url);
+      if (error) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          error.message || (language === "ar" ? "فشل إكمال تسجيل الدخول عبر Google" : "Failed to complete Google Sign-In")
+        );
+        return;
+      }
+      navigation.navigate("MainTabs", { loggedIn: true, admin: false });
+    };
+
+    Linking.getInitialURL().then((url) => {
+      if (url) handleAuthCallback(url);
+    });
+
+    const linkingSubscription = Linking.addEventListener('url', ({ url }) => {
+      handleAuthCallback(url);
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigation.navigate("MainTabs", { loggedIn: true, admin: false });
       }
     });
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      linkingSubscription.remove();
+      subscription.unsubscribe();
+    };
+  }, [language, navigation]);
 
   // Google Sign-In
   const handleGoogleSignIn = async () => {
