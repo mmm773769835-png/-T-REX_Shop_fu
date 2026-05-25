@@ -22,6 +22,7 @@ import { useCart } from "../contexts/CartContext";
 import { CATEGORIES_WITH_ICONS } from "../shared/constants/productConstants";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { LanguageContext } from '../contexts/LanguageContext';
+import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
 
 const { width } = Dimensions.get("window");
 
@@ -49,6 +50,10 @@ interface Product {
   currency?: string;
   discount?: number;
   originalPrice?: number;
+  old_price?: number;
+  is_new?: boolean;
+  stock?: number;
+  attribute?: string;
 }
 
 interface RouteParams {
@@ -73,6 +78,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [slideAnim] = useState(new Animated.Value(width));
   const [userImage, setUserImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
+  const { state: filterState } = useAdvancedFilters();
 
   // التحقق من دور المشرف عند تحميل الشاشة
   useEffect(() => {
@@ -206,7 +212,11 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 paymentMethod: item.payment_method || item.paymentMethod || "cash",
                 currency: item.currency || "YER",
                 discount: item.discount || 0,
-                originalPrice: item.original_price || item.originalPrice || null
+                originalPrice: item.original_price || item.old_price || item.originalPrice || null,
+                old_price: item.old_price || item.original_price || null,
+                is_new: item.is_new || false,
+                stock: item.stock ?? item.quantity ?? null,
+                attribute: item.attribute || item.status || ""
               });
             } else {
               console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", item.id, item);
@@ -340,19 +350,50 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
 
   // تصفية المنتجات حسب القسم والبحث
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    const normalizedSearch = normalizeText(searchQuery);
+    const filters = filterState.filters;
+    const categoryFilterSet = new Set(filters.categories.map(category => normalizeText(category)));
+
+    const filtered = products.filter(product => {
       // تصفية حسب القسم
       const categoryMatch = selectedCategory === (language === "ar" ? "جميع المنتجات" : "All Products") ||
                            (product.category && product.category === selectedCategory);
       
       // تصفية حسب البحث
       const searchMatch = !searchQuery || 
-                         normalizeText(product.name).includes(normalizeText(searchQuery)) ||
-                         normalizeText(product.description).includes(normalizeText(searchQuery));
+                         normalizeText([
+                           product.name,
+                           product.description,
+                           product.category,
+                           product.attribute,
+                           product.currency,
+                           product.price,
+                         ].filter(Boolean).join(' ')).includes(normalizedSearch);
+
+      const priceMatch = product.price >= filters.priceRange.min && product.price <= filters.priceRange.max;
+      const advancedCategoryMatch = !filters.categories.length || categoryFilterSet.has(normalizeText(product.category || ""));
+      const stockValue = product.stock;
+      const stockMatch = !filters.inStock || stockValue === undefined || stockValue === null || Number(stockValue) > 0;
       
-      return categoryMatch && searchMatch;
+      return categoryMatch && searchMatch && priceMatch && advancedCategoryMatch && stockMatch;
     });
-  }, [products, selectedCategory, searchQuery]);
+
+    return [...filtered].sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'rating-desc':
+          return 0;
+        case 'newest':
+        default:
+          return 0;
+      }
+    });
+  }, [products, selectedCategory, searchQuery, filterState.filters, language]);
 
   // 🎨 عرض الشريط العلوي
   const renderHeader = () => (
@@ -483,9 +524,20 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
         <Text style={[styles.sectionTitle, { color: isDarkMode ? "#FFD700" : "#1a1a1a" }]}>
           {language === "ar" ? "🛍️ المنتجات" : "🛍️ Products"}
         </Text>
-        <Text style={[styles.sectionCount, { color: isDarkMode ? "#888" : "#888" }]}>
-          {filteredProducts.length} {language === "ar" ? "منتج" : "items"}
-        </Text>
+        <View style={styles.sectionActions}>
+          <TouchableOpacity
+            style={[styles.filterButton, filterState.isFilterApplied && styles.activeFilterButton]}
+            onPress={() => navigation.navigate('Filters')}
+          >
+            <Ionicons name="options-outline" size={16} color={filterState.isFilterApplied ? "#111" : "#FFD700"} />
+            <Text style={[styles.filterButtonText, filterState.isFilterApplied && styles.activeFilterButtonText]}>
+              {language === "ar" ? "فلتر" : "Filter"}
+            </Text>
+          </TouchableOpacity>
+          <Text style={[styles.sectionCount, { color: isDarkMode ? "#888" : "#888" }]}>
+            {filteredProducts.length} {language === "ar" ? "منتج" : "items"}
+          </Text>
+        </View>
       </View>
       
       <View style={styles.content}>
@@ -629,6 +681,32 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
+  },
+  sectionActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  filterButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  activeFilterButton: {
+    backgroundColor: "#FFD700",
+  },
+  filterButtonText: {
+    color: "#FFD700",
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  activeFilterButtonText: {
+    color: "#111",
   },
   sectionCount: {
     fontSize: 13,

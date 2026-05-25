@@ -27,7 +27,7 @@ interface AdvancedFiltersContextType {
   setInStock: (inStock: boolean) => void;
   setSortBy: (sortBy: FilterOptions['sortBy']) => void;
   resetFilters: () => void;
-  applyFilters: () => void;
+  applyFilters: (filtersOverride?: FilterOptions) => void;
   clearFilters: () => void;
 }
 
@@ -94,9 +94,11 @@ export const AdvancedFiltersProvider: React.FC<{ children: ReactNode }> = ({ chi
     setTempFilters(initialFilters);
   };
 
-  const applyFilters = () => {
+  const applyFilters = (filtersOverride?: FilterOptions) => {
+    const filtersToApply = filtersOverride || tempFilters;
+    setTempFilters(filtersToApply);
     setState({
-      filters: tempFilters,
+      filters: filtersToApply,
       isFilterApplied: true,
     });
   };

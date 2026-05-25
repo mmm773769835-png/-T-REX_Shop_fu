@@ -6,6 +6,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { useSearch } from '../contexts/SearchContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { dbService } from '../services/SupabaseService';
+import { sanitizeImageUrl } from '../utils/imageUtils';
 
 const normalizeText = (text: string): string =>
   text
@@ -75,8 +76,17 @@ const SearchScreen = ({ navigation }: any) => {
               price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0,
               description: item.description || "",
               imageUrl: item.image_url || item.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
+              image_url: item.image_url || item.imageUrl,
+              images: item.images || (item.image_url ? [item.image_url] : []),
               category: item.category || "غير مصنف",
-              paymentMethod: item.payment_method || item.paymentMethod || "cash"
+              currency: item.currency || "YER",
+              paymentMethod: item.payment_method || item.paymentMethod || "cash",
+              old_price: item.old_price || item.original_price || null,
+              originalPrice: item.original_price || item.old_price || null,
+              discount: item.discount || 0,
+              is_new: item.is_new || false,
+              stock: item.stock ?? item.quantity ?? null,
+              attribute: item.attribute || item.status || "",
             });
           }
         });
@@ -107,10 +117,15 @@ const SearchScreen = ({ navigation }: any) => {
       setIsSearching(true);
       const filtered = allProducts.filter((product: any) => {
         const normalizedQuery = normalizeText(debouncedSearchQuery);
-        const nameMatch = product.name ? normalizeText(product.name).includes(normalizedQuery) : false;
-        const categoryMatch = product.category ? normalizeText(product.category).includes(normalizedQuery) : false;
-        const descriptionMatch = product.description ? normalizeText(product.description).includes(normalizedQuery) : false;
-        return nameMatch || categoryMatch || descriptionMatch;
+        const searchableText = normalizeText([
+          product.name,
+          product.category,
+          product.description,
+          product.attribute,
+          product.currency,
+          product.price,
+        ].filter(Boolean).join(' '));
+        return searchableText.includes(normalizedQuery);
       });
       setFilteredProducts(filtered);
       setShowResults(true);
@@ -146,28 +161,69 @@ const SearchScreen = ({ navigation }: any) => {
     navigation.navigate('ProductDetails', { product });
   };
 
-  const renderProduct = ({ item }: { item: any }) => (
-    <TouchableOpacity 
-      style={styles.productCard}
-      onPress={() => handleProductPress(item)}
-      activeOpacity={0.8}
-    >
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-        {item.category && (
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText} numberOfLines={1}>
-              {item.category}
-            </Text>
+  const renderProduct = ({ item }: { item: any }) => {
+    const originalPrice = item.originalPrice || item.old_price;
+    const discountPercent = originalPrice && originalPrice > item.price
+      ? Math.round(((originalPrice - item.price) / originalPrice) * 100)
+      : item.discount || 0;
+    const imageUrl = sanitizeImageUrl(item.image_url || item.images?.[0] || item.imageUrl || 'https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image');
+    const stockValue = item.stock ?? item.quantity;
+
+    return (
+      <TouchableOpacity
+        style={styles.productCard}
+        onPress={() => handleProductPress(item)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUrl }} style={styles.productImage} />
+          {discountPercent > 0 && (
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountBadgeText}>-{discountPercent}%</Text>
+            </View>
+          )}
+          {item.is_new && (
+            <View style={styles.newBadge}>
+              <Text style={styles.badgeText}>{language === "ar" ? "جديد" : "New"}</Text>
+            </View>
+          )}
+          {item.category && (
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText} numberOfLines={1}>
+                {item.category}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.productInfo}>
+          <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+          {!!item.description && (
+            <Text style={styles.productDescription} numberOfLines={2}>{item.description}</Text>
+          )}
+          <View style={styles.priceRow}>
+            <Text style={styles.productPrice}>{formatPrice(item.price, (item.currency || 'YER') as any)}</Text>
+            {originalPrice && originalPrice > item.price && (
+              <Text style={styles.originalPrice}>{formatPrice(originalPrice, (item.currency || 'YER') as any)}</Text>
+            )}
           </View>
-        )}
-      </View>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
-        <Text style={styles.productPrice}>{formatPrice(item.price, (item.currency || 'YER') as any)}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+          <View style={styles.metaRow}>
+            {!!item.attribute && (
+              <View style={styles.metaBadge}>
+                <Text style={styles.metaText}>{item.attribute}</Text>
+              </View>
+            )}
+            {stockValue !== null && stockValue !== undefined && (
+              <View style={[styles.metaBadge, Number(stockValue) > 0 ? styles.stockBadge : styles.outOfStockBadge]}>
+                <Text style={styles.metaText}>
+                  {Number(stockValue) > 0 ? (language === "ar" ? "متوفر" : "In stock") : (language === "ar" ? "نفد" : "Out")}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -492,6 +548,34 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
+  discountBadge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "#ff4444",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  discountBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  newBadge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "#00c853",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
   productInfo: {
     padding: 12,
   },
@@ -501,10 +585,49 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     color: colors.text,
     marginBottom: 4,
   },
+  productDescription: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
   productPrice: {
     fontSize: 16,
     color: colors.gold,
     fontWeight: "bold",
+  },
+  originalPrice: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textDecorationLine: "line-through",
+  },
+  metaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  metaBadge: {
+    backgroundColor: colors.border,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  stockBadge: {
+    backgroundColor: "#1b5e20",
+  },
+  outOfStockBadge: {
+    backgroundColor: "#b71c1c",
+  },
+  metaText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
   },
 });
 

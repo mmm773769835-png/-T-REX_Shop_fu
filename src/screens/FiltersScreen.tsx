@@ -20,18 +20,14 @@ const FiltersScreen = ({ navigation }: any) => {
   const styles = getStyles(isDarkMode, colors);
 
   const handleApplyFilters = () => {
-    setPriceRange(tempPriceRange.min, tempPriceRange.max);
-    setMinRating(tempMinRating);
-    setInStock(tempInStock);
-    setSortBy(tempSortBy);
-    
-    tempCategories.forEach(cat => {
-      if (!state.filters.categories.includes(cat)) {
-        toggleCategory(cat);
-      }
-    });
-    
-    applyFilters();
+    const filtersToApply = {
+      priceRange: tempPriceRange,
+      minRating: tempMinRating,
+      categories: tempCategories,
+      inStock: tempInStock,
+      sortBy: tempSortBy,
+    };
+    applyFilters(filtersToApply);
     navigation.goBack();
   };
 

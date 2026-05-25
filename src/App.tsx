@@ -7,6 +7,7 @@ import { CartProvider } from './contexts/CartContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
+import { AdvancedFiltersProvider } from './contexts/AdvancedFiltersContext';
 
 const App = () => {
   return (
@@ -16,10 +17,12 @@ const App = () => {
           <ProductsProvider>
             <ThemeProvider>
               <LanguageProvider>
-                <SafeAreaView style={{ flex: 1 }}>
-                  <StatusBar barStyle="dark-content" />
-                  <AppNavigator />
-                </SafeAreaView>
+                <AdvancedFiltersProvider>
+                  <SafeAreaView style={{ flex: 1 }}>
+                    <StatusBar barStyle="dark-content" />
+                    <AppNavigator />
+                  </SafeAreaView>
+                </AdvancedFiltersProvider>
               </LanguageProvider>
             </ThemeProvider>
           </ProductsProvider>

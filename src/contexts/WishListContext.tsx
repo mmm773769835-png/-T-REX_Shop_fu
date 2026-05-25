@@ -8,8 +8,16 @@ interface Product {
   price: number;
   description: string;
   imageUrl: string;
+  image_url?: string;
+  images?: string[];
   category?: string;
   attribute?: string;
+  currency?: string;
+  old_price?: number;
+  originalPrice?: number;
+  discount?: number;
+  is_new?: boolean;
+  stock?: number;
 }
 
 interface WishListItem extends Product {
@@ -118,8 +126,16 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
             price: item.price,
             description: item.description,
             imageUrl: item.image_url,
+            image_url: item.image_url,
+            images: item.images || (item.image_url ? [item.image_url] : []),
             category: item.category,
             attribute: item.attribute,
+            currency: item.currency,
+            old_price: item.old_price,
+            originalPrice: item.original_price,
+            discount: item.discount,
+            is_new: item.is_new,
+            stock: item.stock,
             addedAt: new Date(item.added_at) || new Date(),
           });
         });
@@ -148,14 +164,23 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       // Add to Firebase
+      const productId = String(product.id);
+      const imageUrl = product.image_url || product.imageUrl || product.images?.[0] || '';
       const wishlistData: any = {
-        userId,
-        productId: product.id,
+        user_id: userId,
+        product_id: productId,
         name: product.name,
         price: product.price,
         description: product.description,
-        imageUrl: product.imageUrl,
-        addedAt: new Date(),
+        image_url: imageUrl,
+        images: product.images || (imageUrl ? [imageUrl] : []),
+        currency: product.currency || 'YER',
+        old_price: product.old_price || product.originalPrice || null,
+        original_price: product.originalPrice || product.old_price || null,
+        discount: product.discount || 0,
+        is_new: product.is_new || false,
+        stock: product.stock ?? null,
+        added_at: new Date().toISOString(),
       };
 
       // Only add optional fields if they exist
@@ -167,7 +192,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       // Add to Supabase
-      const { error } = await dbService.add('wishlists', wishlistData);
+      const { error } = await dbService.upsert('wishlists', wishlistData, 'user_id,product_id');
 
       if (error) {
         console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
@@ -175,7 +200,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       // Update local state
-      dispatch({ type: 'ADD_TO_WISHLIST', payload: product });
+      dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl } });
       console.log('✅ WishListContext: تم إضافة المنتج إلى قائمة الأمنيات');
     } catch (error) {
       console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
@@ -219,7 +244,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Check if product is in wish list
   const isInWishList = (productId: string): boolean => {
-    return state.items.some(item => item.id === productId);
+    return state.items.some(item => String(item.id) === String(productId));
   };
 
   return (
