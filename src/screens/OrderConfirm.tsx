@@ -128,8 +128,8 @@ const OrderConfirm = ({ route, navigation }: any) => {
       }
       
       message += language === "ar"
-        ? `\n🚚 الشحن: حسب المسافة ويتم الاتفاق عليه عبر واتساب\n`
-        : `\n🚚 Shipping: Based on distance and confirmed via WhatsApp\n`;
+        ? `\n🚚 الشحن: حسب المسافة\n`
+        : `\n🚚 Shipping: Based on distance\n`;
 
       message += language === "ar"
         ? `💰 الإجمالي: ${finalTotal.toFixed(2)} ر.ي\n`
@@ -327,7 +327,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
         items: cleanedItems,
         subtotal: total,
         shippingFee: null,
-        shippingMethod: "distance_whatsapp_negotiation",
+        shippingMethod: "distance_based",
         total: finalTotal,
         createdAt: new Date().toISOString(),
       };
@@ -430,7 +430,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>{language === "ar" ? "الشحن" : "Shipping"}</Text>
             <Text style={styles.summaryValue}>
-              {language === "ar" ? "حسب المسافة عبر واتساب" : "By distance via WhatsApp"}
+              {language === "ar" ? "حسب المسافة" : "By distance"}
             </Text>
           </View>
           <View style={styles.divider} />
