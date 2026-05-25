@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,6 +10,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishList } from '../contexts/WishListContext';
+import { useAuth } from '../contexts/AuthContext';
 
 // Import screens normally (without lazy loading for web compatibility)
 import HomeV2 from '../screens/HomeV2';
@@ -202,6 +204,7 @@ const MainTabs = () => {
 const AppNavigator = () => {
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
+  const { user, loading } = useAuth();
 
   // دالة لترجمة العناوين
   const getHeaderTitle = (routeName: string, defaultTitle: string) => {
@@ -236,6 +239,7 @@ const AppNavigator = () => {
     config: {
       screens: {
         MainTabs: 'home',
+        AuthCallback: 'auth/callback',
         ProductDetails: {
           path: '',
           parse: {
@@ -246,10 +250,18 @@ const AppNavigator = () => {
     },
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer linking={linking}>
       <Stack.Navigator 
-        initialRouteName="Login"
+        initialRouteName={user ? "MainTabs" : "Login"}
         screenOptions={() => ({
           headerStyle: {
             backgroundColor: colors.header,
@@ -291,9 +303,14 @@ const AppNavigator = () => {
             headerShown: true,
           })}
         />
-        <Stack.Screen 
-          name='ProductDetails' 
-          component={ProductDetailsScreen} 
+        <Stack.Screen
+          name="AuthCallback"
+          component={MainTabs}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='ProductDetails'
+          component={ProductDetailsScreen}
           options={() => ({
             title: getHeaderTitle('ProductDetails', 'Product Details'),
             headerShown: true,

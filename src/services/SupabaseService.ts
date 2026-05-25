@@ -33,6 +33,7 @@ export const authService = {
       email,
       password,
       options: {
+        emailRedirectTo: 'trexshop://auth/callback',
         data: userData,
       },
     });
@@ -72,6 +73,7 @@ export const authService = {
       provider: 'google',
       options: {
         redirectTo: 'trexshop://auth/callback',
+        skipBrowserRedirect: true,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

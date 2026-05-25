@@ -13,11 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { authService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
-import supabase from '../services/SupabaseService';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen({ navigation }: any) {
   const { language } = useContext(LanguageContext);
   const { isDarkMode, colors } = useContext(ThemeContext);
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,39 +79,10 @@ export default function LoginScreen({ navigation }: any) {
 
   // مراقبة التغييرات في حالة المصادقة (للعودة بعد Google)
   useEffect(() => {
-    const handleAuthCallback = async (url: string) => {
-      if (!url.startsWith('trexshop://auth/callback')) {
-        return;
-      }
-      const { error } = await authService.exchangeCodeForSession(url);
-      if (error) {
-        Alert.alert(
-          language === "ar" ? "خطأ" : "Error",
-          error.message || (language === "ar" ? "فشل إكمال تسجيل الدخول عبر Google" : "Failed to complete Google Sign-In")
-        );
-        return;
-      }
-      navigation.navigate("MainTabs", { loggedIn: true, admin: false });
-    };
-
-    Linking.getInitialURL().then((url) => {
-      if (url) handleAuthCallback(url);
-    });
-
-    const linkingSubscription = Linking.addEventListener('url', ({ url }) => {
-      handleAuthCallback(url);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigation.navigate("MainTabs", { loggedIn: true, admin: false });
-      }
-    });
-    return () => {
-      linkingSubscription.remove();
-      subscription.unsubscribe();
-    };
-  }, [language, navigation]);
+    if (user) {
+      navigation.replace("MainTabs", { loggedIn: true, admin: false });
+    }
+  }, [navigation, user]);
 
   // Google Sign-In
   const handleGoogleSignIn = async () => {

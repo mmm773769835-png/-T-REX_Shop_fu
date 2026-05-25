@@ -16,11 +16,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { authService, dbService, storageService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getDefaultUserImage } from '../utils/imageUtils';
 
 export default function RegisterScreen({ navigation }: any) {
   const { language } = useContext(LanguageContext);
   const { isDarkMode, colors } = useContext(ThemeContext);
+  const { setUser } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -225,17 +227,43 @@ export default function RegisterScreen({ navigation }: any) {
           ]
         );
       } else {
+        let signedUser = data?.user;
+        if (!data?.session) {
+          const { data: loginData, error: loginError } = await authService.signIn(email.trim(), password);
+          if (!loginError && loginData?.user) {
+            signedUser = loginData.user;
+          }
+        }
+
         if (data?.user?.id) {
-          await dbService.upsert('users', {
+          const { error: profileError } = await dbService.upsert('users', {
             id: data.user.id,
             name: name.trim(),
             email: email.trim(),
             phone: phone.trim() || "",
-            photo_url: photoURL,
-            role: 'customer',
+            profile_image: photoURL,
+            avatar_url: photoURL,
+            role: 'user',
             created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+          if (profileError) {
+            console.error("Profile creation error:", profileError);
+          }
+        }
+
+        if (signedUser) {
+          const metadata = signedUser.user_metadata || {};
+          setUser({
+            uid: signedUser.id,
+            email: signedUser.email || email.trim(),
+            displayName: metadata.full_name || metadata.name || name.trim(),
+            phoneNumber: signedUser.phone || phone.trim() || null,
+            photoURL,
           });
         }
+
         Alert.alert(
           language === "ar" ? "نجاح" : "Success",
           language === "ar" ? "تم إنشاء الحساب بنجاح" : "Account created successfully",
