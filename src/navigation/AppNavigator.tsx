@@ -7,6 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { useCart } from '../contexts/CartContext';
+import { useWishList } from '../contexts/WishListContext';
 
 // Import screens normally (without lazy loading for web compatibility)
 import HomeV2 from '../screens/HomeV2';
@@ -40,7 +42,11 @@ const Stack = createStackNavigator();
 const MainTabs = () => {
   const { language } = useContext(LanguageContext);
   const { isDarkMode, colors } = useContext(ThemeContext);
+  const { state: cartState } = useCart();
+  const { state: wishListState } = useWishList();
   const insets = useSafeAreaInsets();
+  const cartCount = cartState.items.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistCount = wishListState.items.length;
 
   // translate tab names
   const getTabLabel = (routeName: string) => {
@@ -131,6 +137,11 @@ const MainTabs = () => {
         tabBarActiveBackgroundColor: 'transparent',
         tabBarInactiveBackgroundColor: 'transparent',
         tabBarShowLabel: true,
+        tabBarBadgeStyle: {
+          backgroundColor: '#FFD700',
+          color: '#111',
+          fontWeight: '800',
+        },
       })}
     >
       <Tab.Screen 
@@ -162,7 +173,8 @@ const MainTabs = () => {
         component={CartScreen} 
         options={{ 
           headerShown: false,
-          tabBarLabel: language === 'ar' ? 'السلة' : 'Cart'
+          tabBarLabel: language === 'ar' ? 'السلة' : 'Cart',
+          tabBarBadge: cartCount > 0 ? cartCount : undefined
         }} 
       />
       <Tab.Screen 
@@ -170,7 +182,8 @@ const MainTabs = () => {
         component={WishlistScreen} 
         options={{ 
           headerShown: false,
-          tabBarLabel: language === 'ar' ? 'المفضلة' : 'Wishlist'
+          tabBarLabel: language === 'ar' ? 'المفضلة' : 'Wishlist',
+          tabBarBadge: wishlistCount > 0 ? wishlistCount : undefined
         }} 
       />
       <Tab.Screen 

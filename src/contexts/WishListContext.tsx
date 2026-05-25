@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useReducer, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dbService, authService } from '../services/SupabaseService';
+
+const LOCAL_WISHLIST_KEY = 'localWishlistItems';
 
 // Define types
 interface Product {
@@ -88,6 +91,18 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Get current user
   useEffect(() => {
+    const saveLocalWishList = async () => {
+      try {
+        await AsyncStorage.setItem(LOCAL_WISHLIST_KEY, JSON.stringify(state.items));
+      } catch (error) {
+        console.error('❌ WishListContext: خطأ في حفظ المفضلة محلياً:', error);
+      }
+    };
+
+    saveLocalWishList();
+  }, [state.items]);
+
+  useEffect(() => {
     const checkUser = async () => {
       const { user } = await authService.getCurrentUser();
       if (user) {
@@ -95,12 +110,34 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
         loadWishList(user.id);
       } else {
         setUserId(null);
-        dispatch({ type: 'SET_WISHLIST', payload: [] });
+        loadLocalWishList();
       }
     };
 
     checkUser();
+    const { data: { subscription } } = authService.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUserId(session.user.id);
+        loadWishList(session.user.id);
+      } else {
+        setUserId(null);
+        loadLocalWishList();
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const loadLocalWishList = async () => {
+    try {
+      const storedItems = await AsyncStorage.getItem(LOCAL_WISHLIST_KEY);
+      const items = storedItems ? JSON.parse(storedItems) : [];
+      dispatch({ type: 'SET_WISHLIST', payload: Array.isArray(items) ? items : [] });
+    } catch (error) {
+      console.error('❌ WishListContext: خطأ في تحميل المفضلة المحلية:', error);
+      dispatch({ type: 'SET_WISHLIST', payload: [] });
+    }
+  };
 
   // Load wish list from Supabase
   const loadWishList = async (uid?: string) => {
@@ -151,21 +188,25 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Add product to wish list
   const addToWishList = async (product: Product) => {
+    const productId = String(product.id);
+    const imageUrl = product.image_url || product.imageUrl || product.images?.[0] || '';
+
     if (!userId) {
       console.warn('⚠️ WishListContext: المستخدم غير مسجل الدخول');
+      if (!state.items.some(item => String(item.id) === productId)) {
+        dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl } });
+      }
       return;
     }
 
     try {
       // Check if already in wish list
-      if (state.items.some(item => item.id === product.id)) {
+      if (state.items.some(item => String(item.id) === String(product.id))) {
         console.log('ℹ️ WishListContext: المنتج موجود بالفعل في قائمة الأمنيات');
         return;
       }
 
-      // Add to Firebase
-      const productId = String(product.id);
-      const imageUrl = product.image_url || product.imageUrl || product.images?.[0] || '';
+      // Add to Supabase
       const wishlistData: any = {
         user_id: userId,
         product_id: productId,
@@ -191,8 +232,12 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
         wishlistData.attribute = product.attribute;
       }
 
-      // Add to Supabase
-      const { error } = await dbService.upsert('wishlists', wishlistData, 'user_id,product_id');
+      const { data: existingItems } = await dbService.get('wishlists', {
+        eq: { user_id: userId, product_id: productId }
+      });
+      const { error } = existingItems && existingItems.length > 0
+        ? await dbService.update('wishlists', existingItems[0].id, wishlistData)
+        : await dbService.add('wishlists', wishlistData);
 
       if (error) {
         console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
@@ -211,6 +256,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
   const removeFromWishList = async (productId: string) => {
     if (!userId) {
       console.warn('⚠️ WishListContext: المستخدم غير مسجل الدخول');
+      dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: productId });
       return;
     }
 

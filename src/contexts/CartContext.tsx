@@ -7,10 +7,18 @@ interface Product {
   price: number;
   description: string;
   imageUrl: string;
+  image_url?: string;
+  images?: string[];
   category?: string;
   attribute?: string;
   paymentMethod?: string;
   quantity?: number;
+  currency?: string;
+  old_price?: number;
+  originalPrice?: number;
+  discount?: number;
+  is_new?: boolean;
+  stock?: number;
 }
 
 interface CartItem extends Product {
@@ -38,12 +46,13 @@ const initialState: CartState = {
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_TO_CART':
-      const existingItem = state.items.find(item => item.id === action.payload.id);
+      const productId = String(action.payload.id);
+      const existingItem = state.items.find(item => String(item.id) === productId);
       
       if (existingItem) {
         // Update quantity if item already exists
         const updatedItems = state.items.map(item =>
-          item.id === action.payload.id
+          String(item.id) === productId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -57,6 +66,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         // Add new item
         const newItem: CartItem = {
           ...action.payload,
+          id: productId,
           quantity: 1,
         };
         
@@ -70,7 +80,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       }
       
     case 'REMOVE_FROM_CART':
-      const filteredItems = state.items.filter(item => item.id !== action.payload);
+      const filteredItems = state.items.filter(item => String(item.id) !== String(action.payload));
       
       return {
         ...state,
@@ -80,7 +90,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       
     case 'UPDATE_QUANTITY':
       const updatedItems = state.items.map(item =>
-        item.id === action.payload.id
+        String(item.id) === String(action.payload.id)
           ? { ...item, quantity: Math.max(1, action.payload.quantity) }
           : item
       );

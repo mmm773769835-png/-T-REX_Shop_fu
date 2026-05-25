@@ -20,8 +20,8 @@ interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   convertPrice: (price: number, targetCurrency?: Currency) => number;
-  formatPrice: (price: number, targetCurrency?: Currency) => string;
-  getCurrencySymbol: (targetCurrency?: Currency) => string;
+  formatPrice: (price: number | string, targetCurrency?: Currency | string | null) => string;
+  getCurrencySymbol: (targetCurrency?: Currency | string | null) => string;
 }
 
 export const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -56,24 +56,28 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveCurrency();
   }, [currency]);
 
+  const normalizeCurrency = (targetCurrency?: Currency | string | null): Currency => {
+    const normalized = String(targetCurrency || currency || 'YER').toUpperCase() as Currency;
+    return CURRENCY_RATES.some(r => r.code === normalized) ? normalized : 'YER';
+  };
+
   const convertPrice = (price: number, targetCurrency?: Currency): number => {
-    const target = targetCurrency || currency;
+    const target = normalizeCurrency(targetCurrency);
     const currencyRate = CURRENCY_RATES.find(r => r.code === target);
     if (!currencyRate) return price;
     return price * currencyRate.rate;
   };
 
-  const formatPrice = (price: number, targetCurrency?: Currency): string => {
-    const target = targetCurrency || currency;
+  const formatPrice = (price: number | string, targetCurrency?: Currency | string | null): string => {
+    const target = normalizeCurrency(targetCurrency);
     const currencyRate = CURRENCY_RATES.find(r => r.code === target);
     const symbol = currencyRate?.symbol || 'ر.ي';
-    // إذا كانت العملة محددة، عرض السعر كما هو بدون تحويل
-    // لأن المستخدم يدخل السعر بالعملة المختارة مباشرة
-    return `${price.toFixed(2)} ${symbol}`;
+    const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
+    return `${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };
 
-  const getCurrencySymbol = (targetCurrency?: Currency): string => {
-    const target = targetCurrency || currency;
+  const getCurrencySymbol = (targetCurrency?: Currency | string | null): string => {
+    const target = normalizeCurrency(targetCurrency);
     const currencyRate = CURRENCY_RATES.find(r => r.code === target);
     return currencyRate?.symbol || 'ر.ي';
   };
