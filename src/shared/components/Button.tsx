@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Animated, Easing, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Animated, Easing, View, StyleProp, ViewStyle } from 'react-native';
 
 interface ButtonProps {
   title: string;
@@ -10,6 +10,7 @@ interface ButtonProps {
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   block?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 const Button: React.FC<ButtonProps> = ({ 
@@ -20,7 +21,8 @@ const Button: React.FC<ButtonProps> = ({
   size = 'medium',
   icon,
   iconPosition = 'left',
-  block = false
+  block = false,
+  style
 }) => {
   const scaleValue = new Animated.Value(1);
 
@@ -39,7 +41,7 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const getButtonStyle = () => {
-    const baseStyles = [styles.button, styles[size], block && styles.block];
+    const baseStyles = [styles.button, styles[size], block && styles.block, style];
     
     switch (variant) {
       case 'secondary':

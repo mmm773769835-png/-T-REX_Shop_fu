@@ -5,8 +5,9 @@
  * Auto-updates data when changes occur in the database
  */
 
+import { useEffect, useState } from 'react';
 import { db } from './FirebaseAuthService';
-import { collection, onSnapshot, query, orderBy, where, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, where, DocumentData, QueryDocumentSnapshot, QuerySnapshot, FirestoreError } from 'firebase/firestore';
 
 export interface SyncConfig {
   collectionName: string;
@@ -73,7 +74,7 @@ class DataSyncService {
       // Start listening to real-time updates
       const unsubscribe = onSnapshot(
         q,
-        (snapshot) => {
+        (snapshot: QuerySnapshot<DocumentData>) => {
           const data = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
             id: doc.id,
             ...doc.data()
@@ -82,7 +83,7 @@ class DataSyncService {
           console.log(`🔄 Sync update for ${collectionName}: ${data.length} items`);
           onDataUpdate(data);
         },
-        (error) => {
+        (error: FirestoreError) => {
           console.error(`❌ Sync error for ${collectionName}:`, error);
           if (onError) {
             onError(error as Error);

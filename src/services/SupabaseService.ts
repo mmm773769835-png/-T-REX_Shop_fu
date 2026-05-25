@@ -6,12 +6,21 @@
  */
 
 import { createClient, SupabaseClient, AuthChangeEvent, Session } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import supabaseConfig from '../config/supabaseConfig';
 
 // Initialize Supabase client
 const supabase: SupabaseClient = createClient(
   supabaseConfig.url,
-  supabaseConfig.anonKey
+  supabaseConfig.anonKey,
+  {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  }
 );
 
 export default supabase;
@@ -59,7 +68,7 @@ export const authService = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'com.trexshop.app://auth/callback',
+        redirectTo: 'trexshop://auth/callback',
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

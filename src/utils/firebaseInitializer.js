@@ -7,6 +7,7 @@ const isWeb = Platform.OS === 'web' || typeof window !== 'undefined';
 
 // Firebase will be initialized in FirebaseAuthService.js only
 // This file now only exports the existing app if it exists
+/** @type {import('firebase/app').FirebaseApp | null} */
 let app;
 try {
   app = getApp();

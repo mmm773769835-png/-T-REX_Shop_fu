@@ -25,7 +25,9 @@ import { dbService } from '../services/SupabaseService';
 
 export default function ProductDetails({ route, navigation }: any) {
   // استقبال product من التنقل العادي أو productId من Deep Link
-  const { product, productId } = route.params;
+  const routeParams = route.params || {};
+  const product = typeof routeParams.product === 'object' ? routeParams.product : null;
+  const productId = routeParams.productId || (typeof routeParams.product === 'string' ? routeParams.product : null);
   const [fetchedProduct, setFetchedProduct] = useState<any>(null);
   const [loading, setLoading] = useState(!!productId);
   const { isDarkMode, colors } = useContext(ThemeContext);

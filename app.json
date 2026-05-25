@@ -13,9 +13,6 @@
     "web": {
       "port": 8082
     },
-    "devServer": {
-      "port": 8082
-    },
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
@@ -36,7 +33,7 @@
       "bundleIdentifier": "com.trexshop.app",
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:trex-shop.com"
+        "applinks:trexshopmax.com"
       ],
       "infoPlist": {
         "CFBundleURLTypes": [
@@ -72,6 +69,10 @@
           "data": [
             {
               "scheme": "trexshop"
+            },
+            {
+              "scheme": "https",
+              "host": "trexshopmax.com"
             }
           ],
           "category": [
