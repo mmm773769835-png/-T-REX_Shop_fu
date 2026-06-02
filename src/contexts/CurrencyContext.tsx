@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type Currency = 'YER' | 'USD' | 'SAR';
+export type Currency = 'YER' | 'USD' | 'SAR' | 'KWD' | 'JOD' | 'AED' | 'EUR';
 
 export interface CurrencyRate {
   code: Currency;
@@ -12,8 +12,12 @@ export interface CurrencyRate {
 
 export const CURRENCY_RATES: CurrencyRate[] = [
   { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 1 },
-  { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 0.004 },
   { code: 'SAR', symbol: 'ر.س', name: 'ريال سعودي', rate: 0.015 },
+  { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 0.004 },
+  { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 0.0012 },
+  { code: 'JOD', symbol: 'د.أ', name: 'دينار أردني', rate: 0.004 },
+  { code: 'AED', symbol: 'د.إ', name: 'درهم إماراتي', rate: 0.015 },
+  { code: 'EUR', symbol: '€', name: 'يورو', rate: 0.0038 },
 ];
 
 interface CurrencyContextType {
