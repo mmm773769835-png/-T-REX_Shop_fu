@@ -26,13 +26,33 @@ import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
 
 const { width } = Dimensions.get("window");
 
-const normalizeText = (text: string): string =>
-  text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/gi, "")
-    .trim();
+const normalizeText = (text: string): string => {
+  if (!text) return "";
+  // تحويل النص إلى سلسلة
+  const str = String(text);
+  // إزالة المسافات الزائدة
+  const trimmed = str.trim();
+  // التحقق إذا كان النص يحتوي على أحرف عربية
+  const hasArabic = /[\u0600-\u06FF]/.test(trimmed);
+  
+  if (hasArabic) {
+    // للنص العربي: إزالة التشكيل فقط والحفاظ على الحروف
+    return trimmed
+      .normalize("NFC")
+      .replace(/[\u064B-\u065F\u0670]/g, "") // إزالة علامات التشكيل العربية
+      .replace(/\s+/g, " ") // إزالة المسافات المتعددة
+      .trim();
+  } else {
+    // للنص الإنجليزي: التحويل إلى أحرف صغيرة وإزالة الرموز
+    return trimmed
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // إزالة علامات التشكيل اللاتينية
+      .replace(/[^\w\s]/gi, "") // إزالة الرموز غير الكلمة
+      .replace(/\s+/g, " ") // إزالة المسافات المتعددة
+      .trim();
+  }
+};
 
 // قائمة الأقسام المتاحة
 const CATEGORIES = [...CATEGORIES_WITH_ICONS];
