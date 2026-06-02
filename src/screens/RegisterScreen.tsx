@@ -228,10 +228,32 @@ export default function RegisterScreen({ navigation }: any) {
         );
       } else {
         let signedUser = data?.user;
-        if (!data?.session) {
+        let session = data?.session;
+
+        // إذا لم تكن هناك session، حاول تسجيل الدخول
+        if (!session) {
+          console.log('[DEBUG] RegisterScreen: No session after signup, attempting sign in');
           const { data: loginData, error: loginError } = await authService.signIn(email.trim(), password);
           if (!loginError && loginData?.user) {
             signedUser = loginData.user;
+            session = loginData?.session;
+            console.log('[DEBUG] RegisterScreen: Sign in successful after signup');
+          } else if (loginError) {
+            console.error('[DEBUG] RegisterScreen: Sign in failed after signup', loginError);
+            Alert.alert(
+              language === "ar" ? "تنبيه" : "Notice",
+              language === "ar" 
+                ? "تم إنشاء الحساب بنجاح، لكن قد يتطلب تأكيد البريد الإلكتروني. يرجى التحقق من بريدك الإلكتروني أو محاولة تسجيل الدخول يدويًا."
+                : "Account created successfully, but email confirmation may be required. Please check your email or try signing in manually.",
+              [
+                {
+                  text: language === "ar" ? "تسجيل الدخول" : "Sign In",
+                  onPress: () => navigation.navigate("Login"),
+                }
+              ]
+            );
+            setLoading(false);
+            return;
           }
         }
 
