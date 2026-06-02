@@ -33,6 +33,10 @@ const SettingsScreen = ({ navigation }: any) => {
     navigation.navigate('About');
   };
 
+  const handleSecurityPolicy = () => {
+    navigation.navigate('SecurityPolicy');
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -128,6 +132,14 @@ const SettingsScreen = ({ navigation }: any) => {
           <View style={styles.settingInfo}>
             <Ionicons name="information-circle" size={24} color="#666" />
             <Text style={styles.settingText}>{language === 'ar' ? 'حول التطبيق' : 'About App'}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#999" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.settingItem} onPress={handleSecurityPolicy}>
+          <View style={styles.settingInfo}>
+            <Ionicons name="shield-checkmark" size={24} color="#666" />
+            <Text style={styles.settingText}>{language === 'ar' ? 'الحماية والخصوصية' : 'Security & Privacy'}</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#999" />
         </TouchableOpacity>

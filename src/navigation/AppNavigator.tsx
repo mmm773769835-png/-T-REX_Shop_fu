@@ -36,6 +36,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import EditProfile from '../screens/EditProfile';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import AboutScreen from '../screens/AboutScreen';
+import SecurityPolicyScreen from '../screens/SecurityPolicyScreen';
 // Create navigators
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -228,6 +229,7 @@ const AppNavigator = () => {
       EditProfile: { ar: 'تعديل الملف الشخصي', en: 'Edit Profile' },
       ChangePassword: { ar: 'تغيير كلمة المرور', en: 'Change Password' },
       About: { ar: 'حول التطبيق', en: 'About App' },
+      SecurityPolicy: { ar: 'الحماية والخصوصية', en: 'Security & Privacy' },
     };
     
     return titles[routeName]?.[language === 'ar' ? 'ar' : 'en'] || defaultTitle;
@@ -428,11 +430,19 @@ const AppNavigator = () => {
             headerShown: true,
           })}
         />
-        <Stack.Screen 
-          name="About" 
-          component={AboutScreen} 
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
           options={() => ({
             title: getHeaderTitle('About', 'About App'),
+            headerShown: true,
+          })}
+        />
+        <Stack.Screen
+          name="SecurityPolicy"
+          component={SecurityPolicyScreen}
+          options={() => ({
+            title: getHeaderTitle('SecurityPolicy', 'Security & Privacy'),
             headerShown: true,
           })}
         />

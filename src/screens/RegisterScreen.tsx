@@ -271,9 +271,9 @@ export default function RegisterScreen({ navigation }: any) {
             {
               text: language === "ar" ? "حسناً" : "OK",
               onPress: () => {
-                navigation.replace("MainTabs", { 
-                  loggedIn: true,
-                  admin: false
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "MainTabs", params: { loggedIn: true, admin: false } }],
                 });
               }
             }

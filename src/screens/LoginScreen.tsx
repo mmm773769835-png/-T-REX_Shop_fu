@@ -47,9 +47,9 @@ export default function LoginScreen({ navigation }: any) {
         );
         // تمرير معلومات تسجيل الدخول إلى الشاشة الرئيسية
         console.log('Navigating to MainTabs screen with login');
-        navigation.navigate("MainTabs", { 
-          loggedIn: true,
-          admin: true // سيتم التحقق من الدور لاحقًا في الشاشة الرئيسية
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "MainTabs", params: { loggedIn: true, admin: true } }],
         });
       }
     } catch (error) {
