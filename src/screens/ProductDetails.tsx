@@ -272,7 +272,7 @@ export default function ProductDetails({ route, navigation }: any) {
             {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
               <>
                 <Text style={styles.originalPrice}>
-                  {(currentProduct.originalPrice).toLocaleString()} {currentProduct.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+                  {formatPrice(currentProduct.originalPrice, currentProduct.currency || 'YER')}
                 </Text>
                 <View style={styles.discountBadge}>
                   <Text style={styles.discountBadgeText}>
@@ -282,7 +282,7 @@ export default function ProductDetails({ route, navigation }: any) {
               </>
             )}
             <Text style={styles.productPrice}>
-              {(currentProduct.price).toLocaleString()} {currentProduct.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+              {formatPrice(currentProduct.price, currentProduct.currency || 'YER')}
             </Text>
           </View>
 

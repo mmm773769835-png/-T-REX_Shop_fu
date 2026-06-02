@@ -23,6 +23,7 @@ import { CATEGORIES_WITH_ICONS } from "../shared/constants/productConstants";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const { width } = Dimensions.get("window");
 
@@ -89,6 +90,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [isLoggedIn, setIsLoggedIn] = useState(routeLoggedIn || routeAdmin);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
+  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -333,7 +335,6 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     const discountPercent = item.originalPrice && item.originalPrice > item.price
       ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)
       : 0;
-    const currencySymbol = item.currency === 'USD' ? '$' : item.currency === 'SAR' ? 'ر.س' : 'ر.ي';
 
     return (
       <TouchableOpacity
@@ -374,11 +375,11 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
             <View style={styles.priceContainer}>
               {item.originalPrice && item.originalPrice > item.price && (
                 <Text style={styles.originalPrice}>
-                  {item.originalPrice.toLocaleString()} {currencySymbol}
+                  {formatPrice(item.originalPrice, item.currency || 'YER')}
                 </Text>
               )}
               <Text style={styles.productPrice}>
-                {item.price.toLocaleString()} {currencySymbol}
+                {formatPrice(item.price, item.currency || 'YER')}
               </Text>
             </View>
           </View>

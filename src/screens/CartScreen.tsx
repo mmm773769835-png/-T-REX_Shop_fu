@@ -87,7 +87,7 @@ const CartScreen = ({ route, navigation }: any) => {
       <View style={styles.itemDetails}>
         <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
         <Text style={styles.itemPrice}>
-          {(item.price || 0).toLocaleString()} {item.currency === 'SAR' ? 'ر.س' : 'ر.ي'}
+          {formatPrice(item.price || 0, item.currency || 'YER')}
         </Text>
         <View style={styles.quantityContainer}>
           <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
