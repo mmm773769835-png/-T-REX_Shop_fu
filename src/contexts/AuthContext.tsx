@@ -15,6 +15,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   setUser: (user: User | null) => void;
+  signOut: () => Promise<void>;
 }
 
 // Create context
@@ -90,6 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     loading,
     setUser,
+    signOut: async () => {
+      await authService.signOut();
+      setUser(null);
+    },
   };
 
   return (

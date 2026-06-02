@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert } f
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const SettingsScreen = ({ navigation }: any) => {
   const { isDarkMode, toggleTheme, colors } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
+  const { signOut } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(false);
   
@@ -35,6 +37,30 @@ const SettingsScreen = ({ navigation }: any) => {
 
   const handleSecurityPolicy = () => {
     navigation.navigate('SecurityPolicy');
+  };
+
+  const handleSignOut = () => {
+    Alert.alert(
+      language === 'ar' ? 'تسجيل الخروج' : 'Sign Out',
+      language === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to sign out?',
+      [
+        {
+          text: language === 'ar' ? 'إلغاء' : 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: language === 'ar' ? 'تسجيل الخروج' : 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -114,6 +140,14 @@ const SettingsScreen = ({ navigation }: any) => {
             <Text style={styles.settingText}>{language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#999" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.settingItem} onPress={handleSignOut}>
+          <View style={styles.settingInfo}>
+            <Ionicons name="log-out-outline" size={24} color="#ff4444" />
+            <Text style={[styles.settingText, { color: '#ff4444' }]}>{language === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#ff4444" />
         </TouchableOpacity>
       </View>
 
