@@ -10,7 +10,7 @@ import { getDefaultUserImage } from '../utils/imageUtils';
 import { dbService } from '../services/SupabaseService';
 
 const ProfileScreen = ({ navigation }: any) => {
-  const { user: authUser } = useAuth();
+  const { user: authUser, signOut } = useAuth();
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
   
@@ -118,7 +118,8 @@ const ProfileScreen = ({ navigation }: any) => {
         { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
         { 
           text: language === "ar" ? "تسجيل الخروج" : "Logout", 
-          onPress: () => {
+          onPress: async () => {
+            await signOut();
             // @ts-ignore
             navigation.navigate("Login");
           } 
