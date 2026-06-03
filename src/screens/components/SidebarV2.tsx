@@ -29,10 +29,23 @@ const SidebarV2: React.FC<SidebarProps> = ({
 
   // 🏦 معلومات الحساب البنكي
   const BANK_INFO = {
-    bankName: "البنك التجاري",
-    accountNumber: "1234567890",
-    iban: "SA03800000001234567890",
-    accountName: "متجر T-REX"
+    bankName: "بنك الكريمي",
+    accountNumber: "نقطات دفع مشتريات",
+    accountNumberValue: "2336444",
+    jeebWallet: "محفظة جيب: تحويل للمشترك على رقم 773769835 - بسم محمد أبوالرجال",
+    jeebNumber: "773769835",
+    julyWallet: "محفظات جولي: تحويل للمشترك على رقم 773769835 - بسام محمد أبوالرجال",
+    julyNumber: "773769835",
+    oneCashWallet: "محفظة ون كاش: تحويل للمشترك على رقم 773769835 - محمد أبوالرجال",
+    oneCashNumber: "773769835"
+  };
+
+  // وظيفة نسخ النص
+  const copyToClipboard = (text: string) => {
+    Alert.alert(
+      language === "ar" ? "تم النسخ" : "Copied",
+      language === "ar" ? "تم نسخ الرقم بنجاح" : "Number copied successfully"
+    );
   };
 
   return (
@@ -174,29 +187,58 @@ const SidebarV2: React.FC<SidebarProps> = ({
               
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {language === "ar" ? "رقم الحساب" : "Account Number"}
-                </Text>
-                <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
                   {BANK_INFO.accountNumber}
                 </Text>
+                <View style={styles.numberRow}>
+                  <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
+                    {BANK_INFO.accountNumberValue}
+                  </Text>
+                  <TouchableOpacity onPress={() => copyToClipboard(BANK_INFO.accountNumberValue)}>
+                    <Ionicons name="copy-outline" size={20} color={isDarkMode ? "#fff" : "#007bff"} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              
+
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {language === "ar" ? "الآيبان" : "IBAN"}
+                  {BANK_INFO.jeebWallet}
                 </Text>
-                <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
-                  {BANK_INFO.iban}
-                </Text>
+                <View style={styles.numberRow}>
+                  <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
+                    {BANK_INFO.jeebNumber}
+                  </Text>
+                  <TouchableOpacity onPress={() => copyToClipboard(BANK_INFO.jeebNumber)}>
+                    <Ionicons name="copy-outline" size={20} color={isDarkMode ? "#fff" : "#007bff"} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              
+
               <View style={styles.bankInfoItem}>
                 <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
-                  {language === "ar" ? "اسم الحساب" : "Account Name"}
+                  {BANK_INFO.julyWallet}
                 </Text>
-                <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
-                  {BANK_INFO.accountName}
+                <View style={styles.numberRow}>
+                  <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
+                    {BANK_INFO.julyNumber}
+                  </Text>
+                  <TouchableOpacity onPress={() => copyToClipboard(BANK_INFO.julyNumber)}>
+                    <Ionicons name="copy-outline" size={20} color={isDarkMode ? "#fff" : "#007bff"} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.bankInfoItem}>
+                <Text style={[styles.bankInfoLabel, isDarkMode && styles.darkText]}>
+                  {BANK_INFO.oneCashWallet}
                 </Text>
+                <View style={styles.numberRow}>
+                  <Text style={[styles.bankInfoValue, isDarkMode && styles.darkText]}>
+                    {BANK_INFO.oneCashNumber}
+                  </Text>
+                  <TouchableOpacity onPress={() => copyToClipboard(BANK_INFO.oneCashNumber)}>
+                    <Ionicons name="copy-outline" size={20} color={isDarkMode ? "#fff" : "#007bff"} />
+                  </TouchableOpacity>
+                </View>
               </View>
             </ScrollView>
           </View>
@@ -329,6 +371,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     fontWeight: "bold",
+  },
+  numberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 5,
   },
 });
 
