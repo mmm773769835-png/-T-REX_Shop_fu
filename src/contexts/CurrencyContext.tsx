@@ -12,7 +12,7 @@ export interface CurrencyRate {
 
 // Default rates (will be updated from API)
 export const DEFAULT_CURRENCY_RATES: CurrencyRate[] = [
-  { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 145.0 },
+  { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 140.168 },
   { code: 'SAR', symbol: 'ر.س', name: 'ريال سعودي', rate: 1 },
   { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 0.2667 },
   { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 0.0815 },
@@ -64,7 +64,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       for (const defaultRate of DEFAULT_CURRENCY_RATES) {
         if (defaultRate.code === 'YER') {
           // Yemeni Rial - Use special market rate for Sana'a
-          newRates.push({ ...defaultRate, rate: 145.0 }); // 1 SAR = ~145 YER (Sana'a market rate)
+          newRates.push({ ...defaultRate, rate: 140.168 }); // 1 SAR = ~140.168 YER (Sana'a market rate)
         } else if (data.rates[defaultRate.code]) {
           newRates.push({ ...defaultRate, rate: data.rates[defaultRate.code] });
         } else {
@@ -153,7 +153,10 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Convert price from source currency to target currency
     // First convert to SAR (base currency), then to target currency
     const priceInSar = numericPrice / (sourceRate?.rate || 1);
-    const convertedPrice = priceInSar * (targetRate?.rate || 1);
+    const rawConvertedPrice = priceInSar * (targetRate?.rate || 1);
+    
+    // Apply sell margin if converting between different currencies (like the website)
+    const convertedPrice = (source === target ? rawConvertedPrice : rawConvertedPrice * (1 + EXCHANGE_SELL_MARGIN));
     
     return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };
