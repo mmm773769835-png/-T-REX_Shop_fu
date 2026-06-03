@@ -90,7 +90,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [isLoggedIn, setIsLoggedIn] = useState(routeLoggedIn || routeAdmin);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
-  const { formatPrice, currency, setCurrency } = useCurrency();
+  const { formatPrice, formatPriceWithSource, currency, setCurrency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -376,11 +376,11 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
             <View style={styles.priceContainer}>
               {item.originalPrice && item.originalPrice > item.price && (
                 <Text style={styles.originalPrice}>
-                  {formatPrice(item.originalPrice, item.currency || 'YER')}
+                  {formatPriceWithSource(item.originalPrice, item.currency || 'YER', currency)}
                 </Text>
               )}
               <Text style={styles.productPrice}>
-                {formatPrice(item.price, item.currency || 'YER')}
+                {formatPriceWithSource(item.price, item.currency || 'YER', currency)}
               </Text>
             </View>
           </View>

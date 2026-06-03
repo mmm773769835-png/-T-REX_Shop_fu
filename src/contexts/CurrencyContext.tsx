@@ -25,6 +25,7 @@ interface CurrencyContextType {
   setCurrency: (currency: Currency) => void;
   convertPrice: (price: number, targetCurrency?: Currency) => number;
   formatPrice: (price: number | string, targetCurrency?: Currency | string | null) => string;
+  formatPriceWithSource: (price: number | string, sourceCurrency: Currency | string | null, targetCurrency?: Currency | string | null) => string;
   getCurrencySymbol: (targetCurrency?: Currency | string | null) => string;
 }
 
@@ -77,7 +78,26 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const currencyRate = CURRENCY_RATES.find(r => r.code === target);
     const symbol = currencyRate?.symbol || 'ر.ي';
     const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
-    return `${numericPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
+    // Convert price from YER (base currency) to target currency
+    // Note: Prices from Supabase are assumed to be in YER (base currency)
+    const convertedPrice = numericPrice * (currencyRate?.rate || 1);
+    return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
+  };
+
+  const formatPriceWithSource = (price: number | string, sourceCurrency: Currency | string | null, targetCurrency?: Currency | string | null): string => {
+    const target = normalizeCurrency(targetCurrency);
+    const source = normalizeCurrency(sourceCurrency);
+    const targetRate = CURRENCY_RATES.find(r => r.code === target);
+    const sourceRate = CURRENCY_RATES.find(r => r.code === source);
+    const symbol = targetRate?.symbol || 'ر.ي';
+    const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
+    
+    // Convert price from source currency to target currency
+    // First convert to YER (base currency), then to target currency
+    const priceInYer = numericPrice / (sourceRate?.rate || 1);
+    const convertedPrice = priceInYer * (targetRate?.rate || 1);
+    
+    return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };
 
   const getCurrencySymbol = (targetCurrency?: Currency | string | null): string => {
@@ -93,6 +113,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setCurrency,
         convertPrice,
         formatPrice,
+        formatPriceWithSource,
         getCurrencySymbol,
       }}
     >
