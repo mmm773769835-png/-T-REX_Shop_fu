@@ -90,7 +90,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [isLoggedIn, setIsLoggedIn] = useState(routeLoggedIn || routeAdmin);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency, setCurrency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +101,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
   const { state: filterState } = useAdvancedFilters();
+  const [currencyDropdownVisible, setCurrencyDropdownVisible] = useState(false);
   const searchDropdownResults = useMemo(() => {
     const normalizedSearch = normalizeText(searchQuery);
     if (!normalizedSearch) {
@@ -450,15 +451,53 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
         <Text style={styles.headerSubtitle}>{language === "ar" ? "المتجر" : "SHOP"}</Text>
       </View>
       
-      <TouchableOpacity 
-        style={styles.searchButton}
-        onPress={() => {
-          // @ts-ignore
-          navigation.navigate('Search');
-        }}
-      >
-        <Ionicons name="search" size={24} color="#FFD700" />
-      </TouchableOpacity>
+      <View style={styles.headerRight}>
+        <TouchableOpacity 
+          style={styles.currencyButton}
+          onPress={() => setCurrencyDropdownVisible(!currencyDropdownVisible)}
+        >
+          <Text style={styles.currencyButtonText}>{currency}</Text>
+          <Ionicons name="chevron-down" size={16} color="#FFD700" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.searchButton}
+          onPress={() => {
+            // @ts-ignore
+            navigation.navigate('Search');
+          }}
+        >
+          <Ionicons name="search" size={24} color="#FFD700" />
+        </TouchableOpacity>
+      </View>
+
+      {currencyDropdownVisible && (
+        <View style={styles.currencyDropdown}>
+          {(['SAR', 'USD', 'KWD', 'JOD', 'AED', 'YER', 'EUR'] as const).map((curr) => (
+            <TouchableOpacity
+              key={curr}
+              style={[
+                styles.currencyOption,
+                currency === curr && styles.selectedCurrencyOption
+              ]}
+              onPress={() => {
+                setCurrency(curr);
+                setCurrencyDropdownVisible(false);
+              }}
+            >
+              <Text style={[
+                styles.currencyOptionText,
+                currency === curr && styles.selectedCurrencyOptionText
+              ]}>
+                {curr}
+              </Text>
+              {currency === curr && (
+                <Ionicons name="checkmark" size={16} color="#FFD700" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 
@@ -699,6 +738,62 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     padding: 8,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  currencyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: "#2a2a2a",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#FFD700",
+  },
+  currencyButtonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#FFD700",
+    marginRight: 4,
+  },
+  currencyDropdown: {
+    position: "absolute",
+    top: 60,
+    right: 16,
+    backgroundColor: "#1a1a1a",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#333",
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  currencyOption: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  selectedCurrencyOption: {
+    backgroundColor: "#FFD70020",
+  },
+  currencyOptionText: {
+    fontSize: 14,
+    color: "#fff",
+  },
+  selectedCurrencyOptionText: {
+    color: "#FFD700",
+    fontWeight: "bold",
   },
   headerTitle: {
     fontSize: 20,
