@@ -24,6 +24,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const { width } = Dimensions.get("window");
 
@@ -91,6 +92,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
   const { formatPrice, formatPriceWithSource, currency, setCurrency } = useCurrency();
+  const { signOut } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -687,9 +689,10 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
           // @ts-ignore
           navigation.navigate("AddProduct");
         }}
-        onLoginLogout={() => {
+        onLoginLogout={async () => {
           if (isLoggedIn) {
             // Logout
+            await signOut();
             setIsLoggedIn(false);
             setIsAdmin(false);
             // @ts-ignore
