@@ -87,19 +87,27 @@ export default function LoginScreen({ navigation }: any) {
   // Google Sign-In
   const handleGoogleSignIn = async () => {
     setLoading(true);
+    console.log('[DEBUG] LoginScreen: Google Sign-In button pressed');
     try {
       const { data, error } = await authService.signInWithGoogle();
+      console.log('[DEBUG] LoginScreen: Google Sign-In response', { data, error });
       if (error) {
+        console.error('[DEBUG] LoginScreen: Google Sign-In error', error);
         Alert.alert(
           language === "ar" ? "خطأ" : "Error",
           error.message || (language === "ar" ? "فشل تسجيل الدخول عبر Google" : "Google Sign-In failed")
         );
         setLoading(false);
       } else if (data?.url) {
+        console.log('[DEBUG] LoginScreen: Opening URL', data.url);
         await Linking.openURL(data.url);
+        setLoading(false);
+      } else {
+        console.log('[DEBUG] LoginScreen: No URL returned from Google Sign-In');
         setLoading(false);
       }
     } catch (error) {
+      console.error('[DEBUG] LoginScreen: Google Sign-In exception', error);
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
         language === "ar" ? "حدث خطأ أثناء تسجيل الدخول" : "An error occurred during login"
