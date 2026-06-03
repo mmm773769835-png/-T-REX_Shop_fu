@@ -402,6 +402,7 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     marginTop: 8,
+    paddingBottom: 30,
   },
   resetButton: {
     flex: 1,
