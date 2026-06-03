@@ -10,6 +10,7 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as WebBrowser from 'expo-web-browser';
 import { authService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -99,8 +100,9 @@ export default function LoginScreen({ navigation }: any) {
         );
         setLoading(false);
       } else if (data?.url) {
-        console.log('[DEBUG] LoginScreen: Opening URL', data.url);
-        await Linking.openURL(data.url);
+        console.log('[DEBUG] LoginScreen: Opening URL with WebBrowser', data.url);
+        const result = await WebBrowser.openAuthSessionAsync(data.url, 'trexshop://auth/callback');
+        console.log('[DEBUG] LoginScreen: WebBrowser result', result);
         setLoading(false);
       } else {
         console.log('[DEBUG] LoginScreen: No URL returned from Google Sign-In');
