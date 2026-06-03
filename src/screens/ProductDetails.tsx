@@ -32,7 +32,7 @@ export default function ProductDetails({ route, navigation }: any) {
   const [loading, setLoading] = useState(!!productId);
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, formatPriceWithSource, currency } = useCurrency();
   const { addToCart } = useCart();
   const { addToWishList, removeFromWishList, isInWishList } = useWishList();
   const { loadReviews, getAverageRating, getReviewsByProduct } = useReviews();
@@ -272,7 +272,7 @@ export default function ProductDetails({ route, navigation }: any) {
             {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
               <>
                 <Text style={styles.originalPrice}>
-                  {formatPrice(currentProduct.originalPrice, currentProduct.currency || 'YER')}
+                  {formatPriceWithSource(currentProduct.originalPrice, currentProduct.currency || 'YER', currency)}
                 </Text>
                 <View style={styles.discountBadge}>
                   <Text style={styles.discountBadgeText}>
@@ -282,7 +282,7 @@ export default function ProductDetails({ route, navigation }: any) {
               </>
             )}
             <Text style={styles.productPrice}>
-              {formatPrice(currentProduct.price, currentProduct.currency || 'YER')}
+              {formatPriceWithSource(currentProduct.price, currentProduct.currency || 'YER', currency)}
             </Text>
           </View>
 
