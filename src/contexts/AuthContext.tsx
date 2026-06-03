@@ -28,24 +28,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const handleAuthCallback = async (url: string | null) => {
+      console.log('[DEBUG] AuthContext: handleAuthCallback called with URL:', url);
       if (!url || !url.startsWith('trexshop://auth/callback')) {
+        console.log('[DEBUG] AuthContext: URL does not match auth callback pattern');
         return;
       }
 
+      console.log('[DEBUG] AuthContext: URL matches auth callback pattern, exchanging code for session');
       setLoading(true);
       const { error } = await authService.exchangeCodeForSession(url);
       if (error) {
         console.error('[DEBUG] AuthContext: Failed to exchange auth code', error);
         setLoading(false);
+      } else {
+        console.log('[DEBUG] AuthContext: Successfully exchanged auth code for session');
       }
     };
 
-    Linking.getInitialURL().then(handleAuthCallback).catch(() => setLoading(false));
+    console.log('[DEBUG] AuthContext: Setting up deep linking');
+    Linking.getInitialURL().then((url) => {
+      console.log('[DEBUG] AuthContext: Initial URL:', url);
+      handleAuthCallback(url);
+    }).catch((error) => {
+      console.error('[DEBUG] AuthContext: Failed to get initial URL', error);
+      setLoading(false);
+    });
     const linkingSubscription = Linking.addEventListener('url', ({ url }) => {
+      console.log('[DEBUG] AuthContext: Deep link received:', url);
       handleAuthCallback(url);
     });
 
     authService.getCurrentSession().then(({ session }) => {
+      console.log('[DEBUG] AuthContext: Current session:', session);
       if (session?.user) {
         const metadata = session.user.user_metadata || {};
         setUser({
@@ -57,7 +71,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch((error) => {
+      console.error('[DEBUG] AuthContext: Failed to get current session', error);
+      setLoading(false);
+    });
 
     // Listen for auth state changes
     console.log('[DEBUG] AuthContext: Setting up auth state listener');
