@@ -152,7 +152,6 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
         user_name: review.userName,
         rating: review.rating,
         comment: review.comment,
-        images: imageUrls,
         video: videoUrl,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
