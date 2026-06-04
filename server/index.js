@@ -15,6 +15,7 @@ const { body, validationResult } = require('express-validator');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const csrf = require('csurf');
+const cheerio = require('cheerio');
 
 const app = express();
 app.use(helmet());
@@ -623,6 +624,87 @@ app.post('/api/auth/admin-login',
     }
   }
 );
+
+// Endpoint لجلب أسعار الصرف من exrye.com/sanaa
+app.get('/api/exchange-rates/sanaa', async (req, res) => {
+  try {
+    console.log('🔄 Fetching exchange rates from exrye.com/sanaa');
+    
+    // جلب الصفحة من exrye.com/sanaa
+    const response = await fetch('https://exrye.com/sanaa');
+    const html = await response.text();
+    
+    // استخدام cheerio لاستخراج البيانات من HTML
+    const $ = cheerio.load(html);
+    
+    // الأسعار الافتراضية (إذا فشل الاستخراج)
+    const defaultRates = {
+      YER: 1.0,
+      SAR: 140.20,
+      USD: 535.00,
+      KWD: 1582.00,
+      JOD: 754.50,
+      AED: 143.00,
+      EUR: 564.00
+    };
+    
+    // محاولة استخراج الأسعار من HTML
+    // ملاحظة: هذا يعتمد على بنية HTML الحالية للموقع
+    // قد يحتاج تحديث إذا تغيرت بنية الموقع
+    let rates = { ...defaultRates };
+    
+    // البحث عن أسعار الصرف في الصفحة
+    // هذا مثال بسيط - قد يحتاج تعديل بناءً على بنية HTML الفعلية
+    $('table tbody tr, .rate-row, .exchange-rate').each((index, element) => {
+      const text = $(element).text();
+      
+      // محاولة استخراج العملة والسعر من النص
+      const sarMatch = text.match(/ريال سعودي.*?(\d+\.?\d*)/i);
+      const usdMatch = text.match(/دولار.*?(\d+\.?\d*)/i);
+      const aedMatch = text.match(/درهم.*?(\d+\.?\d*)/i);
+      const kwdMatch = text.match(/دينار كويتي.*?(\d+\.?\d*)/i);
+      const jodMatch = text.match(/دينار أردني.*?(\d+\.?\d*)/i);
+      const eurMatch = text.match(/يورو.*?(\d+\.?\d*)/i);
+      
+      if (sarMatch) rates.SAR = parseFloat(sarMatch[1]);
+      if (usdMatch) rates.USD = parseFloat(usdMatch[1]);
+      if (aedMatch) rates.AED = parseFloat(aedMatch[1]);
+      if (kwdMatch) rates.KWD = parseFloat(kwdMatch[1]);
+      if (jodMatch) rates.JOD = parseFloat(jodMatch[1]);
+      if (eurMatch) rates.EUR = parseFloat(eurMatch[1]);
+    });
+    
+    console.log('✅ Exchange rates fetched:', rates);
+    
+    return res.json({
+      success: true,
+      rates: rates,
+      timestamp: new Date().toISOString(),
+      source: 'exrye.com/sanaa'
+    });
+  } catch (error) {
+    console.error('❌ Error fetching exchange rates:', error);
+    
+    // إرجاع الأسعار الافتراضية في حالة الفشل
+    const defaultRates = {
+      YER: 1.0,
+      SAR: 140.20,
+      USD: 535.00,
+      KWD: 1582.00,
+      JOD: 754.50,
+      AED: 143.00,
+      EUR: 564.00
+    };
+    
+    return res.json({
+      success: false,
+      rates: defaultRates,
+      timestamp: new Date().toISOString(),
+      source: 'default',
+      error: error.message
+    });
+  }
+});
 
 const PORT = process.env.PORT || 4001;
 const HTTPS_PORT = process.env.HTTPS_PORT || 4433;

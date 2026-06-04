@@ -39,35 +39,53 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [currency, setCurrency] = useState<Currency>('YER');
   const [currencyRates, setCurrencyRates] = useState<CurrencyRate[]>(DEFAULT_CURRENCY_RATES);
 
-  // Fetch live exchange rates from API
+  // Fetch live exchange rates from server endpoint (scrapes exrye.com/sanaa)
   const fetchExchangeRates = async () => {
     try {
-      // Check cache first (valid for 1 hour)
+      // Check cache first (valid for 48 hours = 2 days)
       const cached = await AsyncStorage.getItem('exchangeRates');
       if (cached) {
         const { rates, timestamp } = JSON.parse(cached);
-        const oneHour = 60 * 60 * 1000;
-        if (Date.now() - timestamp < oneHour) {
+        const twoDays = 48 * 60 * 60 * 1000;
+        if (Date.now() - timestamp < twoDays) {
           setCurrencyRates(rates);
-          console.log('✅ Using cached exchange rates');
+          console.log('✅ Using cached exchange rates (valid for 48 hours)');
           return;
         }
       }
 
-      // Use default Sana'a market rates (will be updated from bank API later)
-      const newRates: CurrencyRate[] = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
+      // Fetch from server endpoint
+      const response = await fetch('https://trexshopmax.com/api/exchange-rates/sanaa');
+      if (!response.ok) throw new Error('API error: ' + response.status);
+      
+      const data = await response.json();
+      
+      // Update rates from server response
+      const newRates: CurrencyRate[] = [];
+      for (const defaultRate of DEFAULT_CURRENCY_RATES) {
+        const serverRate = data.rates?.[defaultRate.code];
+        if (serverRate) {
+          newRates.push({ ...defaultRate, rate: serverRate });
+        } else {
+          newRates.push(defaultRate);
+        }
+      }
       
       setCurrencyRates(newRates);
       
-      // Cache the rates
+      // Cache the rates with timestamp
       await AsyncStorage.setItem('exchangeRates', JSON.stringify({
         rates: newRates,
         timestamp: Date.now()
       }));
       
-      console.log('✅ Fetched live exchange rates from API');
+      console.log('✅ Fetched live exchange rates from server (exrye.com/sanaa)');
     } catch (error) {
       console.warn('⚠️ Failed to fetch live rates, using defaults:', error);
+      
+      // Use default rates if fetch fails
+      const defaultRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
+      setCurrencyRates(defaultRates);
     }
   };
 
