@@ -7,18 +7,19 @@ export interface CurrencyRate {
   code: Currency;
   symbol: string;
   name: string;
-  rate: number; // Rate relative to SAR (base currency)
+  rate: number; // Rate relative to YER (base currency)
 }
 
 // Default rates (will be updated from API)
+// Based on Sana'a market rates (1 YER as base)
 export const DEFAULT_CURRENCY_RATES: CurrencyRate[] = [
-  { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 140.168 },
-  { code: 'SAR', symbol: 'ر.س', name: 'ريال سعودي', rate: 1 },
-  { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 0.2667 },
-  { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 0.0815 },
-  { code: 'JOD', symbol: 'د.أ', name: 'دينار أردني', rate: 0.1889 },
-  { code: 'AED', symbol: 'د.إ', name: 'درهم إماراتي', rate: 0.9793 },
-  { code: 'EUR', symbol: '€', name: 'يورو', rate: 0.2457 },
+  { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 1.0 },
+  { code: 'SAR', symbol: 'ر.س', name: 'ريال سعودي', rate: 140.20 },
+  { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 535.00 },
+  { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 1582.00 },
+  { code: 'JOD', symbol: 'د.أ', name: 'دينار أردني', rate: 754.50 },
+  { code: 'AED', symbol: 'د.إ', name: 'درهم إماراتي', rate: 143.00 },
+  { code: 'EUR', symbol: '€', name: 'يورو', rate: 564.00 },
 ];
 
 const EXCHANGE_SELL_MARGIN = 0.0345; // 3.45%
@@ -53,24 +54,8 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
 
-      // Fetch from API
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/SAR');
-      if (!response.ok) throw new Error('API error: ' + response.status);
-      
-      const data = await response.json();
-      
-      // Update rates for our currencies
-      const newRates: CurrencyRate[] = [];
-      for (const defaultRate of DEFAULT_CURRENCY_RATES) {
-        if (defaultRate.code === 'YER') {
-          // Yemeni Rial - Use special market rate for Sana'a
-          newRates.push({ ...defaultRate, rate: 140.168 }); // 1 SAR = ~140.168 YER (Sana'a market rate)
-        } else if (data.rates[defaultRate.code]) {
-          newRates.push({ ...defaultRate, rate: data.rates[defaultRate.code] });
-        } else {
-          newRates.push(defaultRate);
-        }
-      }
+      // Use default Sana'a market rates (will be updated from bank API later)
+      const newRates: CurrencyRate[] = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
       
       setCurrencyRates(newRates);
       
@@ -128,7 +113,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const target = normalizeCurrency(targetCurrency);
     const currencyRate = currencyRates.find(r => r.code === target);
     if (!currencyRate) return price;
-    return price * currencyRate.rate;
+    return price / currencyRate.rate;
   };
 
   const formatPrice = (price: number | string, targetCurrency?: Currency | string | null): string => {
@@ -136,9 +121,9 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const currencyRate = currencyRates.find(r => r.code === target);
     const symbol = currencyRate?.symbol || 'ر.ي';
     const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
-    // Convert price from SAR (base currency) to target currency
-    // Note: Prices from Supabase are assumed to be in SAR (base currency)
-    const convertedPrice = numericPrice * (currencyRate?.rate || 1);
+    // Convert price from YER (base currency) to target currency
+    // Note: Prices from Supabase are assumed to be in YER (base currency)
+    const convertedPrice = numericPrice / (currencyRate?.rate || 1);
     return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };
 
@@ -149,15 +134,15 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const sourceRate = currencyRates.find(r => r.code === source);
     const symbol = targetRate?.symbol || 'ر.ي';
     const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
-    
+
     // Convert price from source currency to target currency
-    // First convert to SAR (base currency), then to target currency
-    const priceInSar = numericPrice / (sourceRate?.rate || 1);
-    const rawConvertedPrice = priceInSar * (targetRate?.rate || 1);
-    
+    // First convert to YER (base currency), then to target currency
+    const priceInYER = numericPrice * (sourceRate?.rate || 1);
+    const rawConvertedPrice = priceInYER / (targetRate?.rate || 1);
+
     // Apply sell margin if converting between different currencies (like the website)
     const convertedPrice = (source === target ? rawConvertedPrice : rawConvertedPrice * (1 + EXCHANGE_SELL_MARGIN));
-    
+
     return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };
 
