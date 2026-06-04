@@ -16,8 +16,15 @@ const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const csrf = require('csurf');
 const cheerio = require('cheerio');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
+
+// Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 app.use(helmet());
 app.use(express.json({ limit: '10mb' }));
 
@@ -675,6 +682,33 @@ app.get('/api/exchange-rates/sanaa', async (req, res) => {
     });
     
     console.log('✅ Exchange rates fetched:', rates);
+    
+    // تحديث جدول exchange_rates في Supabase تلقائياً
+    try {
+      for (const [currencyCode, rate] of Object.entries(rates)) {
+        const { error: upsertError } = await supabase
+          .from('exchange_rates')
+          .upsert({
+            currency_code: currencyCode,
+            rate: rate,
+            timestamp: new Date().toISOString(),
+            source: 'exrye.com/sanaa'
+          }, {
+            onConflict: 'currency_code'
+          });
+        
+        if (upsertError) {
+          console.error(`❌ Error updating ${currencyCode} in Supabase:`, upsertError);
+        } else {
+          console.log(`✅ Updated ${currencyCode} in Supabase: ${rate}`);
+        }
+      }
+      
+      console.log('✅ All exchange rates updated in Supabase');
+    } catch (supabaseError) {
+      console.error('❌ Error updating Supabase:', supabaseError);
+      // لا نوقف العملية إذا فشل تحديث Supabase، نكمل بإرجاع الأسعار
+    }
     
     return res.json({
       success: true,

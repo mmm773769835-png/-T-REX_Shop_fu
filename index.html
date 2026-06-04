@@ -3398,7 +3398,7 @@
                     }
                 }
 
-                // Fetch from server endpoint (scrapes exrye.com/sanaa)
+                // Fetch from server endpoint (reads from Supabase exchange_rates table)
                 const response = await fetch('/api/exchange-rates/sanaa');
                 if (!response.ok) throw new Error('API error: ' + response.status);
                 
@@ -3421,7 +3421,7 @@
                 
                 exchangeRates = newRates;
                 
-                console.log('✅ Fetched live exchange rates from server (exrye.com/sanaa)');
+                console.log('✅ Fetched live exchange rates from Supabase (exchange_rates table)');
                 
                 // Cache the rates
                 localStorage.setItem('exchangeRates', JSON.stringify({

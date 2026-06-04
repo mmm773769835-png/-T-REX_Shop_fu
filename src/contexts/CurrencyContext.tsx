@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../config/supabase';
 
 export type Currency = 'YER' | 'USD' | 'SAR' | 'KWD' | 'JOD' | 'AED' | 'EUR';
 
@@ -39,7 +40,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [currency, setCurrency] = useState<Currency>('YER');
   const [currencyRates, setCurrencyRates] = useState<CurrencyRate[]>(DEFAULT_CURRENCY_RATES);
 
-  // Fetch live exchange rates from server endpoint (scrapes exrye.com/sanaa)
+  // Fetch live exchange rates from Supabase exchange_rates table
   const fetchExchangeRates = async () => {
     try {
       // Check cache first (valid for 48 hours = 2 days)
@@ -54,35 +55,48 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
 
-      // Fetch from server endpoint
-      const response = await fetch('https://trexshopmax.com/api/exchange-rates/sanaa');
-      if (!response.ok) throw new Error('API error: ' + response.status);
-      
-      const data = await response.json();
-      
-      // Update rates from server response
+      // Fetch from Supabase exchange_rates table
+      const { data: exchangeRatesData, error } = await supabase
+        .from('exchange_rates')
+        .select('currency_code, rate')
+        .order('timestamp', { ascending: false });
+
+      if (error) throw error;
+
+      // Update rates from Supabase response
       const newRates: CurrencyRate[] = [];
+      const latestRates = new Map<string, number>();
+
+      // Get the latest rate for each currency
+      if (exchangeRatesData) {
+        for (const item of exchangeRatesData) {
+          if (!latestRates.has(item.currency_code)) {
+            latestRates.set(item.currency_code, item.rate);
+          }
+        }
+      }
+
       for (const defaultRate of DEFAULT_CURRENCY_RATES) {
-        const serverRate = data.rates?.[defaultRate.code];
-        if (serverRate) {
-          newRates.push({ ...defaultRate, rate: serverRate });
+        const supabaseRate = latestRates.get(defaultRate.code);
+        if (supabaseRate) {
+          newRates.push({ ...defaultRate, rate: supabaseRate });
         } else {
           newRates.push(defaultRate);
         }
       }
-      
+
       setCurrencyRates(newRates);
-      
+
       // Cache the rates with timestamp
       await AsyncStorage.setItem('exchangeRates', JSON.stringify({
         rates: newRates,
         timestamp: Date.now()
       }));
-      
-      console.log('✅ Fetched live exchange rates from server (exrye.com/sanaa)');
+
+      console.log('✅ Fetched live exchange rates from Supabase (exchange_rates table)');
     } catch (error) {
-      console.warn('⚠️ Failed to fetch live rates, using defaults:', error);
-      
+      console.warn('⚠️ Failed to fetch live rates from Supabase, using defaults:', error);
+
       // Use default rates if fetch fails
       const defaultRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
       setCurrencyRates(defaultRates);
