@@ -6,7 +6,12 @@ console.log('\n🚀 T-REX Shop OTP Server Setup\n');
 console.log('='.repeat(50));
 
 const envPath = path.join(__dirname, '.env');
-const password = '773769835As';
+const password = process.env.ADMIN_PASSWORD;
+if (!password) {
+  console.error('❌ ADMIN_PASSWORD environment variable is required.');
+  console.log('Usage: ADMIN_PASSWORD=YourSecurePassword node quick-start.js');
+  process.exit(1);
+}
 
 // Generate hash
 console.log('\n📝 Generating password hash...');
@@ -23,7 +28,7 @@ ADMIN_USER=owner
 ADMIN_HASH=${hash}
 
 # JWT Secret
-JWT_SECRET=trex_shop_secret_key_change_in_production_2024
+JWT_SECRET=CHANGE_ME_TO_A_STRONG_RANDOM_SECRET
 
 # Twilio Configuration (Optional - Server works in dev mode without it)
 # TWILIO_SID=

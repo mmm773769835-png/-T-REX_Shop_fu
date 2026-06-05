@@ -29,12 +29,30 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 -- VALUES ('اكتب_الـ_ID_هنا', 'trexshopmax@gmail.com', 'admin');
 
 -- ============================================
--- لتمكين الوصول للجميع (مؤقتاً للتطوير):
+-- Row Level Security for profiles table
 -- ============================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Enable all access for all users"
+-- Users can only read their own profile
+CREATE POLICY "Users can view own profile"
+  ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile"
+  ON public.profiles
+  FOR UPDATE
+  USING (auth.uid() = id);
+
+-- Admins have full access
+CREATE POLICY "Admins have full access"
   ON public.profiles
   FOR ALL
-  USING (true)
-  WITH CHECK (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.role = 'admin'
+    )
+  );

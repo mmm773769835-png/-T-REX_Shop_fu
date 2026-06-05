@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 // ==========================================
 // Supabase Configuration
 // ==========================================
-const SUPABASE_URL = 'https://udqnrsrwzifrzseixrcj.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_cNZtDBzqP3gGDMxJsvcvuA_iYOO-d4e';
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || 'https://udqnrsrwzifrzseixrcj.supabase.co';
+const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY || '';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -131,7 +131,7 @@ function App() {
     const password = e.target.password.value;
     
     try {
-      console.log('Attempting login with:', email);
+      console.log('Attempting login...');
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -143,10 +143,20 @@ function App() {
         throw error;
       }
       
-      console.log('Login successful, user:', data.user);
+      console.log('Login successful');
       
-      // Check if user is admin - simplified check
-      // If login succeeds, allow access (admin check can be done later)
+      // Verify admin role before granting access
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+      
+      if (profile?.role !== 'admin') {
+        await supabase.auth.signOut();
+        throw new Error('ليس لديك صلاحيات المدير');
+      }
+      
       setUser(data.user);
       setMessage({ type: 'success', text: 'تم تسجيل الدخول بنجاح!' });
       

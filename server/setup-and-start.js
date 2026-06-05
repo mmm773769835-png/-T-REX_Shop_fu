@@ -2,7 +2,12 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 
-const password = '773769835As';
+const password = process.env.ADMIN_PASSWORD;
+if (!password) {
+  console.error('❌ ADMIN_PASSWORD environment variable is required.');
+  console.log('Usage: ADMIN_PASSWORD=YourSecurePassword node setup-and-start.js');
+  process.exit(1);
+}
 const envPath = path.join(__dirname, '.env');
 
 console.log('🔧 Setting up server...\n');
@@ -28,7 +33,7 @@ ADMIN_HASH=
 # Run: node generate-hash.js to generate hash
 
 # JWT Secret
-JWT_SECRET=trex_shop_secret_key_change_in_production_2024
+JWT_SECRET=CHANGE_ME_TO_A_STRONG_RANDOM_SECRET
 
 # Twilio Configuration (Optional - Server works in dev mode without it)
 # TWILIO_SID=

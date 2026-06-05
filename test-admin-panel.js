@@ -3,13 +3,12 @@ console.log('=== Admin Panel Test Script ===');
 
 // Test credentials
 const ADMIN_CREDENTIALS = {
-  email: 'mmm712874799@gmail.com',
-  password: '733770042As'
+  email: process.env.ADMIN_EMAIL || '<set ADMIN_EMAIL env var>',
+  password: process.env.ADMIN_PASSWORD || '<set ADMIN_PASSWORD env var>'
 };
 
 console.log('Test 1: Admin Credentials');
 console.log(`Email: ${ADMIN_CREDENTIALS.email}`);
-console.log(`Password: ${ADMIN_CREDENTIALS.password}`);
 console.log('Status: ✅ Ready for use');
 
 console.log('\nTest 2: Navigation Routes');
