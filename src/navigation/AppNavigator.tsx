@@ -27,7 +27,7 @@ import AdminLoginScreen from '../screens/AdminLoginScreen';
 import AdminScreen from '../screens/AdminScreen';
 import AddProduct from '../screens/AddProduct';
 import AddressesScreen from '../screens/AddressesScreen';
-import WishlistScreen from '../screens/WishListScreen';
+import WishlistScreen from '../screens/WishlistScreen';
 import DealsScreen from '../screens/DealsScreen';
 import ReviewsScreen from '../screens/ReviewsScreen';
 import FiltersScreen from '../screens/FiltersScreen';
