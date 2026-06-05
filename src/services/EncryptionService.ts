@@ -84,7 +84,7 @@ export function decryptPhoneNumber(encryptedPhone: string): string {
     return decrypted;
   } catch (error) {
     console.error('Error decrypting phone number:', error);
-    return '***-***-****';
+    throw new Error('Phone number decryption failed');
   }
 }
 
@@ -108,7 +108,7 @@ export function decryptEmail(encryptedEmail: string): string {
     return decrypted;
   } catch (error) {
     console.error('Error decrypting email:', error);
-    return '***@***.***';
+    throw new Error('Email decryption failed');
   }
 }
 
@@ -138,11 +138,7 @@ export function decryptAddress(encryptedAddress: string): any {
     return decryptObject(encryptedAddress);
   } catch (error) {
     console.error('Error decrypting address:', error);
-    return {
-      street: '***',
-      city: '***',
-      country: '***',
-    };
+    throw new Error('Address decryption failed');
   }
 }
 
@@ -185,7 +181,7 @@ export function verifyHash(data: string, hash: string): boolean {
     return computedHash === hash;
   } catch (error) {
     console.error('Error verifying hash:', error);
-    return false;
+    throw new Error('Hash verification failed');
   }
 }
 
@@ -232,7 +228,7 @@ export function decryptFromFirestore(data: any, sensitiveFields: string[] = []):
       const isValid = verifyHash(dataString, data._dataHash);
 
       if (!isValid) {
-        console.warn('⚠️ Data integrity check failed');
+        throw new Error('Data integrity check failed: hash mismatch');
       }
     }
 

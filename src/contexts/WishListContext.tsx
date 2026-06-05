@@ -241,7 +241,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       if (error) {
         console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
-        return;
+        throw new Error(error.message || 'Failed to add item to wishlist');
       }
 
       // Update local state
@@ -249,6 +249,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       console.log('✅ WishListContext: تم إضافة المنتج إلى قائمة الأمنيات');
     } catch (error) {
       console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
+      throw error;
     }
   };
 
@@ -277,7 +278,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       if (deleteError) {
         console.error('❌ WishListContext: خطأ في حذف العنصر:', deleteError);
-        return;
+        throw new Error(deleteError.message || 'Failed to remove item from wishlist');
       }
 
       // Update local state
@@ -285,6 +286,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       console.log('✅ WishListContext: تم إزالة المنتج من قائمة الأمنيات');
     } catch (error) {
       console.error('❌ WishListContext: خطأ في إزالة المنتج من قائمة الأمنيات:', error);
+      throw error;
     }
   };
 

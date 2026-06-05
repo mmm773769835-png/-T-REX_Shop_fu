@@ -100,7 +100,7 @@ export async function getTwoFactorSettings(userId: string): Promise<TwoFactorSet
     return { enabled: false };
   } catch (error) {
     console.error('Error getting 2FA settings:', error);
-    return { enabled: false };
+    throw error;
   }
 }
 
@@ -159,7 +159,7 @@ export async function isTwoFactorEnabled(userId: string): Promise<boolean> {
     return settings.enabled;
   } catch (error) {
     console.error('Error checking 2FA status:', error);
-    return false;
+    throw error;
   }
 }
 
@@ -181,7 +181,7 @@ export async function verifyTwoFactorCode(userId: string, verificationCode: stri
     return true;
   } catch (error) {
     console.error('Error verifying 2FA code:', error);
-    return false;
+    throw error;
   }
 }
 

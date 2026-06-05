@@ -110,7 +110,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser,
     signOut: async () => {
       console.log('[DEBUG] AuthContext: Sign out called');
-      await authService.signOut();
+      const { error } = await authService.signOut();
+      if (error) {
+        console.error('[DEBUG] AuthContext: Sign out failed', error);
+        throw error;
+      }
       console.log('[DEBUG] AuthContext: Sign out completed, setting user to null');
       setUser(null);
       console.log('[DEBUG] AuthContext: User set to null');

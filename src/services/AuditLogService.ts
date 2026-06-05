@@ -53,6 +53,10 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
     console.log(`📝 Audit log created: ${entry.action} - ${entry.status}`);
   } catch (error) {
     console.error('Error creating audit log:', error);
+    // Re-throw for critical/high severity events so callers can react
+    if (entry.severity === 'critical' || entry.severity === 'high') {
+      throw error;
+    }
   }
 }
 
@@ -151,7 +155,7 @@ export async function getUserAuditLogs(userId: string, limitCount: number = 50):
     return logs;
   } catch (error) {
     console.error('Error fetching audit logs:', error);
-    return [];
+    throw error;
   }
 }
 
@@ -177,7 +181,7 @@ export async function getCriticalAuditLogs(limitCount: number = 20): Promise<any
     return logs;
   } catch (error) {
     console.error('Error fetching critical audit logs:', error);
-    return [];
+    throw error;
   }
 }
 
