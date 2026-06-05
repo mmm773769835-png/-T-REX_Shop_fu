@@ -33,9 +33,9 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        username: 'owner',
-                        password: '773769835As',
-                        phone: '773769835',
+                        username: document.getElementById('username')?.value || 'owner',
+                        password: document.getElementById('password')?.value || '',
+                        phone: document.getElementById('phone')?.value || '',
                         via: 'both'
                     })
                 });

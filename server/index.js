@@ -149,7 +149,8 @@ setInterval(() => {
 }, 60 * 1000); // Every minute
 
 function genOTP(){ 
-  return ('000000' + Math.floor(Math.random()*1000000)).slice(-6); 
+  const { randomInt } = require('crypto');
+  return ('000000' + randomInt(1000000)).slice(-6); 
 }
 
 function verifyAdminToken(req, res, next) {
@@ -535,8 +536,7 @@ app.post('/api/upload/image-base64', verifyAdminToken, async (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -556,7 +556,6 @@ app.post('/api/auth/admin-login',
       
       console.log('🔐 Admin Login Attempt:');
       console.log('  - Provided Email:', email);
-      console.log('  - Provided Password:', password);
       
       // التحقق من أن البريد هو بريد المدير
       const adminEmail = process.env.ADMIN_EMAIL;
@@ -579,7 +578,7 @@ app.post('/api/auth/admin-login',
       
       // التحقق من كلمة المرور
       const adminHash = process.env.ADMIN_HASH;
-      console.log('  - Hash Length:', adminHash ? adminHash.length : 'N/A');
+
       
       if (!adminHash) {
         console.error('❌ ADMIN_HASH not configured in environment variables');

@@ -11,9 +11,9 @@ async function testOtpRequest() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: 'owner',
-        password: '773769835As',
-        phone: '773769835',
+        username: process.env.ADMIN_USER || 'owner',
+        password: process.env.ADMIN_PASSWORD || '<set ADMIN_PASSWORD env var>',
+        phone: process.env.TEST_PHONE || '773769835',
         via: 'both'
       })
     });
