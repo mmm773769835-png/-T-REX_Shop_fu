@@ -2,12 +2,12 @@ import * as React from "react";
 import { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal, FlatList, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
 import { PRODUCT_CATEGORIES, PRODUCT_ATTRIBUTES } from "../shared/constants/productConstants";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { getDefaultProductImage } from '../utils/imageUtils';
 import { dbService, storageService } from '../services/SupabaseService';
+import { pickImageFromLibrary, uploadImageToStorage } from '../shared/utils/imagePickerUtils';
 
 export default function AddProduct({ navigation, route }: any) {
   const { language } = useContext(LanguageContext);
@@ -25,44 +25,14 @@ export default function AddProduct({ navigation, route }: any) {
   const [showAttributeModal, setShowAttributeModal] = useState(false);
 
   const pickImage = async () => {
-    try {
-      // التحقق من العدد الأقصى للصور
-      if (images.length >= 10) {
-        Alert.alert(
-          language === "ar" ? "تنبيه" : "Warning",
-          language === "ar" ? "الحد الأقصى للصور هو 10 صور" : "Maximum 10 images allowed"
-        );
-        return;
-      }
-
-      // طلب إذن الوصول إلى المعرض
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (!permissionResult.granted) {
-        Alert.alert(
-          language === "ar" ? "خطأ" : "Error",
-          language === "ar" ? "نحتاج إلى إذن للوصول إلى المعرض" : "We need permission to access the gallery"
-        );
-        return;
-      }
-
-      // فتح محدد الصور
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        setImages([...images, result.assets[0].uri]);
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "فشل في اختيار الصورة. يرجى المحاولة مرة أخرى." : "Failed to select image. Please try again."
-      );
+    const uri = await pickImageFromLibrary({
+      language,
+      aspect: [4, 3],
+      maxImages: 10,
+      currentCount: images.length,
+    });
+    if (uri) {
+      setImages([...images, uri]);
     }
   };
 
@@ -72,41 +42,11 @@ export default function AddProduct({ navigation, route }: any) {
   };
 
   const uploadImage = async (uri: string) => {
-    try {
-      // التحقق من صحة URI
-      if (!uri || typeof uri !== 'string') {
-        console.warn("Invalid image URI provided");
-        return getDefaultProductImage();
-      }
-
-      const filename = `${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
-
-      // التحقق من نوع الصورة لتجنب خطأ ArrayBuffer
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      // رفع الصورة إلى Supabase Storage
-      const { data, error } = await storageService.upload('product-images', filename, blob);
-
-      if (error) {
-        console.error("Error uploading image:", error);
-        Alert.alert(
-          language === "ar" ? "تحذير" : "Warning",
-          language === "ar" ? "فشل في رفع الصورة. سيتم استخدام صورة افتراضية." : "Failed to upload image. Default image will be used."
-        );
-        return getDefaultProductImage();
-      }
-
-      const downloadURL = storageService.getPublicUrl('product-images', filename);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      Alert.alert(
-        language === "ar" ? "تحذير" : "Warning",
-        language === "ar" ? "فشل في رفع الصورة. سيتم استخدام صورة افتراضية." : "Failed to upload image. Default image will be used."
-      );
+    if (!uri || typeof uri !== 'string') {
       return getDefaultProductImage();
     }
+    const filename = `${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+    return uploadImageToStorage(uri, storageService, 'product-images', filename, getDefaultProductImage());
   };
 
   const handleAddProduct = async () => {

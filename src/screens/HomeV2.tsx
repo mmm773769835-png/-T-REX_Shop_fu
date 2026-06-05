@@ -25,36 +25,10 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
+import { normalizeText } from '../shared/utils/textUtils';
+import { mapRawProducts } from '../shared/utils/productMapper';
 
 const { width } = Dimensions.get("window");
-
-const normalizeText = (text: string): string => {
-  if (!text) return "";
-  // تحويل النص إلى سلسلة
-  const str = String(text);
-  // إزالة المسافات الزائدة
-  const trimmed = str.trim();
-  // التحقق إذا كان النص يحتوي على أحرف عربية
-  const hasArabic = /[\u0600-\u06FF]/.test(trimmed);
-  
-  if (hasArabic) {
-    // للنص العربي: إزالة التشكيل فقط والحفاظ على الحروف
-    return trimmed
-      .normalize("NFC")
-      .replace(/[\u064B-\u065F\u0670]/g, "") // إزالة علامات التشكيل العربية
-      .replace(/\s+/g, " ") // إزالة المسافات المتعددة
-      .trim();
-  } else {
-    // للنص الإنجليزي: التحويل إلى أحرف صغيرة وإزالة الرموز
-    return trimmed
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // إزالة علامات التشكيل اللاتينية
-      .replace(/[^\w\s]/gi, "") // إزالة الرموز غير الكلمة
-      .replace(/\s+/g, " ") // إزالة المسافات المتعددة
-      .trim();
-  }
-};
 
 // قائمة الأقسام المتاحة
 const CATEGORIES = [...CATEGORIES_WITH_ICONS];
@@ -234,53 +208,12 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
           return;
         }
 
-        console.log("📥 تم استلام تحديث من قاعدة البيانات. عدد الوثائق:", data?.length || 0);
-
-        // معالجة البيانات إلى مصفوفة منتجات
-        const items: Product[] = [];
-
-        if (data) {
-          data.forEach((item: any) => {
-            console.log("📄 بيانات الوثيقة:", item.id, item);
-
-            // التأكد من أن البيانات تحتوي على الحقول المطلوبة
-            if (item && item.name && item.price !== undefined) {
-              items.push({
-                id: item.id,
-                name: item.name || "منتج غير مسمى",
-                price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0,
-                description: item.description || "لا يوجد وصف",
-                imageUrl: item.image_url || item.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
-                images: item.images || (item.image_url ? [item.image_url] : []),
-                category: item.category || "غير مصنف",
-                paymentMethod: item.payment_method || item.paymentMethod || "cash",
-                currency: item.currency || "YER",
-                discount: item.discount || 0,
-                originalPrice: item.original_price || item.old_price || item.originalPrice || null,
-                old_price: item.old_price || item.original_price || null,
-                is_new: item.is_new || false,
-                stock: item.stock ?? item.quantity ?? null,
-                attribute: item.attribute || item.status || ""
-              });
-            } else {
-              console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", item.id, item);
-            }
-          });
-        }
-
-        console.log("📦 المنتجات المحولة:", items);
+        const items = mapRawProducts(data) as unknown as Product[];
 
         setProducts(items);
         setLoading(false);
         setError(null);
-
-        // طباعة معلومات التصحيح
         console.log("✅ تم تحميل المنتجات:", items.length);
-        if (items.length > 0) {
-          console.log("📝 أول منتج:", items[0]);
-        } else {
-          console.log("📝 لا توجد منتجات في قاعدة البيانات");
-        }
       };
 
       loadProducts();

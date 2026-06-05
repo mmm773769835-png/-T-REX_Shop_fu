@@ -22,6 +22,7 @@ import { useReviews } from '../contexts/ReviewsContext';
 import Button from "../shared/components/Button";
 import { sanitizeImageUrl, getDefaultProductImage } from '../utils/imageUtils';
 import { dbService } from '../services/SupabaseService';
+import { showErrorAlert } from '../shared/utils/alertUtils';
 
 export default function ProductDetails({ route, navigation }: any) {
   // استقبال product من التنقل العادي أو productId من Deep Link
@@ -51,10 +52,7 @@ export default function ProductDetails({ route, navigation }: any) {
 
           if (error) {
             console.error('❌ ProductDetails: خطأ في جلب المنتج:', error);
-            Alert.alert(
-              language === "ar" ? "خطأ" : "Error",
-              language === "ar" ? "حدث خطأ في جلب المنتج" : "Error fetching product"
-            );
+            showErrorAlert(language, "حدث خطأ في جلب المنتج", "Error fetching product");
             navigation.goBack();
             return;
           }
@@ -62,21 +60,13 @@ export default function ProductDetails({ route, navigation }: any) {
           if (data && data.length > 0) {
             const productData = { ...data[0] };
             setFetchedProduct(productData);
-            console.log('✅ ProductDetails: تم جلب المنتج بنجاح');
           } else {
-            console.error('❌ ProductDetails: المنتج غير موجود');
-            Alert.alert(
-              language === "ar" ? "خطأ" : "Error",
-              language === "ar" ? "المنتج غير موجود" : "Product not found"
-            );
+            showErrorAlert(language, "المنتج غير موجود", "Product not found");
             navigation.goBack();
           }
         } catch (error) {
           console.error('❌ ProductDetails: خطأ في جلب المنتج:', error);
-          Alert.alert(
-            language === "ar" ? "خطأ" : "Error",
-            language === "ar" ? "حدث خطأ في جلب المنتج" : "Error fetching product"
-          );
+          showErrorAlert(language, "حدث خطأ في جلب المنتج", "Error fetching product");
           navigation.goBack();
         } finally {
           setLoading(false);

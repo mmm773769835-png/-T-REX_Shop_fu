@@ -10,7 +10,6 @@ import {
   Image,
   Platform,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { Ionicons } from "@expo/vector-icons";
 import { authService, dbService, storageService } from '../services/SupabaseService';
@@ -18,6 +17,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getDefaultUserImage } from '../utils/imageUtils';
+import { pickImageFromLibrary, uploadImageToStorage } from '../shared/utils/imagePickerUtils';
 
 export default function RegisterScreen({ navigation }: any) {
   const { language } = useContext(LanguageContext);
@@ -34,72 +34,22 @@ export default function RegisterScreen({ navigation }: any) {
   const styles = getStyles(isDarkMode, colors);
 
   const pickImage = async () => {
-    try {
-      // طلب إذن الوصول إلى المعرض
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (!permissionResult.granted) {
-        Alert.alert(
-          language === "ar" ? "خطأ" : "Error",
-          language === "ar" ? "نحتاج إلى إذن للوصول إلى المعرض" : "We need permission to access the gallery"
-        );
-        return;
-      }
-
-      // فتح محدد الصور
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        setProfileImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "فشل في اختيار الصورة" : "Failed to pick image"
-      );
+    const uri = await pickImageFromLibrary({ language, aspect: [1, 1] });
+    if (uri) {
+      setProfileImage(uri);
     }
   };
 
   const uploadProfileImage = async (imageUri: string): Promise<string> => {
-    try {
-      if (!imageUri || imageUri.startsWith('http')) {
-        return imageUri || getDefaultUserImage();
-      }
-
-      console.log("📤 بدء رفع صورة الملف الشخصي...");
-      
-      const timestamp = Date.now();
-      const filename = `profiles/user_${timestamp}.jpg`;
-      
-      // التحقق من نوع الصورة لتجنب خطأ ArrayBuffer
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      
-      // رفع الصورة إلى Supabase Storage
-      const { data, error } = await storageService.upload('profile-images', filename, blob);
-      
-      if (error) {
-        console.error("❌ خطأ في رفع صورة الملف الشخصي:", error);
-        return getDefaultUserImage();
-      }
-      
-      const downloadURL = storageService.getPublicUrl('profile-images', filename);
-      
-      console.log(`📤 رفع صورة الملف الشخصي إلى Supabase Storage: ${filename}`);
-      console.log(`✅ تم رفع صورة الملف الشخصي: ${downloadURL}`);
-      return downloadURL;
-    } catch (error: any) {
-      console.error("❌ خطأ في رفع صورة الملف الشخصي:", error);
-      console.error("تفاصيل الخطأ:", error?.message || error);
-      // في حالة الفشل، نستخدم الصورة الافتراضية
-      return getDefaultUserImage();
-    }
+    const timestamp = Date.now();
+    const path = `profiles/user_${timestamp}.jpg`;
+    return uploadImageToStorage(
+      imageUri,
+      storageService,
+      'profile-images',
+      path,
+      getDefaultUserImage()
+    );
   };
 
   const handleRegister = async () => {

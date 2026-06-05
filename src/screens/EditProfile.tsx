@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, Platform } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { getDefaultUserImage } from "../utils/imageUtils";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useAuth } from "../contexts/AuthContext";
 import { dbService, storageService } from '../services/SupabaseService';
+import { pickImageFromLibrary, uploadImageToStorage } from '../shared/utils/imagePickerUtils';
 
 const EditProfile = ({ navigation, route }: any) => {
   const { language } = useContext(LanguageContext);
@@ -15,20 +15,9 @@ const EditProfile = ({ navigation, route }: any) => {
   const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (!permissionResult.granted) {
-      Alert.alert("❌", language === 'ar' ? "نحتاج إلى إذن للوصول إلى المعرض" : "We need permission to access the gallery");
-      return;
-    }
-    
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-    });
-    
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    const uri = await pickImageFromLibrary({ language, allowsEditing: false });
+    if (uri) {
+      setImage(uri);
     }
   };
 
@@ -39,19 +28,8 @@ const EditProfile = ({ navigation, route }: any) => {
       setLoading(true);
       let photoURL = image;
       if (image && !image.startsWith("https")) {
-        // التحقق من نوع الصورة لتجنب خطأ ArrayBuffer
-        const response = await fetch(image);
-        const blob = await response.blob();
-
-        // رفع الصورة إلى Supabase Storage
         const filename = `profiles/${user?.uid || phone}.jpg`;
-        const { data, error } = await storageService.upload('profile-images', filename, blob);
-
-        if (error) {
-          throw error;
-        }
-
-        photoURL = storageService.getPublicUrl('profile-images', filename);
+        photoURL = await uploadImageToStorage(image, storageService, 'profile-images', filename, getDefaultUserImage());
       }
 
       if (!user?.uid) {

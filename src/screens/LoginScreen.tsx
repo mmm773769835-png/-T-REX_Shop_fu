@@ -15,6 +15,7 @@ import { authService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { showErrorAlert, showSuccessAlert } from '../shared/utils/alertUtils';
 
 export default function LoginScreen({ navigation }: any) {
   const { language } = useContext(LanguageContext);
@@ -26,10 +27,7 @@ export default function LoginScreen({ navigation }: any) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "يرجى ملء جميع الحقول" : "Please fill all fields"
-      );
+      showErrorAlert(language, "يرجى ملء جميع الحقول", "Please fill all fields");
       return;
     }
 
@@ -37,16 +35,9 @@ export default function LoginScreen({ navigation }: any) {
     try {
       const { data, error } = await authService.signIn(email, password);
       if (error) {
-        Alert.alert(
-          language === "ar" ? "خطأ" : "Error",
-          error.message || (language === "ar" ? "فشل تسجيل الدخول" : "Login failed")
-        );
+        showErrorAlert(language, error.message || "فشل تسجيل الدخول", error.message || "Login failed");
       } else {
-        Alert.alert(
-          language === "ar" ? "نجاح" : "Success",
-          language === "ar" ? "تم تسجيل الدخول بنجاح" : "Login successful"
-        );
-        // تمرير معلومات تسجيل الدخول إلى الشاشة الرئيسية
+        showSuccessAlert(language, "تم تسجيل الدخول بنجاح", "Login successful");
         console.log('Navigating to MainTabs screen with login');
         navigation.reset({
           index: 0,
@@ -54,10 +45,7 @@ export default function LoginScreen({ navigation }: any) {
         });
       }
     } catch (error) {
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "حدث خطأ أثناء تسجيل الدخول" : "An error occurred during login"
-      );
+      showErrorAlert(language, "حدث خطأ أثناء تسجيل الدخول", "An error occurred during login");
     } finally {
       setLoading(false);
     }
@@ -88,32 +76,19 @@ export default function LoginScreen({ navigation }: any) {
   // Google Sign-In
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    console.log('[DEBUG] LoginScreen: Google Sign-In button pressed');
     try {
       const { data, error } = await authService.signInWithGoogle();
-      console.log('[DEBUG] LoginScreen: Google Sign-In response', { data, error });
       if (error) {
-        console.error('[DEBUG] LoginScreen: Google Sign-In error', error);
-        Alert.alert(
-          language === "ar" ? "خطأ" : "Error",
-          error.message || (language === "ar" ? "فشل تسجيل الدخول عبر Google" : "Google Sign-In failed")
-        );
+        showErrorAlert(language, error.message || "فشل تسجيل الدخول عبر Google", error.message || "Google Sign-In failed");
         setLoading(false);
       } else if (data?.url) {
-        console.log('[DEBUG] LoginScreen: Opening URL with WebBrowser', data.url);
-        const result = await WebBrowser.openAuthSessionAsync(data.url, 'trexshop://auth/callback');
-        console.log('[DEBUG] LoginScreen: WebBrowser result', result);
+        await WebBrowser.openAuthSessionAsync(data.url, 'trexshop://auth/callback');
         setLoading(false);
       } else {
-        console.log('[DEBUG] LoginScreen: No URL returned from Google Sign-In');
         setLoading(false);
       }
     } catch (error) {
-      console.error('[DEBUG] LoginScreen: Google Sign-In exception', error);
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "حدث خطأ أثناء تسجيل الدخول" : "An error occurred during login"
-      );
+      showErrorAlert(language, "حدث خطأ أثناء تسجيل الدخول", "An error occurred during login");
       setLoading(false);
     }
   };
