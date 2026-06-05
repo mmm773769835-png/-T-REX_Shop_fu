@@ -6,6 +6,7 @@ import { ThemeContext } from '../contexts/ThemeContext';
 import { useCart } from '../contexts/CartContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { showWarningAlert, showErrorAlert } from '../shared/utils/alertUtils';
 
 const CartScreen = ({ route, navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
@@ -27,11 +28,7 @@ const CartScreen = ({ route, navigation }: any) => {
 
     
     if (cartItems.length === 0) {
-
-      Alert.alert(
-        language === "ar" ? "تحذير" : "Warning",
-        language === "ar" ? "السلة فارغة" : "Cart is empty"
-      );
+      showWarningAlert(language, "السلة فارغة", "Cart is empty");
       return;
     }
     
@@ -55,11 +52,10 @@ const CartScreen = ({ route, navigation }: any) => {
       }
     } catch (error) {
       console.error('❌ CartScreen: خطأ في التنقل:', error);
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" 
-          ? `حدث خطأ أثناء التنقل: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`
-          : `An error occurred while navigating: ${error instanceof Error ? error.message : 'Unknown error'}`
+      showErrorAlert(
+        language,
+        `حدث خطأ أثناء التنقل: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`,
+        `An error occurred while navigating: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   };

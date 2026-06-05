@@ -7,31 +7,9 @@ import { useSearch } from '../contexts/SearchContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { dbService } from '../services/SupabaseService';
 import { sanitizeImageUrl } from '../utils/imageUtils';
-
-const normalizeText = (text: string): string =>
-  text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s\u0600-\u06FF]/gi, "")
-    .trim();
-
-// دالة debouncing لتحسين الأداء
-const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
+import { normalizeText } from '../shared/utils/textUtils';
+import { useDebounce } from '../shared/hooks/useDebounce';
+import { mapRawProducts } from '../shared/utils/productMapper';
 
 const SearchScreen = ({ navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
@@ -65,34 +43,7 @@ const SearchScreen = ({ navigation }: any) => {
         return;
       }
 
-      const items: any[] = [];
-
-      if (data) {
-        data.forEach((item: any) => {
-          if (item && item.name) {
-            items.push({
-              id: item.id,
-              name: item.name,
-              price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0,
-              description: item.description || "",
-              imageUrl: item.image_url || item.imageUrl || "https://via.placeholder.com/300x300/CCCCCC/FFFFFF?text=No+Image",
-              image_url: item.image_url || item.imageUrl,
-              images: item.images || (item.image_url ? [item.image_url] : []),
-              category: item.category || "غير مصنف",
-              currency: item.currency || "YER",
-              paymentMethod: item.payment_method || item.paymentMethod || "cash",
-              old_price: item.old_price || item.original_price || null,
-              originalPrice: item.original_price || item.old_price || null,
-              discount: item.discount || 0,
-              is_new: item.is_new || false,
-              stock: item.stock ?? item.quantity ?? null,
-              attribute: item.attribute || item.status || "",
-            });
-          }
-        });
-      }
-
-      setAllProducts(items);
+      setAllProducts(mapRawProducts(data));
       setLoading(false);
     };
 

@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import { showConfirmAlert } from '../shared/utils/alertUtils';
 
 const SettingsScreen = ({ navigation }: any) => {
   const { isDarkMode, toggleTheme, colors } = useContext(ThemeContext);
@@ -40,23 +41,18 @@ const SettingsScreen = ({ navigation }: any) => {
   };
 
   const handleSignOut = () => {
-    Alert.alert(
-      language === 'ar' ? 'تسجيل الخروج' : 'Sign Out',
-      language === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to sign out?',
-      [
-        {
-          text: language === 'ar' ? 'إلغاء' : 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: language === 'ar' ? 'تسجيل الخروج' : 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            await signOut();
-            navigation.navigate('Login');
-          },
-        },
-      ]
+    showConfirmAlert(
+      language,
+      "تسجيل الخروج",
+      "Sign Out",
+      "هل أنت متأكد من تسجيل الخروج؟",
+      "Are you sure you want to sign out?",
+      async () => {
+        await signOut();
+        navigation.navigate('Login');
+      },
+      "تسجيل الخروج",
+      "Sign Out"
     );
   };
 

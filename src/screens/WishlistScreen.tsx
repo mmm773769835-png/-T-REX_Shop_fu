@@ -7,6 +7,7 @@ import { useWishList } from '../contexts/WishListContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useCart } from '../contexts/CartContext';
 import { sanitizeImageUrl } from '../utils/imageUtils';
+import { showConfirmAlert, showLocalizedAlert } from '../shared/utils/alertUtils';
 
 const WishlistScreen = ({ navigation }: any) => {
   const { isDarkMode } = useContext(ThemeContext);
@@ -18,26 +19,26 @@ const WishlistScreen = ({ navigation }: any) => {
   const styles = getStyles(isDarkMode);
 
   const handleRemoveFromWishlist = (id: string, name: string) => {
-    Alert.alert(
-      language === "ar" ? "❌ إزالة من المفضلة" : "❌ Remove from Wishlist",
-      language === "ar" ? `هل تريد إزالة "${name}" من المفضلة؟` : `Remove "${name}" from wishlist?`,
-      [
-        { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
-        {
-          text: language === "ar" ? "إزالة" : "Remove",
-          style: "destructive",
-          onPress: () => removeFromWishList(id)
-        }
-      ]
+    showConfirmAlert(
+      language,
+      "❌ إزالة من المفضلة",
+      "❌ Remove from Wishlist",
+      `هل تريد إزالة "${name}" من المفضلة؟`,
+      `Remove "${name}" from wishlist?`,
+      () => removeFromWishList(id),
+      "إزالة",
+      "Remove"
     );
   };
 
   const handleAddToCart = (item: any) => {
     addToCart(item);
-    Alert.alert(
-      language === "ar" ? "✅ تمت الإضافة" : "✅ Added",
-      language === "ar" ? `تم إضافة "${item.name}" للسلة` : `"${item.name}" added to cart`,
-      [{ text: language === "ar" ? "حسناً" : "OK" }]
+    showLocalizedAlert(
+      language,
+      "✅ تمت الإضافة",
+      "✅ Added",
+      `تم إضافة "${item.name}" للسلة`,
+      `"${item.name}" added to cart`
     );
   };
 
@@ -55,10 +56,12 @@ const WishlistScreen = ({ navigation }: any) => {
     if (state.items.length === 0) return;
     
     state.items.forEach((item: any) => addToCart(item));
-    Alert.alert(
-      language === "ar" ? "✅ تمت الإضافة" : "✅ Added",
-      language === "ar" ? `تم إضافة ${state.items.length} منتجات للسلة` : `${state.items.length} products added to cart`,
-      [{ text: language === "ar" ? "حسناً" : "OK" }]
+    showLocalizedAlert(
+      language,
+      "✅ تمت الإضافة",
+      "✅ Added",
+      `تم إضافة ${state.items.length} منتجات للسلة`,
+      `${state.items.length} products added to cart`
     );
   };
 
