@@ -2848,8 +2848,11 @@
                         <div class="currency-option" onclick="selectCurrency('KWD')">
                             <span class="currency-flag">🇰🇼</span> دينار كويتي
                         </div>
-                        <div class="currency-option" onclick="selectCurrency('JOD')">
-                            <span class="currency-flag">🇯🇴</span> دينار أردني
+                        <div class="currency-option" onclick="selectCurrency('BHD')">
+                            <span class="currency-flag">🇧🇭</span> دينار بحريني
+                        </div>
+                        <div class="currency-option" onclick="selectCurrency('OMR')">
+                            <span class="currency-flag">🇴🇲</span> ريال عماني
                         </div>
                         <div class="currency-option" onclick="selectCurrency('AED')">
                             <span class="currency-flag">🇦🇪</span> درهم إماراتي
@@ -3364,7 +3367,8 @@
             'SAR': { symbol: '🇸🇦 ر.س', flag: '🇸🇦' },
             'USD': { symbol: '🇺🇸 $', flag: '🇺🇸' },
             'KWD': { symbol: '🇰🇼 د.ك', flag: '🇰🇼' },
-            'JOD': { symbol: '🇯🇴 د.أ', flag: '🇯🇴' },
+            'BHD': { symbol: '🇧🇭 د.ب', flag: '🇧🇭' },
+            'OMR': { symbol: '🇴🇲 ر.ع', flag: '🇴🇲' },
             'AED': { symbol: '🇦🇪 د.إ', flag: '🇦🇪' },
             'YER': { symbol: '🇾🇪 ر.ي', flag: '🇾🇪' },
             'EUR': { symbol: '🇪🇺 €', flag: '🇪🇺' }
@@ -3373,17 +3377,23 @@
         // Live exchange rates (SAR as base = 1)
         // YER uses special rate for Sana'a (approximate market rate)
         let exchangeRates = {
-            'SAR': 1, 'USD': 0.2667, 'KWD': 0.0815, 'JOD': 0.1889,
-            'AED': 0.9793, 'YER': 145.0, 'EUR': 0.2457
+            'YER': 1.0,
+            'SAR': 140.20,
+            'USD': 535.00,
+            'AED': 143.00,
+            'EUR': 564.00,
+            'KWD': 1582.00,
+            'BHD': 1334.00,
+            'OMR': 1371.00
         };
-        const EXCHANGE_SELL_MARGIN = 0.0345;
+        const EXCHANGE_SELL_MARGIN = 0; // 0% - No extra margins
 
         function getSellRate(code) {
             const rate = exchangeRates[code] || 1;
             return rate * (1 + EXCHANGE_SELL_MARGIN);
         }
 
-        // Fetch live exchange rates from API
+        // Fetch exchange rates from Supabase currency_rates table
         async function fetchExchangeRates() {
             try {
                 // Check cache first (valid for 48 hours = 2 days)
@@ -3398,57 +3408,51 @@
                     }
                 }
 
-                // Fetch from server endpoint (reads from Supabase exchange_rates table)
+                // Clear any existing cache
+                localStorage.removeItem('exchangeRates');
+                
+                // Fetch rates from Supabase currency_rates table via server endpoint
                 const response = await fetch('/api/exchange-rates/sanaa');
-                if (!response.ok) throw new Error('API error: ' + response.status);
+                if (!response.ok) {
+                    throw new Error('API error: ' + response.status);
+                }
                 
                 const data = await response.json();
                 
-                // Update rates for our currencies
-                const newRates = {};
-                for (const code of Object.keys(currencyInfo)) {
-                    if (data.rates && data.rates[code]) {
-                        newRates[code] = data.rates[code];
+                if (data.success && data.rates) {
+                    exchangeRates = data.rates;
+                    console.log('✅ Fetched exchange rates from Supabase currency_rates table');
+                    
+                    // Cache the rates
+                    localStorage.setItem('exchangeRates', JSON.stringify({
+                        rates: exchangeRates,
+                        timestamp: Date.now()
+                    }));
+                    
+                    // Re-render if currency is not YER
+                    if (currentCurrency.code !== 'YER') {
+                        currentCurrency.rate = getSellRate(currentCurrency.code);
+                        localStorage.setItem('currency', JSON.stringify(currentCurrency));
+                        renderProducts();
+                        updateCartDisplay();
                     }
-                }
-                
-                // Yemeni Rial (YER) - Use special market rate for Sana'a
-                // Official rate is different from market rate, using approximate market rate
-                // Ensure YER is set (base currency)
-                if (!newRates['YER']) {
-                    newRates['YER'] = 1.0;
-                }
-                
-                exchangeRates = newRates;
-                
-                console.log('✅ Fetched live exchange rates from Supabase (exchange_rates table)');
-                
-                // Cache the rates
-                localStorage.setItem('exchangeRates', JSON.stringify({
-                    rates: exchangeRates,
-                    timestamp: Date.now()
-                }));
-                
-                // Re-render if currency is not YER
-                if (currentCurrency.code !== 'YER') {
-                    currentCurrency.rate = getSellRate(currentCurrency.code);
-                    localStorage.setItem('currency', JSON.stringify(currentCurrency));
-                    renderProducts();
-                    updateCartDisplay();
+                } else {
+                    throw new Error('Invalid response from server');
                 }
                 
             } catch (error) {
                 console.warn('⚠️ Failed to fetch live rates, using defaults:', error.message);
                 
-                // Use default rates if fetch fails
+                // Use fallback rates if fetch fails
                 exchangeRates = {
                     'YER': 1.0,
                     'SAR': 140.20,
                     'USD': 535.00,
-                    'KWD': 1582.00,
-                    'JOD': 754.50,
                     'AED': 143.00,
-                    'EUR': 564.00
+                    'EUR': 564.00,
+                    'KWD': 1582.00,
+                    'BHD': 1334.00,
+                    'OMR': 1371.00
                 };
             }
         }

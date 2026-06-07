@@ -632,109 +632,85 @@ app.post('/api/auth/admin-login',
   }
 );
 
-// Endpoint لجلب أسعار الصرف من exrye.com/sanaa
+// Endpoint لجلب أسعار الصرف من جدول currency_rates في Supabase
 app.get('/api/exchange-rates/sanaa', async (req, res) => {
   try {
-    console.log('🔄 Fetching exchange rates from exrye.com/sanaa');
-    
-    // جلب الصفحة من exrye.com/sanaa
-    const response = await fetch('https://exrye.com/sanaa');
-    const html = await response.text();
-    
-    // استخدام cheerio لاستخراج البيانات من HTML
-    const $ = cheerio.load(html);
-    
-    // الأسعار الافتراضية (إذا فشل الاستخراج)
-    const defaultRates = {
+    // Fallback manual rates (used if Supabase fetch fails)
+    const fallbackRates = {
       YER: 1.0,
       SAR: 140.20,
       USD: 535.00,
-      KWD: 1582.00,
-      JOD: 754.50,
       AED: 143.00,
-      EUR: 564.00
+      EUR: 564.00,
+      KWD: 1582.00,
+      BHD: 1334.00,
+      OMR: 1371.00
     };
-    
-    // محاولة استخراج الأسعار من HTML
-    // ملاحظة: هذا يعتمد على بنية HTML الحالية للموقع
-    // قد يحتاج تحديث إذا تغيرت بنية الموقع
-    let rates = { ...defaultRates };
-    
-    // البحث عن أسعار الصرف في الصفحة
-    // هذا مثال بسيط - قد يحتاج تعديل بناءً على بنية HTML الفعلية
-    $('table tbody tr, .rate-row, .exchange-rate').each((index, element) => {
-      const text = $(element).text();
-      
-      // محاولة استخراج العملة والسعر من النص
-      const sarMatch = text.match(/ريال سعودي.*?(\d+\.?\d*)/i);
-      const usdMatch = text.match(/دولار.*?(\d+\.?\d*)/i);
-      const aedMatch = text.match(/درهم.*?(\d+\.?\d*)/i);
-      const kwdMatch = text.match(/دينار كويتي.*?(\d+\.?\d*)/i);
-      const jodMatch = text.match(/دينار أردني.*?(\d+\.?\d*)/i);
-      const eurMatch = text.match(/يورو.*?(\d+\.?\d*)/i);
-      
-      if (sarMatch) rates.SAR = parseFloat(sarMatch[1]);
-      if (usdMatch) rates.USD = parseFloat(usdMatch[1]);
-      if (aedMatch) rates.AED = parseFloat(aedMatch[1]);
-      if (kwdMatch) rates.KWD = parseFloat(kwdMatch[1]);
-      if (jodMatch) rates.JOD = parseFloat(jodMatch[1]);
-      if (eurMatch) rates.EUR = parseFloat(eurMatch[1]);
-    });
-    
-    console.log('✅ Exchange rates fetched:', rates);
-    
-    // تحديث جدول exchange_rates في Supabase تلقائياً
-    try {
-      for (const [currencyCode, rate] of Object.entries(rates)) {
-        const { error: upsertError } = await supabase
-          .from('exchange_rates')
-          .upsert({
-            currency_code: currencyCode,
-            rate: rate,
-            timestamp: new Date().toISOString(),
-            source: 'exrye.com/sanaa'
-          }, {
-            onConflict: 'currency_code'
-          });
-        
-        if (upsertError) {
-          console.error(`❌ Error updating ${currencyCode} in Supabase:`, upsertError);
-        } else {
-          console.log(`✅ Updated ${currencyCode} in Supabase: ${rate}`);
-        }
+
+    // Fetch from Supabase currency_rates table
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('currency_rates')
+        .select('*')
+        .eq('is_active', true)
+        .order('code');
+
+      if (error) {
+        console.warn('⚠️ Failed to fetch rates from Supabase:', error.message);
+        console.log('✅ Using fallback manual exchange rates');
+        return res.json({
+          success: true,
+          rates: fallbackRates,
+          timestamp: new Date().toISOString(),
+          source: 'fallback'
+        });
       }
-      
-      console.log('✅ All exchange rates updated in Supabase');
-    } catch (supabaseError) {
-      console.error('❌ Error updating Supabase:', supabaseError);
-      // لا نوقف العملية إذا فشل تحديث Supabase، نكمل بإرجاع الأسعار
+
+      if (data && data.length > 0) {
+        // Convert Supabase data to rates object
+        const rates = {};
+        data.forEach(item => {
+          rates[item.code] = parseFloat(item.rate);
+        });
+
+        console.log('✅ Fetched exchange rates from Supabase currency_rates table');
+        return res.json({
+          success: true,
+          rates: rates,
+          timestamp: new Date().toISOString(),
+          source: 'supabase'
+        });
+      }
     }
-    
+
+    // Supabase not configured or no data, use fallback rates
+    console.log('✅ Using fallback manual exchange rates');
     return res.json({
       success: true,
-      rates: rates,
+      rates: fallbackRates,
       timestamp: new Date().toISOString(),
-      source: 'exrye.com/sanaa'
+      source: 'fallback'
     });
   } catch (error) {
     console.error('❌ Error fetching exchange rates:', error);
-    
-    // إرجاع الأسعار الافتراضية في حالة الفشل
-    const defaultRates = {
+
+    // Return fallback rates on error
+    const fallbackRates = {
       YER: 1.0,
       SAR: 140.20,
       USD: 535.00,
-      KWD: 1582.00,
-      JOD: 754.50,
       AED: 143.00,
-      EUR: 564.00
+      EUR: 564.00,
+      KWD: 1582.00,
+      BHD: 1334.00,
+      OMR: 1371.00
     };
-    
+
     return res.json({
       success: false,
-      rates: defaultRates,
+      rates: fallbackRates,
       timestamp: new Date().toISOString(),
-      source: 'default',
+      source: 'fallback',
       error: error.message
     });
   }

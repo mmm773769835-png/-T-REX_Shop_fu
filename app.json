@@ -16,19 +16,17 @@
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser"
     ],
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "assetBundlePatterns": [
       "**/*"
     ],
-
     "ios": {
       "bundleIdentifier": "com.trexshop.app",
       "supportsTablet": true,
@@ -45,16 +43,12 @@
         ]
       }
     },
-
     "android": {
       "package": "com.trexshop.app",
-
-
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-
       "permissions": [
         "INTERNET",
         "VIBRATE",
@@ -62,7 +56,6 @@
         "WRITE_EXTERNAL_STORAGE",
         "CAMERA"
       ],
-
       "intentFilters": [
         {
           "action": "VIEW",
@@ -81,10 +74,8 @@
           ]
         }
       ],
-
       "googleServicesFile": "./google-services.json"
     },
-
     "extra": {
       "eas": {
         "projectId": "501b6d0b-9352-489d-8a74-57b84e1393bd"
@@ -99,7 +90,5 @@
         "measurementId": ""
       }
     }
-    
-
   }
 }

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../config/supabase';
 
-export type Currency = 'YER' | 'USD' | 'SAR' | 'KWD' | 'JOD' | 'AED' | 'EUR';
+export type Currency = 'YER' | 'USD' | 'SAR' | 'KWD' | 'AED' | 'EUR' | 'BHD' | 'OMR';
 
 export interface CurrencyRate {
   code: Currency;
@@ -11,19 +11,20 @@ export interface CurrencyRate {
   rate: number; // Rate relative to YER (base currency)
 }
 
-// Default rates (will be updated from API)
-// Based on Sana'a market rates (1 YER as base)
+// Fallback manual rates (used if Supabase fetch fails)
+// Base currency: YER (1 YER as base)
 export const DEFAULT_CURRENCY_RATES: CurrencyRate[] = [
   { code: 'YER', symbol: 'ر.ي', name: 'ريال يمني', rate: 1.0 },
   { code: 'SAR', symbol: 'ر.س', name: 'ريال سعودي', rate: 140.20 },
   { code: 'USD', symbol: '$', name: 'دولار أمريكي', rate: 535.00 },
-  { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 1582.00 },
-  { code: 'JOD', symbol: 'د.أ', name: 'دينار أردني', rate: 754.50 },
   { code: 'AED', symbol: 'د.إ', name: 'درهم إماراتي', rate: 143.00 },
   { code: 'EUR', symbol: '€', name: 'يورو', rate: 564.00 },
+  { code: 'KWD', symbol: 'د.ك', name: 'دينار كويتي', rate: 1582.00 },
+  { code: 'BHD', symbol: 'د.ب', name: 'دينار بحريني', rate: 1334.00 },
+  { code: 'OMR', symbol: 'ر.ع', name: 'ريال عماني', rate: 1371.00 },
 ];
 
-const EXCHANGE_SELL_MARGIN = 0.0345; // 3.45%
+const EXCHANGE_SELL_MARGIN = 0; // 0% - No extra margins
 
 interface CurrencyContextType {
   currency: Currency;
@@ -40,66 +41,50 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [currency, setCurrency] = useState<Currency>('YER');
   const [currencyRates, setCurrencyRates] = useState<CurrencyRate[]>(DEFAULT_CURRENCY_RATES);
 
-  // Fetch live exchange rates from Supabase exchange_rates table
+  // Fetch exchange rates from Supabase currency_rates table
   const fetchExchangeRates = async () => {
     try {
-      // Check cache first (valid for 48 hours = 2 days)
-      const cached = await AsyncStorage.getItem('exchangeRates');
-      if (cached) {
-        const { rates, timestamp } = JSON.parse(cached);
-        const twoDays = 48 * 60 * 60 * 1000;
-        if (Date.now() - timestamp < twoDays) {
-          setCurrencyRates(rates);
-          console.log('✅ Using cached exchange rates (valid for 48 hours)');
-          return;
-        }
+      // Clear any existing cache
+      await AsyncStorage.removeItem('exchangeRates');
+      
+      // Fetch rates from Supabase currency_rates table
+      const { data, error } = await supabase
+        .from('currency_rates')
+        .select('*')
+        .eq('is_active', true)
+        .order('code');
+      
+      if (error) {
+        console.warn('⚠️ Failed to fetch rates from Supabase:', error.message);
+        // Use fallback manual rates
+        const fallbackRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
+        setCurrencyRates(fallbackRates);
+        return;
       }
-
-      // Fetch from Supabase exchange_rates table
-      const { data: exchangeRatesData, error } = await supabase
-        .from('exchange_rates')
-        .select('currency_code, rate')
-        .order('timestamp', { ascending: false });
-
-      if (error) throw error;
-
-      // Update rates from Supabase response
-      const newRates: CurrencyRate[] = [];
-      const latestRates = new Map<string, number>();
-
-      // Get the latest rate for each currency
-      if (exchangeRatesData) {
-        for (const item of exchangeRatesData) {
-          if (!latestRates.has(item.currency_code)) {
-            latestRates.set(item.currency_code, item.rate);
-          }
-        }
+      
+      if (data && data.length > 0) {
+        // Convert Supabase data to CurrencyRate format
+        const fetchedRates: CurrencyRate[] = data.map(item => ({
+          code: item.code as Currency,
+          symbol: item.symbol,
+          name: item.name,
+          rate: parseFloat(item.rate)
+        }));
+        
+        setCurrencyRates(fetchedRates);
+        console.log('✅ Fetched exchange rates from Supabase currency_rates table');
+      } else {
+        // No data in Supabase, use fallback rates
+        const fallbackRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
+        setCurrencyRates(fallbackRates);
+        console.log('⚠️ No data in currency_rates table, using fallback rates');
       }
-
-      for (const defaultRate of DEFAULT_CURRENCY_RATES) {
-        const supabaseRate = latestRates.get(defaultRate.code);
-        if (supabaseRate) {
-          newRates.push({ ...defaultRate, rate: supabaseRate });
-        } else {
-          newRates.push(defaultRate);
-        }
-      }
-
-      setCurrencyRates(newRates);
-
-      // Cache the rates with timestamp
-      await AsyncStorage.setItem('exchangeRates', JSON.stringify({
-        rates: newRates,
-        timestamp: Date.now()
-      }));
-
-      console.log('✅ Fetched live exchange rates from Supabase (exchange_rates table)');
     } catch (error) {
-      console.warn('⚠️ Failed to fetch live rates from Supabase, using defaults:', error);
-
-      // Use default rates if fetch fails
-      const defaultRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
-      setCurrencyRates(defaultRates);
+      console.warn('⚠️ Error fetching exchange rates:', error);
+      
+      // Use fallback rates if error occurs
+      const fallbackRates = DEFAULT_CURRENCY_RATES.map(rate => ({ ...rate }));
+      setCurrencyRates(fallbackRates);
     }
   };
 
@@ -168,12 +153,26 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const numericPrice = typeof price === 'number' ? price : parseFloat(String(price).replace(/,/g, '')) || 0;
 
     // Convert price from source currency to target currency
-    // First convert to YER (base currency), then to target currency
-    const priceInYER = numericPrice * (sourceRate?.rate || 1);
-    const rawConvertedPrice = priceInYER / (targetRate?.rate || 1);
+    // If source is YER (base currency), divide by target rate
+    // If source is not YER, first convert to YER then to target
+    let convertedPrice: number;
+    
+    if (source === 'YER') {
+      // Price is already in YER, convert to target currency
+      convertedPrice = numericPrice / (targetRate?.rate || 1);
+    } else if (target === 'YER') {
+      // Convert from source to YER
+      convertedPrice = numericPrice * (sourceRate?.rate || 1);
+    } else {
+      // Convert from source to YER, then to target
+      const priceInYER = numericPrice * (sourceRate?.rate || 1);
+      convertedPrice = priceInYER / (targetRate?.rate || 1);
+    }
 
     // Apply sell margin if converting between different currencies (like the website)
-    const convertedPrice = (source === target ? rawConvertedPrice : rawConvertedPrice * (1 + EXCHANGE_SELL_MARGIN));
+    if (source !== target) {
+      convertedPrice = convertedPrice * (1 + EXCHANGE_SELL_MARGIN);
+    }
 
     return `${convertedPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${symbol}`;
   };

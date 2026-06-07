@@ -475,7 +475,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
 
       {currencyDropdownVisible && (
         <View style={styles.currencyDropdown}>
-          {(['SAR', 'USD', 'KWD', 'JOD', 'AED', 'YER', 'EUR'] as const).map((curr) => (
+          {(['SAR', 'USD', 'KWD', 'AED', 'YER', 'EUR', 'BHD', 'OMR'] as const).map((curr) => (
             <TouchableOpacity
               key={curr}
               style={[

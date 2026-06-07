@@ -103,6 +103,24 @@ export default function LoginScreen({ navigation }: any) {
         console.log('[DEBUG] LoginScreen: Opening URL with WebBrowser', data.url);
         const result = await WebBrowser.openAuthSessionAsync(data.url, 'trexshop://auth/callback');
         console.log('[DEBUG] LoginScreen: WebBrowser result', result);
+        
+        // Handle the result from WebBrowser
+        if (result.type === 'success' && result.url) {
+          console.log('[DEBUG] LoginScreen: Auth successful, exchanging code for session');
+          const { error: exchangeError } = await authService.exchangeCodeForSession(result.url);
+          if (exchangeError) {
+            console.error('[DEBUG] LoginScreen: Failed to exchange auth code', exchangeError);
+            Alert.alert(
+              language === "ar" ? "خطأ" : "Error",
+              language === "ar" ? "فشل تسجيل الدخول" : "Login failed"
+            );
+          }
+        } else if (result.type === 'cancel') {
+          console.log('[DEBUG] LoginScreen: User cancelled auth');
+        } else if (result.type === 'dismiss') {
+          console.log('[DEBUG] LoginScreen: Browser dismissed');
+        }
+        
         setLoading(false);
       } else {
         console.log('[DEBUG] LoginScreen: No URL returned from Google Sign-In');
