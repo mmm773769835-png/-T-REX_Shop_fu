@@ -19,18 +19,21 @@ interface Deal {
 interface DealsState {
   deals: Deal[];
   loading: boolean;
+  error: string | null;
 }
 
 interface DealsContextType {
   state: DealsState;
   loadDeals: () => Promise<void>;
   getDealById: (dealId: string) => Deal | undefined;
+  clearError: () => void;
 }
 
 // Initial state
 const initialState: DealsState = {
   deals: [],
   loading: false,
+  error: null,
 };
 
 // Create context
@@ -40,10 +43,14 @@ const DealsContext = createContext<DealsContextType | undefined>(undefined);
 export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<DealsState>(initialState);
 
+  const clearError = () => {
+    setState(prev => ({ ...prev, error: null }));
+  };
+
   // Load deals from Firebase
   const loadDeals = async () => {
     try {
-      setState(prev => ({ ...prev, loading: true }));
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
       // Get products that have original_price (discounted products)
       const { data, error } = await dbService.get('products', {
@@ -53,7 +60,7 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (error) {
         console.error('❌ DealsContext: خطأ في تحميل العروض:', error);
-        setState(prev => ({ ...prev, loading: false }));
+        setState(prev => ({ ...prev, loading: false, error: error.message || 'Failed to load deals' }));
         return;
       }
 
@@ -81,11 +88,12 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         });
       }
 
-      setState({ deals, loading: false });
+      setState({ deals, loading: false, error: null });
       console.log('✅ DealsContext: تم تحميل العروض بنجاح', deals.length);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load deals';
       console.error('❌ DealsContext: خطأ في تحميل العروض:', error);
-      setState(prev => ({ ...prev, loading: false }));
+      setState(prev => ({ ...prev, loading: false, error: message }));
     }
   };
 
@@ -105,6 +113,7 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         state,
         loadDeals,
         getDealById,
+        clearError,
       }}
     >
       {children}
