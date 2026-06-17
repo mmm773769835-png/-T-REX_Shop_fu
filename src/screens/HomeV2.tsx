@@ -91,7 +91,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [isLoggedIn, setIsLoggedIn] = useState(routeLoggedIn || routeAdmin);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, switchLanguage } = useContext(LanguageContext);
-  const { formatPrice, formatPriceWithSource, currency, setCurrency } = useCurrency();
+  const { formatPrice, formatPriceWithSource, currency, setCurrency, currencyRates } = useCurrency();
   const { signOut } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -413,7 +413,22 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                            product.price,
                          ].filter(Boolean).join(' ')).includes(normalizedSearch);
 
-      const priceMatch = product.price >= filters.priceRange.min && product.price <= filters.priceRange.max;
+      // تصفية حسب السعر - تحويل السعر إلى العملة الحالية للمقارنة
+      const sourceCurrency = product.currency || 'YER';
+      const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
+      const targetRate = currencyRates.find(r => r.code === currency)?.rate || 1;
+      
+      let priceInTargetCurrency = product.price;
+      if (sourceCurrency === 'YER' && currency !== 'YER') {
+        priceInTargetCurrency = product.price / targetRate;
+      } else if (sourceCurrency !== 'YER' && currency === 'YER') {
+        priceInTargetCurrency = product.price * sourceRate;
+      } else if (sourceCurrency !== 'YER' && currency !== 'YER') {
+        const priceInYER = product.price * sourceRate;
+        priceInTargetCurrency = priceInYER / targetRate;
+      }
+      
+      const priceMatch = priceInTargetCurrency >= filters.priceRange.min && priceInTargetCurrency <= filters.priceRange.max;
       const advancedCategoryMatch = !filters.categories.length || categoryFilterSet.has(normalizeText(product.category || ""));
       const stockValue = product.stock;
       const stockMatch = !filters.inStock || stockValue === undefined || stockValue === null || Number(stockValue) > 0;

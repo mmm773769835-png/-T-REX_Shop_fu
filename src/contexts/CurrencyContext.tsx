@@ -29,6 +29,7 @@ const EXCHANGE_SELL_MARGIN = 0; // 0% - No extra margins
 interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
+  currencyRates: CurrencyRate[];
   convertPrice: (price: number, targetCurrency?: Currency) => number;
   formatPrice: (price: number | string, targetCurrency?: Currency | string | null) => string;
   formatPriceWithSource: (price: number | string, sourceCurrency: Currency | string | null, targetCurrency?: Currency | string | null) => string;
@@ -188,6 +189,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         currency,
         setCurrency,
+        currencyRates,
         convertPrice,
         formatPrice,
         formatPriceWithSource,
