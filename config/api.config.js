@@ -15,7 +15,7 @@ const PRODUCTION_API_URL = "https://your-server.example.com";
 // إذا كان السيرفر محلياً - اختر أحد الخيارات:
 
 // الخيار 1: استخدم IP address (للهاتف الحقيقي أو Android Emulator)
-const LOCAL_IP = '172.20.44.8'; // ✅ IP address من شبكة WiFi (محدث من ipconfig)
+const LOCAL_IP = '172.20.44.18'; // ✅ IP address من شبكة WiFi (محدث من ipconfig)
 const USE_IP = true; // ✅ مفعّل لاستخدام IP address
 
 // الخيار 2: استخدم localhost (للـ iOS Simulator أو إذا كان التطبيق على نفس الجهاز)

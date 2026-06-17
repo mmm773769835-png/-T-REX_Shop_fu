@@ -121,11 +121,17 @@ export default function LoginScreen({ navigation }: any) {
             console.log('[DEBUG] LoginScreen: Browser dismissed');
           }
         } catch (inAppError) {
-          console.error('[DEBUG] LoginScreen: InAppBrowser error', inAppError);
-          Alert.alert(
-            language === "ar" ? "خطأ" : "Error",
-            language === "ar" ? "فشل فتح المتصفح" : "Failed to open browser"
-          );
+          console.error('[DEBUG] LoginScreen: InAppBrowser error, trying fallback', inAppError);
+          try {
+            console.log('[DEBUG] LoginScreen: Launching fallback browser with Linking.openURL');
+            await Linking.openURL(data.url);
+          } catch (linkError) {
+            console.error('[DEBUG] LoginScreen: Linking fallback error', linkError);
+            Alert.alert(
+              language === "ar" ? "خطأ" : "Error",
+              language === "ar" ? "فشل فتح المتصفح" : "Failed to open browser"
+            );
+          }
         }
         
         setLoading(false);
