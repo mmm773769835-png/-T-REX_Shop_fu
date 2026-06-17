@@ -3479,19 +3479,53 @@
             updateCartDisplay();
         }
 
-        function formatPrice(price, sourceCurrency = 'SAR') {
+        function formatPrice(price, sourceCurrency = 'YER') {
             const sourceRate = exchangeRates[sourceCurrency] || 1;
-            const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
             const targetRate = exchangeRates[currentCurrency.code] || 1;
-            const rawConvertedPrice = priceInSar * targetRate;
-            const convertedPrice = (sourceCurrency === currentCurrency.code ? rawConvertedPrice : rawConvertedPrice * (1 + EXCHANGE_SELL_MARGIN)).toFixed(2);
-            return `${convertedPrice} ${currentCurrency.symbol}`;
+            
+            // Convert from source currency to YER (base currency), then to target currency
+            let priceInYer;
+            if (sourceCurrency === 'YER') {
+                priceInYer = price;
+            } else {
+                priceInYer = price * sourceRate;
+            }
+            
+            let convertedPrice;
+            if (currentCurrency.code === 'YER') {
+                convertedPrice = priceInYer;
+            } else {
+                convertedPrice = priceInYer / targetRate;
+            }
+            
+            // Apply sell margin if converting between different currencies
+            if (sourceCurrency !== currentCurrency.code) {
+                convertedPrice = convertedPrice * (1 + EXCHANGE_SELL_MARGIN);
+            }
+            
+            return `${convertedPrice.toFixed(2)} ${currentCurrency.symbol}`;
         }
 
-        function toSar(price, sourceCurrency = 'SAR') {
+        function toSar(price, sourceCurrency = 'YER') {
             const sourceRate = exchangeRates[sourceCurrency] || 1;
-            const priceInSar = sourceCurrency === 'SAR' ? price : price / sourceRate;
-            return sourceCurrency === 'SAR' ? priceInSar : priceInSar * (1 + EXCHANGE_SELL_MARGIN);
+            const targetRate = exchangeRates['SAR'] || 1;
+            
+            // Convert from source currency to YER (base currency), then to SAR
+            let priceInYer;
+            if (sourceCurrency === 'YER') {
+                priceInYer = price;
+            } else {
+                priceInYer = price * sourceRate;
+            }
+            
+            let priceInSar = priceInYer / targetRate;
+            
+            // Apply sell margin if converting between different currencies
+            if (sourceCurrency !== 'SAR') {
+                priceInSar = priceInSar * (1 + EXCHANGE_SELL_MARGIN);
+            }
+            
+            return priceInSar;
         }
 
         // Load Currency from Storage

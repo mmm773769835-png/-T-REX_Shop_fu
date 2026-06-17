@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS currency_rates (
 -- Create index on code for faster lookups
 CREATE INDEX IF NOT EXISTS idx_currency_rates_code ON currency_rates(code);
 
--- Create trigger for updated_at
+-- Create trigger for updated_at (only if it doesn't exist)
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -24,6 +24,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_currency_rates_updated_at ON currency_rates;
 CREATE TRIGGER update_currency_rates_updated_at
   BEFORE UPDATE ON currency_rates
   FOR EACH ROW
@@ -43,6 +44,10 @@ ON CONFLICT (code) DO NOTHING;
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE currency_rates ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow public read access to currency_rates" ON currency_rates;
+DROP POLICY IF EXISTS "Allow authenticated users to update currency_rates" ON currency_rates;
 
 -- Create policy to allow public read access (for app and website)
 CREATE POLICY "Allow public read access to currency_rates"
