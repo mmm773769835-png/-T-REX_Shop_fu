@@ -18,6 +18,7 @@ cd /d "%~dp0"
 echo جاري بدء البناء المحلي...
 echo.
 
+set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot
 eas build --platform android --profile preview --local
 
 echo.

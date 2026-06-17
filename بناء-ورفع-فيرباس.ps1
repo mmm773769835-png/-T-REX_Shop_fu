@@ -70,6 +70,7 @@ if (-not (Test-Path $apkPath)) {
     Write-Host "This may take 5-10 minutes..." -ForegroundColor Cyan
     Write-Host ""
     
+    $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot"
     Set-Location android
     & .\gradlew.bat assembleRelease
     

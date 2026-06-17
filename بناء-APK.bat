@@ -30,6 +30,7 @@ echo جاري بدء البناء باستخدام Gradle...
 echo ⏳ قد يستغرق هذا 5-10 دقائق...
 echo.
 
+set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot
 cd android
 call gradlew.bat assembleRelease
 

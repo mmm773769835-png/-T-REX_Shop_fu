@@ -32,6 +32,8 @@
       <intent-filter data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
         <data android:scheme="trexshop"/>
+        <data android:scheme="https" android:host="trexshopmax.com"/>
+        <data android:scheme="exp+trex-shop"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>

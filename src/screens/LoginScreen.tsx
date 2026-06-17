@@ -10,7 +10,7 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as WebBrowser from 'expo-web-browser';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 import { authService } from '../services/SupabaseService';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -100,25 +100,32 @@ export default function LoginScreen({ navigation }: any) {
         );
         setLoading(false);
       } else if (data?.url) {
-        console.log('[DEBUG] LoginScreen: Opening URL with WebBrowser', data.url);
-        const result = await WebBrowser.openAuthSessionAsync(data.url, 'trexshop://auth/callback');
-        console.log('[DEBUG] LoginScreen: WebBrowser result', result);
-        
-        // Handle the result from WebBrowser
-        if (result.type === 'success' && result.url) {
-          console.log('[DEBUG] LoginScreen: Auth successful, exchanging code for session');
-          const { error: exchangeError } = await authService.exchangeCodeForSession(result.url);
-          if (exchangeError) {
-            console.error('[DEBUG] LoginScreen: Failed to exchange auth code', exchangeError);
-            Alert.alert(
-              language === "ar" ? "خطأ" : "Error",
-              language === "ar" ? "فشل تسجيل الدخول" : "Login failed"
-            );
+        console.log('[DEBUG] LoginScreen: Opening URL with InAppBrowser', data.url);
+        try {
+          const result = await InAppBrowser.openAuth(data.url, 'trexshop://auth/callback');
+          console.log('[DEBUG] LoginScreen: InAppBrowser result', result);
+          
+          if (result.type === 'success' && result.url) {
+            console.log('[DEBUG] LoginScreen: Auth successful, exchanging code for session');
+            const { error: exchangeError } = await authService.exchangeCodeForSession(result.url);
+            if (exchangeError) {
+              console.error('[DEBUG] LoginScreen: Failed to exchange auth code', exchangeError);
+              Alert.alert(
+                language === "ar" ? "خطأ" : "Error",
+                language === "ar" ? "فشل تسجيل الدخول" : "Login failed"
+              );
+            }
+          } else if (result.type === 'cancel') {
+            console.log('[DEBUG] LoginScreen: User cancelled auth');
+          } else if (result.type === 'dismiss') {
+            console.log('[DEBUG] LoginScreen: Browser dismissed');
           }
-        } else if (result.type === 'cancel') {
-          console.log('[DEBUG] LoginScreen: User cancelled auth');
-        } else if (result.type === 'dismiss') {
-          console.log('[DEBUG] LoginScreen: Browser dismissed');
+        } catch (inAppError) {
+          console.error('[DEBUG] LoginScreen: InAppBrowser error', inAppError);
+          Alert.alert(
+            language === "ar" ? "خطأ" : "Error",
+            language === "ar" ? "فشل فتح المتصفح" : "Failed to open browser"
+          );
         }
         
         setLoading(false);
