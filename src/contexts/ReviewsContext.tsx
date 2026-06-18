@@ -18,6 +18,7 @@ interface Review {
 interface ReviewsState {
   reviews: Review[];
   loading: boolean;
+  error: string | null;
 }
 
 interface ReviewsContextType {
@@ -27,12 +28,14 @@ interface ReviewsContextType {
   deleteReview: (reviewId: string) => Promise<void>;
   getReviewsByProduct: (productId: string) => Review[];
   getAverageRating: (productId: string) => number;
+  clearError: () => void;
 }
 
 // Initial state
 const initialState: ReviewsState = {
   reviews: [],
   loading: false,
+  error: null,
 };
 
 // Create context
@@ -78,16 +81,20 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   };
 
+  const clearError = () => {
+    setState(prev => ({ ...prev, error: null }));
+  };
+
   // Load reviews from Supabase
   const loadReviews = async (productId: string) => {
     try {
-      setState(prev => ({ ...prev, loading: true }));
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
       const { data, error } = await dbService.get('reviews', { eq: { product_id: productId } });
 
       if (error) {
-        // جدول reviews غير موجود بعد - تجاهل الخطأ بهدوء
-        setState(prev => ({ ...prev, loading: false, reviews: [] }));
+        console.error('❌ ReviewsContext: خطأ في تحميل المراجعات:', error);
+        setState(prev => ({ ...prev, loading: false, error: error.message || 'Failed to load reviews' }));
         return;
       }
 
@@ -113,11 +120,12 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
       // Sort reviews by createdAt in descending order
       reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-      setState({ reviews, loading: false });
+      setState({ reviews, loading: false, error: null });
       console.log('✅ ReviewsContext: تم تحميل المراجعات بنجاح', reviews.length);
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load reviews';
       console.error('❌ ReviewsContext: خطأ في تحميل المراجعات:', error);
-      setState(prev => ({ ...prev, loading: false }));
+      setState(prev => ({ ...prev, loading: false, error: message }));
     }
   };
 
@@ -218,6 +226,7 @@ export const ReviewsProvider: React.FC<{ children: ReactNode }> = ({ children })
         deleteReview,
         getReviewsByProduct,
         getAverageRating,
+        clearError,
       }}
     >
       {children}
