@@ -532,7 +532,7 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   productImage: {
     width: "100%",
     height: 150,
-    resizeMode: "cover",
+    resizeMode: "contain",
   },
   categoryBadge: {
     position: "absolute",

@@ -17,3 +17,7 @@
   to = "/index.html"
   status = 200
   force = false
+
+[[edge_functions]]
+  path = "/*"
+  function = "inject-metadata"

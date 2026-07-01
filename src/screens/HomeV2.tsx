@@ -1042,7 +1042,7 @@ const styles = StyleSheet.create({
   productImage: {
     width: "100%",
     height: 160,
-    resizeMode: "cover",
+    resizeMode: "contain",
   },
   imageContainer: {
     position: "relative",

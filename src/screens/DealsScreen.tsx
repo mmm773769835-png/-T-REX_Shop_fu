@@ -190,7 +190,7 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   dealImage: {
     width: "100%",
     height: 180,
-    resizeMode: "cover",
+    resizeMode: "contain",
   },
   discountBadge: {
     position: "absolute",

@@ -37,6 +37,7 @@ import EditProfile from '../screens/EditProfile';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import AboutScreen from '../screens/AboutScreen';
 import SecurityPolicyScreen from '../screens/SecurityPolicyScreen';
+import AuthCallbackScreen from '../screens/AuthCallbackScreen';
 // Create navigators
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -307,7 +308,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="AuthCallback"
-          component={MainTabs}
+          component={AuthCallbackScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

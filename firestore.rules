@@ -1,55 +1,83 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     // دالة مساعدة للتحقق من أن المستخدم مسجل دخول
     function isLoggedIn() {
       return request.auth != null;
     }
-    
-    // دالة للتحقق من أن المستخدم هو المدير
+
+    // دالة للتحقق من أن المستخدم هو المدير (عبر البريد الإلكتروني فقط - Server-side)
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
              request.auth.token.email == 'mmm773769835@gmail.com';
     }
-    
+
     // دالة للتحقق من أن المستخدم يملك البيانات
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
-    
+
+    // منع تعديل الحقول الحساسة المتعلقة بالصلاحيات
+    function notChangingPrivilegedFields() {
+      return !request.resource.data.diff(resource.data)
+              .affectedKeys()
+              .hasAny(['isAdmin', 'role', 'admin', 'superAdmin', 'permissions']);
+    }
+
     // المنتجات - القراءة للجميع، الكتابة للمدير فقط
     match /products/{productId} {
-      allow read: if true; // الجميع يقرأ
+      allow read: if true;
       allow create: if isAdmin();
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
-    
-    // الطلبات - القراءة للمستخدمين المسجلين، الكتابة لمالك الطلب أو المدير
+
+    // الطلبات - القراءة لمالك الطلب أو المدير فقط
     match /orders/{orderId} {
-      allow read: if isLoggedIn();
-      allow create: if isLoggedIn() && 
-                       request.data.userId == request.auth.uid;
-      allow update: if isLoggedIn() && 
+      allow read: if isLoggedIn() &&
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn() &&
+                       request.resource.data.userId == request.auth.uid;
+      allow update: if isLoggedIn() &&
                        (resource.data.userId == request.auth.uid || isAdmin());
       allow delete: if isAdmin();
     }
-    
+
     // بيانات المستخدمين - كل مستخدم يقرأ ويكتب بياناته فقط
+    // مع منع تعديل حقول الصلاحيات (isAdmin, role, ...) تماماً
     match /users/{userId} {
       allow read: if isLoggedIn() && (isOwner(userId) || isAdmin());
       allow create: if isLoggedIn() && isOwner(userId);
-      allow update: if isLoggedIn() && (isOwner(userId) || isAdmin());
+      allow update: if isLoggedIn() &&
+                       (isOwner(userId) || isAdmin()) &&
+                       (isAdmin() || notChangingPrivilegedFields());
       allow delete: if isAdmin();
     }
-    
+
     // عناوين المستخدمين
     match /addresses/{addressId} {
-      allow read: if isLoggedIn() && 
+      allow read: if isLoggedIn() &&
                      (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isLoggedIn() && 
-                       request.data.userId == request.auth.uid;
-      allow update, delete: if isLoggedIn() && 
-                               (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn() &&
+                       request.resource.data.userId == request.auth.uid;
+      allow update: if isLoggedIn() &&
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isLoggedIn() &&
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // سجلات الأنشطة الأمنية - المدير فقط يقرأ، النظام يكتب
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isLoggedIn();
+      allow update: if false; // لا يمكن تعديل السجلات أبداً
+      allow delete: if false; // لا يمكن حذف السجلات أبداً
+    }
+
+    // رفض أي وصول غير محدد
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

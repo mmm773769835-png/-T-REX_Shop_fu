@@ -73,7 +73,8 @@
           ]
         }
       ],
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "ndk": "26.2.11394342"
     },
     "extra": {
       "eas": {

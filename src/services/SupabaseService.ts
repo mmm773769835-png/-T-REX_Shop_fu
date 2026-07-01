@@ -84,13 +84,86 @@ export const authService = {
   },
 
   exchangeCodeForSession: async (url: string) => {
-    const parsedUrl = new URL(url);
-    const code = parsedUrl.searchParams.get('code');
-    if (!code) {
-      return { data: null, error: new Error('Missing auth code') };
+    try {
+      console.log('[DEBUG] exchangeCodeForSession called with URL:', url);
+      const queryParams: { [key: string]: string } = {};
+      
+      const queryIndex = url.indexOf('?');
+      const hashIndex = url.indexOf('#');
+      
+      let queryString = '';
+      let hashString = '';
+      
+      if (queryIndex !== -1) {
+        const endOfQuery = hashIndex !== -1 && hashIndex > queryIndex ? hashIndex : url.length;
+        queryString = url.substring(queryIndex + 1, endOfQuery);
+      }
+      
+      if (hashIndex !== -1) {
+        hashString = url.substring(hashIndex + 1);
+      }
+      
+      const safeDecode = (str: string) => {
+        try {
+          return decodeURIComponent(str);
+        } catch (e) {
+          return str;
+        }
+      };
+      
+      const parsePairs = (str: string) => {
+        if (!str) return;
+        const pairs = str.split('&');
+        for (const pair of pairs) {
+          const eqIndex = pair.indexOf('=');
+          if (eqIndex !== -1) {
+            const key = pair.substring(0, eqIndex);
+            const value = pair.substring(eqIndex + 1);
+            if (key) {
+              queryParams[safeDecode(key)] = safeDecode(value);
+            }
+          }
+        }
+      };
+      
+      parsePairs(queryString);
+      parsePairs(hashString);
+      
+      console.log('[DEBUG] Parsed URL parameters:', {
+        hasCode: !!queryParams.code,
+        hasAccessToken: !!queryParams.access_token,
+        hasRefreshToken: !!queryParams.refresh_token,
+        error: queryParams.error,
+        errorDescription: queryParams.error_description
+      });
+      
+      if (queryParams.error) {
+        return { 
+          data: null, 
+          error: new Error(queryParams.error_description || queryParams.error || 'Authentication error') 
+        };
+      }
+      
+      if (queryParams.access_token && queryParams.refresh_token) {
+        console.log('[DEBUG] Found access_token and refresh_token, setting session directly');
+        const { data, error } = await supabase.auth.setSession({
+          access_token: queryParams.access_token,
+          refresh_token: queryParams.refresh_token,
+        });
+        return { data, error };
+      }
+      
+      if (queryParams.code) {
+        console.log('[DEBUG] Found auth code, exchanging for session');
+        const { data, error } = await supabase.auth.exchangeCodeForSession(queryParams.code);
+        return { data, error };
+      }
+      
+      return { data: null, error: new Error('No authentication code or tokens found in callback URL') };
+    } catch (err: any) {
+      console.error('[DEBUG] Exception in exchangeCodeForSession:', err);
+      return { data: null, error: err };
     }
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    return { data, error };
   },
 
   // Sign out

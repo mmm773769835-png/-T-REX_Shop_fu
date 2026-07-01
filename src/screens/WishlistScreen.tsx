@@ -118,7 +118,7 @@ const WishlistScreen = ({ navigation }: any) => {
                   <Image 
                     source={{ uri: sanitizeImageUrl(item.image_url || (item.images?.[0]) || item.imageUrl || 'https://via.placeholder.com/150') }} 
                     style={styles.itemImage} 
-                    resizeMode="cover"
+                    resizeMode="contain"
                   />
                   {item.is_new && (
                     <View style={styles.badgeNew}>

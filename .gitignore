@@ -55,3 +55,7 @@ expo-env.d.ts
 # @end expo-cli
 # Local Netlify folder
 .netlify
+
+# Native prebuild directories
+/android
+/ios

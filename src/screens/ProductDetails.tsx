@@ -11,6 +11,8 @@ import {
   Dimensions,
   SafeAreaView,
   FlatList,
+  Modal,
+  Share,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -38,8 +40,25 @@ export default function ProductDetails({ route, navigation }: any) {
   const { loadReviews, getAverageRating, getReviewsByProduct } = useReviews();
   const [imageFailed, setImageFailed] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
 
   const styles = getStyles(isDarkMode, colors);
+
+  const handleShareProduct = async () => {
+    if (!currentProduct) return;
+    try {
+      const shareUrl = `https://trexshopmax.com/?product=${currentProduct.id}`;
+      const text = language === 'ar' 
+        ? `شاهد هذا المنتج الرائع على متجر T-REX SHOP:\n${currentProduct.name}\n${shareUrl}`
+        : `Check out this amazing product on T-REX SHOP:\n${currentProduct.name}\n${shareUrl}`;
+      await Share.share({
+        message: text,
+        url: shareUrl,
+      });
+    } catch (error) {
+      console.error('Error sharing product:', error);
+    }
+  };
 
   // Fetch المنتج من Supabase إذا تم استقبال productId
   useEffect(() => {
@@ -216,13 +235,18 @@ export default function ProductDetails({ route, navigation }: any) {
         <Text style={styles.title}>
           {language === "ar" ? "تفاصيل المنتج" : "Product Details"}
         </Text>
-        <TouchableOpacity onPress={handleToggleWishList} style={styles.wishlistButton}>
-          <Ionicons 
-            name={isInWishList(currentProduct?.id) ? "heart" : "heart-outline"} 
-            size={24} 
-            color={isInWishList(currentProduct?.id) ? "#FF3B3B" : "#FFD700"} 
-          />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={handleShareProduct} style={styles.shareBtn}>
+            <Ionicons name="share-social-outline" size={22} color="#FFD700" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleToggleWishList} style={styles.wishlistButton}>
+            <Ionicons 
+              name={isInWishList(currentProduct?.id) ? "heart" : "heart-outline"} 
+              size={24} 
+              color={isInWishList(currentProduct?.id) ? "#FF3B3B" : "#FFD700"} 
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -237,14 +261,19 @@ export default function ProductDetails({ route, navigation }: any) {
         }}
         style={styles.imageSwiper}
         renderItem={({ item, index }: { item: string, index: number }) => (
-          <View key={index} style={styles.imageSlide}>
+          <TouchableOpacity 
+            key={index} 
+            style={styles.imageSlide}
+            activeOpacity={0.955}
+            onPress={() => setIsImageModalVisible(true)}
+          >
             <Image
               source={{ uri: sanitizeImageUrl(item) }}
               style={styles.productImage}
-              resizeMode="cover"
+              resizeMode="contain"
               onError={() => setImageFailed(true)}
             />
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -334,6 +363,30 @@ export default function ProductDetails({ route, navigation }: any) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* مودال عرض الصورة بملء الشاشة */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        onRequestClose={() => setIsImageModalVisible(false)}
+        animationType="fade"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <TouchableOpacity 
+            style={styles.modalCloseButton} 
+            onPress={() => setIsImageModalVisible(false)}
+          >
+            <Ionicons name="close" size={30} color="#FFF" />
+          </TouchableOpacity>
+          <View style={styles.modalImageContainer}>
+            <Image
+              source={{ uri: currentImage }}
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+            />
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -350,7 +403,7 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   backBtn: { padding: 6 },
   title: { fontSize: 17, fontWeight: "800", color: "#FFD700", letterSpacing: 1 },
   wishlistButton: { padding: 6 },
-  productImage: { width: "100%", height: 300, resizeMode: "cover" },
+  productImage: { width: "100%", height: 300, resizeMode: "contain" },
   imageSwiper: { width: '100%', height: 300 },
   imageSlide: {
     width: Dimensions.get('window').width, height: 300,
@@ -439,4 +492,29 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   reviewsCount: { fontSize: 13, color: "#888" },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { marginTop: 16, fontSize: 16, color: colors.textSecondary },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 12 },
+  shareBtn: { padding: 6 },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    padding: 10,
+  },
+  modalImageContainer: {
+    width: '100%',
+    height: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+  },
 });
