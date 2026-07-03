@@ -90,7 +90,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
           const productId = item.id || '';
 
           // إنشاء رابط deep link للمنتج (Universal Link)
-          const productLink = `https://trex-shop.com/product/${productId}`;
+          const productLink = `https://trexshopmax.com/product/${productId}`;
 
           message += language === "ar"
             ? `📦 ${itemName} - ${itemPrice} ر.ي × ${itemQuantity} = ${itemTotal} ر.ي\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
