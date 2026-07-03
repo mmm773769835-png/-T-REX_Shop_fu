@@ -3,7 +3,13 @@ export default async (request, context) => {
   const userAgent = request.headers.get("user-agent") || "";
   
   // Check if request is for a product
-  const productId = url.searchParams.get("product");
+  let productId = url.searchParams.get("product");
+  if (!productId) {
+    const match = url.pathname.match(/\/product\/([a-zA-Z0-9-]+)/);
+    if (match) {
+      productId = match[1];
+    }
+  }
   
   // Crawler detection
   const isCrawler = /bot|google|baidu|bing|msn|duckduckbot|teoma|slurp|yandex|chrome-lighthouse|lighthouse|whatsapp|facebook|twitter|telegram/i.test(userAgent);

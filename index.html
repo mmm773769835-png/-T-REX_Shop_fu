@@ -105,7 +105,7 @@
     }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="fonts/fontawesome/all.min.css">
+    <link rel="stylesheet" href="/fonts/fontawesome/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -3718,6 +3718,11 @@
                 const itemTotal = item.price * item.quantity;
                 totalSar += toSar(itemTotal, item.currency || 'SAR');
                 itemsList += `📦 ${item.name} - ${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity} = ${formatPrice(itemTotal, item.currency || 'SAR')}\n`;
+                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/product/${item.id}\n`;
+                if (item.image_url) {
+                    itemsList += `   🖼️ صورة المنتج: ${item.image_url}\n`;
+                }
+                itemsList += `\n`;
             });
             
             // Build WhatsApp message
@@ -4091,7 +4096,13 @@
         }
 
         function openProductFromUrl() {
-            const productId = new URLSearchParams(window.location.search).get('product');
+            let productId = new URLSearchParams(window.location.search).get('product');
+            if (!productId) {
+                const match = window.location.pathname.match(/\/product\/([a-zA-Z0-9-]+)/);
+                if (match) {
+                    productId = match[1];
+                }
+            }
             if (!productId || !allProducts.length) return;
             const product = allProducts.find(item => String(item.id) === String(productId));
             if (product) {
@@ -4204,6 +4215,13 @@
             message += `💰 *السعر:* ${formatPrice(currentProduct.price, currentProduct.currency || 'SAR')}\n`;
             message += `📊 *الكمية:* ${currentQuantity}\n`;
             message += `💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}\n\n`;
+            
+            const productUrl = `${window.location.origin}/product/${currentProduct.id}`;
+            message += `🔗 *رابط المنتج:* ${productUrl}\n`;
+            if (currentProduct.image_url) {
+                message += `🖼️ *صورة المنتج:* ${currentProduct.image_url}\n\n`;
+            }
+            
             message += `👤 *معلومات العميل:*\n`;
             message += `• الاسم: ${name}\n`;
             message += `• الهاتف: ${phone}\n`;
@@ -4498,16 +4516,16 @@
                     <div class="modal-share-row">
                         <h4><i class="fas fa-share-alt"></i> مشاركة المنتج</h4>
                         <div class="social-share">
-                            <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
+                            <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
                                 <i class="fab fa-whatsapp"></i><span>واتساب</span>
                             </button>
-                            <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
+                            <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
                                 <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                             </button>
-                            <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${product.id}', 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
+                            <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
                                 <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                             </button>
-                            <button class="share-btn share-copy" onclick="copyProductLink('https://trexshopmax.com/?product=${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                            <button class="share-btn share-copy" onclick="copyProductLink(`${window.location.origin}/product/${product.id}`)" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                 <i class="fas fa-copy"></i><span>نسخ الرابط</span>
                             </button>
                         </div>
@@ -4592,6 +4610,7 @@
             const total = currentProduct.price * currentQuantity;
             
             // Build WhatsApp message
+            const productUrl = `${window.location.origin}/product/${currentProduct.id}`;
             const message = `
 🛒 *طلب جديد من T-REX Shop*
 
@@ -4600,6 +4619,8 @@
 🔢 *الكمية:* ${currentQuantity}
 💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}
 
+🔗 *رابط المنتج:* ${productUrl}
+${currentProduct.image_url ? `🖼️ *صورة المنتج:* ${currentProduct.image_url}\n` : ''}
 👤 *العميل:* ${name}
 📱 *الهاتف:* ${phone}
 🌍 *الدولة:* ${country}
@@ -4745,16 +4766,16 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 <i class="fas fa-share-alt"></i> مشاركة المنتج
                             </button>
                             <div class="product-card-share">
-                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${productId}', 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
+                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}`, 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
                                     <i class="fab fa-whatsapp"></i><span>واتساب</span>
                                 </button>
-                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${productId}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
+                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
                                     <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                                 </button>
-                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', 'https://trexshopmax.com/?product=${productId}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
+                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
                                     <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                                 </button>
-                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLink('https://trexshopmax.com/?product=${productId}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLink(`${window.location.origin}/product/${productId}`)" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                     <i class="fas fa-copy"></i><span>نسخ</span>
                                 </button>
                             </div>

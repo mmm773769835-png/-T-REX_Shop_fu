@@ -70,41 +70,14 @@ const OrderConfirm = ({ route, navigation }: any) => {
 
       // بناء الرسالة بشكل آمن
       let message = language === "ar" 
-        ? `🛒 طلب جديد من متجر T-REX\n\n`
-        : `🛒 New Order from T-REX Shop\n\n`;
+        ? `🛍️ *طلب جديد من T-REX Shop* 🦖\n\n`
+        : `🛍️ *New Order from T-REX Shop* 🦖\n\n`;
       
       message += language === "ar" 
-        ? `📋 رقم الطلب: ${orderId}\n`
-        : `📋 Order ID: ${orderId}\n`;
+        ? `📋 *رقم الطلب:* ${orderId}\n`
+        : `📋 *Order ID:* ${orderId}\n`;
       
-      message += language === "ar"
-        ? `👤 اسم العميل: ${name || 'غير محدد'}\n`
-        : `👤 Customer Name: ${name || 'Not specified'}\n`;
-      
-      message += language === "ar"
-        ? `📞 رقم الهاتف: ${phone || 'غير محدد'}\n`
-        : `📞 Phone: ${phone || 'Not specified'}\n`;
-      
-      message += language === "ar"
-        ? `📍 العنوان: ${address || 'غير محدد'}\n`
-        : `📍 Address: ${address || 'Not specified'}\n`;
-      
-      message += language === "ar"
-        ? `💳 طريقة الدفع: ${paymentMethodText}\n`
-        : `💳 Payment Method: ${paymentMethodText}\n`;
-      
-      // إضافة رابط الإيصال إذا كان موجوداً
-      if (orderData.receiptUrl && orderData.receiptUrl.trim() !== "") {
-        message += language === "ar"
-          ? `📸 رابط إيصال التحويل: ${orderData.receiptUrl}\n`
-          : `📸 Transfer Receipt: ${orderData.receiptUrl}\n`;
-      }
-      
-      message += language === "ar" ? `
-📦 المنتجات:
-` : `
-📦 Products:
-`;
+      message += language === "ar" ? `\n*المنتجات:*\n` : `\n*Products:*\n`;
       
       // إضافة المنتجات بشكل آمن مع روابط وصور
       if (cartItems && cartItems.length > 0) {
@@ -113,27 +86,44 @@ const OrderConfirm = ({ route, navigation }: any) => {
           const itemQuantity = item.quantity || 1;
           const itemPrice = item.price || 0;
           const itemTotal = (itemPrice * itemQuantity).toFixed(2);
-          const itemImage = item.imageUrl || '';
+          const itemImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : '') || item.imageUrl || '';
           const productId = item.id || '';
 
           // إنشاء رابط deep link للمنتج (Universal Link)
           const productLink = `https://trex-shop.com/product/${productId}`;
 
           message += language === "ar"
-            ? `${index + 1}. ${itemName}\n   ${itemQuantity}x - ${itemTotal} ر.ي\n   🔗 ${productLink}\n   🖼️ ${itemImage}\n\n`
-            : `${index + 1}. ${itemName}\n   ${itemQuantity}x - ${itemTotal} SAR\n   🔗 ${productLink}\n   🖼️ ${itemImage}\n\n`;
+            ? `📦 ${itemName} - ${itemPrice} ر.ي × ${itemQuantity} = ${itemTotal} ر.ي\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
+            : `📦 ${itemName} - ${itemPrice} YER × ${itemQuantity} = ${itemTotal} YER\n   🔗 Product Link: ${productLink}\n` + (itemImage ? `   🖼️ Product Image: ${itemImage}\n` : '') + `\n`;
         });
       } else {
         message += language === "ar" ? "لا توجد منتجات\n" : "No products\n";
       }
       
       message += language === "ar"
-        ? `\n🚚 الشحن: حسب المسافة\n`
-        : `\n🚚 Shipping: Based on distance\n`;
+        ? `💰 *الإجمالي:* ${finalTotal.toFixed(2)} ر.ي\n\n`
+        : `💰 *Total:* ${finalTotal.toFixed(2)} YER\n\n`;
 
+      message += language === "ar" ? `👤 *معلومات العميل:*\n` : `👤 *Customer Details:*\n`;
       message += language === "ar"
-        ? `💰 الإجمالي: ${finalTotal.toFixed(2)} ر.ي\n`
-        : `💰 Total: ${finalTotal.toFixed(2)} YER\n`;
+        ? `• الاسم: ${name || 'غير محدد'}\n`
+        : `• Name: ${name || 'Not specified'}\n`;
+      message += language === "ar"
+        ? `• الهاتف: ${phone || 'غير محدد'}\n`
+        : `• Phone: ${phone || 'Not specified'}\n`;
+      message += language === "ar"
+        ? `• العنوان: ${address || 'غير محدد'}\n`
+        : `• Address: ${address || 'Not specified'}\n`;
+      message += language === "ar"
+        ? `• طريقة الدفع: ${paymentMethodText}\n`
+        : `• Payment Method: ${paymentMethodText}\n`;
+      
+      // إضافة رابط الإيصال إذا كان موجوداً
+      if (orderData.receiptUrl && orderData.receiptUrl.trim() !== "") {
+        message += language === "ar"
+          ? `📸 *إيصال التحويل:* ${orderData.receiptUrl}\n`
+          : `📸 *Transfer Receipt:* ${orderData.receiptUrl}\n`;
+      }
       
       // إضافة التاريخ والوقت
       const now = new Date();
