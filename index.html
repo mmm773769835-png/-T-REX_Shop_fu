@@ -4516,16 +4516,16 @@
                     <div class="modal-share-row">
                         <h4><i class="fas fa-share-alt"></i> مشاركة المنتج</h4>
                         <div class="social-share">
-                            <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
+                            <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
                                 <i class="fab fa-whatsapp"></i><span>واتساب</span>
                             </button>
-                            <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
+                            <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
                                 <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                             </button>
-                            <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${product.id}`, 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
+                            <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
                                 <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                             </button>
-                            <button class="share-btn share-copy" onclick="copyProductLink(`${window.location.origin}/product/${product.id}`)" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                            <button class="share-btn share-copy" onclick="copyProductLink('${window.location.origin}/product/${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                 <i class="fas fa-copy"></i><span>نسخ الرابط</span>
                             </button>
                         </div>
@@ -4766,16 +4766,16 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 <i class="fas fa-share-alt"></i> مشاركة المنتج
                             </button>
                             <div class="product-card-share">
-                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}`, 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
+                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
                                     <i class="fab fa-whatsapp"></i><span>واتساب</span>
                                 </button>
-                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
+                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
                                     <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                                 </button>
-                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', `${window.location.origin}/product/${productId}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
+                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
                                     <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                                 </button>
-                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLink(`${window.location.origin}/product/${productId}`)" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLink('${window.location.origin}/product/${productId}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                     <i class="fas fa-copy"></i><span>نسخ</span>
                                 </button>
                             </div>
