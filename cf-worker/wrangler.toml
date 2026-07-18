@@ -1,0 +1,8 @@
+name = "trexshop-supabase-proxy"
+main = "supabase-proxy.js"
+compatibility_date = "2024-01-01"
+
+# يربط الـ worker بدومينك على مسار /supabase/*
+# سيتم تفعيل هذا عبر Cloudflare Dashboard > Workers Routes
+# Route: trexshopmax.com/supabase/*
+# Worker: trexshop-supabase-proxy
