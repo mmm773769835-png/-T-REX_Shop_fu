@@ -1,4 +1,10 @@
+// IMPORTANT: react-native-gesture-handler must be imported first, before any
+// other module. @react-navigation/stack depends on it, and without this import
+// the app crashes immediately on launch in Android release builds (it only
+// works in development without it).
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigator from './src/navigation/AppNavigator';
 import { CartProvider } from './src/contexts/CartContext';
 import { AuthProvider } from './src/contexts/AuthContext';
@@ -25,8 +31,9 @@ export default function App() {
   // App component initialization
   console.log('[DEBUG] App component started');
   return (
-    <ErrorBoundary>
-      <AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
+        <AuthProvider>
         <CartProvider>
           <CurrencyProvider>
             <WishListProvider>
@@ -51,7 +58,8 @@ export default function App() {
           </CurrencyProvider>
         </CartProvider>
       </AuthProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
   );
 }
 
