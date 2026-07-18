@@ -128,18 +128,28 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   useEffect(() => {
     const checkUserRole = async () => {
       if (routeLoggedIn || routeAdmin) {
-        const { user } = await authService.getCurrentUser();
-        if (user) {
-          // التحقق من دور المشرف من قاعدة البيانات
-          try {
+        try {
+          const { user, error: userError } = await authService.getCurrentUser();
+          if (userError) {
+            console.error("خطأ في الحصول على المستخدم الحالي:", userError);
+            setError("فشل في التحقق من صلاحيات المستخدم");
+            return;
+          }
+          if (user) {
+            // التحقق من دور المشرف من قاعدة البيانات
             const { data, error } = await dbService.get('users', { eq: { id: user.id } });
+            if (error) {
+              console.error("خطأ في التحقق من دور المشرف:", error);
+              return;
+            }
             if (data && data.length > 0) {
               const userData = data[0];
               setIsAdmin(userData.role === "admin");
             }
-          } catch (error) {
-            console.error("خطأ في التحقق من دور المشرف:", error);
           }
+        } catch (error) {
+          console.error("خطأ في التحقق من دور المشرف:", error);
+          setError("فشل في التحقق من صلاحيات المستخدم");
         }
       }
     };

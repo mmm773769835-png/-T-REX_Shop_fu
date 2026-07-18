@@ -325,12 +325,12 @@ const OrderConfirm = ({ route, navigation }: any) => {
       const orderId = Date.now().toString();
       console.log('✅ OrderConfirm: بيانات الطلب جاهزة، ID:', orderId);
 
-      // مسح السلة
-      clearCart();
-      console.log('✅ OrderConfirm: تم مسح السلة');
-
       // إرسال بيانات الطلب إلى الواتساب
       sendOrderToWhatsApp(orderData, orderId);
+
+      // مسح السلة فقط بعد إرسال الطلب بنجاح
+      clearCart();
+      console.log('✅ OrderConfirm: تم مسح السلة');
       
       Alert.alert(
         "✅",
