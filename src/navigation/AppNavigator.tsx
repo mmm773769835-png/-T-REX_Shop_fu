@@ -166,7 +166,7 @@ const MainTabs = () => {
       />
       <Tab.Screen 
         name='Search' 
-        component={HomeV2} 
+        component={SearchScreen} 
         options={{ 
           headerShown: false,
           tabBarLabel: language === 'ar' ? 'البحث' : 'Search'

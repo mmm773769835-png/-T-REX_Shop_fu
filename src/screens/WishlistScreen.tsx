@@ -44,7 +44,43 @@ const WishlistScreen = ({ navigation }: any) => {
   const handleOrderNow = (item: any) => {
     // Add to cart first then go to order confirmation
     addToCart(item);
-    navigation.navigate('OrderConfirm');
+    try {
+      const stackNavigator = navigation.getParent();
+      if (stackNavigator) {
+        stackNavigator.navigate('OrderConfirm');
+      } else {
+        navigation.navigate('OrderConfirm');
+      }
+    } catch (error) {
+      console.error('❌ WishListScreen: error navigating to OrderConfirm', error);
+      navigation.navigate('OrderConfirm');
+    }
+  };
+
+  const handleCompletePurchase = () => {
+    if (state.items.length === 0) {
+      Alert.alert(
+        language === "ar" ? "تحذير" : "Warning",
+        language === "ar" ? "المفضلة فارغة، أضف منتجات إأولاً" : "Wishlist is empty, please add items first"
+      );
+      return;
+    }
+
+    // Add all wishlist items to cart
+    state.items.forEach((item: any) => addToCart(item));
+
+    // Navigate to OrderConfirm safely
+    try {
+      const stackNavigator = navigation.getParent();
+      if (stackNavigator) {
+        stackNavigator.navigate('OrderConfirm');
+      } else {
+        navigation.navigate('OrderConfirm');
+      }
+    } catch (error) {
+      console.error('❌ WishListScreen: error navigating to OrderConfirm', error);
+      navigation.navigate('OrderConfirm');
+    }
   };
 
   const handleViewProduct = (item: any) => {
@@ -168,7 +204,7 @@ const WishlistScreen = ({ navigation }: any) => {
 
           {/* Bottom Action Bar */}
           <View style={styles.bottomBar}>
-            <TouchableOpacity style={styles.bottomOrderBtn} onPress={() => navigation.navigate('OrderConfirm')}>
+            <TouchableOpacity style={styles.bottomOrderBtn} onPress={handleCompletePurchase}>
               <Ionicons name="bag-check" size={22} color="#111" />
               <Text style={styles.bottomOrderText}>
                 {language === "ar" ? "إتمام الشراء" : "Complete Purchase"}

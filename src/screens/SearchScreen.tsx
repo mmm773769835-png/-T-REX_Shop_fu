@@ -5,6 +5,7 @@ import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { useSearch } from '../contexts/SearchContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useAdvancedFilters } from '../contexts/AdvancedFiltersContext';
 import { dbService } from '../services/SupabaseService';
 import { sanitizeImageUrl } from '../utils/imageUtils';
 
@@ -38,6 +39,7 @@ const SearchScreen = ({ navigation }: any) => {
   const { language } = useContext(LanguageContext);
   const { formatPrice } = useCurrency();
   const { state: searchState, setQuery, addToHistory, clearHistory, generateSuggestions } = useSearch();
+  const { state: filterState } = useAdvancedFilters();
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300); // 300ms delay
@@ -111,12 +113,14 @@ const SearchScreen = ({ navigation }: any) => {
     }
   }, [searchQuery, allProducts, generateSuggestions]);
 
-  // Filter products based on search query with debouncing
+  // Filter products based on search query and advanced filters
   useEffect(() => {
-    if (debouncedSearchQuery.length > 0) {
+    const filters = filterState?.filters;
+    const normalizedQuery = normalizeText(debouncedSearchQuery);
+
+    if (normalizedQuery.length > 0 || filterState.isFilterApplied) {
       setIsSearching(true);
-      const filtered = allProducts.filter((product: any) => {
-        const normalizedQuery = normalizeText(debouncedSearchQuery);
+      let filtered = allProducts.filter((product: any) => {
         const searchableText = normalizeText([
           product.name,
           product.category,
@@ -125,8 +129,42 @@ const SearchScreen = ({ navigation }: any) => {
           product.currency,
           product.price,
         ].filter(Boolean).join(' '));
-        return searchableText.includes(normalizedQuery);
+        
+        const searchMatch = !normalizedQuery || searchableText.includes(normalizedQuery);
+        if (!searchMatch) return false;
+
+        if (filters) {
+          if (product.price < filters.priceRange.min || product.price > filters.priceRange.max) {
+            return false;
+          }
+          if (filters.inStock && product.stock !== null && product.stock !== undefined && Number(product.stock) <= 0) {
+            return false;
+          }
+          if (filters.categories && filters.categories.length > 0) {
+            const catSet = new Set(filters.categories.map((c: string) => normalizeText(c)));
+            if (!catSet.has(normalizeText(product.category || ""))) {
+              return false;
+            }
+          }
+        }
+        return true;
       });
+
+      if (filters?.sortBy) {
+        filtered = [...filtered].sort((a, b) => {
+          switch (filters.sortBy) {
+            case 'price-asc':
+              return a.price - b.price;
+            case 'price-desc':
+              return b.price - a.price;
+            case 'name-asc':
+              return a.name.localeCompare(b.name);
+            default:
+              return 0;
+          }
+        });
+      }
+
       setFilteredProducts(filtered);
       setShowResults(true);
       setIsSearching(false);
@@ -134,7 +172,7 @@ const SearchScreen = ({ navigation }: any) => {
       setFilteredProducts([]);
       setShowResults(false);
     }
-  }, [debouncedSearchQuery, allProducts]);
+  }, [debouncedSearchQuery, allProducts, filterState]);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -251,6 +289,13 @@ const SearchScreen = ({ navigation }: any) => {
             </TouchableOpacity>
           ) : null}
         </View>
+
+        <TouchableOpacity
+          style={[styles.filterButtonHeader, filterState?.isFilterApplied && styles.activeFilterButtonHeader]}
+          onPress={() => navigation.navigate('Filters')}
+        >
+          <Ionicons name="options-outline" size={20} color={filterState?.isFilterApplied ? "#111" : colors.primary || "#FFD700"} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>
@@ -386,6 +431,21 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  filterButtonHeader: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: colors.border || "#333",
+  },
+  activeFilterButtonHeader: {
+    backgroundColor: colors.primary || "#FFD700",
+    borderColor: colors.primary || "#FFD700",
   },
   searchIcon: {
     marginRight: 8,

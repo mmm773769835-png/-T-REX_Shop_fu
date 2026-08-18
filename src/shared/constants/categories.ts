@@ -1,14 +1,17 @@
 export const CATEGORIES = [
-  { id: '1', name: 'Electronics', icon: '📱' },
-  { id: '2', name: 'Clothing', icon: '👕' },
-  { id: '3', name: 'Home & Kitchen', icon: '🏠' },
-  { id: '4', name: 'Books', icon: '📚' },
-  { id: '5', name: 'Sports', icon: '⚽' },
-  { id: '6', name: 'Beauty', icon: '💄' },
-  { id: '7', name: 'Toys', icon: '🧸' },
-  { id: '8', name: 'Automotive', icon: '🚗' },
-  { id: '9', name: 'Health', icon: '💊' },
-  { id: '10', name: 'Groceries', icon: '🍎' },
+  { id: '1', name: 'Electronics', nameAr: 'إلكترونيات', icon: '📱' },
+  { id: '2', name: 'Fashion', nameAr: 'أزياء', icon: '👗' },
+  { id: '3', name: 'Home', nameAr: 'منزل', icon: '🏠' },
+  { id: '4', name: 'Sports', nameAr: 'رياضة', icon: '⚽' },
+  { id: '5', name: 'Beauty', nameAr: 'جمال', icon: '💄' },
+  { id: '6', name: 'Cars & Automotive', nameAr: 'سيارات ومستلزمات السيارات', icon: '🚗' },
+  { id: '7', name: 'Restaurant & Grocery', nameAr: 'مطعم و بقالة', icon: '🛒' },
+  { id: '8', name: 'Clothing', nameAr: 'ملابس', icon: '👕' },
+  { id: '9', name: 'Shoes', nameAr: 'أحذية', icon: '👟' },
+  { id: '10', name: 'Accessories', nameAr: 'إكسسوارات', icon: '💎' },
+  { id: '11', name: 'Toys', nameAr: 'ألعاب', icon: '🧸' },
+  { id: '12', name: 'Health', nameAr: 'صحة', icon: '💊' },
+  { id: '13', name: 'Books', nameAr: 'كتب', icon: '📚' },
 ];
 
 export const SUB_CATEGORIES = [

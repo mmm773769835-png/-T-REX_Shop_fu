@@ -399,8 +399,12 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
 
     const filtered = products.filter(product => {
       // تصفية حسب القسم
-      const categoryMatch = selectedCategory === (language === "ar" ? "جميع المنتجات" : "All Products") ||
-                           (product.category && product.category === selectedCategory);
+      let categoryMatch = selectedCategory === (language === "ar" ? "جميع المنتجات" : "All Products");
+      if (!categoryMatch && product.category) {
+        const prodCat = normalizeText(product.category);
+        const selCat = normalizeText(selectedCategory);
+        categoryMatch = prodCat === selCat || prodCat.includes(selCat) || selCat.includes(prodCat);
+      }
       
       // تصفية حسب البحث
       const searchMatch = !searchQuery || 
@@ -521,20 +525,28 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   // 🎨 عرض شريط البحث
   const renderSearchBar = () => (
     <View style={[styles.searchWrapper, { backgroundColor: isDarkMode ? "#1a1a1a" : "#1a1a1a" }]}>
-      <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? "#2a2a2a" : "#2a2a2a" }]}>
-        <Ionicons name="search" size={18} color="#FFD700" style={styles.searchIcon} />
-        <TextInput
-          style={[styles.searchInput, { color: "#fff" }]}
-          placeholder={language === "ar" ? "ابحث عن منتجات..." : "Search for products..."}
-          placeholderTextColor="#888"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        {searchQuery ? (
-          <TouchableOpacity onPress={() => setSearchQuery("")}>
-            <Ionicons name="close-circle" size={20} color="#888" />
-          </TouchableOpacity>
-        ) : null}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={[styles.searchContainer, { flex: 1, backgroundColor: isDarkMode ? "#2a2a2a" : "#2a2a2a" }]}>
+          <Ionicons name="search" size={18} color="#FFD700" style={styles.searchIcon} />
+          <TextInput
+            style={[styles.searchInput, { color: "#fff" }]}
+            placeholder={language === "ar" ? "ابحث عن منتجات..." : "Search for products..."}
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery ? (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons name="close-circle" size={20} color="#888" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        <TouchableOpacity
+          style={[styles.topFilterBtn, filterState.isFilterApplied && styles.activeTopFilterBtn]}
+          onPress={() => navigation.navigate('Filters')}
+        >
+          <Ionicons name="options-outline" size={20} color={filterState.isFilterApplied ? "#111" : "#FFD700"} />
+        </TouchableOpacity>
       </View>
       {!!searchQuery.trim() && (
         <View style={styles.searchDropdown}>
@@ -841,6 +853,19 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     paddingVertical: 0,
+  },
+  topFilterBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: "#2a2a2a",
+    borderWidth: 1,
+    borderColor: "#FFD700",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activeTopFilterBtn: {
+    backgroundColor: "#FFD700",
   },
   searchDropdown: {
     marginTop: 8,
