@@ -10,12 +10,21 @@ import { useCurrency } from '../contexts/CurrencyContext';
 const CartScreen = ({ route, navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
-  const { formatPrice } = useCurrency();
+  const { currency, currencyRates, formatPriceWithSource } = useCurrency();
   const { state, removeFromCart, updateQuantity } = useCart();
   
   // استخدام CartContext بدلاً من route.params
   const cartItems = state.items;
-  const total = state.total;
+
+  // حساب الإجمالي بالعملة الأساسية (YER) بناءً على عملة المصدر لكل منتج
+  const totalInYER = cartItems.reduce((sum: number, item: any) => {
+    const sourceCurrency = item.currency || 'YER';
+    const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
+    const itemPriceInYER = (item.price || 0) * sourceRate;
+    return sum + (itemPriceInYER * (item.quantity || 1));
+  }, 0);
+
+  const formattedTotal = formatPriceWithSource(totalInYER, 'YER', currency);
   
   const styles = getStyles(isDarkMode, colors);
 
@@ -24,10 +33,7 @@ const CartScreen = ({ route, navigation }: any) => {
   };
 
   const handleCheckout = () => {
-
-    
     if (cartItems.length === 0) {
-
       Alert.alert(
         language === "ar" ? "تحذير" : "Warning",
         language === "ar" ? "السلة فارغة" : "Cart is empty"
@@ -35,22 +41,11 @@ const CartScreen = ({ route, navigation }: any) => {
       return;
     }
     
-    // التنقل إلى شاشة تأكيد الطلب
-    // CartScreen موجود في Tab Navigator، و OrderConfirm موجود في Stack Navigator
-    // لذلك يجب استخدام getParent() للوصول إلى Stack Navigator
     try {
-
-      
-      // الطريقة الأولى: استخدام getParent() للوصول إلى Stack Navigator
       const stackNavigator = navigation.getParent();
-      
       if (stackNavigator) {
-        
         stackNavigator.navigate("OrderConfirm");
-        
       } else {
-        // الطريقة البديلة: استخدام navigate مباشرة
-        
         navigation.navigate("OrderConfirm");
       }
     } catch (error) {
@@ -78,37 +73,42 @@ const CartScreen = ({ route, navigation }: any) => {
     }
   };
 
-  const renderCartItem = ({ item }: any) => (
-    <View style={styles.cartItem}>
-      <Image 
-        source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} 
-        style={styles.itemImage} 
-      />
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-        <Text style={styles.itemPrice}>
-          {formatPrice(item.price || 0, item.currency || 'YER')}
-        </Text>
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
-            <Ionicons name="remove" size={16} color="#1a1a1a" />
+  const renderCartItem = ({ item }: any) => {
+    const itemUnitPriceFormatted = formatPriceWithSource(item.price || 0, item.currency || 'YER', currency);
+    const itemTotalFormatted = formatPriceWithSource((item.price || 0) * (item.quantity || 1), item.currency || 'YER', currency);
+
+    return (
+      <View style={styles.cartItem}>
+        <Image 
+          source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }} 
+          style={styles.itemImage} 
+        />
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.itemPrice}>
+            {itemUnitPriceFormatted}
+          </Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
+              <Ionicons name="remove" size={16} color="#1a1a1a" />
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{item.quantity || 1}</Text>
+            <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
+              <Ionicons name="add" size={16} color="#1a1a1a" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.itemRight}>
+          <TouchableOpacity style={styles.removeButton} onPress={() => handleRemove(item.id)}>
+            <Ionicons name="trash-outline" size={20} color="#FF3B3B" />
           </TouchableOpacity>
-          <Text style={styles.quantityText}>{item.quantity || 1}</Text>
-          <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
-            <Ionicons name="add" size={16} color="#1a1a1a" />
-          </TouchableOpacity>
+          <Text style={styles.itemTotal}>
+            {itemTotalFormatted}
+          </Text>
         </View>
       </View>
-      <View style={styles.itemRight}>
-        <TouchableOpacity style={styles.removeButton} onPress={() => handleRemove(item.id)}>
-          <Ionicons name="trash-outline" size={20} color="#FF3B3B" />
-        </TouchableOpacity>
-        <Text style={styles.itemTotal}>
-          {((item.price || 0) * (item.quantity || 1)).toLocaleString()}
-        </Text>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -158,7 +158,7 @@ const CartScreen = ({ route, navigation }: any) => {
               <Text style={styles.summaryLabel}>
                 {language === "ar" ? `المنتجات (${cartItems.length})` : `Items (${cartItems.length})`}
               </Text>
-              <Text style={styles.summaryValue}>{formatPrice(total)}</Text>
+              <Text style={styles.summaryValue}>{formattedTotal}</Text>
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>
@@ -173,7 +173,7 @@ const CartScreen = ({ route, navigation }: any) => {
               <Text style={styles.totalLabel}>
                 {language === "ar" ? "الإجمالي" : "Total"}
               </Text>
-              <Text style={styles.totalAmount}>{formatPrice(total)}</Text>
+              <Text style={styles.totalAmount}>{formattedTotal}</Text>
             </View>
             <TouchableOpacity style={styles.checkoutBtn} onPress={handleCheckout}>
               <Ionicons name="checkmark-circle-outline" size={22} color="#1a1a1a" />

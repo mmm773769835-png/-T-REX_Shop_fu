@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
 import { useCart } from '../contexts/CartContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { dbService, storageService } from '../services/SupabaseService';
@@ -11,11 +12,21 @@ import { dbService, storageService } from '../services/SupabaseService';
 const OrderConfirm = ({ route, navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
+  const { currency, currencyRates, formatPriceWithSource } = useCurrency();
   const { state, clearCart } = useCart();
   
   // استخدام CartContext بدلاً من route.params
   const cartItems = state.items;
-  const total = state.total;
+  
+  // حساب الإجمالي بالعملة الأساسية (YER) بناءً على عملة المصدر لكل منتج
+  const totalInYER = cartItems.reduce((sum: number, item: any) => {
+    const sourceCurrency = item.currency || 'YER';
+    const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
+    const itemPriceInYER = (item.price || 0) * sourceRate;
+    return sum + (itemPriceInYER * (item.quantity || 1));
+  }, 0);
+
+  const formattedTotal = formatPriceWithSource(totalInYER, 'YER', currency);
   
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -23,7 +34,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const finalTotal = total;
+  const finalTotal = totalInYER;
 
   const styles = getStyles(isDarkMode, colors);
 
@@ -31,10 +42,10 @@ const OrderConfirm = ({ route, navigation }: any) => {
   useEffect(() => {
     console.log('📦 OrderConfirm: تم تحميل الشاشة');
     console.log('📦 OrderConfirm: عدد المنتجات في السلة:', cartItems.length);
-    console.log('📦 OrderConfirm: الإجمالي:', total);
+    console.log('📦 OrderConfirm: الإجمالي:', totalInYER);
     console.log('📦 OrderConfirm: المنتجات:', cartItems);
     console.log('📦 OrderConfirm: طريقة الدفع الافتراضية:', paymentMethod);
-  }, [cartItems, total]);
+  }, [cartItems, totalInYER]);
 
   const pickReceipt = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -84,8 +95,8 @@ const OrderConfirm = ({ route, navigation }: any) => {
         cartItems.forEach((item: any, index: number) => {
           const itemName = item.name || 'منتج غير مسمى';
           const itemQuantity = item.quantity || 1;
-          const itemPrice = item.price || 0;
-          const itemTotal = (itemPrice * itemQuantity).toFixed(2);
+          const itemPriceFormatted = formatPriceWithSource(item.price || 0, item.currency || 'YER', currency);
+          const itemTotalFormatted = formatPriceWithSource((item.price || 0) * itemQuantity, item.currency || 'YER', currency);
           const itemImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : '') || item.imageUrl || '';
           const productId = item.id || '';
 
@@ -93,16 +104,16 @@ const OrderConfirm = ({ route, navigation }: any) => {
           const productLink = `https://trexshopmax.com/product/${productId}`;
 
           message += language === "ar"
-            ? `📦 ${itemName} - ${itemPrice} ر.ي × ${itemQuantity} = ${itemTotal} ر.ي\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
-            : `📦 ${itemName} - ${itemPrice} YER × ${itemQuantity} = ${itemTotal} YER\n   🔗 Product Link: ${productLink}\n` + (itemImage ? `   🖼️ Product Image: ${itemImage}\n` : '') + `\n`;
+            ? `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
+            : `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔗 Product Link: ${productLink}\n` + (itemImage ? `   🖼️ Product Image: ${itemImage}\n` : '') + `\n`;
         });
       } else {
         message += language === "ar" ? "لا توجد منتجات\n" : "No products\n";
       }
       
       message += language === "ar"
-        ? `💰 *الإجمالي:* ${finalTotal.toFixed(2)} ر.ي\n\n`
-        : `💰 *Total:* ${finalTotal.toFixed(2)} YER\n\n`;
+        ? `💰 *الإجمالي:* ${formattedTotal}\n\n`
+        : `💰 *Total:* ${formattedTotal}\n\n`;
 
       message += language === "ar" ? `👤 *معلومات العميل:*\n` : `👤 *Customer Details:*\n`;
       message += language === "ar"
@@ -208,7 +219,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
 
   const handleSubmit = async () => {
     console.log('📦 OrderConfirm: بدء إرسال الطلب');
-    console.log('📦 OrderConfirm: البيانات:', { name, phone, address, paymentMethod, cartItems: cartItems.length, total });
+    console.log('📦 OrderConfirm: البيانات:', { name, phone, address, paymentMethod, cartItems: cartItems.length, total: totalInYER });
     
     if (!name || !phone || !address) {
       console.log('⚠️ OrderConfirm: البيانات غير مكتملة');
@@ -315,7 +326,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
         paymentMethod,
         receiptUrl: receiptUrl || "",
         items: cleanedItems,
-        subtotal: total,
+        subtotal: totalInYER,
         shippingFee: null,
         shippingMethod: "distance_based",
         total: finalTotal,
@@ -426,7 +437,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>{language === "ar" ? "الإجمالي" : "Total"}</Text>
-            <Text style={styles.totalAmount}>{finalTotal.toLocaleString()} {language === "ar" ? "ر.ي" : "YER"}</Text>
+            <Text style={styles.totalAmount}>{formattedTotal}</Text>
           </View>
         </View>
       </View>

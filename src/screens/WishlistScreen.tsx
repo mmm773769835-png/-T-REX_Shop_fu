@@ -11,7 +11,7 @@ import { sanitizeImageUrl } from '../utils/imageUtils';
 const WishlistScreen = ({ navigation }: any) => {
   const { isDarkMode } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
-  const { formatPrice } = useCurrency();
+  const { currency, formatPriceWithSource } = useCurrency();
   const { state, removeFromWishList } = useWishList();
   const { addToCart } = useCart();
 
@@ -34,16 +34,17 @@ const WishlistScreen = ({ navigation }: any) => {
 
   const handleAddToCart = (item: any) => {
     addToCart(item);
+    removeFromWishList(item.id);
     Alert.alert(
       language === "ar" ? "✅ تمت الإضافة" : "✅ Added",
-      language === "ar" ? `تم إضافة "${item.name}" للسلة` : `"${item.name}" added to cart`,
+      language === "ar" ? `تم إضافة "${item.name}" للسلة ونقله من المفضلة` : `"${item.name}" added to cart and moved from wishlist`,
       [{ text: language === "ar" ? "حسناً" : "OK" }]
     );
   };
 
   const handleOrderNow = (item: any) => {
-    // Add to cart first then go to order confirmation
     addToCart(item);
+    removeFromWishList(item.id);
     try {
       const stackNavigator = navigation.getParent();
       if (stackNavigator) {
@@ -61,15 +62,17 @@ const WishlistScreen = ({ navigation }: any) => {
     if (state.items.length === 0) {
       Alert.alert(
         language === "ar" ? "تحذير" : "Warning",
-        language === "ar" ? "المفضلة فارغة، أضف منتجات إأولاً" : "Wishlist is empty, please add items first"
+        language === "ar" ? "المفضلة فارغة، أضف منتجات أولاً" : "Wishlist is empty, please add items first"
       );
       return;
     }
 
-    // Add all wishlist items to cart
-    state.items.forEach((item: any) => addToCart(item));
+    const itemsToMove = [...state.items];
+    itemsToMove.forEach((item: any) => {
+      addToCart(item);
+      removeFromWishList(item.id);
+    });
 
-    // Navigate to OrderConfirm safely
     try {
       const stackNavigator = navigation.getParent();
       if (stackNavigator) {
@@ -90,10 +93,15 @@ const WishlistScreen = ({ navigation }: any) => {
   const handleAddAllToCart = () => {
     if (state.items.length === 0) return;
     
-    state.items.forEach((item: any) => addToCart(item));
+    const itemsToMove = [...state.items];
+    itemsToMove.forEach((item: any) => {
+      addToCart(item);
+      removeFromWishList(item.id);
+    });
+
     Alert.alert(
       language === "ar" ? "✅ تمت الإضافة" : "✅ Added",
-      language === "ar" ? `تم إضافة ${state.items.length} منتجات للسلة` : `${state.items.length} products added to cart`,
+      language === "ar" ? `تم إضافة ${itemsToMove.length} منتجات للسلة ونقلها من المفضلة` : `${itemsToMove.length} products moved to cart`,
       [{ text: language === "ar" ? "حسناً" : "OK" }]
     );
   };
@@ -171,7 +179,7 @@ const WishlistScreen = ({ navigation }: any) => {
                   </TouchableOpacity>
 
                   <Text style={styles.itemPrice}>
-                    {formatPrice(item.price, (item.currency || 'YER') as any)}
+                    {formatPriceWithSource(item.price, item.currency || 'YER', currency)}
                   </Text>
 
                   {/* Action Buttons */}

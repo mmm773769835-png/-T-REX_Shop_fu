@@ -37,7 +37,7 @@ const useDebounce = (value: string, delay: number) => {
 const SearchScreen = ({ navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
-  const { formatPrice } = useCurrency();
+  const { currency, formatPriceWithSource } = useCurrency();
   const { state: searchState, setQuery, addToHistory, clearHistory, generateSuggestions } = useSearch();
   const { state: filterState } = useAdvancedFilters();
 
@@ -239,9 +239,9 @@ const SearchScreen = ({ navigation }: any) => {
             <Text style={styles.productDescription} numberOfLines={2}>{item.description}</Text>
           )}
           <View style={styles.priceRow}>
-            <Text style={styles.productPrice}>{formatPrice(item.price, (item.currency || 'YER') as any)}</Text>
+            <Text style={styles.productPrice}>{formatPriceWithSource(item.price, item.currency || 'YER', currency)}</Text>
             {originalPrice && originalPrice > item.price && (
-              <Text style={styles.originalPrice}>{formatPrice(originalPrice, (item.currency || 'YER') as any)}</Text>
+              <Text style={styles.originalPrice}>{formatPriceWithSource(originalPrice, item.currency || 'YER', currency)}</Text>
             )}
           </View>
           <View style={styles.metaRow}>
