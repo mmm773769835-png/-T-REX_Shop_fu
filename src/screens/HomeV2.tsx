@@ -418,7 +418,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                          ].filter(Boolean).join(' ')).includes(normalizedSearch);
 
       // تصفية حسب السعر - تحويل السعر إلى العملة الحالية للمقارنة
-      const sourceCurrency = product.currency || 'YER';
+      const sourceCurrency = product.currency || 'SAR';
       const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
       const targetRate = currencyRates.find(r => r.code === currency)?.rate || 1;
       

@@ -18,7 +18,7 @@ const CartScreen = ({ route, navigation }: any) => {
 
   // حساب الإجمالي بالعملة الأساسية (YER) بناءً على عملة المصدر لكل منتج
   const totalInYER = cartItems.reduce((sum: number, item: any) => {
-    const sourceCurrency = item.currency || 'YER';
+    const sourceCurrency = item.currency || 'SAR';
     const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
     const itemPriceInYER = (item.price || 0) * sourceRate;
     return sum + (itemPriceInYER * (item.quantity || 1));
@@ -74,8 +74,8 @@ const CartScreen = ({ route, navigation }: any) => {
   };
 
   const renderCartItem = ({ item }: any) => {
-    const itemUnitPriceFormatted = formatPriceWithSource(item.price || 0, item.currency || 'YER', currency);
-    const itemTotalFormatted = formatPriceWithSource((item.price || 0) * (item.quantity || 1), item.currency || 'YER', currency);
+    const itemUnitPriceFormatted = formatPriceWithSource(item.price || 0, item.currency || 'SAR', currency);
+    const itemTotalFormatted = formatPriceWithSource((item.price || 0) * (item.quantity || 1), item.currency || 'SAR', currency);
 
     return (
       <View style={styles.cartItem}>

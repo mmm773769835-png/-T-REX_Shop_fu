@@ -180,7 +180,7 @@ const WishlistScreen = ({ navigation }: any) => {
                   </TouchableOpacity>
 
                   <Text style={styles.itemPrice}>
-                    {formatPriceWithSource(item.price, item.currency || 'YER', currency)}
+                    {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
                   </Text>
 
                   {/* Action Buttons */}

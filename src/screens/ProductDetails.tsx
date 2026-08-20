@@ -301,7 +301,7 @@ export default function ProductDetails({ route, navigation }: any) {
             {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
               <>
                 <Text style={styles.originalPrice}>
-                  {formatPriceWithSource(currentProduct.originalPrice, currentProduct.currency || 'YER', currency)}
+                  {formatPriceWithSource(currentProduct.originalPrice, currentProduct.currency || 'SAR', currency)}
                 </Text>
                 <View style={styles.discountBadge}>
                   <Text style={styles.discountBadgeText}>
@@ -311,7 +311,7 @@ export default function ProductDetails({ route, navigation }: any) {
               </>
             )}
             <Text style={styles.productPrice}>
-              {formatPriceWithSource(currentProduct.price, currentProduct.currency || 'YER', currency)}
+              {formatPriceWithSource(currentProduct.price, currentProduct.currency || 'SAR', currency)}
             </Text>
           </View>
 

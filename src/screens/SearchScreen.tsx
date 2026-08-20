@@ -81,7 +81,7 @@ const SearchScreen = ({ navigation }: any) => {
               image_url: item.image_url || item.imageUrl,
               images: item.images || (item.image_url ? [item.image_url] : []),
               category: item.category || "غير مصنف",
-              currency: item.currency || "YER",
+              currency: item.currency || "SAR",
               paymentMethod: item.payment_method || item.paymentMethod || "cash",
               old_price: item.old_price || item.original_price || null,
               originalPrice: item.original_price || item.old_price || null,
@@ -239,9 +239,9 @@ const SearchScreen = ({ navigation }: any) => {
             <Text style={styles.productDescription} numberOfLines={2}>{item.description}</Text>
           )}
           <View style={styles.priceRow}>
-            <Text style={styles.productPrice}>{formatPriceWithSource(item.price, item.currency || 'YER', currency)}</Text>
+            <Text style={styles.productPrice}>{formatPriceWithSource(item.price, item.currency || 'SAR', currency)}</Text>
             {originalPrice && originalPrice > item.price && (
-              <Text style={styles.originalPrice}>{formatPriceWithSource(originalPrice, item.currency || 'YER', currency)}</Text>
+              <Text style={styles.originalPrice}>{formatPriceWithSource(originalPrice, item.currency || 'SAR', currency)}</Text>
             )}
           </View>
           <View style={styles.metaRow}>

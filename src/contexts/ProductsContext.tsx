@@ -59,7 +59,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           category: item.category || 'general',
           attribute: item.attribute,
           payment_method: item.payment_method,
-          currency: item.currency || 'OMR',
+          currency: item.currency || 'SAR',
           discount: item.discount,
           created_at: item.created_at,
           updated_at: item.updated_at,

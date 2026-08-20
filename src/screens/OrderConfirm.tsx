@@ -18,15 +18,15 @@ const OrderConfirm = ({ route, navigation }: any) => {
   // استخدام CartContext بدلاً من route.params
   const cartItems = state.items;
   
-  // حساب الإجمالي بالعملة الأساسية (YER) بناءً على عملة المصدر لكل منتج
+  // حساب الإجمالي بالعملة الأساسية (SAR) بناءً على عملة المصدر لكل منتج
   const totalInYER = cartItems.reduce((sum: number, item: any) => {
-    const sourceCurrency = item.currency || 'YER';
+    const sourceCurrency = item.currency || 'SAR';
     const sourceRate = currencyRates.find(r => r.code === sourceCurrency)?.rate || 1;
-    const itemPriceInYER = (item.price || 0) * sourceRate;
-    return sum + (itemPriceInYER * (item.quantity || 1));
+    const itemPriceInSAR = (item.price || 0) * sourceRate;
+    return sum + (itemPriceInSAR * (item.quantity || 1));
   }, 0);
 
-  const formattedTotal = formatPriceWithSource(totalInYER, 'YER', currency);
+  const formattedTotal = formatPriceWithSource(totalInYER, 'SAR', currency);
   
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

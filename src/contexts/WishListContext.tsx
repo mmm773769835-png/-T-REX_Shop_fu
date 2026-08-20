@@ -174,7 +174,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
             images: item.images || (item.image_url ? [item.image_url] : []),
             category: item.category,
             attribute: item.attribute,
-            currency: item.currency,
+            currency: item.currency || 'SAR',
             old_price: item.old_price,
             originalPrice: item.original_price,
             discount: item.discount,
@@ -197,11 +197,12 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
   const addToWishList = async (product: Product) => {
     const productId = String(product.id);
     const imageUrl = product.image_url || product.imageUrl || product.images?.[0] || '';
+    const productCurrency = product.currency || 'SAR';
 
     if (!userId) {
       console.warn('⚠️ WishListContext: المستخدم غير مسجل الدخول');
       if (!state.items.some(item => String(item.id) === productId)) {
-        dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl } });
+        dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl, currency: productCurrency } });
       }
       return;
     }
@@ -222,7 +223,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
         description: product.description,
         image_url: imageUrl,
         images: product.images || (imageUrl ? [imageUrl] : []),
-        currency: product.currency || 'YER',
+        currency: productCurrency,
         old_price: product.old_price || product.originalPrice || null,
         original_price: product.originalPrice || product.old_price || null,
         discount: product.discount || 0,
@@ -252,7 +253,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       // Update local state
-      dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl } });
+      dispatch({ type: 'ADD_TO_WISHLIST', payload: { ...product, id: productId, imageUrl, currency: productCurrency } });
       console.log('✅ WishListContext: تم إضافة المنتج إلى قائمة الأمنيات');
     } catch (error) {
       console.error('❌ WishListContext: خطأ في إضافة المنتج إلى قائمة الأمنيات:', error);
