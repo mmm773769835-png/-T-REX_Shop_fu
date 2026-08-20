@@ -12,7 +12,7 @@ const WishlistScreen = ({ navigation }: any) => {
   const { isDarkMode } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
   const { currency, formatPriceWithSource } = useCurrency();
-  const { state, removeFromWishList } = useWishList();
+  const { state, removeFromWishList, clearWishList } = useWishList();
   const { addToCart } = useCart();
 
   const styles = getStyles(isDarkMode);
@@ -58,7 +58,7 @@ const WishlistScreen = ({ navigation }: any) => {
     }
   };
 
-  const handleCompletePurchase = () => {
+  const handleCompletePurchase = async () => {
     if (state.items.length === 0) {
       Alert.alert(
         language === "ar" ? "تحذير" : "Warning",
@@ -70,8 +70,8 @@ const WishlistScreen = ({ navigation }: any) => {
     const itemsToMove = [...state.items];
     itemsToMove.forEach((item: any) => {
       addToCart(item);
-      removeFromWishList(item.id);
     });
+    await clearWishList();
 
     try {
       const stackNavigator = navigation.getParent();
@@ -90,18 +90,19 @@ const WishlistScreen = ({ navigation }: any) => {
     navigation.navigate('ProductDetails', { product: item });
   };
 
-  const handleAddAllToCart = () => {
+  const handleAddAllToCart = async () => {
     if (state.items.length === 0) return;
     
+    const count = state.items.length;
     const itemsToMove = [...state.items];
     itemsToMove.forEach((item: any) => {
       addToCart(item);
-      removeFromWishList(item.id);
     });
+    await clearWishList();
 
     Alert.alert(
       language === "ar" ? "✅ تمت الإضافة" : "✅ Added",
-      language === "ar" ? `تم إضافة ${itemsToMove.length} منتجات للسلة ونقلها من المفضلة` : `${itemsToMove.length} products moved to cart`,
+      language === "ar" ? `تم إضافة ${count} منتجات للسلة ونقلها من المفضلة` : `${count} products moved to cart`,
       [{ text: language === "ar" ? "حسناً" : "OK" }]
     );
   };

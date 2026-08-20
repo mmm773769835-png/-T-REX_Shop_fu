@@ -3817,7 +3817,7 @@
                                 <div style="color: var(--primary); font-weight: 800;">${formatPrice(product.price, product.currency || 'SAR')}</div>
                             </div>
                             <div class="wishlist-actions">
-                                <button class="icon-action-btn cart-action" onclick='addToCart(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="أضف للسلة" aria-label="أضف للسلة">
+                                <button class="icon-action-btn cart-action" onclick='addToCartFromWishlist(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="أضف للسلة" aria-label="أضف للسلة">
                                     <i class="fas fa-cart-plus"></i><span>السلة</span>
                                 </button>
                                 <button class="icon-action-btn buy-action" onclick='openQuickView(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="شراء" aria-label="شراء">
@@ -3846,6 +3846,11 @@
             showNotification('تم إزالة المنتج من المفضلة 💔');
         }
 
+        function addToCartFromWishlist(product) {
+            addToCart(product);
+            removeWishlistItem(product.id);
+        }
+
         function addWishlistToCart() {
             const items = getWishlistProducts();
             if (items.length === 0) {
@@ -3862,8 +3867,16 @@
             });
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartDisplay();
+            
+            // Empty wishlist after adding all items to cart
+            wishlist = [];
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+            renderProducts();
+
             closeModal();
             openCartOrderModal();
+            showNotification('تم إضافة جميع منتجات المفضلة إلى السلة 🛒');
         }
 
         // Compare Management

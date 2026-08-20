@@ -36,6 +36,7 @@ interface WishListState {
 type WishListAction =
   | { type: 'ADD_TO_WISHLIST'; payload: Product }
   | { type: 'REMOVE_FROM_WISHLIST'; payload: string }
+  | { type: 'CLEAR_WISHLIST' }
   | { type: 'SET_WISHLIST'; payload: WishListItem[] }
   | { type: 'SET_LOADING'; payload: boolean };
 
@@ -58,6 +59,11 @@ const wishListReducer = (state: WishListState, action: WishListAction): WishList
         ...state,
         items: state.items.filter(item => item.id !== action.payload),
       };
+    case 'CLEAR_WISHLIST':
+      return {
+        ...state,
+        items: [],
+      };
     case 'SET_WISHLIST':
       return {
         ...state,
@@ -78,6 +84,7 @@ interface WishListContextType {
   state: WishListState;
   addToWishList: (product: Product) => Promise<void>;
   removeFromWishList: (productId: string) => Promise<void>;
+  clearWishList: () => Promise<void>;
   isInWishList: (productId: string) => boolean;
   loadWishList: () => Promise<void>;
 }
@@ -288,6 +295,36 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
+  // Clear all products from wish list
+  const clearWishList = async () => {
+    if (!userId) {
+      dispatch({ type: 'CLEAR_WISHLIST' });
+      try {
+        await AsyncStorage.setItem(LOCAL_WISHLIST_KEY, JSON.stringify([]));
+      } catch (error) {
+        console.error('❌ WishListContext: خطأ في تفريغ المفضلة المحلية:', error);
+      }
+      return;
+    }
+
+    try {
+      const { data, error } = await dbService.get('wishlists', {
+        eq: { user_id: userId }
+      });
+
+      if (!error && data && data.length > 0) {
+        await Promise.all(data.map((item: any) => dbService.delete('wishlists', item.id)));
+      }
+
+      dispatch({ type: 'CLEAR_WISHLIST' });
+      await AsyncStorage.setItem(LOCAL_WISHLIST_KEY, JSON.stringify([]));
+      console.log('✅ WishListContext: تم تفريغ قائمة الأمنيات بالكامل');
+    } catch (error) {
+      console.error('❌ WishListContext: خطأ في تفريغ قائمة الأمنيات:', error);
+      dispatch({ type: 'CLEAR_WISHLIST' });
+    }
+  };
+
   // Check if product is in wish list
   const isInWishList = (productId: string): boolean => {
     return state.items.some(item => String(item.id) === String(productId));
@@ -299,6 +336,7 @@ export const WishListProvider: React.FC<{ children: ReactNode }> = ({ children }
         state,
         addToWishList,
         removeFromWishList,
+        clearWishList,
         isInWishList,
         loadWishList,
       }}
