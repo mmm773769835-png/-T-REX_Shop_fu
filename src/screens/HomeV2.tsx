@@ -468,8 +468,16 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
       </TouchableOpacity>
       
       <View style={styles.headerCenter}>
-        <Text style={styles.headerLogo}>T-REX</Text>
-        <Text style={styles.headerSubtitle}>{language === "ar" ? "المتجر" : "SHOP"}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Image 
+            source={require('../../logo.png')} 
+            style={{ width: 32, height: 32, resizeMode: 'contain', marginEnd: 6 }} 
+          />
+          <View style={{ alignItems: 'center' }}>
+            <Text style={styles.headerLogo}>T-REX</Text>
+            <Text style={styles.headerSubtitle}>{language === "ar" ? "المتجر" : "SHOP"}</Text>
+          </View>
+        </View>
       </View>
       
       <View style={styles.headerRight}>

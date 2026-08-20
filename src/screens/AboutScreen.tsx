@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -37,7 +37,10 @@ const AboutScreen = ({ navigation }: any) => {
       {/* Logo Section */}
       <View style={styles.heroSection}>
         <View style={styles.logoCircle}>
-          <Text style={styles.logoText}>T-REX</Text>
+          <Image 
+            source={require('../../logo.png')} 
+            style={{ width: 60, height: 60, resizeMode: 'contain' }} 
+          />
         </View>
         <Text style={styles.storeName}>
           {language === 'ar' ? 'متجر T-REX' : 'T-REX Store'}

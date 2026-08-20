@@ -193,10 +193,12 @@
             50% { transform: translateX(0%) rotate(45deg); }
             100% { transform: translateX(100%) rotate(45deg); }
         }
-        .trex-emoji {
-            font-size: 28px;
+        .logo-img {
+            width: 88%;
+            height: 88%;
+            object-fit: contain;
             z-index: 1;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
             animation: bounce 2s ease infinite;
         }
         @keyframes bounce {
@@ -2820,7 +2822,7 @@
         <div class="header-content">
             <a href="/" class="logo">
                 <div class="logo-icon">
-                    <span class="trex-emoji">🦖</span>
+                    <img src="/logo.png" alt="T-REX Logo" class="logo-img">
                 </div>
                 <div class="logo-text">
                     <span class="logo-title">T-REX</span>
@@ -3281,7 +3283,7 @@
                     <h3 class="settings-title"><i class="fas fa-store"></i> حول المتجر</h3>
                     <div class="about-store">
                         <div class="about-logo">
-                            <i class="fas fa-rocket"></i>
+                            <img src="/logo.png" alt="T-REX Logo" style="width: 55px; height: 55px; object-fit: contain;">
                         </div>
                         <h3>T-REX Shop</h3>
                         <p class="tagline">متجر إلكتروني متطور يوفر تجربة تسوق فريدة ومميزة</p>

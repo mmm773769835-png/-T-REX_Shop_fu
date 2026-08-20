@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
   Linking,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import InAppBrowser from 'react-native-inappbrowser-reborn';
@@ -157,6 +158,10 @@ export default function LoginScreen({ navigation }: any) {
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {/* Logo */}
       <View style={styles.logoSection}>
+        <Image 
+          source={require('../../logo.png')} 
+          style={{ width: 70, height: 70, resizeMode: 'contain', marginBottom: 8 }} 
+        />
         <Text style={styles.logoText}>T-REX</Text>
         <Text style={styles.logoSub}>{language === "ar" ? "المتجر" : "SHOP"}</Text>
       </View>
