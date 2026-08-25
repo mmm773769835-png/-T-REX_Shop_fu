@@ -378,11 +378,11 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
             <View style={styles.priceContainer}>
               {item.originalPrice && item.originalPrice > item.price && (
                 <Text style={styles.originalPrice}>
-                  {formatPriceWithSource(item.originalPrice, item.currency || 'YER', currency)}
+                  {formatPriceWithSource(item.originalPrice, item.currency || 'SAR', currency)}
                 </Text>
               )}
               <Text style={styles.productPrice}>
-                {formatPriceWithSource(item.price, item.currency || 'YER', currency)}
+                {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
               </Text>
             </View>
           </View>

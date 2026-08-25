@@ -13,7 +13,7 @@ const DealsScreen = ({ navigation }: any) => {
   const { language } = useContext(LanguageContext);
   const { state, loadDeals } = useDeals();
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { currency, formatPriceWithSource } = useCurrency();
 
   const styles = getStyles(isDarkMode, colors);
 
@@ -48,8 +48,8 @@ const DealsScreen = ({ navigation }: any) => {
           </Text>
           
           <View style={styles.priceContainer}>
-            <Text style={styles.originalPrice}>{formatPrice(item.originalPrice, (item.currency || 'YER') as any)}</Text>
-            <Text style={styles.currentPrice}>{formatPrice(item.price, (item.currency || 'YER') as any)}</Text>
+            <Text style={styles.originalPrice}>{formatPriceWithSource(item.originalPrice, item.currency || 'SAR', currency)}</Text>
+            <Text style={styles.currentPrice}>{formatPriceWithSource(item.price, item.currency || 'SAR', currency)}</Text>
           </View>
           
           {item.validUntil && (
