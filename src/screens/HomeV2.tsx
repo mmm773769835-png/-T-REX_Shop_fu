@@ -361,6 +361,13 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
               <Text style={styles.discountBadgeText}>-{discountPercent}%</Text>
             </View>
           )}
+          {(item as any).condition === 'used' && (
+            <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: '#ff9800', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, zIndex: 3 }}>
+              <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>
+                🏷️ {language === 'ar' ? 'مستعمل' : 'Used'}
+              </Text>
+            </View>
+          )}
           {/* زر الإضافة للسلة فوق الصورة */}
           <TouchableOpacity
             style={styles.quickAddButton}

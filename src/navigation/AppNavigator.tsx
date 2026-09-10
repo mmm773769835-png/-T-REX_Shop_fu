@@ -38,6 +38,8 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import AboutScreen from '../screens/AboutScreen';
 import SecurityPolicyScreen from '../screens/SecurityPolicyScreen';
 import AuthCallbackScreen from '../screens/AuthCallbackScreen';
+import VendorDashboard from '../screens/VendorDashboard';
+import AdminVendorsScreen from '../screens/AdminVendorsScreen';
 // Create navigators
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -358,6 +360,16 @@ const AppNavigator = () => {
             title: getHeaderTitle('AddProduct', 'Add New Product'),
             headerShown: true,
           })}
+        />
+        <Stack.Screen 
+          name="VendorDashboard" 
+          component={VendorDashboard} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="AdminVendors" 
+          component={AdminVendorsScreen} 
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Addresses" 

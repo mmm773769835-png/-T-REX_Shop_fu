@@ -99,13 +99,14 @@ const OrderConfirm = ({ route, navigation }: any) => {
           const itemTotalFormatted = formatPriceWithSource((item.price || 0) * itemQuantity, item.currency || 'SAR', currency);
           const itemImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : '') || item.imageUrl || '';
           const productId = item.id || '';
+          const vendorCode = item.vendor_code || 'VND-MAIN';
 
           // إنشاء رابط deep link للمنتج (Universal Link)
           const productLink = `https://trexshopmax.com/product/${productId}`;
 
           message += language === "ar"
-            ? `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
-            : `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔗 Product Link: ${productLink}\n` + (itemImage ? `   🖼️ Product Image: ${itemImage}\n` : '') + `\n`;
+            ? `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔑 كود التاجر: ${vendorCode}\n   🔗 رابط المنتج: ${productLink}\n` + (itemImage ? `   🖼️ صورة المنتج: ${itemImage}\n` : '') + `\n`
+            : `📦 ${itemName} - ${itemPriceFormatted} × ${itemQuantity} = ${itemTotalFormatted}\n   🔑 Vendor Code: ${vendorCode}\n   🔗 Product Link: ${productLink}\n` + (itemImage ? `   🖼️ Product Image: ${itemImage}\n` : '') + `\n`;
         });
       } else {
         message += language === "ar" ? "لا توجد منتجات\n" : "No products\n";

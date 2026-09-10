@@ -183,6 +183,18 @@ const FiltersScreen = ({ navigation }: any) => {
               <View style={[styles.switchThumb, tempInStock && styles.switchThumbActive]} />
             </TouchableOpacity>
           </View>
+
+          <View style={[styles.switchContainer, { marginTop: 12 }]}>
+            <Text style={styles.switchLabel}>
+              {language === "ar" ? "🏷️ المنتجات المستعملة فقط" : "🏷️ Used Products Only"}
+            </Text>
+            <TouchableOpacity
+              style={[styles.switch, tempCategories.includes('مستعمل') && styles.switchActive]}
+              onPress={() => handleToggleCategory('مستعمل')}
+            >
+              <View style={[styles.switchThumb, tempCategories.includes('مستعمل') && styles.switchThumbActive]} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Sort By */}

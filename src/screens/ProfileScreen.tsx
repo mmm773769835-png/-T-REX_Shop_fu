@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
@@ -17,16 +17,28 @@ const ProfileScreen = ({ navigation }: any) => {
   const [localUser, setLocalUser] = useState({
     name: "جاري التحميل...",
     email: "جاري التحميل...",
-    phone: "جاري التحميل...",
+    phone: "غير متوفر",
+    role: "customer",
+    shopName: "",
+    vendorCode: "",
     profileImage: getDefaultUserImage(),
   });
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeShopName, setUpgradeShopName] = useState("");
+  const [upgradePhone, setUpgradePhone] = useState("");
+  const [upgradeAddress, setUpgradeAddress] = useState("");
+  const [upgrading, setUpgrading] = useState(false);
   
   useEffect(() => {
     const fetchUserData = async () => {
       if (authUser) {
         try {
-          // محاولة الحصول على معلومات المستخدم من قاعدة البيانات
-          const { data, error } = await dbService.get('users', { eq: { id: authUser.uid } });
+          // جلب بيانات الحساب من profiles أولاً ثم users
+          let { data, error } = await dbService.get('profiles', { eq: { id: authUser.uid } });
+          if (!data || data.length === 0) {
+            const res = await dbService.get('users', { eq: { id: authUser.uid } });
+            data = res.data;
+          }
 
           if (data && data.length > 0) {
             const userData = data[0];
@@ -34,14 +46,19 @@ const ProfileScreen = ({ navigation }: any) => {
               name: userData.name || authUser.displayName || "مستخدم جديد",
               email: authUser.email || "غير متوفر",
               phone: userData.phone || authUser.phoneNumber || "غير متوفر",
-              profileImage: userData.photo_url || getDefaultUserImage(),
+              role: userData.role || "customer",
+              shopName: userData.shop_name || "",
+              vendorCode: userData.vendor_code || "",
+              profileImage: userData.photo_url || userData.profile_image || getDefaultUserImage(),
             });
           } else {
-            // إذا لم يتم العثور على المستخدم في قاعدة البيانات، نستخدم معلومات auth فقط
             setLocalUser({
               name: authUser.displayName || "مستخدم جديد",
               email: authUser.email || "غير متوفر",
               phone: authUser.phoneNumber || "غير متوفر",
+              role: "customer",
+              shopName: "",
+              vendorCode: "",
               profileImage: getDefaultUserImage(),
             });
           }
@@ -51,6 +68,9 @@ const ProfileScreen = ({ navigation }: any) => {
             name: authUser.displayName || "مستخدم جديد",
             email: authUser.email || "غير متوفر",
             phone: authUser.phoneNumber || "غير متوفر",
+            role: "customer",
+            shopName: "",
+            vendorCode: "",
             profileImage: getDefaultUserImage(),
           });
         }
@@ -59,6 +79,60 @@ const ProfileScreen = ({ navigation }: any) => {
     
     fetchUserData();
   }, [authUser]);
+
+  const handleUpgradeToVendor = async () => {
+    if (!upgradeShopName.trim() || !upgradePhone.trim()) {
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "يرجى تعبئة اسم المتجر ورقم الهاتف" : "Please fill shop name and phone number"
+      );
+      return;
+    }
+
+    setUpgrading(true);
+    try {
+      if (!authUser?.uid) return;
+      const generatedCode = `VND-${Math.floor(1000 + Math.random() * 9000)}`;
+      const payload = {
+        id: authUser.uid,
+        name: localUser.name,
+        email: localUser.email,
+        phone: upgradePhone.trim(),
+        shop_name: upgradeShopName.trim(),
+        address: upgradeAddress.trim(),
+        role: 'vendor',
+        vendor_code: generatedCode,
+        updated_at: new Date().toISOString(),
+      };
+
+      await dbService.upsert('profiles', payload);
+      await dbService.upsert('users', payload);
+
+      setLocalUser({
+        ...localUser,
+        role: 'vendor',
+        shopName: upgradeShopName.trim(),
+        phone: upgradePhone.trim(),
+        vendorCode: generatedCode,
+      });
+
+      setShowUpgradeModal(false);
+      Alert.alert(
+        language === "ar" ? "تهانينا! 🎉" : "Congratulations! 🎉",
+        language === "ar" 
+          ? `تم ترقية حسابك إلى تاجر بنجاح! كود التاجر الخاص بك هو: ${generatedCode}`
+          : `Your account has been upgraded to vendor! Your vendor code is: ${generatedCode}`
+      );
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "فشل في ترقية الحساب" : "Failed to upgrade account"
+      );
+    } finally {
+      setUpgrading(false);
+    }
+  };
   
   const styles = getStyles(isDarkMode, colors);
 
@@ -175,9 +249,102 @@ const ProfileScreen = ({ navigation }: any) => {
             {localUser.phone !== "غير متوفر" && (
               <Text style={styles.userPhone}>{localUser.phone}</Text>
             )}
+
+            {/* شارة التاجر إذا كان تاجر */}
+            {localUser.role === 'vendor' && (
+              <View style={{ marginTop: 10, paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#e8f8ec', borderRadius: 20, borderWidth: 1, borderColor: '#28a745', alignItems: 'center' }}>
+                <Text style={{ color: '#28a745', fontWeight: 'bold', fontSize: 13 }}>
+                  🏬 {localUser.shopName || "متجر تاجر"} | {localUser.vendorCode}
+                </Text>
+              </View>
+            )}
+
+            {/* زر الترقية إلى تاجر إذا كان زبون عادي */}
+            {localUser.role !== 'vendor' && localUser.role !== 'admin' && (
+              <TouchableOpacity
+                style={{
+                  marginTop: 14,
+                  backgroundColor: '#FFD700',
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 25,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                onPress={() => setShowUpgradeModal(true)}
+              >
+                <Ionicons name="storefront-outline" size={18} color="#1a1a1a" />
+                <Text style={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: 14 }}>
+                  {language === "ar" ? "التحويل لحساب تاجر 🏪" : "Upgrade to Vendor Account 🏪"}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
+
+      {/* لوحة التاجر إذا كان تاجر أو أدمن */}
+      {!isGuest && (localUser.role === 'vendor' || localUser.role === 'admin') && (
+        <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#28a745',
+              padding: 14,
+              borderRadius: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              elevation: 2,
+            }}
+            onPress={() => navigation.navigate("VendorDashboard" as never)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Ionicons name="cube-outline" size={24} color="#fff" />
+              <View>
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                  {language === "ar" ? "لوحة منتجات التاجر" : "Vendor Dashboard"}
+                </Text>
+                <Text style={{ color: '#e8f8ec', fontSize: 12 }}>
+                  {language === "ar" ? "إضافة وتعديل وحذف منتجاتك" : "Manage your products"}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* قسم إدارة التجار للمدير فقط */}
+      {!isGuest && localUser.role === 'admin' && (
+        <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#17a2b8',
+              padding: 14,
+              borderRadius: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              elevation: 2,
+            }}
+            onPress={() => navigation.navigate("AdminVendors" as never)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Ionicons name="people-outline" size={24} color="#fff" />
+              <View>
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                  {language === "ar" ? "دليل وبحث كود التجار (Admin)" : "Vendor Codes & Search"}
+                </Text>
+                <Text style={{ color: '#e1f5fe', fontSize: 12 }}>
+                  {language === "ar" ? "البحث بـ VND-XXXX والتواصل المباشر" : "Lookup vendor details"}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Menu Items */}
       <View style={styles.menuSection}>
@@ -209,6 +376,109 @@ const ProfileScreen = ({ navigation }: any) => {
       )}
 
       <View style={{ height: 30 }} />
+
+      {/* نافذة ترقية الحساب إلى تاجر */}
+      <Modal
+        visible={showUpgradeModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowUpgradeModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <View style={{ width: '100%', backgroundColor: colors.card, borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#FFD700' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>
+                {language === "ar" ? "الترقية إلى حساب تاجر 🏪" : "Upgrade to Vendor Account"}
+              </Text>
+              <TouchableOpacity onPress={() => setShowUpgradeModal(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 15 }}>
+              {language === "ar" 
+                ? "أدخل بيانات متجرك للبدء في إضافة وعرض منتجاتك واستقبال الطلبات."
+                : "Enter your shop details to start adding products and managing orders."}
+            </Text>
+
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.text, marginBottom: 6 }}>
+              {language === "ar" ? "اسم المتجر *" : "Shop Name *"}
+            </Text>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 15,
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                marginBottom: 12,
+              }}
+              placeholder={language === "ar" ? "مثال: متجر الأناقة" : "e.g. Elegance Shop"}
+              value={upgradeShopName}
+              onChangeText={setUpgradeShopName}
+            />
+
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.text, marginBottom: 6 }}>
+              {language === "ar" ? "رقم الهاتف للتواصل *" : "Phone Number *"}
+            </Text>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 15,
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                marginBottom: 12,
+              }}
+              placeholder={language === "ar" ? "أدخل رقم هاتفك" : "Enter phone number"}
+              value={upgradePhone}
+              onChangeText={setUpgradePhone}
+              keyboardType="phone-pad"
+            />
+
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.text, marginBottom: 6 }}>
+              {language === "ar" ? "العنوان *" : "Address *"}
+            </Text>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 15,
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                marginBottom: 20,
+              }}
+              placeholder={language === "ar" ? "أدخل عنوان المتجر" : "Enter shop address"}
+              value={upgradeAddress}
+              onChangeText={setUpgradeAddress}
+            />
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#28a745',
+                padding: 14,
+                borderRadius: 10,
+                alignItems: 'center',
+                opacity: upgrading ? 0.7 : 1,
+              }}
+              onPress={handleUpgradeToVendor}
+              disabled={upgrading}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+                {upgrading 
+                  ? (language === "ar" ? "جاري الترقية..." : "Upgrading...")
+                  : (language === "ar" ? "تأكيد الترقية وتوليد كود التاجر" : "Confirm Upgrade")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

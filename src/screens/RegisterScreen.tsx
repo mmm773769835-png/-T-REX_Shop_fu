@@ -30,6 +30,9 @@ export default function RegisterScreen({ navigation }: any) {
   const [phone, setPhone] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isVendor, setIsVendor] = useState(false);
+  const [shopName, setShopName] = useState("");
+  const [address, setAddress] = useState("");
 
   const styles = getStyles(isDarkMode, colors);
 
@@ -183,6 +186,23 @@ export default function RegisterScreen({ navigation }: any) {
       return;
     }
 
+    if (isVendor) {
+      if (!shopName.trim()) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          language === "ar" ? "يرجى إدخال اسم المتجر" : "Please enter shop name"
+        );
+        return;
+      }
+      if (!phone.trim()) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          language === "ar" ? "رقم الهاتف إجباري للحساب التجاري" : "Phone number is required for vendor account"
+        );
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       // رفع صورة الملف الشخصي إذا كانت موجودة
@@ -190,6 +210,9 @@ export default function RegisterScreen({ navigation }: any) {
       if (profileImage) {
         photoURL = await uploadProfileImage(profileImage);
       }
+
+      const userRole = isVendor ? 'vendor' : 'customer';
+      const generatedVendorCode = isVendor ? `VND-${Math.floor(1000 + Math.random() * 9000)}` : null;
 
       // إنشاء الحساب مع جميع البيانات
       const additionalData = {
@@ -199,6 +222,10 @@ export default function RegisterScreen({ navigation }: any) {
         photo_url: photoURL,
         displayName: name.trim(),
         full_name: name.trim(),
+        role: userRole,
+        shop_name: isVendor ? shopName.trim() : null,
+        address: address.trim() || "",
+        vendor_code: generatedVendorCode,
         createdAt: new Date().toISOString(),
       };
 
@@ -257,22 +284,27 @@ export default function RegisterScreen({ navigation }: any) {
           }
         }
 
-        if (data?.user?.id) {
-          const { error: profileError } = await dbService.upsert('users', {
-            id: data.user.id,
+        const userId = signedUser?.id || data?.user?.id;
+        if (userId) {
+          const profilePayload = {
+            id: userId,
             name: name.trim(),
             email: email.trim(),
             phone: phone.trim() || "",
             profile_image: photoURL,
             avatar_url: photoURL,
-            role: 'user',
-            created_at: new Date().toISOString(),
+            role: userRole,
+            shop_name: isVendor ? shopName.trim() : null,
+            address: address.trim() || "",
+            vendor_code: generatedVendorCode,
             updated_at: new Date().toISOString(),
-          });
+          };
 
+          const { error: profileError } = await dbService.upsert('profiles', profilePayload);
           if (profileError) {
-            console.error("Profile creation error:", profileError);
+            console.error("Profiles creation error:", profileError);
           }
+          await dbService.upsert('users', profilePayload);
         }
 
         if (signedUser) {
@@ -342,6 +374,78 @@ export default function RegisterScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
+        {/* نوع الحساب: زبون / تاجر */}
+        <View style={{ marginBottom: 20 }}>
+          <Text style={styles.label}>
+            {language === "ar" ? "نوع الحساب" : "Account Type"}
+          </Text>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                padding: 12,
+                borderRadius: 8,
+                borderWidth: 1.5,
+                borderColor: !isVendor ? "#FFD700" : colors.border,
+                backgroundColor: !isVendor ? (isDarkMode ? "#333" : "#FFF9E6") : colors.card,
+                alignItems: "center",
+              }}
+              onPress={() => setIsVendor(false)}
+            >
+              <Ionicons name="person-outline" size={20} color={!isVendor ? "#FFD700" : colors.text} />
+              <Text style={{ fontWeight: "bold", color: !isVendor ? "#FFD700" : colors.text, marginTop: 4 }}>
+                {language === "ar" ? "زبون" : "Customer"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                padding: 12,
+                borderRadius: 8,
+                borderWidth: 1.5,
+                borderColor: isVendor ? "#28a745" : colors.border,
+                backgroundColor: isVendor ? (isDarkMode ? "#1e3a24" : "#e8f8ec") : colors.card,
+                alignItems: "center",
+              }}
+              onPress={() => setIsVendor(true)}
+            >
+              <Ionicons name="storefront-outline" size={20} color={isVendor ? "#28a745" : colors.text} />
+              <Text style={{ fontWeight: "bold", color: isVendor ? "#28a745" : colors.text, marginTop: 4 }}>
+                {language === "ar" ? "تاجر" : "Vendor"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {isVendor && (
+          <View style={{ padding: 12, backgroundColor: isDarkMode ? '#222' : '#f9f9f9', borderRadius: 8, marginBottom: 16, borderWidth: 1, borderColor: '#28a745' }}>
+            <Text style={{ fontSize: 13, color: '#28a745', fontWeight: 'bold', marginBottom: 10 }}>
+              {language === "ar" ? "بيانات حساب التاجر (إلزامية)" : "Vendor Details (Required)"}
+            </Text>
+
+            <Text style={styles.label}>
+              {language === "ar" ? "اسم المتجر *" : "Shop Name *"}
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder={language === "ar" ? "أدخل اسم متجرك" : "Enter your shop name"}
+              value={shopName}
+              onChangeText={setShopName}
+            />
+
+            <Text style={styles.label}>
+              {language === "ar" ? "العنوان *" : "Address *"}
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder={language === "ar" ? "أدخل عنوان المتجر أو المحل" : "Enter shop address"}
+              value={address}
+              onChangeText={setAddress}
+            />
+          </View>
+        )}
+
         <Text style={styles.label}>
           {language === "ar" ? "الاسم الكامل *" : "Full Name *"}
         </Text>
@@ -366,11 +470,11 @@ export default function RegisterScreen({ navigation }: any) {
         />
 
         <Text style={styles.label}>
-          {language === "ar" ? "رقم الهاتف" : "Phone Number"}
+          {language === "ar" ? (isVendor ? "رقم الهاتف للتواصل *" : "رقم الهاتف") : (isVendor ? "Contact Phone *" : "Phone Number")}
         </Text>
         <TextInput
           style={styles.input}
-          placeholder={language === "ar" ? "أدخل رقم هاتفك (اختياري)" : "Enter your phone (optional)"}
+          placeholder={language === "ar" ? "أدخل رقم الهاتف" : "Enter phone number"}
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"

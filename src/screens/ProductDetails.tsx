@@ -315,13 +315,31 @@ export default function ProductDetails({ route, navigation }: any) {
             </Text>
           </View>
 
-          {/* Category chip */}
-          {currentProduct.category && (
-            <View style={styles.chip}>
-              <Ionicons name="pricetag-outline" size={12} color="#1a1a1a" />
-              <Text style={styles.chipText}>{currentProduct.category}</Text>
-            </View>
-          )}
+          {/* Category & Condition Chips */}
+          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginVertical: 8 }}>
+            {currentProduct.category && (
+              <View style={styles.chip}>
+                <Ionicons name="pricetag-outline" size={12} color="#1a1a1a" />
+                <Text style={styles.chipText}>{currentProduct.category}</Text>
+              </View>
+            )}
+
+            {currentProduct.condition === 'used' ? (
+              <View style={[styles.chip, { backgroundColor: '#fff3e0', borderColor: '#ff9800', borderWidth: 1 }]}>
+                <Ionicons name="pricetags" size={12} color="#ff9800" />
+                <Text style={[styles.chipText, { color: '#ff9800', fontWeight: 'bold' }]}>
+                  🏷️ {language === 'ar' ? 'مستعمل - حالة ممتازة' : 'Used - Good Condition'}
+                </Text>
+              </View>
+            ) : (
+              <View style={[styles.chip, { backgroundColor: '#e8f8ec', borderColor: '#28a745', borderWidth: 1 }]}>
+                <Ionicons name="sparkles" size={12} color="#28a745" />
+                <Text style={[styles.chipText, { color: '#28a745', fontWeight: 'bold' }]}>
+                  ✨ {language === 'ar' ? 'منتج جديد' : 'Brand New'}
+                </Text>
+              </View>
+            )}
+          </View>
 
           {/* Description */}
           <Text style={styles.productDescription}>{currentProduct.description}</Text>

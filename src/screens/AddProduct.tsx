@@ -9,11 +9,15 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { getDefaultProductImage } from '../utils/imageUtils';
 import { dbService, storageService } from '../services/SupabaseService';
 
+import { useAuth } from '../contexts/AuthContext';
+
 export default function AddProduct({ navigation, route }: any) {
   const { language } = useContext(LanguageContext);
+  const { user } = useAuth();
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  const [vendorPrice, setVendorPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [condition, setCondition] = useState<'new' | 'used'>('new');
   const categories = language === 'ar' ? PRODUCT_CATEGORIES.ar : PRODUCT_CATEGORIES.en;
   const attributes = language === 'ar' ? PRODUCT_ATTRIBUTES.ar : PRODUCT_ATTRIBUTES.en;
   const [category, setCategory] = useState(route?.params?.category || categories[0]);
@@ -23,6 +27,10 @@ export default function AddProduct({ navigation, route }: any) {
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showAttributeModal, setShowAttributeModal] = useState(false);
+
+  // حساب السعر النهائي المعروض للزبون (+10%)
+  const parsedVendorPrice = parseFloat(vendorPrice) || 0;
+  const finalPriceForCustomer = (parsedVendorPrice * 1.10).toFixed(2);
 
   const pickImage = async () => {
     try {
@@ -137,16 +145,28 @@ export default function AddProduct({ navigation, route }: any) {
       return;
     }
     
-    if (!price.trim()) {
+    // كشف وحظر أرقام الهواتف ووسائل التواصل بأي صيغة داخل العنوان أو الوصف
+    const phoneRegex = /(\+?[0-9]{1,4}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?[\d\s-]{7,12}/g;
+    if (phoneRegex.test(name) || phoneRegex.test(description)) {
+      Alert.alert(
+        language === "ar" ? "حظر أمني 🚫" : "Security Block 🚫",
+        language === "ar" 
+          ? "ممنوع كتابة أرقام الهواتف أو بيانات التواصل داخل اسم المنتج أو تفاصيله."
+          : "Phone numbers or contact info are strictly prohibited inside product title or description."
+      );
+      return;
+    }
+
+    if (!vendorPrice.trim()) {
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "يرجى إدخال السعر" : "Please enter price"
+        language === "ar" ? "يرجى إدخال سعرك الصافي" : "Please enter your net price"
       );
       return;
     }
     
     // التحقق من أن السعر رقم صحيح
-    const priceNum = parseFloat(price);
+    const priceNum = parseFloat(vendorPrice);
     if (isNaN(priceNum) || priceNum <= 0) {
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
@@ -154,6 +174,8 @@ export default function AddProduct({ navigation, route }: any) {
       );
       return;
     }
+
+    const calculatedCustomerPrice = parseFloat((priceNum * 1.10).toFixed(2));
     
     if (!description.trim()) {
       Alert.alert(
@@ -196,15 +218,31 @@ export default function AddProduct({ navigation, route }: any) {
         imageUrls = [getDefaultProductImage()];
       }
 
+      // جلب vendor_code الخاص بالتاجر الحالي إذا وُجد
+      let vendorId = user?.uid || null;
+      let vendorCode = null;
+      if (user?.uid) {
+        const { data: profData } = await dbService.get('profiles', { eq: { id: user.uid } });
+        if (profData && profData.length > 0) {
+          vendorCode = profData[0].vendor_code || null;
+        }
+      }
+
       const productData = {
         name: name.trim(),
-        price: priceNum,
+        vendor_price: priceNum,
+        price: calculatedCustomerPrice, // السعر للزبون بعد إضافة 10%
         description: description.trim(),
         category,
         attribute,
+        condition, // 'new' أو 'used'
+        vendor_id: vendorId,
+        vendor_code: vendorCode,
         paymentMethod,
-        imageUrls, // حفظ مصفوفة الصور بدلاً من صورة واحدة
-        primaryImage: imageUrls[0], // الصورة الأساسية للعرض
+        images: imageUrls,
+        image_url: imageUrls[0],
+        imageUrls,
+        primaryImage: imageUrls[0],
         createdAt: new Date().toISOString(),
       };
 
@@ -215,12 +253,14 @@ export default function AddProduct({ navigation, route }: any) {
       }
 
       Alert.alert(
-        language === "ar" ? "نجاح" : "Success",
-        language === "ar" ? "تمت إضافة المنتج بنجاح" : "Product added successfully"
+        language === "ar" ? "تم بنجاح! 🎉" : "Success! 🎉",
+        language === "ar" 
+          ? `تم حفظ المنتج بنجاح!\nسعرك الصافي: ${priceNum} د.ل\nالسعر المعروض للزبون (+10%): ${calculatedCustomerPrice} د.ل`
+          : `Product added successfully!\nNet Price: ${priceNum}\nCustomer Price (+10%): ${calculatedCustomerPrice}`
       );
       // إعادة تعيين النموذج
       setName("");
-      setPrice("");
+      setVendorPrice("");
       setDescription("");
       setImages([]);
       // @ts-ignore
@@ -249,34 +289,86 @@ export default function AddProduct({ navigation, route }: any) {
       </View>
 
       <View style={styles.form}>
+        {/* حالة المنتج: جديد / مستعمل */}
+        <Text style={styles.label}>{language === 'ar' ? 'حالة المنتج *' : 'Product Condition *'}</Text>
+        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16 }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 8,
+              borderWidth: 1.5,
+              borderColor: condition === 'new' ? '#28a745' : '#ccc',
+              backgroundColor: condition === 'new' ? '#e8f8ec' : '#f9f9f9',
+              alignItems: 'center',
+            }}
+            onPress={() => setCondition('new')}
+          >
+            <Text style={{ fontWeight: 'bold', color: condition === 'new' ? '#28a745' : '#555' }}>
+              ✨ {language === 'ar' ? 'جديد (New)' : 'New'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              padding: 12,
+              borderRadius: 8,
+              borderWidth: 1.5,
+              borderColor: condition === 'used' ? '#ff9800' : '#ccc',
+              backgroundColor: condition === 'used' ? '#fff3e0' : '#f9f9f9',
+              alignItems: 'center',
+            }}
+            onPress={() => setCondition('used')}
+          >
+            <Text style={{ fontWeight: 'bold', color: condition === 'used' ? '#ff9800' : '#555' }}>
+              🏷️ {language === 'ar' ? 'مستعمل (Used)' : 'Used'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.label}>{language === 'ar' ? 'اسم المنتج *' : 'Product Name *'}</Text>
         <TextInput
           style={styles.input}
-          placeholder={language === 'ar' ? "أدخل اسم المنتج" : "Enter product name"}
+          placeholder={language === 'ar' ? "أدخل اسم المنتج (بدون أرقام هواتف)" : "Enter product name (no phones)"}
           value={name}
           onChangeText={setName}
           maxLength={100}
         />
 
-        <Text style={styles.label}>{language === 'ar' ? 'السعر *' : 'Price *'}</Text>
+        <Text style={styles.label}>{language === 'ar' ? 'سعرك الصافي بالدينار (الخاص بك كتاجر) *' : 'Your Net Price *'}</Text>
         <TextInput
           style={styles.input}
-          placeholder={language === 'ar' ? "أدخل السعر" : "Enter price"}
-          value={price}
+          placeholder={language === 'ar' ? "أدخل سعرك الصافي (مثال: 100)" : "Enter net price"}
+          value={vendorPrice}
           onChangeText={(text) => {
-            // السماح فقط بالأرقام والنقطة العشرية
             if (/^\d*\.?\d*$/.test(text)) {
-              setPrice(text);
+              setVendorPrice(text);
             }
           }}
           keyboardType="numeric"
           maxLength={10}
         />
 
+        {/* بطاقة توضيح السعر والعمولة الشفافة للتاجر */}
+        {parsedVendorPrice > 0 && (
+          <View style={{ padding: 12, backgroundColor: '#f0f4ff', borderRadius: 8, borderWidth: 1, borderColor: '#3b82f6', marginBottom: 16 }}>
+            <Text style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 'bold', marginBottom: 4 }}>
+              💡 {language === 'ar' ? 'شفافية التسعير ورسوم المتجر:' : 'Pricing Transparency & Store Fees:'}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#1e3a8a' }}>
+              • {language === 'ar' ? `سعرك الصافي المحفوظ: ${parsedVendorPrice} د.ل` : `Your Saved Net Price: ${parsedVendorPrice}`}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#1e3a8a', fontWeight: 'bold', marginTop: 2 }}>
+              • {language === 'ar' ? `السعر النهائي المعروض للزبون (+10% رسوم المتجر): ${finalPriceForCustomer} د.ل` : `Final Price for Customer (+10% store fee): ${finalPriceForCustomer}`}
+            </Text>
+          </View>
+        )}
+
         <Text style={styles.label}>{language === 'ar' ? 'الوصف *' : 'Description *'}</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder={language === 'ar' ? "أدخل وصف المنتج" : "Enter product description"}
+          placeholder={language === 'ar' ? "أدخل وصف المنتج (يمنع كتابة أرقام الهواتف أو بيانات التواصل)" : "Enter description (no contact info allowed)"}
           value={description}
           onChangeText={setDescription}
           multiline
