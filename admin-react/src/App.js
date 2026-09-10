@@ -495,16 +495,17 @@ function App() {
                 <th>الصورة</th>
                 <th>الاسم</th>
                 <th>الفئة</th>
-                <th>السعر</th>
-                <th>العملة</th>
-                <th>تاريخ الإضافة</th>
+                <th>كود التاجر</th>
+                <th>سعر التاجر</th>
+                <th>سعر الزبون (+10%)</th>
+                <th>الحالة</th>
                 <th>الإجراءات</th>
               </tr>
             </thead>
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="no-products">
+                  <td colSpan="8" className="no-products">
                     لا توجد منتجات حالياً. أضف منتج جديد!
                   </td>
                 </tr>
@@ -532,19 +533,16 @@ function App() {
                           justifyContent: 'center',
                           color: '#666'
                         }}>
-          لا صورة
+                          لا صورة
                         </div>
                       )}
                     </td>
                     <td>{product.name}</td>
                     <td>{product.category}</td>
-                    <td style={{ color: '#FFD700', fontWeight: 'bold' }}>
-                      {product.price}
-                    </td>
-                    <td>{product.currency || 'OMR'}</td>
-                    <td>
-                      {new Date(product.created_at).toLocaleDateString('ar-SA')}
-                    </td>
+                    <td><span style={{ background: '#d4edda', color: '#155724', padding: '4px 8px', borderRadius: '6px', fontWeight: 'bold', border: '1px solid #28a745', fontSize: '12px' }}>{product.vendor_code || 'VND-MAIN'}</span></td>
+                    <td style={{ color: '#aaa' }}>{product.vendor_price || product.price} {product.currency || 'SAR'}</td>
+                    <td style={{ color: '#28a745', fontWeight: 'bold' }}>{product.price} {product.currency || 'SAR'}</td>
+                    <td>{product.condition === 'used' ? <span style={{ color: '#ff9800', fontWeight: 'bold', fontSize: '12px' }}>🏷️ مستعمل</span> : <span style={{ color: '#28a745', fontWeight: 'bold', fontSize: '12px' }}>✨ جديد</span>}</td>
                     <td>
                       <button 
                         className="btn-edit" 
