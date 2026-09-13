@@ -1201,9 +1201,16 @@
                 if (currentVendor && currentVendor.role === 'vendor') {
                     query = query.eq('vendor_id', currentUser.id);
                 }
-                // Admin sees all products
                 
-                const { data: products, error } = await query;
+                let { data: products, error } = await query;
+                
+                // Fallback if vendor_id column does not exist yet in Supabase
+                if (error && error.message && error.message.includes('vendor_id')) {
+                    console.warn('vendor_id column missing in Supabase schema, fetching all products...');
+                    const fallback = await supabase.from('products').select('*').order('created_at', { ascending: false });
+                    products = fallback.data;
+                    error = fallback.error;
+                }
                 
                 if (error) throw error;
                 
@@ -1213,7 +1220,7 @@
             } catch (error) {
                 console.error('Products error:', error);
                 document.getElementById('productsTableBody').innerHTML =
-                    `<tr><td colspan="8" style="text-align:center; padding:40px; color:#ff6b6b;">خطأ في تحميل المنتجات</td></tr>`;
+                    `<tr><td colspan="8" style="text-align:center; padding:40px; color:#ff6b6b;">خطأ في تحميل المنتجات: ${error.message || ''}<br><small style="color:#aaa;">تأكد من إضافات الأعمدة في Supabase SQL Editor.</small></td></tr>`;
             }
         }
 
