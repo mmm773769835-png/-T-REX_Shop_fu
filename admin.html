@@ -526,7 +526,7 @@
             <!-- Auth Mode Switcher Tabs -->
             <div class="auth-tabs">
                 <button type="button" class="auth-tab active" id="tabVendorRegister" onclick="switchAuthTab('register')">
-                    <i class="fas fa-store"></i> تسجيل متجر جديد
+                    <i class="fas fa-store"></i> حساب تاجر جديد
                 </button>
                 <button type="button" class="auth-tab" id="tabVendorLogin" onclick="switchAuthTab('login')">
                     <i class="fas fa-key"></i> تسجيل الدخول
@@ -798,7 +798,7 @@
         </div>
 
         <!-- قسم دليل وإدارة أكواد التجار -->
-        <div class="products-table" style="margin-top: 30px;">
+        <div class="products-table" id="vendorsSection" style="margin-top: 30px;">
             <h3>🔑 دليل وأكواد التواصل مع التجار (Vendors Directory)</h3>
             <div class="admin-search-bar">
                 <input type="text" id="adminVendorSearch" class="admin-search-input" placeholder="ابحث بكود التاجر (VND-1001) أو اسم المتجر أو الهاتف..." oninput="searchAdminVendors()">
@@ -1071,11 +1071,20 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('show');
 
+            const isAdmin = currentVendor?.role === 'admin';
             const shopTitle = currentVendor?.shop_name ? `🏬 ${currentVendor.shop_name}` : (currentUser?.email || 'تاجر / مسؤول');
             const vendorCodeBadge = currentVendor?.vendor_code ? ` | كود التاجر: [ ${currentVendor.vendor_code} ]` : '';
             const countryBadge = currentVendor?.address ? ` | 📍 ${currentVendor.address}` : '';
+            const roleBadge = isAdmin ? ' | 👑 مسؤول (Admin)' : ' | 🏪 تاجر (Vendor)';
 
-            document.getElementById('userInfo').textContent = `${shopTitle}${vendorCodeBadge}${countryBadge}`;
+            document.getElementById('userInfo').textContent = `${shopTitle}${vendorCodeBadge}${countryBadge}${roleBadge}`;
+            
+            // Hide vendors directory for non-admin users
+            const vendorsSection = document.getElementById('vendorsSection');
+            if (vendorsSection) {
+                vendorsSection.style.display = isAdmin ? 'block' : 'none';
+            }
+            
             loadDashboardData();
         }
 
@@ -1135,9 +1144,16 @@
 
         async function loadStats() {
             try {
-                const { count: productsCount } = await supabase
+                let productsQuery = supabase
                     .from('products')
                     .select('*', { count: 'exact', head: true });
+                
+                // Vendors only see their own product count
+                if (currentVendor && currentVendor.role === 'vendor') {
+                    productsQuery = productsQuery.eq('vendor_id', currentUser.id);
+                }
+                
+                const { count: productsCount } = await productsQuery;
                 
                 const today = new Date().toISOString().split('T')[0];
                 const { count: ordersCount } = await supabase
@@ -1161,10 +1177,18 @@
 
         async function loadProducts() {
             try {
-                const { data: products, error } = await supabase
+                let query = supabase
                     .from('products')
                     .select('*')
                     .order('created_at', { ascending: false });
+                
+                // Vendors only see their own products
+                if (currentVendor && currentVendor.role === 'vendor') {
+                    query = query.eq('vendor_id', currentUser.id);
+                }
+                // Admin sees all products
+                
+                const { data: products, error } = await query;
                 
                 if (error) throw error;
                 
@@ -1376,12 +1400,31 @@
                     productData.images = imageUrls;
                 }
                 
+                // Attach vendor ownership data for vendors
+                if (currentVendor && currentVendor.role === 'vendor') {
+                    productData.vendor_id = currentUser.id;
+                    productData.vendor_code = currentVendor.vendor_code || '';
+                }
+                
                 if (!editingProductId) productData.created_at = new Date().toISOString();
                 let result;
-                const saveProduct = async () => editingProductId
-                    ? await supabase.from('products').update(productData).eq('id', editingProductId)
-                    : await supabase.from('products').insert([productData]);
-                result = await saveProduct();
+                
+                if (editingProductId) {
+                    // Ownership check for vendors editing products
+                    if (currentVendor && currentVendor.role === 'vendor') {
+                        const { data: existingProduct } = await supabase
+                            .from('products')
+                            .select('vendor_id')
+                            .eq('id', editingProductId)
+                            .single();
+                        if (existingProduct && existingProduct.vendor_id !== currentUser.id) {
+                            throw new Error('لا يمكنك تعديل منتج لا يخصك');
+                        }
+                    }
+                    result = await supabase.from('products').update(productData).eq('id', editingProductId);
+                } else {
+                    result = await supabase.from('products').insert([productData]);
+                }
                 
                 if (result.error) throw result.error;
                 
@@ -1411,6 +1454,12 @@
                     .single();
                 
                 if (error) throw error;
+                
+                // Vendor ownership check
+                if (currentVendor && currentVendor.role === 'vendor' && product.vendor_id !== currentUser.id) {
+                    alert('❌ لا يمكنك تعديل منتج لا يخصك');
+                    return;
+                }
                 
                 editingProductId = id;
                 document.getElementById('productId').value = id;
@@ -1455,6 +1504,19 @@
             if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
             
             try {
+                // Vendor ownership check
+                if (currentVendor && currentVendor.role === 'vendor') {
+                    const { data: product } = await supabase
+                        .from('products')
+                        .select('vendor_id')
+                        .eq('id', id)
+                        .single();
+                    if (product && product.vendor_id !== currentUser.id) {
+                        alert('❌ لا يمكنك حذف منتج لا يخصك');
+                        return;
+                    }
+                }
+                
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
                 
@@ -1509,23 +1571,7 @@
             });
         }
 
-        // Check auth on load
-        async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('role')
-                    .eq('id', session.user.id)
-                    .single();
-                
-                if (profile?.role === 'admin') {
-                    currentUser = session.user;
-                    showDashboard();
-                }
-            }
-        }
-
+        // Initialize auth check on page load
         checkAuth();
     </script>
 </body>
