@@ -608,6 +608,37 @@
             font-family: Arial, sans-serif;
             font-size: 16px;
         }
+        /* Vendor Auth & Link Styling */
+        .vendor-login-btn {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+            border: 2px solid rgba(255, 255, 255, 0.75);
+            color: #ffffff !important;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            font-family: 'Cairo', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.35);
+        }
+        .vendor-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(255, 107, 53, 0.6);
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+        }
+        .nav-vendor-link {
+            color: #FF6B35 !important;
+            font-weight: 700 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
         .user-profile {
             position: relative;
             display: flex;
@@ -2578,6 +2609,7 @@
             .settings-btn { width: 30px; height: 30px; font-size: 13px; margin-right: 0; }
             .login-btn { padding: 7px 10px; font-size: 12px; min-width: 36px; }
             .login-btn span { display: none; }
+            .vendor-login-btn { padding: 7px 10px; font-size: 12px; }
             .google-mark { display: inline-flex !important; width: 20px; height: 20px; font-size: 14px; }
             .cart-btn { width: 34px; height: 34px; min-width: 34px; padding: 0; justify-content: center; font-size: 14px; }
             .user-auth { margin-left: 0; }
@@ -2910,6 +2942,7 @@
             <nav class="nav-links">
                 <a href="/">الرئيسية</a>
                 <a href="#products">المنتجات</a>
+                <a href="/admin.html" class="nav-vendor-link"><i class="fas fa-store"></i> دخول التاجر</a>
             </nav>
 
             <!-- Header Actions - Always visible -->
@@ -2959,6 +2992,11 @@
                     <span class="cart-count" id="wishlistCount" data-count="0">0</span>
                 </a>
 
+                <!-- Vendor Auth Button -->
+                <a href="/admin.html" class="vendor-login-btn" title="دخول الموردين والتاجر">
+                    <i class="fas fa-store"></i> <span>دخول تاجر</span>
+                </a>
+
                 <!-- User Auth -->
                 <div class="user-auth" id="userAuth">
                     <button class="login-btn" onclick="signInWithGoogle()" id="loginBtn">
@@ -2976,6 +3014,7 @@
                                 <a href="#" onclick="showOrders()"><i class="fas fa-shopping-bag"></i> طلباتي</a>
                                 <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> المفضلة</a>
                                 <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> الملف الشخصي</a>
+                                <a href="/admin.html"><i class="fas fa-store"></i> حساب المورد / الأدمن</a>
                                 <div class="divider"></div>
                                 <a href="#" onclick="signOut()" class="logout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
                             </div>
