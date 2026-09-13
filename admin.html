@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.3"></script>
     <style>
         * {
@@ -30,16 +31,16 @@
         }
         .login-box {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            padding: 40px;
+            padding: 35px 30px;
             border-radius: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             border: 2px solid rgba(255,215,0,0.3);
-            box-shadow: 0 10px 40px rgba(255,215,0,0.1);
+            box-shadow: 0 10px 40px rgba(255,215,0,0.15);
         }
         .logo {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .logo img {
             width: 80px;
@@ -51,42 +52,134 @@
         }
         .logo h1 {
             color: #FFD700;
-            margin-top: 15px;
-            font-size: 1.5rem;
+            margin-top: 12px;
+            font-size: 1.4rem;
             text-shadow: 0 0 10px rgba(255,215,0,0.3);
         }
+
+        /* Auth Tabs & Google Auth Styling */
+        .auth-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 22px;
+            background: rgba(0,0,0,0.4);
+            padding: 5px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.25);
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 11px 8px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-weight: 700;
+            font-family: inherit;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .auth-tab.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+        .btn-google-auth {
+            width: 100%;
+            padding: 13px;
+            background: #ffffff;
+            color: #333333;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+        }
+        .btn-google-auth:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.25);
+        }
+        .google-icon {
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+            color: #4285F4;
+            font-size: 18px;
+            background: #e8f0fe;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-divider {
+            text-align: center;
+            margin: 18px 0;
+            position: relative;
+        }
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+        }
+        .auth-divider span {
+            position: relative;
+            background: #1a1a1a;
+            padding: 0 12px;
+            color: #888;
+            font-size: 12px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #FFD700;
             font-weight: 600;
+            font-size: 13px;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
-            padding: 15px;
+            padding: 13px 15px;
             border: 1px solid rgba(255,215,0,0.3);
             border-radius: 10px;
             background: #0f0f0f;
             color: #fff;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #FFD700;
             box-shadow: 0 0 15px rgba(255,215,0,0.2);
         }
         .btn-login {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(135deg, #FFD700, #FFA500);
             color: #0a0a0a;
             border: none;
             border-radius: 10px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
@@ -104,10 +197,14 @@
             color: #ff6b6b;
             padding: 10px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             display: none;
             text-align: center;
             border: 1px solid rgba(255,0,0,0.3);
+            font-size: 13px;
+        }
+        .error-message.show {
+            display: block;
         }
         .error-message.show {
             display: block;
@@ -417,26 +514,99 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
+    <!-- Login & Vendor Onboarding Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
             <div class="logo">
                 <img src="logo.png" alt="T-REX Shop" onerror="this.style.display='none'">
-                <h1>لوحة تحكم T-REX</h1>
+                <h1>لوحة التحكم والموردين</h1>
+                <p style="color: #aaa; font-size: 13px; margin-top: 5px;">إدارة الموردين والمنتجات | T-REX Hub</p>
             </div>
+
+            <!-- Auth Mode Switcher Tabs -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="tabVendorRegister" onclick="switchAuthTab('register')">
+                    <i class="fas fa-store"></i> تسجيل متجر جديد
+                </button>
+                <button type="button" class="auth-tab" id="tabVendorLogin" onclick="switchAuthTab('login')">
+                    <i class="fas fa-key"></i> تسجيل الدخول
+                </button>
+            </div>
+
             <div class="error-message" id="loginError"></div>
-            <form id="loginForm">
+            <div class="success-message" id="loginSuccess" style="display: none; text-align: center;"></div>
+
+            <!-- Form 1: Register New Store / Vendor -->
+            <form id="vendorRegisterForm">
+                <div class="form-group">
+                    <label><i class="fas fa-store" style="color:#FFD700;"></i> اسم المتجر الخاص بك *</label>
+                    <input type="text" id="regShopName" required placeholder="مثال: متجر الهواتف المميزة">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone" style="color:#FFD700;"></i> رقم الهاتف / الواتساب *</label>
+                    <input type="tel" id="regPhone" required placeholder="مثال: 771234567">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-globe" style="color:#FFD700;"></i> الدولة *</label>
+                    <select id="regCountry" required>
+                        <option value="اليمن 🇾🇪">اليمن 🇾🇪</option>
+                        <option value="السعودية 🇸🇦">السعودية 🇸🇦</option>
+                        <option value="الإمارات 🇦🇪">الإمارات 🇦🇪</option>
+                        <option value="الكويت 🇰🇼">الكويت 🇰🇼</option>
+                        <option value="البحرين 🇧🇭">البحرين 🇧🇭</option>
+                        <option value="عُمان 🇴🇲">عُمان 🇴🇲</option>
+                        <option value="قطر 🇶🇦">قطر 🇶🇦</option>
+                        <option value="أخرى">دولة أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope" style="color:#FFD700;"></i> البريد الإلكتروني *</label>
+                    <input type="email" id="regEmail" required placeholder="vendor@example.com">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock" style="color:#FFD700;"></i> كلمة المرور *</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" minlength="6">
+                </div>
+
+                <button type="submit" class="btn-login" id="regBtn" style="background: linear-gradient(135deg, #FF6B35, #FFA500); color: #fff; margin-top: 5px;">
+                    🚀 إنشاء حساب المتجر والدخول
+                </button>
+
+                <div class="auth-divider"><span>أو التسجيل السريع عبر Google</span></div>
+
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('register')">
+                    <span class="google-icon">G</span> التسجيل والمتابعة بحساب Google
+                </button>
+            </form>
+
+            <!-- Form 2: Sign In Existing Vendor / Admin -->
+            <form id="loginForm" style="display: none;">
+                <!-- Fast Google Auth Button -->
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
+                    <span class="google-icon">G</span> الدخول المباشر السريع بحساب Google
+                </button>
+
+                <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
+
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
-                    <input type="email" id="adminEmail" required placeholder="admin@trexshop.com">
+                    <input type="email" id="adminEmail" placeholder="admin@trexshop.com">
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="adminPassword" required placeholder="••••••••">
+                    <input type="password" id="adminPassword" placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn-login" id="loginBtn">
                     تسجيل الدخول
                 </button>
+
+                <!-- Quick Auto Register button if login credentials fail -->
+                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
+                    <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
+                    <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
+                        ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -663,46 +833,223 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let currentUser = null;
+        let currentVendor = null;
         let editingProductId = null;
         let adminProducts = [];
 
         // ==========================================
-        // AUTHENTICATION
+        // AUTHENTICATION & VENDOR ONBOARDING
         // ==========================================
+
+        function switchAuthTab(mode) {
+            const regForm = document.getElementById('vendorRegisterForm');
+            const loginForm = document.getElementById('loginForm');
+            const tabRegister = document.getElementById('tabVendorRegister');
+            const tabLogin = document.getElementById('tabVendorLogin');
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+
+            errorDiv.classList.remove('show');
+            if (successDiv) successDiv.style.display = 'none';
+            document.getElementById('quickAutoRegisterBox').style.display = 'none';
+
+            if (mode === 'register') {
+                regForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                tabRegister.classList.add('active');
+                tabLogin.classList.remove('active');
+            } else {
+                regForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+            }
+        }
+
+        // Register New Vendor Form Handler
+        document.getElementById('vendorRegisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const shopName = document.getElementById('regShopName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const country = document.getElementById('regCountry').value;
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const btn = document.getElementById('regBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            btn.disabled = true;
+            btn.textContent = 'جاري إنشاء حساب المتجر...';
+            errorDiv.classList.remove('show');
+
+            try {
+                // 1. Sign Up User in Supabase Auth
+                let { data: authData, error: authError } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { shop_name: shopName, phone: phone, country: country, role: 'vendor' }
+                    }
+                });
+
+                // If user already exists, attempt to sign in
+                if (authError && authError.message.includes('already registered')) {
+                    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (signInErr) throw new Error('البريد مسجل مسبقاً! يرجى استخدام كلمة المرور الصحيحة أو تسجيل الدخول من التبويب الآخر.');
+                    authData = signInData;
+                } else if (authError) {
+                    throw authError;
+                }
+
+                const user = authData.user || (await supabase.auth.getUser()).data.user;
+                if (!user) throw new Error('تعذر إكمال التسجيل، يرجى المحاولة مرة أخرى');
+
+                // 2. Save/Update Profile with Vendor info
+                const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+                const profilePayload = {
+                    id: user.id,
+                    role: 'vendor',
+                    shop_name: shopName,
+                    phone: phone,
+                    address: country,
+                    vendor_code: vendorCode,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error: profileErr } = await supabase
+                    .from('profiles')
+                    .upsert(profilePayload, { onConflict: 'id' });
+
+                if (profileErr) console.warn('Profile upsert warning:', profileErr.message);
+
+                currentUser = user;
+                currentVendor = profilePayload;
+                showDashboard();
+
+            } catch (err) {
+                errorDiv.textContent = '❌ ' + (err.message || 'خطأ في إنشاء حساب المتجر');
+                errorDiv.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 إنشاء حساب المتجر والدخول';
+            }
+        });
+
+        // Quick Auto Register Helper for email/password login
+        async function quickCreateVendorAccount() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!email || !password) {
+                alert('يرجى إدخال البريد الإلكتروني وكلمة المرور أولاً');
+                return;
+            }
+
+            try {
+                const shopName = 'متجر ' + email.split('@')[0];
+                const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+
+                let { data: authData, error: authError } = await supabase.auth.signUp({
+                    email,
+                    password
+                });
+
+                if (authError && authError.message.includes('already registered')) {
+                    authData = await supabase.auth.signInWithPassword({ email, password });
+                } else if (authError) throw authError;
+
+                const user = authData.user || (await supabase.auth.getUser()).data.user;
+                if (user) {
+                    await supabase.from('profiles').upsert({
+                        id: user.id,
+                        role: 'vendor',
+                        shop_name: shopName,
+                        vendor_code: vendorCode,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'id' });
+
+                    currentUser = user;
+                    showDashboard();
+                }
+            } catch (err) {
+                errorDiv.textContent = '❌ ' + (err.message || 'فشل إنشاء الحساب السريع');
+                errorDiv.classList.add('show');
+            }
+        }
+
+        // Google OAuth Sign In for Vendors/Admins
+        async function signInWithGoogleVendor(mode) {
+            if (mode === 'register') {
+                const shopName = document.getElementById('regShopName').value.trim();
+                const phone = document.getElementById('regPhone').value.trim();
+                const country = document.getElementById('regCountry').value;
+                if (shopName) localStorage.setItem('pending_vendor_shop_name', shopName);
+                if (phone) localStorage.setItem('pending_vendor_phone', phone);
+                if (country) localStorage.setItem('pending_vendor_country', country);
+            }
+
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.href.split('?')[0].split('#')[0]
+                }
+            });
+
+            if (error) {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '❌ خطأ في تسجيل الدخول عبر Google: ' + error.message;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        // Login Existing Vendor/Admin Form Handler
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('adminEmail').value;
+            const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             const errorDiv = document.getElementById('loginError');
-            
+            const autoBox = document.getElementById('quickAutoRegisterBox');
+
             btn.disabled = true;
             btn.textContent = 'جاري تسجيل الدخول...';
             errorDiv.classList.remove('show');
-            
+            autoBox.style.display = 'none';
+
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
                     password
                 });
-                
-                if (error) throw error;
-                
-                // Verify admin role
-                const { data: profile, error: profileError } = await supabase
+
+                if (error) {
+                    if (error.message.includes('Invalid login credentials')) {
+                        autoBox.style.display = 'block';
+                    }
+                    throw error;
+                }
+
+                currentUser = data.user;
+
+                // Load or ensure profile
+                let { data: profile } = await supabase
                     .from('profiles')
-                    .select('role')
+                    .select('*')
                     .eq('id', data.user.id)
                     .single();
-                
-                if (profileError || profile?.role !== 'admin') {
-                    await supabase.auth.signOut();
-                    throw new Error('غير مصرح لك بالدخول كمسؤول');
+
+                if (!profile) {
+                    const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+                    profile = { id: data.user.id, role: 'vendor', shop_name: 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر'), vendor_code: vendorCode };
+                    await supabase.from('profiles').upsert(profile, { onConflict: 'id' });
                 }
-                
-                currentUser = data.user;
+
+                currentVendor = profile;
                 showDashboard();
-                
+
             } catch (error) {
                 errorDiv.textContent = '❌ ' + (error.message || 'خطأ في تسجيل الدخول');
                 errorDiv.classList.add('show');
@@ -715,6 +1062,7 @@
         async function logout() {
             await supabase.auth.signOut();
             currentUser = null;
+            currentVendor = null;
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('show');
         }
@@ -722,8 +1070,56 @@
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('show');
-            document.getElementById('userInfo').textContent = currentUser?.email || 'مسؤول';
+
+            const shopTitle = currentVendor?.shop_name ? `🏬 ${currentVendor.shop_name}` : (currentUser?.email || 'تاجر / مسؤول');
+            const vendorCodeBadge = currentVendor?.vendor_code ? ` | كود التاجر: [ ${currentVendor.vendor_code} ]` : '';
+            const countryBadge = currentVendor?.address ? ` | 📍 ${currentVendor.address}` : '';
+
+            document.getElementById('userInfo').textContent = `${shopTitle}${vendorCodeBadge}${countryBadge}`;
             loadDashboardData();
+        }
+
+        // Check Auth on Load & Handle Google OAuth Callback
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                currentUser = session.user;
+
+                // Check pending vendor details from Google Auth onboarding
+                const pendingShopName = localStorage.getItem('pending_vendor_shop_name');
+                const pendingPhone = localStorage.getItem('pending_vendor_phone');
+                const pendingCountry = localStorage.getItem('pending_vendor_country');
+
+                let { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (!profile || pendingShopName) {
+                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
+                    const newProfile = {
+                        id: currentUser.id,
+                        role: profile?.role || 'vendor',
+                        shop_name: pendingShopName || profile?.shop_name || 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر'),
+                        phone: pendingPhone || profile?.phone || '',
+                        address: pendingCountry || profile?.address || '',
+                        vendor_code: vendorCode,
+                        updated_at: new Date().toISOString()
+                    };
+
+                    await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
+                    profile = newProfile;
+
+                    // Clear pending onboarding state
+                    localStorage.removeItem('pending_vendor_shop_name');
+                    localStorage.removeItem('pending_vendor_phone');
+                    localStorage.removeItem('pending_vendor_country');
+                }
+
+                currentVendor = profile;
+                showDashboard();
+            }
         }
 
         // ==========================================
