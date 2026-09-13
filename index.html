@@ -23,8 +23,54 @@
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-    <!-- Google AdSense Code -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
+    <!-- Google AdSense Smart Lazy Loader (Core Web Vitals & Speed Optimized) -->
+    <script>
+        (function() {
+            var adsLoaded = false;
+            function loadAdSenseScript() {
+                if (adsLoaded) return;
+                adsLoaded = true;
+                var script = document.createElement('script');
+                script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951";
+                script.async = true;
+                script.crossOrigin = "anonymous";
+                document.head.appendChild(script);
+
+                script.onload = function() {
+                    document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])').forEach(function() {
+                        try {
+                            (window.adsbygoogle = window.adsbygoogle || []).push({});
+                        } catch(e) {
+                            console.error("AdSense push error:", e);
+                        }
+                    });
+                };
+            }
+
+            ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+                window.addEventListener(evt, loadAdSenseScript, { passive: true, once: true });
+            });
+
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            loadAdSenseScript();
+                            observer.disconnect();
+                        }
+                    });
+                }, { rootMargin: '200px' });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.ad-container').forEach(function(el) {
+                        observer.observe(el);
+                    });
+                });
+            } else {
+                setTimeout(loadAdSenseScript, 3500);
+            }
+        })();
+    </script>
     <!-- Schema.org Structured Data for Google -->
     <script type="application/ld+json">
     {
@@ -122,6 +168,37 @@
             --card: #1a1a1a;
             --text: #ffffff;
             --text-muted: #888;
+        }
+        /* AdSense Layout & CLS Prevention */
+        .ad-container {
+            margin: 25px auto;
+            padding: 12px 10px;
+            max-width: 1200px;
+            width: 95%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            box-sizing: border-box;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        .ad-container-mid {
+            min-height: 270px;
+        }
+        .ad-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            display: inline-block;
         }
         body {
             font-family: 'Cairo', sans-serif;
@@ -2963,6 +3040,17 @@
         </div>
     </div>
 
+    <!-- AdSense: Top Banner Unit -->
+    <div class="ad-container" id="ad-top-unit">
+        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block; width:100%;"
+             data-ad-client="ca-pub-4708671001798951"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+    </div>
+
     <!-- Featured Carousel -->
     <section class="featured-section">
         <h2 class="featured-title">
@@ -3049,6 +3137,17 @@
         </div>
     </div>
 
+    <!-- AdSense: Mid-Page Unit -->
+    <div class="ad-container ad-container-mid" id="ad-mid-unit">
+        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block; width:100%;"
+             data-ad-client="ca-pub-4708671001798951"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+    </div>
+
     <!-- Products Section -->
     <section class="products-section" id="products">
         <h2 class="section-title">
@@ -3061,6 +3160,17 @@
             </div>
         </div>
     </section>
+
+    <!-- AdSense: Pre-Footer Unit -->
+    <div class="ad-container" id="ad-footer-unit">
+        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
+        <ins class="adsbygoogle"
+             style="display:block; width:100%;"
+             data-ad-client="ca-pub-4708671001798951"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+    </div>
 
     <!-- Reviews Section -->
     <section class="reviews-section">
