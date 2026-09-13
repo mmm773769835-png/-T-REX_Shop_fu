@@ -525,19 +525,49 @@
 
             <!-- Auth Mode Switcher Tabs -->
             <div class="auth-tabs">
-                <button type="button" class="auth-tab active" id="tabVendorRegister" onclick="switchAuthTab('register')">
-                    <i class="fas fa-store"></i> حساب تاجر جديد
-                </button>
-                <button type="button" class="auth-tab" id="tabVendorLogin" onclick="switchAuthTab('login')">
+                <button type="button" class="auth-tab active" id="tabVendorLogin" onclick="switchAuthTab('login')">
                     <i class="fas fa-key"></i> تسجيل الدخول
+                </button>
+                <button type="button" class="auth-tab" id="tabVendorRegister" onclick="switchAuthTab('register')">
+                    <i class="fas fa-store"></i> حساب تاجر جديد
                 </button>
             </div>
 
             <div class="error-message" id="loginError"></div>
             <div class="success-message" id="loginSuccess" style="display: none; text-align: center;"></div>
 
-            <!-- Form 1: Register New Store / Vendor -->
-            <form id="vendorRegisterForm">
+            <!-- Form 1: Sign In Existing Vendor / Admin (Default Visible) -->
+            <form id="loginForm">
+                <!-- Fast Google Auth Button -->
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
+                    <span class="google-icon">G</span> الدخول المباشر السريع بحساب Google
+                </button>
+
+                <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
+
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="adminEmail" placeholder="admin@trexshop.com">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-login" id="loginBtn">
+                    تسجيل الدخول
+                </button>
+
+                <!-- Quick Auto Register button if login credentials fail -->
+                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
+                    <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
+                    <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
+                        ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
+                    </button>
+                </div>
+            </form>
+
+            <!-- Form 2: Register New Store / Vendor (Hidden by Default) -->
+            <form id="vendorRegisterForm" style="display: none;">
                 <div class="form-group">
                     <label><i class="fas fa-store" style="color:#FFD700;"></i> اسم المتجر الخاص بك *</label>
                     <input type="text" id="regShopName" required placeholder="مثال: متجر الهواتف المميزة">
@@ -577,36 +607,6 @@
                 <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('register')">
                     <span class="google-icon">G</span> التسجيل والمتابعة بحساب Google
                 </button>
-            </form>
-
-            <!-- Form 2: Sign In Existing Vendor / Admin -->
-            <form id="loginForm" style="display: none;">
-                <!-- Fast Google Auth Button -->
-                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
-                    <span class="google-icon">G</span> الدخول المباشر السريع بحساب Google
-                </button>
-
-                <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
-
-                <div class="form-group">
-                    <label>البريد الإلكتروني</label>
-                    <input type="email" id="adminEmail" placeholder="admin@trexshop.com">
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="adminPassword" placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-login" id="loginBtn">
-                    تسجيل الدخول
-                </button>
-
-                <!-- Quick Auto Register button if login credentials fail -->
-                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
-                    <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
-                    <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
-                        ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
-                    </button>
-                </div>
             </form>
         </div>
     </div>
@@ -1035,15 +1035,25 @@
                 currentUser = data.user;
 
                 // Load or ensure profile
+                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+                const userEmail = (data.user.email || '').toLowerCase();
+                const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
+
                 let { data: profile } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', data.user.id)
                     .single();
 
-                if (!profile) {
-                    const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
-                    profile = { id: data.user.id, role: 'vendor', shop_name: 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر'), vendor_code: vendorCode };
+                if (!profile || (isAdminEmail && profile.role !== 'admin')) {
+                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
+                    profile = { 
+                        id: data.user.id, 
+                        role: isAdminEmail ? 'admin' : (profile?.role || 'vendor'), 
+                        shop_name: profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر')), 
+                        vendor_code: vendorCode,
+                        updated_at: new Date().toISOString()
+                    };
                     await supabase.from('profiles').upsert(profile, { onConflict: 'id' });
                 }
 
@@ -1099,18 +1109,23 @@
                 const pendingPhone = localStorage.getItem('pending_vendor_phone');
                 const pendingCountry = localStorage.getItem('pending_vendor_country');
 
+                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+                const userEmail = (currentUser.email || '').toLowerCase();
+                const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
+
                 let { data: profile } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
 
-                if (!profile || pendingShopName) {
+                if (!profile || pendingShopName || (isAdminEmail && profile?.role !== 'admin')) {
                     const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
+                    const targetRole = isAdminEmail ? 'admin' : (profile?.role || 'vendor');
                     const newProfile = {
                         id: currentUser.id,
-                        role: profile?.role || 'vendor',
-                        shop_name: pendingShopName || profile?.shop_name || 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر'),
+                        role: targetRole,
+                        shop_name: pendingShopName || profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
                         phone: pendingPhone || profile?.phone || '',
                         address: pendingCountry || profile?.address || '',
                         vendor_code: vendorCode,
