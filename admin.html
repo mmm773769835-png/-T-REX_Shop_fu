@@ -538,20 +538,13 @@
 
             <!-- Form 1: Sign In Existing Vendor / Admin (Default Visible) -->
             <form id="loginForm">
-                <!-- Fast Google Auth Button -->
-                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
-                    <span class="google-icon">G</span> الدخول المباشر السريع بحساب Google
-                </button>
-
-                <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
-
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
-                    <input type="email" id="adminEmail" placeholder="admin@trexshop.com">
+                    <input type="email" id="adminEmail" required placeholder="vendor@example.com">
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="adminPassword" placeholder="••••••••">
+                    <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn-login" id="loginBtn">
                     تسجيل الدخول
@@ -600,12 +593,6 @@
 
                 <button type="submit" class="btn-login" id="regBtn" style="background: linear-gradient(135deg, #FF6B35, #FFA500); color: #fff; margin-top: 5px;">
                     🚀 إنشاء حساب المتجر والدخول
-                </button>
-
-                <div class="auth-divider"><span>أو التسجيل السريع عبر Google</span></div>
-
-                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('register')">
-                    <span class="google-icon">G</span> التسجيل والمتابعة بحساب Google
                 </button>
             </form>
         </div>
@@ -980,31 +967,6 @@
             }
         }
 
-        // Google OAuth Sign In for Vendors/Admins
-        async function signInWithGoogleVendor(mode) {
-            if (mode === 'register') {
-                const shopName = document.getElementById('regShopName').value.trim();
-                const phone = document.getElementById('regPhone').value.trim();
-                const country = document.getElementById('regCountry').value;
-                if (shopName) localStorage.setItem('pending_vendor_shop_name', shopName);
-                if (phone) localStorage.setItem('pending_vendor_phone', phone);
-                if (country) localStorage.setItem('pending_vendor_country', country);
-            }
-
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.href.split('?')[0].split('#')[0]
-                }
-            });
-
-            if (error) {
-                const errorDiv = document.getElementById('loginError');
-                errorDiv.textContent = '❌ خطأ في تسجيل الدخول عبر Google: ' + error.message;
-                errorDiv.classList.add('show');
-            }
-        }
-
         // Login Existing Vendor/Admin Form Handler
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1098,16 +1060,11 @@
             loadDashboardData();
         }
 
-        // Check Auth on Load & Handle Google OAuth Callback
+        // Check Auth on Load
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
                 currentUser = session.user;
-
-                // Check pending vendor details from Google Auth onboarding
-                const pendingShopName = localStorage.getItem('pending_vendor_shop_name');
-                const pendingPhone = localStorage.getItem('pending_vendor_phone');
-                const pendingCountry = localStorage.getItem('pending_vendor_country');
 
                 const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
                 const userEmail = (currentUser.email || '').toLowerCase();
@@ -1119,26 +1076,21 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                if (!profile || pendingShopName || (isAdminEmail && profile?.role !== 'admin')) {
+                if (!profile || (isAdminEmail && profile?.role !== 'admin')) {
                     const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
                     const targetRole = isAdminEmail ? 'admin' : (profile?.role || 'vendor');
                     const newProfile = {
                         id: currentUser.id,
                         role: targetRole,
-                        shop_name: pendingShopName || profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
-                        phone: pendingPhone || profile?.phone || '',
-                        address: pendingCountry || profile?.address || '',
+                        shop_name: profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
+                        phone: profile?.phone || '',
+                        address: profile?.address || '',
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
 
                     await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
                     profile = newProfile;
-
-                    // Clear pending onboarding state
-                    localStorage.removeItem('pending_vendor_shop_name');
-                    localStorage.removeItem('pending_vendor_phone');
-                    localStorage.removeItem('pending_vendor_country');
                 }
 
                 currentVendor = profile;
@@ -1159,29 +1111,47 @@
 
         async function loadStats() {
             try {
+                const isAdmin = currentVendor && currentVendor.role === 'admin';
+                
                 let productsQuery = supabase
                     .from('products')
                     .select('*', { count: 'exact', head: true });
                 
-                // Vendors only see their own product count
-                if (currentVendor && currentVendor.role === 'vendor') {
+                if (!isAdmin) {
+                    if (!currentUser || !currentUser.id) {
+                        document.getElementById('totalProducts').textContent = '0';
+                        return;
+                    }
                     productsQuery = productsQuery.eq('vendor_id', currentUser.id);
                 }
                 
-                const { count: productsCount } = await productsQuery;
+                const { count: productsCount, error } = await productsQuery;
+                
+                if (error) {
+                    console.error('Stats products count error:', error);
+                    document.getElementById('totalProducts').textContent = '0';
+                } else {
+                    document.getElementById('totalProducts').textContent = productsCount || 0;
+                }
                 
                 const today = new Date().toISOString().split('T')[0];
-                const { count: ordersCount } = await supabase
+                let ordersQuery = supabase
                     .from('orders')
                     .select('*', { count: 'exact', head: true })
                     .gte('created_at', today);
+                    
+                if (!isAdmin && currentUser?.id) {
+                    ordersQuery = ordersQuery.eq('vendor_id', currentUser.id);
+                }
                 
-                document.getElementById('totalProducts').textContent = productsCount || 0;
+                const { count: ordersCount } = await ordersQuery;
+                
                 document.getElementById('totalOrders').textContent = ordersCount || 0;
                 document.getElementById('totalRevenue').textContent = '0';
                 
             } catch (error) {
                 console.error('Stats error:', error);
+                document.getElementById('totalProducts').textContent = '0';
             }
         }
 
@@ -1192,35 +1162,39 @@
 
         async function loadProducts() {
             try {
+                const isAdmin = currentVendor && currentVendor.role === 'admin';
+                
                 let query = supabase
                     .from('products')
                     .select('*')
                     .order('created_at', { ascending: false });
                 
                 // Vendors only see their own products
-                if (currentVendor && currentVendor.role === 'vendor') {
+                if (!isAdmin) {
+                    if (!currentUser || !currentUser.id) {
+                        adminProducts = [];
+                        renderAdminProducts([]);
+                        return;
+                    }
                     query = query.eq('vendor_id', currentUser.id);
                 }
                 
                 let { data: products, error } = await query;
                 
-                // Fallback if vendor_id column does not exist yet in Supabase
-                if (error && error.message && error.message.includes('vendor_id')) {
-                    console.warn('vendor_id column missing in Supabase schema, fetching all products...');
-                    const fallback = await supabase.from('products').select('*').order('created_at', { ascending: false });
-                    products = fallback.data;
-                    error = fallback.error;
+                if (error) {
+                    console.error('Error loading products:', error);
+                    adminProducts = [];
+                    renderAdminProducts([]);
+                    return;
                 }
-                
-                if (error) throw error;
                 
                 adminProducts = products || [];
                 renderAdminProducts(adminProducts);
                 
             } catch (error) {
-                console.error('Products error:', error);
-                document.getElementById('productsTableBody').innerHTML =
-                    `<tr><td colspan="8" style="text-align:center; padding:40px; color:#ff6b6b;">خطأ في تحميل المنتجات: ${error.message || ''}<br><small style="color:#aaa;">تأكد من إضافات الأعمدة في Supabase SQL Editor.</small></td></tr>`;
+                console.error('Products catch error:', error);
+                adminProducts = [];
+                renderAdminProducts([]);
             }
         }
 
