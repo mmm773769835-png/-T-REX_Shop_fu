@@ -257,6 +257,7 @@ export default function AddProduct({ navigation, route }: any) {
         vendor_id: vendorId,
         vendor_code: vendorCode,
         paymentMethod,
+        is_active: true, // Ensure the product is active by default
         images: imageUrls,
         image_url: imageUrls[0],
         imageUrls,
