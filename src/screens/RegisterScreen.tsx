@@ -233,8 +233,9 @@ export default function RegisterScreen({ navigation }: any) {
         photoURL = await uploadProfileImage(profileImage);
       }
 
-      const userRole = isVendor ? 'vendor' : 'customer';
-      const generatedVendorCode = isVendor ? `VND-${Math.floor(1000 + Math.random() * 9000)}` : null;
+      const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+      const userRole = adminEmails.includes(email.trim().toLowerCase()) ? 'admin' : (isVendor ? 'vendor' : 'customer');
+      const generatedVendorCode = (isVendor || userRole === 'admin') ? `VND-${Math.floor(1000 + Math.random() * 9000)}` : null;
 
       // إنشاء الحساب مع جميع البيانات
       const additionalData = {

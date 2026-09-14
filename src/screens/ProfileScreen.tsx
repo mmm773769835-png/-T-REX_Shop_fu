@@ -43,21 +43,29 @@ const ProfileScreen = ({ navigation }: any) => {
 
           if (data && data.length > 0) {
             const userData = data[0];
+            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+            const userEmail = authUser.email || "";
+            const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
+            
             setLocalUser({
               name: userData.name || authUser.displayName || "مستخدم جديد",
               email: authUser.email || "غير متوفر",
               phone: userData.phone || authUser.phoneNumber || "غير متوفر",
-              role: userData.role || "customer",
+              role: isMasterAdmin ? 'admin' : (userData.role || "customer"),
               shopName: userData.shop_name || "",
               vendorCode: userData.vendor_code || "",
               profileImage: userData.photo_url || userData.profile_image || getDefaultUserImage(),
             });
           } else {
+            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+            const userEmail = authUser.email || "";
+            const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
+            
             setLocalUser({
               name: authUser.displayName || "مستخدم جديد",
               email: authUser.email || "غير متوفر",
               phone: authUser.phoneNumber || "غير متوفر",
-              role: "customer",
+              role: isMasterAdmin ? 'admin' : "customer",
               shopName: "",
               vendorCode: "",
               profileImage: getDefaultUserImage(),
@@ -65,11 +73,15 @@ const ProfileScreen = ({ navigation }: any) => {
           }
         } catch (error) {
           console.error("خطأ في جلب معلومات المستخدم:", error);
+          const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+          const userEmail = authUser.email || "";
+          const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
+          
           setLocalUser({
             name: authUser.displayName || "مستخدم جديد",
             email: authUser.email || "غير متوفر",
             phone: authUser.phoneNumber || "غير متوفر",
-            role: "customer",
+            role: isMasterAdmin ? 'admin' : "customer",
             shopName: "",
             vendorCode: "",
             profileImage: getDefaultUserImage(),
