@@ -265,22 +265,10 @@ export const dbService = {
     return { data: result, error };
   },
 
-  // Delete data from a table (by ID string or filter object)
-  delete: async (table: string, idOrFilter: string | any) => {
-    if (typeof idOrFilter === 'string') {
-      const { error } = await supabase.from(table).delete().eq('id', idOrFilter);
-      return { error };
-    } else if (idOrFilter && idOrFilter.eq) {
-      let query = supabase.from(table).delete();
-      Object.keys(idOrFilter.eq).forEach(key => {
-        query = query.eq(key, idOrFilter.eq[key]);
-      });
-      const { error } = await query;
-      return { error };
-    } else {
-      const { error } = await supabase.from(table).delete().eq('id', idOrFilter);
-      return { error };
-    }
+  // Delete data from a table
+  delete: async (table: string, id: string) => {
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    return { error };
   },
 
   // Listen to real-time changes

@@ -80,46 +80,6 @@ export default function AdminVendorsScreen({ navigation }: any) {
     });
   };
 
-  const handleDeleteVendor = (vendorId: string, vendorName: string) => {
-    Alert.alert(
-      language === 'ar' ? 'حذف حساب التاجر 🗑️' : 'Delete Vendor Account',
-      language === 'ar'
-        ? `هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة منتجاته المنسوبة له؟`
-        : `Are you sure you want to delete vendor account "${vendorName}" and all associated products?`,
-      [
-        { text: language === 'ar' ? 'إلغاء' : 'Cancel', style: 'cancel' },
-        {
-          text: language === 'ar' ? 'حذف الحساب' : 'Delete Account',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setLoading(true);
-              // 1. حذف كافة المنتجات الخاصة بالتاجر
-              await dbService.delete('products', { eq: { vendor_id: vendorId } });
-              // 2. حذف البروفايل الخاص بالتاجر
-              await dbService.delete('profiles', vendorId);
-              await dbService.delete('users', vendorId);
-              
-              Alert.alert(
-                language === 'ar' ? 'تم الحذف' : 'Deleted',
-                language === 'ar' ? 'تم حذف حساب التاجر بنجاح' : 'Vendor account deleted successfully'
-              );
-              fetchVendors();
-            } catch (err) {
-              console.error('Delete vendor error:', err);
-              Alert.alert(
-                language === 'ar' ? 'خطأ' : 'Error',
-                language === 'ar' ? 'فشل في حذف حساب التاجر' : 'Failed to delete vendor account'
-              );
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   // تصفية التجار بحسب كود التاجر VND-XXXX أو الاسم أو اسم المتجر أو الهاتف
   const filteredVendors = vendors.filter((v) => {
     const q = searchQuery.trim().toLowerCase();
@@ -172,15 +132,15 @@ export default function AdminVendorsScreen({ navigation }: any) {
         </Text>
       </View>
 
-      {/* أزرار الاتصال السريع والتواصل عبر الواتساب وحذف الحساب */}
+      {/* أزرار الاتصال السريع والتواصل عبر الواتساب */}
       <View style={styles.actionsRow}>
         <TouchableOpacity
           style={[styles.contactBtn, { backgroundColor: '#28a745' }]}
           onPress={() => handleWhatsAppVendor(item.phone)}
         >
-          <Ionicons name="logo-whatsapp" size={16} color="#fff" />
+          <Ionicons name="logo-whatsapp" size={18} color="#fff" />
           <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'واتساب' : 'WhatsApp'}
+            {language === 'ar' ? 'محادثة واتساب' : 'WhatsApp'}
           </Text>
         </TouchableOpacity>
 
@@ -188,19 +148,9 @@ export default function AdminVendorsScreen({ navigation }: any) {
           style={[styles.contactBtn, { backgroundColor: '#007bff' }]}
           onPress={() => handleCallVendor(item.phone)}
         >
-          <Ionicons name="call" size={16} color="#fff" />
+          <Ionicons name="call" size={18} color="#fff" />
           <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'اتصال' : 'Call'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.contactBtn, { backgroundColor: '#dc3545' }]}
-          onPress={() => handleDeleteVendor(item.id, item.shop_name || item.name || 'تاجر')}
-        >
-          <Ionicons name="trash-outline" size={16} color="#fff" />
-          <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'حذف' : 'Delete'}
+            {language === 'ar' ? 'اتصال مباشر' : 'Call'}
           </Text>
         </TouchableOpacity>
       </View>
