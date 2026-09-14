@@ -104,6 +104,13 @@ const ProfileScreen = ({ navigation }: any) => {
       );
       return;
     }
+    if (!upgradeAddress.trim()) {
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "عنوان التاجر / المحل إجباري للحساب التجاري" : "Address is required for vendor account"
+      );
+      return;
+    }
 
     setUpgrading(true);
     try {

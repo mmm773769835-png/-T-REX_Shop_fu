@@ -599,6 +599,10 @@
                     <input type="tel" id="regPhone" required value="+967 " placeholder="+967 771234567">
                 </div>
                 <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt" style="color:#FFD700;"></i> عنوان التاجر / المحل *</label>
+                    <input type="text" id="regAddress" required placeholder="أدخل العنوان بالتفصيل (المدينة، الشارع، الخ)">
+                </div>
+                <div class="form-group">
                     <label><i class="fas fa-envelope" style="color:#FFD700;"></i> البريد الإلكتروني *</label>
                     <input type="email" id="regEmail" required placeholder="vendor@example.com">
                 </div>
@@ -930,6 +934,7 @@
             const shopName = document.getElementById('regShopName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const country = document.getElementById('regCountry').value;
+            const address = document.getElementById('regAddress').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             const btn = document.getElementById('regBtn');
@@ -946,6 +951,13 @@
                 return;
             }
 
+            if (!address) {
+                errorDiv.textContent = '❌ يرجى إدخال عنوان التاجر (إجباري)';
+                errorDiv.classList.add('show');
+                btn.disabled = false;
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = 'جاري إنشاء حساب المتجر...';
             errorDiv.classList.remove('show');
@@ -956,7 +968,7 @@
                     email,
                     password,
                     options: {
-                        data: { name: name, full_name: name, shop_name: shopName, phone: phone, country: country, role: 'vendor' }
+                        data: { name: name, full_name: name, shop_name: shopName, phone: phone, country: country, address: address, role: 'vendor' }
                     }
                 });
 
@@ -983,7 +995,7 @@
                     role: 'vendor',
                     shop_name: shopName,
                     phone: phone,
-                    address: country,
+                    address: address,
                     vendor_code: vendorCode,
                     updated_at: new Date().toISOString()
                 };

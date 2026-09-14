@@ -7,6 +7,7 @@ ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS name TEXT,
 ADD COLUMN IF NOT EXISTS phone TEXT,
 ADD COLUMN IF NOT EXISTS shop_name TEXT,
+ADD COLUMN IF NOT EXISTS address TEXT,
 ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'customer';
 
 -- 2. إنشاء دالة التحقق من إلزامية اسم التاجر ورقم الهاتف عند الحفظ أو التعديل
@@ -21,6 +22,14 @@ BEGIN
 
     IF NEW.phone IS NULL OR TRIM(NEW.phone) = '' THEN
       RAISE EXCEPTION '❌ رقم الهاتف إجباري للحساب التجاري';
+    END IF;
+    
+    IF NEW.shop_name IS NULL OR TRIM(NEW.shop_name) = '' THEN
+      RAISE EXCEPTION '❌ اسم المتجر إجباري للحساب التجاري';
+    END IF;
+
+    IF NEW.address IS NULL OR TRIM(NEW.address) = '' THEN
+      RAISE EXCEPTION '❌ العنوان إجباري للحساب التجاري';
     END IF;
   END IF;
 
