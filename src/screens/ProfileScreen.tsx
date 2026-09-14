@@ -219,6 +219,48 @@ const ProfileScreen = ({ navigation }: any) => {
     );
   };
 
+  const handleDeleteMyAccount = () => {
+    Alert.alert(
+      language === "ar" ? "حذف الحساب نهائياً 🗑️" : "Delete Account Permanently",
+      language === "ar"
+        ? "هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك وتفاصيل ملفك الشخصي."
+        : "Are you sure you want to permanently delete your account? All your profile data will be deleted.",
+      [
+        { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
+        {
+          text: language === "ar" ? "تأكيد الحذف" : "Confirm Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (authUser?.uid) {
+                if (localUser.role === 'vendor') {
+                  await dbService.delete('products', { eq: { vendor_id: authUser.uid } });
+                }
+                await dbService.delete('profiles', authUser.uid);
+                await dbService.delete('users', authUser.uid);
+              }
+              await signOut();
+              Alert.alert(
+                language === "ar" ? "تم الحذف" : "Deleted",
+                language === "ar" ? "تم حذف حسابك بنجاح" : "Your account has been deleted"
+              );
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "MainTabs", params: { loggedIn: false, admin: false } }],
+              });
+            } catch (err) {
+              console.error("Delete account error:", err);
+              Alert.alert(
+                language === "ar" ? "خطأ" : "Error",
+                language === "ar" ? "فشل في حذف الحساب" : "Failed to delete account"
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleMenuItemPress = (screen: string) => {
     // @ts-ignore
     navigation.navigate(screen);
@@ -386,14 +428,26 @@ const ProfileScreen = ({ navigation }: any) => {
         ))}
       </View>
 
-      {/* Logout */}
+      {/* Logout & Delete Account */}
       {!isGuest && (
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#FF3B3B" />
-          <Text style={styles.logoutBtnText}>
-            {language === "ar" ? "تسجيل الخروج" : "Logout"}
-          </Text>
-        </TouchableOpacity>
+        <View style={{ gap: 10 }}>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={20} color="#FF3B3B" />
+            <Text style={styles.logoutBtnText}>
+              {language === "ar" ? "تسجيل الخروج" : "Logout"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.logoutBtn, { backgroundColor: isDarkMode ? '#2c1515' : '#fff0f0', borderColor: '#FF3B3B', borderWidth: 1 }]} 
+            onPress={handleDeleteMyAccount}
+          >
+            <Ionicons name="trash-outline" size={20} color="#dc3545" />
+            <Text style={[styles.logoutBtnText, { color: "#dc3545" }]}>
+              {language === "ar" ? "حذف الحساب نهائياً 🗑️" : "Delete Account Permanently"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       <View style={{ height: 30 }} />
