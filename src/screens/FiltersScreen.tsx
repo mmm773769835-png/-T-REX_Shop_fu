@@ -16,6 +16,25 @@ const FiltersScreen = ({ navigation }: any) => {
   const [tempInStock, setTempInStock] = useState(state.filters.inStock);
   const [tempSortBy, setTempSortBy] = useState(state.filters.sortBy);
   const [tempCategories, setTempCategories] = useState<string[]>(state.filters.categories);
+  const [appCategories, setAppCategories] = useState(CATEGORIES_WITH_ICONS);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const { data: catData, error: catError } = await dbService.get('categories');
+        if (!catError && catData && catData.length > 0) {
+          const mappedCats = catData.map((cat: any) => ({
+            id: cat.id,
+            name: cat.name_en,
+            nameAr: cat.name_ar,
+            icon: cat.icon || 'star-outline'
+          }));
+          setAppCategories(mappedCats);
+        }
+      } catch (e) { console.log('Categories fetch error in filters', e); }
+    };
+    loadCategories();
+  }, []);
 
   const styles = getStyles(isDarkMode, colors);
 
@@ -145,7 +164,7 @@ const FiltersScreen = ({ navigation }: any) => {
             {language === "ar" ? "الفئات" : "Categories"}
           </Text>
           <View style={styles.categoriesContainer}>
-            {CATEGORIES_WITH_ICONS.map((category) => (
+            {appCategories.map((category) => (
               <TouchableOpacity
                 key={category.id}
                 style={[

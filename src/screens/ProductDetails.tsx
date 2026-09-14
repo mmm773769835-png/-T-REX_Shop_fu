@@ -108,11 +108,23 @@ export default function ProductDetails({ route, navigation }: any) {
 
   // استخدام المنتج الممرر مباشرة أو المنتج المجلوب من Firebase
   const currentProduct = product || fetchedProduct;
+  const [vendorRating, setVendorRating] = useState<number | null>(null);
 
-  // Load reviews when product is loaded
+  // Load reviews and increment views when product is loaded
   useEffect(() => {
     if (currentProduct) {
       loadReviews(currentProduct.id);
+      
+      // Increment views count in the background
+      const supabase = require('../services/supabaseClient').supabase;
+      supabase.rpc('increment_product_views', { product_id: currentProduct.id }).catch((e: any) => console.log('Views error', e));
+      
+      // Fetch Vendor Rating
+      if (currentProduct.vendor_id) {
+        supabase.rpc('get_vendor_rating', { v_id: currentProduct.vendor_id }).then(({data}: any) => {
+           if(data !== null) setVendorRating(data);
+        }).catch((e: any) => console.log('Rating error', e));
+      }
     }
   }, [currentProduct]);
 
@@ -318,10 +330,15 @@ export default function ProductDetails({ route, navigation }: any) {
           {/* Category, Condition, and Vendor Code Chips */}
           <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginVertical: 8 }}>
             {currentProduct.vendor_code && (
-              <View style={{ backgroundColor: '#2b2b2b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#333' }}>
+              <View style={{ backgroundColor: '#2b2b2b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#333', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Text style={{ color: '#FFD700', fontSize: 12, fontWeight: 'bold' }}>
                   {language === 'ar' ? `كود التاجر: ${currentProduct.vendor_code}` : `Vendor: ${currentProduct.vendor_code}`}
                 </Text>
+                {vendorRating !== null && vendorRating > 0 && (
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>
+                    (⭐ {vendorRating})
+                  </Text>
+                )}
               </View>
             )}
             {currentProduct.category && (

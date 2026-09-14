@@ -4557,6 +4557,19 @@
         }
 
         function openQuickView(product) {
+            // Increment views and fetch rating in background
+            if (product && product.id) {
+                supabase.rpc('increment_product_views', { product_id: product.id }).catch(e => console.log('Views error', e));
+            }
+            if (product && product.vendor_id) {
+                supabase.rpc('get_vendor_rating', { v_id: product.vendor_id }).then(({data}) => {
+                    if (data && data > 0) {
+                        const ratingEl = document.getElementById('quickVendorRating');
+                        if (ratingEl) ratingEl.innerHTML = '(⭐ ' + data + ')';
+                    }
+                }).catch(e => console.log('Rating fetch err', e));
+            }
+
             const modal = document.getElementById('productModal');
             const modalContent = modal.querySelector('.modal-content');
             const modalBody = document.getElementById('modalBody');
@@ -4590,7 +4603,8 @@
                     <p class="modal-description" style="margin-bottom: 15px; line-height: 1.6;">${product.description || 'لا يوجد وصف'}</p>
                     <div style="margin-bottom: 20px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 8px;">
                         <strong>📁 الفئة:</strong> ${product.category || 'غير محدد'}<br>
-                        <strong>📦 المخزون:</strong> ✅ متوفر
+                        <strong>📦 المخزون:</strong> ✅ متوفر<br>
+                        ${product.vendor_code ? `<strong>👤 التاجر:</strong> <span style="color:#FFD700; font-weight:bold;">${product.vendor_code} <span id="quickVendorRating" style="font-size:12px;"></span></span>` : ''}
                     </div>
 
                     <!-- Quantity Selector -->

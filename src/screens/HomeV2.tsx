@@ -97,6 +97,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [appCategories, setAppCategories] = useState([...CATEGORIES_WITH_ICONS]);
   const { addToCart } = useCart(); // Use cart context
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(width));
@@ -223,6 +224,20 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
       console.log("🔍 جاري تنفيذ الاستعلام لتحميل المنتجات...");
 
       const loadProducts = async () => {
+        // Fetch categories first
+        try {
+          const { data: catData, error: catError } = await dbService.get('categories');
+          if (!catError && catData && catData.length > 0) {
+            const mappedCats = catData.map((cat: any) => ({
+              id: cat.id,
+              name: cat.name_en,
+              nameAr: cat.name_ar,
+              icon: cat.icon || 'star-outline'
+            }));
+            setAppCategories(mappedCats);
+          }
+        } catch (e) { console.log('Categories fetch error', e); }
+
         const { data, error } = await dbService.get('products', {
           order: { column: 'created_at', ascending: false }
         });
@@ -615,12 +630,12 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const renderCategories = () => (
     <View style={styles.categoriesContainer}>
       <FlatList
-        data={CATEGORIES}
+        data={appCategories}
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        renderItem={renderCategory}
         contentContainerStyle={styles.categoriesList}
+        renderItem={renderCategory}
       />
     </View>
   );
