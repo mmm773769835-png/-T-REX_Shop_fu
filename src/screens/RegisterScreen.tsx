@@ -187,6 +187,13 @@ export default function RegisterScreen({ navigation }: any) {
     }
 
     if (isVendor) {
+      if (!name.trim()) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          language === "ar" ? "اسم التاجر (الاسم الكامل) إجباري عند التسجيل بحساب تاجر" : "Full name is required for vendor account"
+        );
+        return;
+      }
       if (!shopName.trim()) {
         Alert.alert(
           language === "ar" ? "خطأ" : "Error",
@@ -197,7 +204,15 @@ export default function RegisterScreen({ navigation }: any) {
       if (!phone.trim()) {
         Alert.alert(
           language === "ar" ? "خطأ" : "Error",
-          language === "ar" ? "رقم الهاتف إجباري للحساب التجاري" : "Phone number is required for vendor account"
+          language === "ar" ? "رقم الهاتف إجباري عند التسجيل بحساب تاجر" : "Phone number is required for vendor account"
+        );
+        return;
+      }
+      const phoneClean = phone.trim().replace(/[\s\-\(\)\+]/g, '');
+      if (phoneClean.length < 6 || isNaN(Number(phoneClean))) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          language === "ar" ? "يرجى إدخال رقم هاتف صحيح للتواصل (6 أرقام على الأقل)" : "Please enter a valid contact phone number (at least 6 digits)"
         );
         return;
       }
@@ -447,7 +462,7 @@ export default function RegisterScreen({ navigation }: any) {
         )}
 
         <Text style={styles.label}>
-          {language === "ar" ? "الاسم الكامل *" : "Full Name *"}
+          {language === "ar" ? (isVendor ? "الاسم الكامل (إجباري للتاجر) *" : "الاسم الكامل *") : (isVendor ? "Full Name (Required) *" : "Full Name *")}
         </Text>
         <TextInput
           style={styles.input}
@@ -470,7 +485,7 @@ export default function RegisterScreen({ navigation }: any) {
         />
 
         <Text style={styles.label}>
-          {language === "ar" ? (isVendor ? "رقم الهاتف للتواصل *" : "رقم الهاتف") : (isVendor ? "Contact Phone *" : "Phone Number")}
+          {language === "ar" ? (isVendor ? "رقم الهاتف للتواصل (إجباري للتاجر) *" : "رقم الهاتف") : (isVendor ? "Contact Phone (Required) *" : "Phone Number")}
         </Text>
         <TextInput
           style={styles.input}

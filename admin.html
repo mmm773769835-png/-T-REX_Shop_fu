@@ -574,6 +574,10 @@
             <!-- Form 2: Register New Store / Vendor (Hidden by Default) -->
             <form id="vendorRegisterForm" style="display: none;">
                 <div class="form-group">
+                    <label><i class="fas fa-user" style="color:#FFD700;"></i> اسم التاجر / الاسم الكامل *</label>
+                    <input type="text" id="regName" required placeholder="أدخل اسمك الكامل">
+                </div>
+                <div class="form-group">
                     <label><i class="fas fa-store" style="color:#FFD700;"></i> اسم المتجر الخاص بك *</label>
                     <input type="text" id="regShopName" required placeholder="مثال: متجر الهواتف المميزة">
                 </div>
@@ -922,6 +926,7 @@
         // Register New Vendor Form Handler
         document.getElementById('vendorRegisterForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
             const shopName = document.getElementById('regShopName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const country = document.getElementById('regCountry').value;
@@ -929,6 +934,17 @@
             const password = document.getElementById('regPassword').value;
             const btn = document.getElementById('regBtn');
             const errorDiv = document.getElementById('loginError');
+
+            if (!name) {
+                errorDiv.textContent = '❌ يرجى إدخال اسم التاجر / الاسم الكامل (إجباري)';
+                errorDiv.classList.add('show');
+                return;
+            }
+            if (!phone || phone === '+967' || phone === '+966' || phone.replace(/\D/g, '').length < 6) {
+                errorDiv.textContent = '❌ يرجى إدخال رقم هاتف صحيح للتواصل (إجباري للحساب التجاري)';
+                errorDiv.classList.add('show');
+                return;
+            }
 
             btn.disabled = true;
             btn.textContent = 'جاري إنشاء حساب المتجر...';
@@ -940,7 +956,7 @@
                     email,
                     password,
                     options: {
-                        data: { shop_name: shopName, phone: phone, country: country, role: 'vendor' }
+                        data: { name: name, full_name: name, shop_name: shopName, phone: phone, country: country, role: 'vendor' }
                     }
                 });
 
@@ -963,6 +979,7 @@
                 const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
                 const profilePayload = {
                     id: user.id,
+                    name: name,
                     role: 'vendor',
                     shop_name: shopName,
                     phone: phone,
