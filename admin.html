@@ -1307,18 +1307,26 @@
         // ==========================================
         async function loadVendors() {
             try {
-                const { data: vendors, error } = await supabase
+                // Fetch ALL profiles to catch older vendors, then filter in JS to avoid PostgREST syntax issues
+                const { data: profiles, error } = await supabase
                     .from('profiles')
-                    .select('*')
-                    .eq('role', 'vendor');
+                    .select('*');
                 
                 if (error) {
                     console.warn('Vendors fetch error:', error);
-                    document.getElementById('vendorsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#aaa;">لا يوجد تجار أو يرجى تنفيذ سكريبت SQL في Supabase</td></tr>';
+                    document.getElementById('vendorsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#aaa;">لا يوجد تجار أو يرجى تنفيذ سكريبت SQL في Supabase</td></tr>';
                     return;
                 }
                 
-                adminVendors = vendors || [];
+                // Exclude the master admin accounts
+                const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+                
+                adminVendors = (profiles || []).filter(v => {
+                    const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase());
+                    const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
+                    return hasVendorSigns && !isMasterAdmin;
+                });
+                
                 renderAdminVendors(adminVendors);
             } catch (err) {
                 console.error('loadVendors error:', err);

@@ -28,14 +28,22 @@ export default function AdminVendorsScreen({ navigation }: any) {
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      // جلب كافة التجار من جدول profiles حيث role = 'vendor'
-      const { data: profData, error } = await dbService.get('profiles', { eq: { role: 'vendor' } });
+      // Fetch ALL profiles to catch older vendors that might not have role='vendor' perfectly set
+      const { data: profData, error } = await dbService.get('profiles');
       if (error) {
         console.error('Error fetching vendors:', error);
       } else {
+        const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+        // Filter in JS: Must be a vendor OR have a shop name/code, AND must NOT be a master admin
+        const vendorProfiles = (profData || []).filter((v: any) => {
+          const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase());
+          const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
+          return hasVendorSigns && !isMasterAdmin;
+        });
+
         // حساب عدد المنتجات لكل تاجر
         const vendorsWithProductCount = await Promise.all(
-          (profData || []).map(async (v: any) => {
+          vendorProfiles.map(async (v: any) => {
             const { data: prods } = await dbService.get('products', { eq: { vendor_id: v.id } });
             return {
               ...v,
