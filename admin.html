@@ -1320,6 +1320,7 @@
 
             tbody.innerHTML = vendors.map(v => {
                 const cleanPhone = (v.phone || '').replace(/[^0-9]/g, '');
+                const nameEscaped = (v.shop_name || v.name || 'التاجر').replace(/'/g, "\\'");
                 return `
                 <tr>
                     <td><span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:6px; font-weight:bold; border:1px solid #28a745;">${v.vendor_code || 'VND-NEW'}</span></td>
@@ -1329,11 +1330,27 @@
                     <td>
                         ${cleanPhone ? `
                             <a href="https://wa.me/${cleanPhone}" target="_blank" style="background:#28a745; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:5px;">💬 واتساب</a>
-                            <a href="tel:${cleanPhone}" style="background:#007bff; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px;">📞 اتصال</a>
-                        ` : 'لا يوجد رقم'}
+                            <a href="tel:${cleanPhone}" style="background:#007bff; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:5px;">📞 اتصال</a>
+                        ` : ''}
+                        <button onclick="deleteAdminVendor('${v.id}', '${nameEscaped}')" style="background:#dc3545; color:#fff; padding:6px 12px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer;">🗑️ حذف</button>
                     </td>
                 </tr>
             `}).join('');
+        }
+
+        async function deleteAdminVendor(vendorId, vendorName) {
+            if (!confirm(`هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة المنتجات التابعة له؟`)) return;
+            try {
+                // 1. Delete vendor's products
+                await supabase.from('products').delete().eq('vendor_id', vendorId);
+                // 2. Delete vendor profile
+                await supabase.from('profiles').delete().eq('id', vendorId);
+                alert('✅ تم حذف حساب التاجر بنجاح!');
+                loadDashboardData();
+            } catch (err) {
+                console.error('Delete vendor error:', err);
+                alert('❌ فشل في حذف حساب التاجر: ' + err.message);
+            }
         }
 
         function searchAdminVendors() {
