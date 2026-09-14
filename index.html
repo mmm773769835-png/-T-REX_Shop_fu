@@ -4909,6 +4909,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             </div>
                             <h3 class="product-name" itemprop="name">${product.name}</h3>
                             <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
+                            <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                                <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: ${product.address || product.country || 'اليمن 🇾🇪'}
+                            </p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
                                     <span itemprop="price" content="${product.original_price}">${formatPrice(product.original_price, product.currency || 'SAR')}</span>

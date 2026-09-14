@@ -538,6 +538,13 @@
 
             <!-- Form 1: Sign In Existing Vendor / Admin (Default Visible) -->
             <form id="loginForm">
+                <!-- Fast Google Auth Button -->
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
+                    <span class="google-icon">G</span> الدخول السريع بحساب Google
+                </button>
+
+                <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
+
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
                     <input type="email" id="adminEmail" required placeholder="vendor@example.com">
@@ -571,21 +578,21 @@
                     <input type="text" id="regShopName" required placeholder="مثال: متجر الهواتف المميزة">
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-phone" style="color:#FFD700;"></i> رقم الهاتف / الواتساب *</label>
-                    <input type="tel" id="regPhone" required placeholder="مثال: 771234567">
-                </div>
-                <div class="form-group">
                     <label><i class="fas fa-globe" style="color:#FFD700;"></i> الدولة *</label>
-                    <select id="regCountry" required>
-                        <option value="اليمن 🇾🇪">اليمن 🇾🇪</option>
-                        <option value="السعودية 🇸🇦">السعودية 🇸🇦</option>
-                        <option value="الإمارات 🇦🇪">الإمارات 🇦🇪</option>
-                        <option value="الكويت 🇰🇼">الكويت 🇰🇼</option>
-                        <option value="البحرين 🇧🇭">البحرين 🇧🇭</option>
-                        <option value="عُمان 🇴🇲">عُمان 🇴🇲</option>
-                        <option value="قطر 🇶🇦">قطر 🇶🇦</option>
+                    <select id="regCountry" required onchange="updateCountryCode(this.value)">
+                        <option value="اليمن 🇾🇪">اليمن 🇾🇪 (+967)</option>
+                        <option value="السعودية 🇸🇦">السعودية 🇸🇦 (+966)</option>
+                        <option value="الإمارات 🇦🇪">الإمارات 🇦🇪 (+971)</option>
+                        <option value="الكويت 🇰🇼">الكويت 🇰🇼 (+965)</option>
+                        <option value="البحرين 🇧🇭">البحرين 🇧🇭 (+973)</option>
+                        <option value="عُمان 🇴🇲">عُمان 🇴🇲 (+968)</option>
+                        <option value="قطر 🇶🇦">قطر 🇶🇦 (+974)</option>
                         <option value="أخرى">دولة أخرى</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone" style="color:#FFD700;"></i> رقم الهاتف / الواتساب (مع رمز الدولة) *</label>
+                    <input type="tel" id="regPhone" required value="+967 " placeholder="+967 771234567">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-envelope" style="color:#FFD700;"></i> البريد الإلكتروني *</label>
@@ -598,6 +605,12 @@
 
                 <button type="submit" class="btn-login" id="regBtn" style="background: linear-gradient(135deg, #FF6B35, #FFA500); color: #fff; margin-top: 5px;">
                     🚀 إنشاء حساب المتجر والدخول
+                </button>
+
+                <div class="auth-divider"><span>أو التسجيل السريع عبر Google</span></div>
+
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('register')">
+                    <span class="google-icon">G</span> التسجيل والمتابعة بحساب Google
                 </button>
 
                 <!-- Quick switch link -->
@@ -838,6 +851,49 @@
         // AUTHENTICATION & VENDOR ONBOARDING
         // ==========================================
 
+        function updateCountryCode(country) {
+            const dialCodes = {
+                'اليمن 🇾🇪': '+967 ',
+                'السعودية 🇸🇦': '+966 ',
+                'الإمارات 🇦🇪': '+971 ',
+                'الكويت 🇰🇼': '+965 ',
+                'البحرين 🇧🇭': '+973 ',
+                'عُمان 🇴🇲': '+968 ',
+                'قطر 🇶🇦': '+974 ',
+                'أخرى': '+'
+            };
+            const phoneInput = document.getElementById('regPhone');
+            if (phoneInput) {
+                const code = dialCodes[country] || '+967 ';
+                phoneInput.value = code;
+                phoneInput.focus();
+            }
+        }
+
+        async function signInWithGoogleVendor(mode) {
+            if (mode === 'register') {
+                const shopName = document.getElementById('regShopName').value.trim();
+                const phone = document.getElementById('regPhone').value.trim();
+                const country = document.getElementById('regCountry').value;
+                if (shopName) localStorage.setItem('pending_vendor_shop_name', shopName);
+                if (phone) localStorage.setItem('pending_vendor_phone', phone);
+                if (country) localStorage.setItem('pending_vendor_country', country);
+            }
+
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.href.split('?')[0].split('#')[0]
+                }
+            });
+
+            if (error) {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '❌ خطأ في تسجيل الدخول عبر Google: ' + error.message;
+                errorDiv.classList.add('show');
+            }
+        }
+
         function switchAuthTab(mode) {
             const regForm = document.getElementById('vendorRegisterForm');
             const loginForm = document.getElementById('loginForm');
@@ -1070,11 +1126,15 @@
             loadDashboardData();
         }
 
-        // Check Auth on Load
+        // Check Auth on Load & Handle Google OAuth Callback
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
                 currentUser = session.user;
+
+                const pendingShopName = localStorage.getItem('pending_vendor_shop_name');
+                const pendingPhone = localStorage.getItem('pending_vendor_phone');
+                const pendingCountry = localStorage.getItem('pending_vendor_country');
 
                 const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
                 const userEmail = (currentUser.email || '').toLowerCase();
@@ -1086,21 +1146,25 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                if (!profile || (isAdminEmail && profile?.role !== 'admin')) {
+                if (!profile || pendingShopName || (isAdminEmail && profile?.role !== 'admin')) {
                     const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
                     const targetRole = isAdminEmail ? 'admin' : (profile?.role || 'vendor');
                     const newProfile = {
                         id: currentUser.id,
                         role: targetRole,
-                        shop_name: profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
-                        phone: profile?.phone || '',
-                        address: profile?.address || '',
+                        shop_name: pendingShopName || profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
+                        phone: pendingPhone || profile?.phone || '',
+                        address: pendingCountry || profile?.address || '',
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
 
                     await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
                     profile = newProfile;
+
+                    localStorage.removeItem('pending_vendor_shop_name');
+                    localStorage.removeItem('pending_vendor_phone');
+                    localStorage.removeItem('pending_vendor_country');
                 }
 
                 currentVendor = profile;
