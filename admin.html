@@ -636,7 +636,10 @@
                 <h2>لوحة تحكم T-REX Shop</h2>
                 <p class="user-info" id="userInfo">مسؤول</p>
             </div>
-            <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
+            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
+                <button class="btn-logout" id="btnDeleteAccount" onclick="deleteMyVendorAccount()" style="display: none; background: transparent; color: #ff4444; border: 1px solid #ff4444;">حذف حسابي نهائياً</button>
+            </div>
         </div>
 
         <div class="stats-grid">
@@ -1101,10 +1104,49 @@
 
         async function logout() {
             await supabase.auth.signOut();
-            currentUser = null;
-            currentVendor = null;
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboard').classList.remove('show');
+            window.location.reload();
+        }
+
+        async function deleteMyVendorAccount() {
+            if (!currentUser || !currentVendor) return;
+            
+            const confirmMsg = `⚠️ تحذير خطير ⚠️\n\nهل أنت متأكد من حذف حسابك نهائياً؟\n- سيتم حذف جميع منتجاتك المرتبطة بالحساب.\n- سيتم حذف كود التاجر الخاص بك نهائياً.\n- لا يمكن التراجع عن هذا الإجراء!\n\nاكتب كلمة "حذف" لتأكيد العملية:`;
+            const userInput = prompt(confirmMsg);
+            
+            if (userInput === 'حذف') {
+                try {
+                    showLoading();
+                    
+                    // 1. Delete all products owned by this vendor
+                    const { error: prodError } = await supabase
+                        .from('products')
+                        .delete()
+                        .eq('vendor_id', currentUser.id);
+                        
+                    if(prodError) throw prodError;
+
+                    // 2. Delete the profile
+                    const { error: profError } = await supabase
+                        .from('profiles')
+                        .delete()
+                        .eq('id', currentUser.id);
+                        
+                    if(profError) throw profError;
+                    
+                    // Note: Supabase JS client cannot delete the auth.users row directly without service role key,
+                    // but deleting the profile effectively disables their merchant capabilities and hides their products.
+                    
+                    alert('تم حذف حسابك وجميع منتجاتك بنجاح. سيتم تسجيل خروجك الآن.');
+                    await supabase.auth.signOut();
+                    window.location.reload();
+                } catch(error) {
+                    hideLoading();
+                    console.error('Error deleting account:', error);
+                    alert('حدث خطأ أثناء محاولة حذف الحساب: ' + error.message);
+                }
+            } else if (userInput !== null) {
+                alert('تم إلغاء عملية الحذف.');
+            }
         }
 
         function showDashboard() {
@@ -1123,6 +1165,11 @@
             const vendorsSection = document.getElementById('vendorsSection');
             if (vendorsSection) {
                 vendorsSection.style.display = isAdmin ? 'block' : 'none';
+            }
+            
+            const btnDelete = document.getElementById('btnDeleteAccount');
+            if(btnDelete) {
+                btnDelete.style.display = isAdmin ? 'none' : 'block';
             }
             
             loadDashboardData();
