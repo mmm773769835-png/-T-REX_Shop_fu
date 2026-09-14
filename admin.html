@@ -1007,47 +1007,18 @@
             }
         });
 
-        // Quick Auto Register Helper for email/password login
-        async function quickCreateVendorAccount() {
+        // Quick Register Redirection Helper
+        function quickCreateVendorAccount() {
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
             const errorDiv = document.getElementById('loginError');
 
-            if (!email || !password) {
-                alert('يرجى إدخال البريد الإلكتروني وكلمة المرور أولاً');
-                return;
-            }
-
-            try {
-                const shopName = 'متجر ' + email.split('@')[0];
-                const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
-
-                let { data: authData, error: authError } = await supabase.auth.signUp({
-                    email,
-                    password
-                });
-
-                if (authError && authError.message.includes('already registered')) {
-                    authData = await supabase.auth.signInWithPassword({ email, password });
-                } else if (authError) throw authError;
-
-                const user = authData.user || (await supabase.auth.getUser()).data.user;
-                if (user) {
-                    await supabase.from('profiles').upsert({
-                        id: user.id,
-                        role: 'vendor',
-                        shop_name: shopName,
-                        vendor_code: vendorCode,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'id' });
-
-                    currentUser = user;
-                    showDashboard();
-                }
-            } catch (err) {
-                errorDiv.textContent = '❌ ' + (err.message || 'فشل إنشاء الحساب السريع');
-                errorDiv.classList.add('show');
-            }
+            switchAuthTab('register');
+            if (email) document.getElementById('regEmail').value = email;
+            if (password) document.getElementById('regPassword').value = password;
+            
+            errorDiv.textContent = 'ℹ️ يرجى إكمال إدخال اسم التاجر ورقم الهاتف في النموذّج للتسجيل بنجاح.';
+            errorDiv.classList.add('show');
         }
 
         // Login Existing Vendor/Admin Form Handler
