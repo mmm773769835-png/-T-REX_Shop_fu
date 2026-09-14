@@ -145,14 +145,32 @@ export default function AddProduct({ navigation, route }: any) {
       return;
     }
     
-    // كشف وحظر أرقام الهواتف ووسائل التواصل بأي صيغة داخل العنوان أو الوصف
-    const phoneRegex = /(\+?[0-9]{1,4}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?[\d\s-]{7,12}/g;
-    if (phoneRegex.test(name) || phoneRegex.test(description)) {
+    const fullText = (name + " " + description).toLowerCase();
+
+    // كشف الروابط (URLs)
+    const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9-]+\.(com|net|org|ly|me|info|store|shop|co)(?:\/[^\s]*)?)/ig;
+    if (urlRegex.test(fullText)) {
       Alert.alert(
         language === "ar" ? "حظر أمني 🚫" : "Security Block 🚫",
         language === "ar" 
-          ? "ممنوع كتابة أرقام الهواتف أو بيانات التواصل داخل اسم المنتج أو تفاصيله."
-          : "Phone numbers or contact info are strictly prohibited inside product title or description."
+          ? "يُمنع منعاً باتاً نشر الروابط الخارجية في اسم المنتج أو الوصف."
+          : "External links are strictly prohibited in product title or description."
+      );
+      return;
+    }
+
+    // كشف أرقام الهواتف المخفية أو المجزأة
+    // إزالة جميع المسافات، الفواصل، الأسطر، والرموز لجمع الأرقام المتفرقة
+    const cleanTextForPhone = fullText.replace(/[\s\-\.\_\,\n\r\u200B\u200C\u200D\uFEFF]/g, '');
+    const obfuscatedPhoneRegex = /\d{8,}/; // أي تسلسل من 8 أرقام أو أكثر بعد إزالة الفواصل يعتبر رقم هاتف محتمل
+    const standardPhoneRegex = /(\+?[0-9]{1,4}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?[\d\s-]{8,15}/g;
+
+    if (obfuscatedPhoneRegex.test(cleanTextForPhone) || standardPhoneRegex.test(fullText)) {
+      Alert.alert(
+        language === "ar" ? "حظر أمني 🚫" : "Security Block 🚫",
+        language === "ar" 
+          ? "يُمنع كتابة أرقام الهواتف أو وسائل التواصل (حتى لو كانت مجزأة على عدة أسطر) داخل تفاصيل المنتج."
+          : "Phone numbers or contact info (even obfuscated or multi-line) are strictly prohibited."
       );
       return;
     }
