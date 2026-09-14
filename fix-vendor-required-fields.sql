@@ -8,6 +8,7 @@ ADD COLUMN IF NOT EXISTS name TEXT,
 ADD COLUMN IF NOT EXISTS phone TEXT,
 ADD COLUMN IF NOT EXISTS shop_name TEXT,
 ADD COLUMN IF NOT EXISTS address TEXT,
+ADD COLUMN IF NOT EXISTS email TEXT,
 ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'customer';
 
 -- 2. إنشاء دالة التحقق من إلزامية اسم التاجر ورقم الهاتف عند الحفظ أو التعديل
