@@ -24,7 +24,6 @@ const ProfileScreen = ({ navigation }: any) => {
     profileImage: getDefaultUserImage(),
   });
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeName, setUpgradeName] = useState("");
   const [upgradeShopName, setUpgradeShopName] = useState("");
   const [upgradePhone, setUpgradePhone] = useState("");
   const [upgradeAddress, setUpgradeAddress] = useState("");
@@ -82,25 +81,10 @@ const ProfileScreen = ({ navigation }: any) => {
   }, [authUser]);
 
   const handleUpgradeToVendor = async () => {
-    const finalName = upgradeName.trim() || localUser.name;
-    if (!finalName || finalName === "مستخدم جديد") {
+    if (!upgradeShopName.trim() || !upgradePhone.trim()) {
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "يرجى إدخال اسم التاجر / الاسم الكامل (إجباري للحساب التجاري)" : "Please enter your full name for vendor account"
-      );
-      return;
-    }
-    if (!upgradeShopName.trim()) {
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "يرجى إدخال اسم المتجر" : "Please enter shop name"
-      );
-      return;
-    }
-    if (!upgradePhone.trim()) {
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "رقم الهاتف إجباري للحساب التجاري" : "Phone number is required for vendor account"
+        language === "ar" ? "يرجى تعبئة اسم المتجر ورقم الهاتف" : "Please fill shop name and phone number"
       );
       return;
     }
@@ -111,7 +95,7 @@ const ProfileScreen = ({ navigation }: any) => {
       const generatedCode = `VND-${Math.floor(1000 + Math.random() * 9000)}`;
       const payload = {
         id: authUser.uid,
-        name: finalName,
+        name: localUser.name,
         email: localUser.email,
         phone: upgradePhone.trim(),
         shop_name: upgradeShopName.trim(),
@@ -126,7 +110,6 @@ const ProfileScreen = ({ navigation }: any) => {
 
       setLocalUser({
         ...localUser,
-        name: finalName,
         role: 'vendor',
         shopName: upgradeShopName.trim(),
         phone: upgradePhone.trim(),
@@ -289,11 +272,7 @@ const ProfileScreen = ({ navigation }: any) => {
                   alignItems: 'center',
                   gap: 8,
                 }}
-                onPress={() => {
-                  setUpgradeName(localUser.name && localUser.name !== "مستخدم جديد" ? localUser.name : "");
-                  setUpgradePhone(localUser.phone && localUser.phone !== "غير متوفر" ? localUser.phone : "");
-                  setShowUpgradeModal(true);
-                }}
+                onPress={() => setShowUpgradeModal(true)}
               >
                 <Ionicons name="storefront-outline" size={18} color="#1a1a1a" />
                 <Text style={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: 14 }}>
@@ -421,25 +400,6 @@ const ProfileScreen = ({ navigation }: any) => {
                 ? "أدخل بيانات متجرك للبدء في إضافة وعرض منتجاتك واستقبال الطلبات."
                 : "Enter your shop details to start adding products and managing orders."}
             </Text>
-
-            <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.text, marginBottom: 6 }}>
-              {language === "ar" ? "اسم التاجر / الاسم الكامل *" : "Full Name *"}
-            </Text>
-            <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: colors.border,
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 15,
-                backgroundColor: colors.inputBackground,
-                color: colors.text,
-                marginBottom: 12,
-              }}
-              placeholder={language === "ar" ? "أدخل اسمك الكامل" : "Enter full name"}
-              value={upgradeName}
-              onChangeText={setUpgradeName}
-            />
 
             <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.text, marginBottom: 6 }}>
               {language === "ar" ? "اسم المتجر *" : "Shop Name *"}
