@@ -17,7 +17,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { getDefaultProductImage } from '../utils/imageUtils';
 
-export default function VendorDashboard({ navigation }: any) {
+export default function VendorDashboard({ navigation, route }: any) {
   const { user } = useAuth();
   const { language } = useContext(LanguageContext);
   const { isDarkMode, colors } = useContext(ThemeContext);
@@ -28,22 +28,27 @@ export default function VendorDashboard({ navigation }: any) {
   const [vendorCode, setVendorCode] = useState<string>('');
   const [shopName, setShopName] = useState<string>('');
 
+  const targetVendorId = route?.params?.vendorId || user?.uid;
+  const targetVendorName = route?.params?.vendorName || '';
+
   const fetchVendorProducts = async () => {
-    if (!user?.uid) {
+    if (!targetVendorId) {
       setLoading(false);
       return;
     }
 
     try {
       // 1. جلب بيانات التاجر (vendor_code و shop_name)
-      const { data: profileData } = await dbService.get('profiles', { eq: { id: user.uid } });
+      const { data: profileData } = await dbService.get('profiles', { eq: { id: targetVendorId } });
       if (profileData && profileData.length > 0) {
         setVendorCode(profileData[0].vendor_code || 'VND-NEW');
-        setShopName(profileData[0].shop_name || 'متجري');
+        setShopName(profileData[0].shop_name || targetVendorName || profileData[0].name || 'متجري');
+      } else if (targetVendorName) {
+        setShopName(targetVendorName);
       }
 
       // 2. جلب المنتجات التي يملكها هذا التاجر فقط
-      const { data: prodData, error } = await dbService.get('products', { eq: { vendor_id: user.uid } });
+      const { data: prodData, error } = await dbService.get('products', { eq: { vendor_id: targetVendorId } });
       if (error) {
         console.error('Error fetching vendor products:', error);
       } else {
@@ -63,7 +68,7 @@ export default function VendorDashboard({ navigation }: any) {
       fetchVendorProducts();
     });
     return unsubscribe;
-  }, [navigation, user]);
+  }, [navigation, user, targetVendorId]);
 
   const handleDeleteProduct = (productId: string, productName: string) => {
     Alert.alert(

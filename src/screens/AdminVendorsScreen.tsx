@@ -200,10 +200,20 @@ export default function AdminVendorsScreen({ navigation }: any) {
         >
           <Ionicons name="trash-outline" size={16} color="#fff" />
           <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'حذف' : 'Delete'}
+            {language === 'ar' ? 'حذف الحساب' : 'Delete'}
           </Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={[styles.contactBtn, { backgroundColor: '#17a2b8', marginTop: 10, width: '100%', justifyContent: 'center' }]}
+        onPress={() => navigation.navigate('VendorDashboard', { vendorId: item.id, vendorName: item.shop_name || item.name })}
+      >
+        <Ionicons name="cube" size={16} color="#fff" />
+        <Text style={styles.contactBtnText}>
+          {language === 'ar' ? 'إدارة منتجات التاجر' : 'Manage Vendor Products'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 
