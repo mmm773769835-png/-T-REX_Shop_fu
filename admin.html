@@ -828,6 +828,7 @@
                         <tr>
                             <th>كود التاجر (Vendor Code)</th>
                             <th>اسم المتجر / التاجر</th>
+                            <th>البريد الإلكتروني</th>
                             <th>رقم الهاتف للتواصل</th>
                             <th>العنوان</th>
                             <th>التواصل المباشر</th>
@@ -992,6 +993,7 @@
                 const profilePayload = {
                     id: user.id,
                     name: name,
+                    email: email,
                     role: 'vendor',
                     shop_name: shopName,
                     phone: phone,
@@ -1337,6 +1339,7 @@
                 <tr>
                     <td><span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:6px; font-weight:bold; border:1px solid #28a745;">${v.vendor_code || 'VND-NEW'}</span></td>
                     <td><strong>${v.shop_name || 'متجر تاجر'}</strong><br><small style="color:#aaa;">${v.name}</small></td>
+                    <td><a href="mailto:${v.email || ''}" style="color:#17a2b8;">${v.email || 'غير محدد'}</a></td>
                     <td><span style="color:#FFD700; font-weight:bold;">${v.phone || 'غير محدد'}</span></td>
                     <td>${v.address || 'غير محدد'}</td>
                     <td>
