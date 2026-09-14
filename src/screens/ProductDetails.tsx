@@ -315,8 +315,15 @@ export default function ProductDetails({ route, navigation }: any) {
             </Text>
           </View>
 
-          {/* Category & Condition Chips */}
+          {/* Category, Condition, and Vendor Code Chips */}
           <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginVertical: 8 }}>
+            {currentProduct.vendor_code && (
+              <View style={{ backgroundColor: '#2b2b2b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: '#333' }}>
+                <Text style={{ color: '#FFD700', fontSize: 12, fontWeight: 'bold' }}>
+                  {language === 'ar' ? `كود التاجر: ${currentProduct.vendor_code}` : `Vendor: ${currentProduct.vendor_code}`}
+                </Text>
+              </View>
+            )}
             {currentProduct.category && (
               <View style={styles.chip}>
                 <Ionicons name="pricetag-outline" size={12} color="#1a1a1a" />
