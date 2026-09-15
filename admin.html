@@ -1634,6 +1634,56 @@
         // ==========================================
         // ADD / EDIT PRODUCT
         // ==========================================
+        
+        // ==========================================
+        // DYNAMIC PRICE & MARKUP CALCULATIONS
+        // ==========================================
+        function calculateCustomerPriceFromVendorPrice() {
+            const vPriceInput = document.getElementById('productVendorPrice');
+            const markupInput = document.getElementById('productMarkupPercent');
+            const cPriceInput = document.getElementById('productPrice');
+            const badge = document.getElementById('priceSummaryBadge');
+            const currSelect = document.getElementById('currency');
+            const curr = currSelect ? currSelect.value : 'YER';
+
+            const vPrice = parseFloat(vPriceInput ? vPriceInput.value : 0) || 0;
+            const markupPct = parseFloat(markupInput ? markupInput.value : 10) || 0;
+
+            if (vPrice > 0) {
+                const cPrice = (vPrice * (1 + markupPct / 100)).toFixed(2);
+                if (cPriceInput) cPriceInput.value = cPrice;
+                const markupAmt = (cPrice - vPrice).toFixed(2);
+
+                if (badge) {
+                    badge.textContent = `[ سعرك الصافي: ${vPrice} ${curr} | الزيادة فوق سعرك: +${markupAmt} ${curr} (${markupPct}%) | سعر الزبون المعروض بالمتجر: ${cPrice} ${curr} ]`;
+                }
+            } else if (badge) {
+                badge.textContent = `[ سعرك الصافي: 0 | الزيادة المضافة للزبون: +10% | سعر الزبون النهائي بالمتجر: 0 ]`;
+            }
+        }
+
+        function calculateVendorPriceFromCustomerPrice() {
+            const vPriceInput = document.getElementById('productVendorPrice');
+            const markupInput = document.getElementById('productMarkupPercent');
+            const cPriceInput = document.getElementById('productPrice');
+            const badge = document.getElementById('priceSummaryBadge');
+            const currSelect = document.getElementById('currency');
+            const curr = currSelect ? currSelect.value : 'YER';
+
+            const cPrice = parseFloat(cPriceInput ? cPriceInput.value : 0) || 0;
+            const markupPct = parseFloat(markupInput ? markupInput.value : 10) || 10;
+
+            if (cPrice > 0) {
+                const vPrice = (cPrice / (1 + markupPct / 100)).toFixed(2);
+                if (vPriceInput) vPriceInput.value = vPrice;
+                const markupAmt = (cPrice - vPrice).toFixed(2);
+
+                if (badge) {
+                    badge.textContent = `[ سعرك الصافي: ${vPrice} ${curr} | الزيادة فوق سعرك: +${markupAmt} ${curr} (${markupPct}%) | سعر الزبون المعروض بالمتجر: ${cPrice} ${curr} ]`;
+                }
+            }
+        }
+
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -1666,6 +1716,7 @@
                 // payment_method, currency, description, is_new, is_active, image_url, updated_at, created_at
                 const productData = {
                     name: document.getElementById('productName').value,
+                    vendor_price: !isNaN(parseFloat(document.getElementById('productVendorPrice').value)) ? parseFloat(document.getElementById('productVendorPrice').value) : parseFloat(document.getElementById('productPrice').value),
                     price: parseFloat(document.getElementById('productPrice').value),
                     original_price: parseFloat(document.getElementById('productOldPrice').value) || null,
                     category: document.getElementById('productCategory').value,
@@ -1784,7 +1835,9 @@
                 editingProductId = id;
                 document.getElementById('productId').value = id;
                 document.getElementById('productName').value = product.name;
-                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productVendorPrice').value = product.vendor_price || product.price || '';
+                document.getElementById('productPrice').value = product.price || '';
+                calculateCustomerPriceFromVendorPrice();
                 document.getElementById('productOldPrice').value = product.original_price || '';
                 document.getElementById('productCategory').value = product.category;
                 document.getElementById('paymentMethod').value = product.payment_method || 'cash';
@@ -1852,6 +1905,9 @@
         function resetForm() {
             editingProductId = null;
             document.getElementById('productForm').reset();
+            document.getElementById('productVendorPrice').value = '';
+            document.getElementById('productMarkupPercent').value = '10';
+            calculateCustomerPriceFromVendorPrice();
             document.getElementById('submitBtn').textContent = 'إضافة المنتج';
             document.getElementById('cancelBtn').style.display = 'none';
             
