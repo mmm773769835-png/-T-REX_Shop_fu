@@ -520,8 +520,8 @@
         <div class="login-box">
             <div class="logo">
                 <img src="logo.png" alt="T-REX Shop" onerror="this.style.display='none'">
-                <h1>لوحة التحكم والموردين</h1>
-                <p style="color: #aaa; font-size: 13px; margin-top: 5px;">إدارة الموردين والمنتجات | T-REX Hub</p>
+                <h1>👑 لوحة الإدارة العليا</h1>
+                <p style="color: #aaa; font-size: 13px; margin-top: 5px;">نظام الإدارة الكاملة | T-REX Shop</p>
             </div>
 
             <!-- Auth Mode Switcher Tabs -->
@@ -563,8 +563,11 @@
                     ليس لديك حساب تاجر؟ <a href="#" onclick="switchAuthTab('register'); return false;" style="color: #FFD700; font-weight: bold; text-decoration: underline;">إنشاء حساب تاجر جديد 🚀</a>
                 </p>
 
-                <!-- Quick Auto Register button if login credentials fail -->
-                <div id="quickAutoRegisterBox" style="margin-top: 30px; margin-top: 15px; text-align: center;">
+                <p style="text-align:center; margin-top:12px; font-size:12px; color:#555;">
+    تاجر؟ <a href="admin.html" style="color:#FFD700; text-decoration:underline;">لوحة التجار 🏪</a>
+  </p>
+  <!-- Quick Auto Register button if login credentials fail -->
+                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
                     <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
                     <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
                         ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
@@ -572,8 +575,9 @@
                 </div>
             </form>
 
-            <!-- Form 2: Register New Store / Vendor (Hidden by Default) -->
-            <form id="vendorRegisterForm" style="display: none;">
+            <!-- Form 2: DISABLED IN SUPERADMIN - Register belongs in admin.html only -->
+<!-- SUPERADMIN_REGISTER_PLACEHOLDER -->
+            <form id="vendorRegisterForm" style="display: none !important; visibility: hidden; pointer-events:none;" aria-hidden="true">
                 <div class="form-group">
                     <label><i class="fas fa-user" style="color:#FFD700;"></i> اسم التاجر / الاسم الكامل *</label>
                     <input type="text" id="regName" required placeholder="أدخل اسمك الكامل">
@@ -1095,12 +1099,34 @@
                     .eq('id', data.user.id)
                     .single();
 
-                if (!profile || (isAdminEmail && profile.role !== 'admin')) {
-                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
-                    profile = { 
-                        id: data.user.id, 
-                        role: isAdminEmail ? 'admin' : (profile?.role || 'vendor'), 
-                        shop_name: profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر')), 
+                // VENDOR PAGE: Block admin login - redirect to superadmin
+                if (isAdminEmail) {
+                    await supabase.auth.signOut();
+                    errorDiv.textContent = '🔒 هذه الصفحة للتجار فقط. يرجى الدخول من لوحة الإدارة العليا.';
+                    errorDiv.classList.add('show');
+                    setTimeout(() => { window.location.href = 'superadmin.html'; }, 2000);
+                    btn.disabled = false;
+                    btn.textContent = 'تسجيل الدخول';
+                    return;
+                }
+
+                // Block customers from entering
+                if (profile && profile.role !== 'vendor') {
+                    await supabase.auth.signOut();
+                    errorDiv.textContent = 'هذا الحساب غير مسجل كتاجر. يرجى إنشاء حساب تاجر جديد.';
+                    errorDiv.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'تسجيل الدخول';
+                    return;
+                }
+
+                if (!profile) {
+                    const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+                    profile = {
+                        id: data.user.id,
+                        email: data.user.email,
+                        role: 'vendor',
+                        shop_name: 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر'),
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
@@ -1208,8 +1234,16 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                // Reject users who are not vendors/admins unless they are actively registering
-                if (profile && profile.role !== 'vendor' && profile.role !== 'admin' && !pendingShopName && !isAdminEmail) {
+                // VENDOR PAGE: Redirect admins to their own admin page
+                if (isAdminEmail) {
+                    await supabase.auth.signOut();
+                    alert('🔒 لوحة التجار لا تقبل حسابات الإدارة.\nيرجى الدخول من لوحة الإدارة العليا.');
+                    window.location.href = 'superadmin.html';
+                    return;
+                }
+
+                // Reject non-vendor accounts (customers)
+                if (profile && profile.role !== 'vendor' && !pendingShopName) {
                     await supabase.auth.signOut();
                     alert('هذا الحساب مسجل كـ "زبون". يرجى التسجيل كتاجر جديد من تبويب "حساب تاجر جديد".');
                     return;
