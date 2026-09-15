@@ -564,7 +564,7 @@
                 </p>
 
                 <!-- Quick Auto Register button if login credentials fail -->
-                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
+                <div id="quickAutoRegisterBox" style="margin-top: 30px; margin-top: 15px; text-align: center;">
                     <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
                     <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
                         ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
@@ -830,7 +830,7 @@
         </div>
 
         <!-- قسم دليل وإدارة أكواد التجار -->
-        <div class="products-table" id="vendorsSection" style="margin-top: 30px; display:none;">
+        <div class="products-table" id="vendorsSection" style="margin-top: 30px;">
             <h3>🔑 دليل وأكواد التواصل مع التجار (Vendors Directory)</h3>
             <div class="admin-search-bar">
                 <input type="text" id="adminVendorSearch" class="admin-search-input" placeholder="ابحث بكود التاجر (VND-1001) أو اسم المتجر أو الهاتف..." oninput="searchAdminVendors()">
@@ -1095,34 +1095,12 @@
                     .eq('id', data.user.id)
                     .single();
 
-                // VENDOR PAGE: Block admin login - redirect to superadmin
-                if (isAdminEmail) {
-                    await supabase.auth.signOut();
-                    errorDiv.textContent = '🔒 هذه الصفحة للتجار فقط. يرجى الدخول من لوحة الإدارة العليا.';
-                    errorDiv.classList.add('show');
-                    setTimeout(() => { window.location.href = 'superadmin.html'; }, 2000);
-                    btn.disabled = false;
-                    btn.textContent = 'تسجيل الدخول';
-                    return;
-                }
-
-                // Block customers from entering
-                if (profile && profile.role !== 'vendor') {
-                    await supabase.auth.signOut();
-                    errorDiv.textContent = 'هذا الحساب غير مسجل كتاجر. يرجى إنشاء حساب تاجر جديد.';
-                    errorDiv.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'تسجيل الدخول';
-                    return;
-                }
-
-                if (!profile) {
-                    const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
-                    profile = {
-                        id: data.user.id,
-                        email: data.user.email,
-                        role: 'vendor',
-                        shop_name: 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر'),
+                if (!profile || (isAdminEmail && profile.role !== 'admin')) {
+                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
+                    profile = { 
+                        id: data.user.id, 
+                        role: isAdminEmail ? 'admin' : (profile?.role || 'vendor'), 
+                        shop_name: profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر')), 
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
@@ -1204,7 +1182,7 @@
             
             const btnDelete = document.getElementById('btnDeleteAccount');
             if(btnDelete) {
-                btnDelete.style.display = 'block';
+                btnDelete.style.display = 'none';
             }
             
             loadDashboardData();
@@ -1230,16 +1208,8 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                // VENDOR PAGE: Redirect admins to their own admin page
-                if (isAdminEmail) {
-                    await supabase.auth.signOut();
-                    alert('🔒 لوحة التجار لا تقبل حسابات الإدارة.\nيرجى الدخول من لوحة الإدارة العليا.');
-                    window.location.href = 'superadmin.html';
-                    return;
-                }
-
-                // Reject non-vendor accounts (customers)
-                if (profile && profile.role !== 'vendor' && !pendingShopName) {
+                // Reject users who are not vendors/admins unless they are actively registering
+                if (profile && profile.role !== 'vendor' && profile.role !== 'admin' && !pendingShopName && !isAdminEmail) {
                     await supabase.auth.signOut();
                     alert('هذا الحساب مسجل كـ "زبون". يرجى التسجيل كتاجر جديد من تبويب "حساب تاجر جديد".');
                     return;
