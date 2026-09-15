@@ -524,55 +524,34 @@
                 <p style="color: #aaa; font-size: 13px; margin-top: 5px;">نظام الإدارة الكاملة | T-REX Shop</p>
             </div>
 
-            <!-- Auth Mode Switcher Tabs -->
-            <div class="auth-tabs">
-                <button type="button" class="auth-tab active" id="tabVendorLogin" onclick="switchAuthTab('login')">
-                    <i class="fas fa-key"></i> تسجيل الدخول
-                </button>
-                <button type="button" class="auth-tab" id="tabVendorRegister" onclick="switchAuthTab('register')">
-                    <i class="fas fa-store"></i> حساب تاجر جديد
-                </button>
-            </div>
+            <!-- Admin Only Login -->
 
             <div class="error-message" id="loginError"></div>
-            <div class="success-message" id="loginSuccess" style="display: none; text-align: center;"></div>
+            <div class="success-message" id="loginSuccess" style="display:none;"></div>
 
-            <!-- Form 1: Sign In Existing Vendor / Admin (Default Visible) -->
+            <!-- Hidden dummies required by shared JS -->
+            <div id="tabVendorLogin"      style="display:none;"></div>
+            <div id="tabVendorRegister"   style="display:none;"></div>
+            <div id="quickAutoRegisterBox" style="display:none;"></div>
+
+            <!-- Admin Login Form -->
             <form id="loginForm">
-                <!-- Fast Google Auth Button -->
-                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom: 18px;">
-                    <span class="google-icon">G</span> الدخول السريع بحساب Google
+                <button type="button" class="btn-google-auth" onclick="signInWithGoogleVendor('login')" style="margin-bottom:18px;">
+                    <span class="google-icon">G</span> الدخول بحساب Google
                 </button>
-
                 <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
-
                 <div class="form-group">
-                    <label>البريد الإلكتروني</label>
-                    <input type="email" id="adminEmail" required placeholder="vendor@example.com">
+                    <label>البريد الإلكتروني للإدارة</label>
+                    <input type="email" id="adminEmail" required placeholder="admin@trexshopmax.com">
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
                     <input type="password" id="adminPassword" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn-login" id="loginBtn">
-                    تسجيل الدخول
-                </button>
-
-                <!-- Quick switch link -->
-                <p style="text-align: center; margin-top: 15px; color: #aaa; font-size: 13.5px;">
-                    ليس لديك حساب تاجر؟ <a href="#" onclick="switchAuthTab('register'); return false;" style="color: #FFD700; font-weight: bold; text-decoration: underline;">إنشاء حساب تاجر جديد 🚀</a>
+                <button type="submit" class="btn-login" id="loginBtn">تسجيل الدخول 🔑</button>
+                <p style="text-align:center;margin-top:15px;font-size:12px;color:#666;">
+                    تاجر؟ <a href="admin.html" style="color:#FFD700;text-decoration:underline;">لوحة التجار 🏪</a>
                 </p>
-
-                <p style="text-align:center; margin-top:12px; font-size:12px; color:#555;">
-    تاجر؟ <a href="admin.html" style="color:#FFD700; text-decoration:underline;">لوحة التجار 🏪</a>
-  </p>
-  <!-- Quick Auto Register button if login credentials fail -->
-                <div id="quickAutoRegisterBox" style="display:none; margin-top: 15px; text-align: center;">
-                    <p style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">لم نجد حساباً مسجلاً بهذا البريد!</p>
-                    <button type="button" class="btn-login" onclick="quickCreateVendorAccount()" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff; font-size: 0.95rem;">
-                        ⚡ إنشاء حساب كتاجر بهذا البريد فوراً
-                    </button>
-                </div>
             </form>
 
             <!-- Form 2: DISABLED IN SUPERADMIN - Register belongs in admin.html only -->
