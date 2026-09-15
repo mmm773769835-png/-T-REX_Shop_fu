@@ -898,8 +898,14 @@
                 const shopName = document.getElementById('regShopName').value.trim();
                 const phone = document.getElementById('regPhone').value.trim();
                 const country = document.getElementById('regCountry').value;
-                if (shopName) localStorage.setItem('pending_vendor_shop_name', shopName);
-                if (phone) localStorage.setItem('pending_vendor_phone', phone);
+                
+                if (!shopName || !phone) {
+                    alert('⚠️ يرجى تعبئة "اسم المتجر" و "رقم الهاتف" أولاً قبل التسجيل بواسطة Google لتكتمل بيانات حسابك التجاري.');
+                    return;
+                }
+                
+                localStorage.setItem('pending_vendor_shop_name', shopName);
+                localStorage.setItem('pending_vendor_phone', phone);
                 if (country) localStorage.setItem('pending_vendor_country', country);
             }
 
@@ -1206,11 +1212,26 @@
                     .eq('id', currentUser.id)
                     .single();
 
+                // Reject users who are not vendors/admins unless they are actively registering
+                if (profile && profile.role !== 'vendor' && profile.role !== 'admin' && !pendingShopName && !isAdminEmail) {
+                    await supabase.auth.signOut();
+                    alert('هذا الحساب مسجل كـ "زبون". يرجى التسجيل كتاجر جديد من تبويب "حساب تاجر جديد".');
+                    return;
+                }
+                
+                if (!profile && !pendingShopName && !isAdminEmail) {
+                    await supabase.auth.signOut();
+                    alert('لا يوجد حساب تاجر مرتبط بهذا البريد. يرجى إنشاء حساب تاجر جديد أولاً.');
+                    return;
+                }
+
                 if (!profile || pendingShopName || (isAdminEmail && profile?.role !== 'admin')) {
                     const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
-                    const targetRole = isAdminEmail ? 'admin' : (profile?.role || 'vendor');
+                    const targetRole = isAdminEmail ? 'admin' : 'vendor';
                     const newProfile = {
                         id: currentUser.id,
+                        email: currentUser.email,
+                        name: currentUser.user_metadata?.full_name || profile?.name || '',
                         role: targetRole,
                         shop_name: pendingShopName || profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
                         phone: pendingPhone || profile?.phone || '',
@@ -1225,6 +1246,13 @@
                     localStorage.removeItem('pending_vendor_shop_name');
                     localStorage.removeItem('pending_vendor_phone');
                     localStorage.removeItem('pending_vendor_country');
+                } else if (profile && (!profile.email || !profile.name)) {
+                    // Self-heal existing profiles that miss email or name
+                    const updatedEmail = profile.email || currentUser.email;
+                    const updatedName = profile.name || currentUser.user_metadata?.full_name || 'تاجر';
+                    await supabase.from('profiles').update({ email: updatedEmail, name: updatedName }).eq('id', profile.id);
+                    profile.email = updatedEmail;
+                    profile.name = updatedName;
                 }
 
                 currentVendor = profile;
