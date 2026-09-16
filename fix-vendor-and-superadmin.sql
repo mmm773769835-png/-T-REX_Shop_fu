@@ -79,4 +79,24 @@ CREATE POLICY "profiles_admin_all" ON public.profiles
   );
 
 -- 7. إعادة تحميل السكيما في Supabase
+-- 7. سياسات RLS لجدول المنتجات لتسمح للتجار والمسؤولين بقراءة وإضافة والتعديل على منتجاتهم
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "products_public_read" ON public.products;
+CREATE POLICY "products_public_read" ON public.products
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "products_authenticated_insert" ON public.products;
+CREATE POLICY "products_authenticated_insert" ON public.products
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS "products_authenticated_update" ON public.products;
+CREATE POLICY "products_authenticated_update" ON public.products
+  FOR UPDATE USING (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS "products_authenticated_delete" ON public.products;
+CREATE POLICY "products_authenticated_delete" ON public.products
+  FOR DELETE USING (auth.uid() IS NOT NULL);
+
+-- 8. إعادة تحميل السكيما في Supabase
 NOTIFY pgrst, 'reload schema';
