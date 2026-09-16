@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nsfwjs@2.4.2/dist/nsfwjs.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -858,6 +860,121 @@
     </div>
 
     <script>
+
+        // --- Adult & Explicit Image Moderation System ---
+        let nsfwModelPromise = null;
+        async function loadNsfwModel() {
+            if (!nsfwModelPromise && window.nsfwjs) {
+                try {
+                    nsfwModelPromise = window.nsfwjs.load();
+                } catch (e) {
+                    console.warn('NSFWJS Model Load Warning:', e);
+                }
+            }
+            return nsfwModelPromise;
+        }
+
+        async function scanImageSafety(fileOrUrl) {
+            return new Promise(async (resolve) => {
+                try {
+                    // Keyword check on filename or URL
+                    if (typeof fileOrUrl !== 'string' && fileOrUrl.name) {
+                        const lowerName = fileOrUrl.name.toLowerCase();
+                        const forbiddenKeywords = ['sex', 'porn', 'nude', 'nsfw', 'xxx', 'adult', 'erotic', 'naked', 'goddess', 'bikini', 'bra', 'lingerie', 'إباحي', 'جنس', 'عاري'];
+                        if (forbiddenKeywords.some(kw => lowerName.includes(kw))) {
+                            return resolve({ safe: false, reason: 'اسم الملف يحتوي على كلمات دليلية إباحية أو غير لائقة' });
+                        }
+                    } else if (typeof fileOrUrl === 'string') {
+                        const lowerUrl = fileOrUrl.toLowerCase();
+                        const forbiddenKeywords = ['sex', 'porn', 'nude', 'nsfw', 'xxx', 'adult', 'erotic', 'naked', 'bikini', 'bra', 'lingerie'];
+                        if (forbiddenKeywords.some(kw => lowerUrl.includes(kw))) {
+                            return resolve({ safe: false, reason: 'رابط الصورة يحتوي على كلمات غير لائقة' });
+                        }
+                    }
+
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    
+                    const src = typeof fileOrUrl === 'string' 
+                        ? fileOrUrl 
+                        : URL.createObjectURL(fileOrUrl);
+                        
+                    img.onload = async () => {
+                        try {
+                            // 1. TensorFlow AI Classification
+                            if (window.nsfwjs) {
+                                try {
+                                    const model = await loadNsfwModel();
+                                    if (model) {
+                                        const predictions = await model.classify(img);
+                                        const pornPred = predictions.find(p => p.className === 'Porn');
+                                        const hentaiPred = predictions.find(p => p.className === 'Hentai');
+                                        const sexyPred = predictions.find(p => p.className === 'Sexy');
+                                        
+                                        const pornScore = pornPred ? pornPred.probability : 0;
+                                        const hentaiScore = hentaiPred ? hentaiPred.probability : 0;
+                                        const sexyScore = sexyPred ? sexyPred.probability : 0;
+
+                                        if (pornScore > 0.40 || hentaiScore > 0.40 || sexyScore > 0.85) {
+                                            if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
+                                            return resolve({ safe: false, reason: 'تم اكتشاف محتوى غير لائق/إباحي بواسطة الذكاء الاصطناعي (NSFW Block)' });
+                                        }
+                                    }
+                                } catch (aiErr) {
+                                    console.warn('NSFW AI check skipped:', aiErr);
+                                }
+                            }
+
+                            // 2. High density skin pixel detection fallback
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = Math.min(img.width || 200, 200);
+                            canvas.height = Math.min(img.height || 200, 200);
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            
+                            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const pixels = imgData.data;
+                            let totalPixels = pixels.length / 4;
+                            let skinPixels = 0;
+
+                            for (let i = 0; i < pixels.length; i += 4) {
+                                const r = pixels[i];
+                                const g = pixels[i + 1];
+                                const b = pixels[i + 2];
+                                
+                                if (r > 95 && g > 40 && b > 20 && 
+                                    (Math.max(r, g, b) - Math.min(r, g, b) > 15) && 
+                                    Math.abs(r - g) > 15 && r > g && r > b) {
+                                    skinPixels++;
+                                }
+                            }
+
+                            const skinRatio = skinPixels / totalPixels;
+                            if (skinRatio > 0.70) {
+                                if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
+                                return resolve({ safe: false, reason: 'الصورة تحتوي على مساحات مكشوفة كبيرة غير ملائمة للمتجر' });
+                            }
+
+                            if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
+                            return resolve({ safe: true });
+                        } catch (e) {
+                            if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
+                            return resolve({ safe: true });
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
+                        return resolve({ safe: true });
+                    };
+                    
+                    img.src = src;
+                } catch (err) {
+                    return resolve({ safe: true });
+                }
+            });
+        }
+    
         // ==========================================
         // SUPABASE CONFIGURATION - Using Environment Variables
         // ==========================================
@@ -1800,6 +1917,11 @@
                     
                     if (fileInput && fileInput.files && fileInput.files[0]) {
                         const file = fileInput.files[0];
+                        const safetyCheck = await scanImageSafety(file);
+                        if (!safetyCheck.safe) {
+                            alert(`🚫 حظر أمني: الصورة رقم ${i} مرفوضة!\nالسبب: ${safetyCheck.reason}`);
+                            throw new Error(`حظر أمني للصورة ${i}: ${safetyCheck.reason}`);
+                        }
                         const ext = file.name.split('.').pop().toLowerCase();
                         const safeName = file.name
                             .replace(/[^\x20-\x7E]/g, '')
@@ -1820,6 +1942,11 @@
                         
                         imageUrls.push(publicUrl);
                     } else if (imageUrl) {
+                        const safetyCheck = await scanImageSafety(imageUrl);
+                        if (!safetyCheck.safe) {
+                            alert(`🚫 حظر أمني: رابط الصورة رقم ${i} غير لائق!\nالسبب: ${safetyCheck.reason}`);
+                            throw new Error(`حظر أمني لرابط الصورة ${i}`);
+                        }
                         imageUrls.push(imageUrl);
                     }
                 }

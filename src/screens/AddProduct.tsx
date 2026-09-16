@@ -1,3 +1,13 @@
+
+const checkMobileImageSafety = async (imageUri: string): Promise<{ safe: boolean; reason?: string }> => {
+  const lowerUri = imageUri.toLowerCase();
+  const forbiddenKeywords = ['sex', 'porn', 'nude', 'nsfw', 'xxx', 'adult', 'erotic', 'naked', 'bikini', 'bra', 'lingerie', 'إباحي', 'جنس', 'عاري'];
+  if (forbiddenKeywords.some(kw => lowerUri.includes(kw))) {
+    return { safe: false, reason: 'اسم أو مسار الصورة يحتوي على مصطلحات غير لائقة' };
+  }
+  return { safe: true };
+};
+
 import * as React from "react";
 import { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal, FlatList, Platform } from "react-native";
@@ -240,8 +250,22 @@ export default function AddProduct({ navigation, route }: any) {
     try {
       let imageUrls: string[] = [];
       
-      // رفع جميع الصور إذا كانت موجودة
+      // رفع جميع الصور إذا كانت موجودة بعد الفحص الأمني
       if (images.length > 0) {
+        for (let idx = 0; idx < images.length; idx++) {
+          const imageUri = images[idx];
+          const safety = await checkMobileImageSafety(imageUri);
+          if (!safety.safe) {
+            Alert.alert(
+              language === "ar" ? "حظر أمني 🚫" : "Security Block 🚫",
+              language === "ar"
+                ? `الصورة رقم ${idx + 1} مرفوضة لأنها تحتوي على محتوى غير لائق!`
+                : `Image #${idx + 1} is rejected due to inappropriate content!`
+            );
+            setLoading(false);
+            return;
+          }
+        }
         for (const imageUri of images) {
           const uploadedUrl = await uploadImage(imageUri);
           imageUrls.push(uploadedUrl);
