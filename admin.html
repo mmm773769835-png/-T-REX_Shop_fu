@@ -716,7 +716,7 @@
                     </div>
                     <div class="form-group">
                         <label>العملة</label>
-                        <select id="currency" style="width:100%; padding:15px; border:1px solid rgba(255,215,0,0.3); border-radius:10px; background:#0f0f0f; color:#fff;">
+                        <select id="currency" onchange="calculateCustomerPriceFromVendorPrice()" style="width:100%; padding:15px; border:1px solid rgba(255,215,0,0.3); border-radius:10px; background:#0f0f0f; color:#fff;">
                             <option value="YER">ريال يمني (YER)</option>
                             <option value="SAR">ريال سعودي (SAR)</option>
                             <option value="USD">دولار أمريكي (USD)</option>
@@ -1635,9 +1635,30 @@
         // ADD / EDIT PRODUCT
         // ==========================================
         
+                // ==========================================
+        // DYNAMIC TIERED PRICE & MARKUP CALCULATIONS
         // ==========================================
-        // DYNAMIC PRICE & MARKUP CALCULATIONS
-        // ==========================================
+        function getTieredMarkupPercent(vPrice, currency = 'YER') {
+            const price = parseFloat(vPrice) || 0;
+            if (price <= 0) return 10;
+
+            let yerEquiv = price;
+            const curr = (currency || 'YER').toUpperCase();
+            if (curr === 'SAR') {
+                yerEquiv = price * 140; // 1 SAR ≈ 140 YER
+            } else if (curr === 'USD') {
+                yerEquiv = price * 535; // 1 USD ≈ 535 YER
+            }
+
+            if (yerEquiv <= 5000) {
+                return 10; // 10% for 1 - 5,000 YER (or equivalent)
+            } else if (yerEquiv <= 100000) {
+                return 5;  // 5% for 5,001 - 100,000 YER (or equivalent)
+            } else {
+                return 3;  // 3% for > 100,000 YER up to 1,000,000 YER+
+            }
+        }
+
         function calculateCustomerPriceFromVendorPrice() {
             const vPriceInput = document.getElementById('productVendorPrice');
             const markupInput = document.getElementById('productMarkupPercent');
@@ -1647,18 +1668,23 @@
             const curr = currSelect ? currSelect.value : 'YER';
 
             const vPrice = parseFloat(vPriceInput ? vPriceInput.value : 0) || 0;
-            const markupPct = parseFloat(markupInput ? markupInput.value : 10) || 0;
 
             if (vPrice > 0) {
-                const cPrice = (vPrice * (1 + markupPct / 100)).toFixed(2);
+                const markupPct = getTieredMarkupPercent(vPrice, curr);
+                if (markupInput) markupInput.value = markupPct;
+
+                const cPrice = parseFloat((vPrice * (1 + markupPct / 100)).toFixed(2));
                 if (cPriceInput) cPriceInput.value = cPrice;
-                const markupAmt = (cPrice - vPrice).toFixed(2);
+                const markupAmt = parseFloat((cPrice - vPrice).toFixed(2));
 
                 if (badge) {
                     badge.textContent = `[ سعرك الصافي: ${vPrice} ${curr} | الزيادة فوق سعرك: +${markupAmt} ${curr} (${markupPct}%) | سعر الزبون المعروض بالمتجر: ${cPrice} ${curr} ]`;
                 }
-            } else if (badge) {
-                badge.textContent = `[ سعرك الصافي: 0 | الزيادة المضافة للزبون: +10% | سعر الزبون النهائي بالمتجر: 0 ]`;
+            } else {
+                if (markupInput) markupInput.value = 10;
+                if (badge) {
+                    badge.textContent = `[ سعرك الصافي: 0 | الزيادة المضافة للزبون: +10% | سعر الزبون النهائي بالمتجر: 0 ]`;
+                }
             }
         }
 
@@ -1671,12 +1697,26 @@
             const curr = currSelect ? currSelect.value : 'YER';
 
             const cPrice = parseFloat(cPriceInput ? cPriceInput.value : 0) || 0;
-            const markupPct = parseFloat(markupInput ? markupInput.value : 10) || 10;
 
             if (cPrice > 0) {
-                const vPrice = (cPrice / (1 + markupPct / 100)).toFixed(2);
+                let yerEquiv = cPrice;
+                if (curr === 'SAR') yerEquiv = cPrice * 140;
+                else if (curr === 'USD') yerEquiv = cPrice * 535;
+
+                let markupPct = 10;
+                if (yerEquiv <= 5500) {
+                    markupPct = 10;
+                } else if (yerEquiv <= 105000) {
+                    markupPct = 5;
+                } else {
+                    markupPct = 3;
+                }
+
+                if (markupInput) markupInput.value = markupPct;
+
+                const vPrice = parseFloat((cPrice / (1 + markupPct / 100)).toFixed(2));
                 if (vPriceInput) vPriceInput.value = vPrice;
-                const markupAmt = (cPrice - vPrice).toFixed(2);
+                const markupAmt = parseFloat((cPrice - vPrice).toFixed(2));
 
                 if (badge) {
                     badge.textContent = `[ سعرك الصافي: ${vPrice} ${curr} | الزيادة فوق سعرك: +${markupAmt} ${curr} (${markupPct}%) | سعر الزبون المعروض بالمتجر: ${cPrice} ${curr} ]`;
