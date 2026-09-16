@@ -1,9 +1,9 @@
 
 const checkMobileImageSafety = async (imageUri: string): Promise<{ safe: boolean; reason?: string }> => {
   const lowerUri = imageUri.toLowerCase();
-  const forbiddenKeywords = ['sex', 'porn', 'nude', 'nsfw', 'xxx', 'adult', 'erotic', 'naked', 'bikini', 'bra', 'lingerie', 'إباحي', 'جنس', 'عاري'];
+  const forbiddenKeywords = ['sex', 'porn', 'nude', 'nsfw', 'xxx', 'adult', 'erotic', 'naked', 'goddess', 'bikini', 'bra', 'lingerie', 'boobs', 'butt', 'ass', 'pussy', 'penis', 'breast', 'nipple', 'إباحي', 'جنس', 'عاري', 'مكشوف', 'سكس', 'بزاز'];
   if (forbiddenKeywords.some(kw => lowerUri.includes(kw))) {
-    return { safe: false, reason: 'اسم أو مسار الصورة يحتوي على مصطلحات غير لائقة' };
+    return { safe: false, reason: 'اسم أو مسار الصورة يحتوي على مصطلحات خادشة للحياء أو غير لائقة' };
   }
   return { safe: true };
 };
