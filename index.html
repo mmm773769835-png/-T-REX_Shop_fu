@@ -3879,8 +3879,15 @@
 `;
                 itemsList += `   ▫️ السعر: ${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity} = ${formatPrice(itemTotal, item.currency || 'SAR')}
 `;
+                itemsList += `   🔑 كود التاجر: ${item.vendor_code || 'VND-MAIN'}
+`;
                 itemsList += `   🔗 رابط المنتج: ${window.location.origin}/product/${item.id}
-
+`;
+                if (item.image_url || item.image) {
+                    itemsList += `   🖼️ صورة المنتج المباشرة (معاينة): ${item.image_url || item.image}
+`;
+                }
+                itemsList += `
 `;
             });
             
@@ -4634,7 +4641,7 @@
 
             modalBody.innerHTML = `
                 <div class="product-gallery">
-                    <img src="${mainImage}" alt="${product.name}" class="main-image" id="mainProductImage">
+                    <img src="${mainImage}" alt="${product.name}" class="main-image" id="mainProductImage" style="cursor:pointer;" onclick="window.open(this.src, '_blank')" title="اضغط لفتح الصورة مباشرة بحجمها الكامل 🖼️">
                     <div class="thumbnail-container">
                         ${thumbnails.map((thumb, index) => `
                             <img src="${thumb}" alt="${product.name} - ${index + 1}"
