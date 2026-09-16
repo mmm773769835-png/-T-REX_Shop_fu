@@ -320,6 +320,9 @@ const OrderConfirm = ({ route, navigation }: any) => {
         return cleanedItem;
       });
       
+      const primaryVendorCode = cleanedItems.find((i: any) => i.vendor_code)?.vendor_code || 'VND-MAIN';
+      const primaryVendorId = cleanedItems.find((i: any) => i.vendor_id)?.vendor_id || null;
+
       const orderData = {
         name,
         phone,
@@ -331,11 +334,21 @@ const OrderConfirm = ({ route, navigation }: any) => {
         shippingFee: null,
         shippingMethod: "distance_based",
         total: finalTotal,
+        vendor_code: primaryVendorCode,
+        vendor_id: primaryVendorId,
         createdAt: new Date().toISOString(),
       };
 
       const orderId = Date.now().toString();
       console.log('✅ OrderConfirm: بيانات الطلب جاهزة، ID:', orderId);
+
+      // حفظ الطلب في جدول orders بقاعدة البيانات Supabase
+      try {
+        await dbService.add('orders', orderData);
+        console.log('✅ OrderConfirm: تم حفظ الطلب بنجاح في قاعدة البيانات Supabase');
+      } catch (dbErr) {
+        console.warn('⚠️ OrderConfirm: لم يتم حفظ الطلب في قاعدة البيانات، المتابعة عبر الواتساب:', dbErr);
+      }
 
       // مسح السلة
       clearCart();

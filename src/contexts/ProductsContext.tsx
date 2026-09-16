@@ -10,6 +10,8 @@ export interface Product {
   image: string;
   category: string;
   attribute?: string;
+  vendor_code?: string;
+  vendor_id?: string;
   payment_method?: string;
   currency?: string;
   discount?: number;

@@ -28,9 +28,23 @@ export default function AddProduct({ navigation, route }: any) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showAttributeModal, setShowAttributeModal] = useState(false);
 
-  // حساب السعر النهائي المعروض للزبون (+10%)
+  // حساب نسبة فائدة المتجر والسعر النهائي بناءً على الشرائح التلقائية
+  const getTieredMarkupPercent = (vPrice: number, curr = 'YER') => {
+    if (vPrice <= 0) return 10;
+    let yerEquiv = vPrice;
+    const c = curr.toUpperCase();
+    if (c === 'SAR') yerEquiv = vPrice * 140;
+    else if (c === 'USD') yerEquiv = vPrice * 535;
+
+    if (yerEquiv <= 5000) return 10;
+    else if (yerEquiv <= 100000) return 5;
+    else return 3;
+  };
+
   const parsedVendorPrice = parseFloat(vendorPrice) || 0;
-  const finalPriceForCustomer = (parsedVendorPrice * 1.10).toFixed(2);
+  const currentMarkupPct = getTieredMarkupPercent(parsedVendorPrice, 'YER');
+  const finalPriceForCustomer = parseFloat((parsedVendorPrice * (1 + currentMarkupPct / 100)).toFixed(2));
+  const markupAmount = parseFloat((finalPriceForCustomer - parsedVendorPrice).toFixed(2));
 
   const pickImage = async () => {
     try {
@@ -193,7 +207,8 @@ export default function AddProduct({ navigation, route }: any) {
       return;
     }
 
-    const calculatedCustomerPrice = parseFloat((priceNum * 1.10).toFixed(2));
+    const markupPct = getTieredMarkupPercent(priceNum, 'YER');
+    const calculatedCustomerPrice = parseFloat((priceNum * (1 + markupPct / 100)).toFixed(2));
     
     if (!description.trim()) {
       Alert.alert(
@@ -369,18 +384,29 @@ export default function AddProduct({ navigation, route }: any) {
           maxLength={10}
         />
 
-        {/* بطاقة توضيح السعر والعمولة الشفافة للتاجر */}
+        {/* بطاقة توضيح السعر والشرائح التلقائية والعمولة الشفافة للتاجر */}
         {parsedVendorPrice > 0 && (
-          <View style={{ padding: 12, backgroundColor: '#f0f4ff', borderRadius: 8, borderWidth: 1, borderColor: '#3b82f6', marginBottom: 16 }}>
-            <Text style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 'bold', marginBottom: 4 }}>
-              💡 {language === 'ar' ? 'شفافية التسعير ورسوم المتجر:' : 'Pricing Transparency & Store Fees:'}
+          <View style={{ padding: 14, backgroundColor: '#f0f4ff', borderRadius: 10, borderWidth: 1.5, borderColor: '#3b82f6', marginBottom: 16 }}>
+            <Text style={{ fontSize: 13.5, color: '#1d4ed8', fontWeight: 'bold', marginBottom: 4 }}>
+              💡 {language === 'ar' ? 'شفافية التسعير ورسوم المتجر التلقائية:' : 'Pricing Transparency & Auto Store Fees:'}
             </Text>
             <Text style={{ fontSize: 13, color: '#1e3a8a' }}>
-              • {language === 'ar' ? `سعرك الصافي المحفوظ: ${parsedVendorPrice} د.ل` : `Your Saved Net Price: ${parsedVendorPrice}`}
+              • {language === 'ar' ? `سعرك الصافي المحفوظ (الذي تسستلمه): ${parsedVendorPrice} د.ل` : `Your Saved Net Price: ${parsedVendorPrice}`}
             </Text>
-            <Text style={{ fontSize: 13, color: '#1e3a8a', fontWeight: 'bold', marginTop: 2 }}>
-              • {language === 'ar' ? `السعر النهائي المعروض للزبون (+10% رسوم المتجر): ${finalPriceForCustomer} د.ل` : `Final Price for Customer (+10% store fee): ${finalPriceForCustomer}`}
+            <Text style={{ fontSize: 13, color: '#1e3a8a', marginTop: 2 }}>
+              • {language === 'ar' ? `شريحة زيادة المتجر التلقائية: +${currentMarkupPct}% (+${markupAmount} د.ل)` : `Auto Store Markup: +${currentMarkupPct}%`}
             </Text>
+            <Text style={{ fontSize: 13, color: '#1e3a8a', fontWeight: 'bold', marginTop: 4 }}>
+              • {language === 'ar' ? `السعر النهائي المعروض للزبون بالمتجر: ${finalPriceForCustomer} د.ل` : `Final Price for Customer: ${finalPriceForCustomer}`}
+            </Text>
+            <View style={{ marginTop: 8, padding: 8, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 6 }}>
+              <Text style={{ fontSize: 11.5, color: '#555', fontWeight: 'bold' }}>
+                📊 {language === 'ar' ? 'شرائح زيادة المتجر التلقائية:' : 'Auto Fee Tiers:'}
+              </Text>
+              <Text style={{ fontSize: 11, color: '#666' }}>
+                • 1 - 5,000 ر.ي (أو ما يعادلها): 10% | • 5,001 - 100,000 ر.ي: 5% | • أكثر من 100,000 ر.ي: 3%
+              </Text>
+            </View>
           </View>
         )}
 

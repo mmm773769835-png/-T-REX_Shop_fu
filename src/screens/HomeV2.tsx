@@ -76,6 +76,8 @@ interface Product {
   is_new?: boolean;
   stock?: number;
   attribute?: string;
+  vendor_code?: string;
+  vendor_id?: string;
 }
 
 interface RouteParams {
@@ -275,7 +277,9 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 old_price: item.old_price || item.original_price || null,
                 is_new: item.is_new || false,
                 stock: item.stock ?? item.quantity ?? null,
-                attribute: item.attribute || item.status || ""
+                attribute: item.attribute || item.status || "",
+                vendor_code: item.vendor_code || "VND-MAIN",
+                vendor_id: item.vendor_id || null
               });
             } else {
               console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", item.id, item);

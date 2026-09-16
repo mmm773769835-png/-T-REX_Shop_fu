@@ -15,6 +15,8 @@ interface Product {
   images?: string[];
   category?: string;
   attribute?: string;
+  vendor_code?: string;
+  vendor_id?: string;
   currency?: string;
   old_price?: number;
   originalPrice?: number;

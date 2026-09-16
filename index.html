@@ -3869,15 +3869,19 @@
             // Calculate total
             let totalSar = 0;
             let itemsList = '';
-            cart.forEach(item => {
+            cart.forEach((item, idx) => {
                 const itemTotal = item.price * item.quantity;
                 totalSar += toSar(itemTotal, item.currency || 'SAR');
-                itemsList += `📦 ${item.name} - ${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity} = ${formatPrice(itemTotal, item.currency || 'SAR')}\n`;
-                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/product/${item.id}\n`;
-                if (item.image_url) {
-                    itemsList += `   🖼️ صورة المنتج: ${item.image_url}\n`;
-                }
-                itemsList += `\n`;
+                const vCode = item.vendor_code || 'VND-MAIN';
+                itemsList += `${idx + 1}. 📦 *${item.name}*
+`;
+                itemsList += `   ▫️ كود التاجر: \`${vCode}\`
+`;
+                itemsList += `   ▫️ السعر: ${formatPrice(item.price, item.currency || 'SAR')} × ${item.quantity} = ${formatPrice(itemTotal, item.currency || 'SAR')}
+`;
+                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/product/${item.id}
+
+`;
             });
             
             // Build WhatsApp message
@@ -4339,6 +4343,50 @@
         }
 
         // Order Modal Functions
+        
+        // Country Phone Prefix Mapping
+        const COUNTRY_PHONE_CODES = {
+            'اليمن': '+967',
+            'السعودية': '+966',
+            'الإمارات': '+971',
+            'الكويت': '+965',
+            'قطر': '+974',
+            'البحرين': '+973',
+            'عمان': '+968',
+            'مصر': '+20',
+            'الأردن': '+962',
+            'لبنان': '+961',
+            'العراق': '+964',
+            'سوريا': '+963',
+            'السودان': '+249',
+            'المغرب': '+212',
+            'تونس': '+216',
+            'الجزائر': '+213',
+            'ليبيا': '+218',
+            'الولايات المتحدة': '+1',
+            'المملكة المتحدة': '+44',
+            'كندا': '+1',
+            'أستراليا': '+61',
+            'ألمانيا': '+49',
+            'فرنسا': '+33',
+            'تركيا': '+90'
+        };
+
+        function updatePhoneCountryCode(countryName, inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const code = COUNTRY_PHONE_CODES[countryName] || '';
+            if (code && !input.value.startsWith(code)) {
+                input.value = code + ' ';
+            }
+        }
+
+        function buyNowDirectly(product) {
+            currentProduct = product;
+            currentQuantity = 1;
+            openOrderModal();
+        }
+
         function openOrderModal() {
             if (!currentProduct) return;
             
@@ -4378,8 +4426,10 @@
             const total = currentProduct.price * currentQuantity;
             
             // Build WhatsApp message
+            const vendorCodeDisplay = currentProduct.vendor_code || 'VND-MAIN';
             let message = `🛍️ *طلب جديد من T-REX Shop* 🦖\n\n`;
             message += `📦 *المنتج:* ${currentProduct.name}\n`;
+            message += `🏪 *كود التاجر:* \`${vendorCodeDisplay}\`\n`;
             message += `💰 *السعر:* ${formatPrice(currentProduct.price, currentProduct.currency || 'SAR')}\n`;
             message += `📊 *الكمية:* ${currentQuantity}\n`;
             message += `💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}\n\n`;
@@ -4633,7 +4683,7 @@
                             
                             <div class="form-group" style="margin-bottom: 12px;">
                                 <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-globe"></i> الدولة *</label>
-                                <select id="quickCustomerCountry" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
+                                <select id="quickCustomerCountry" required onchange="updatePhoneCountryCode(this.value, 'quickCustomerPhone')" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
                                     <option value="">اختر الدولة</option>
                                     <option value="اليمن">اليمن 🇾🇪</option>
                                     <option value="السعودية">السعودية 🇸🇦</option>
@@ -4923,6 +4973,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             </div>
                             <h3 class="product-name" itemprop="name">${product.name}</h3>
                             <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
+                            <p class="product-vendor-badge" style="font-size: 11.5px; color: #17a2b8; font-weight: bold; margin: 2px 0 4px 0; background: rgba(23,162,184,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block;">
+                                <i class="fas fa-store" style="color: #FFD700;"></i> كود التاجر: ${product.vendor_code || 'VND-MAIN'}
+                            </p>
                             <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
                                 <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: ${product.address || product.country || 'اليمن 🇾🇪'}
                             </p>
@@ -5991,7 +6044,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 <div class="form-group">
                     <label><i class="fas fa-globe"></i> الدولة *</label>
-                    <select id="customerCountry" required>
+                    <select id="customerCountry" required onchange="updatePhoneCountryCode(this.value, 'customerPhone')">
                         <option value="">اختر الدولة</option>
                         <option value="اليمن">اليمن 🇾🇪</option>
                         <option value="السعودية">السعودية 🇸🇦</option>
@@ -6072,7 +6125,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 <div class="form-group">
                     <label><i class="fas fa-globe"></i> الدولة *</label>
-                    <select id="cartCustomerCountry" required>
+                    <select id="cartCustomerCountry" required onchange="updatePhoneCountryCode(this.value, 'cartCustomerPhone')">
                         <option value="">اختر الدولة</option>
                         <option value="اليمن">اليمن 🇾🇪</option>
                         <option value="السعودية">السعودية 🇸🇦</option>
