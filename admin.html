@@ -775,6 +775,10 @@
                 
                 <div class="form-group">
                     <label>صور المنتج (1-3 صور)</label>
+                    <div style="background: rgba(220, 53, 69, 0.15); border: 1.5px dashed #ff4444; border-radius: 10px; padding: 12px; margin-bottom: 15px; color: #ff9999; font-size: 13px; line-height: 1.6;">
+                        <strong style="color: #ff4444; font-size: 14px; display: block; margin-bottom: 4px;">⚖️ تحذير أمني وقانوني صارم:</strong>
+                        يُمنع منعاً باتاً رفع أو محاولة رفع أي صور غير لائقة أو إباحية. أي محاولة تضع صاحب الحساب تحت المساءلة والملاحقة القانونية المباشرة وحظر الحساب فوراً.
+                    </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
                         <div class="image-upload-box">
                             <label style="font-size: 12px; color: #aaa; margin-bottom: 5px; display: block;">الصورة الرئيسية *</label>
@@ -1919,7 +1923,7 @@
                         const file = fileInput.files[0];
                         const safetyCheck = await scanImageSafety(file);
                         if (!safetyCheck.safe) {
-                            alert(`🚫 حظر أمني: الصورة رقم ${i} مرفوضة!\nالسبب: ${safetyCheck.reason}`);
+                            alert(`🚨 تحذير أمني وقانوني شديد 🚨\n\nتم كشف وإيقاف محاولة رفع صورة غير لائقة!\n\n⚖️ تنبيه قانوني صارم:\nرفع أو محاولة رفع أي صور غير لائقة أو إباحية يمثل مخالفة صريحة وستخضع فوراً للعقاب والملاحقة القانونية المباشرة، بالإضافة إلى حظر حسابك وجهازك نهائياً من منصة T-REX Shop!\n\nالسبب: ${safetyCheck.reason}`);
                             throw new Error(`حظر أمني للصورة ${i}: ${safetyCheck.reason}`);
                         }
                         const ext = file.name.split('.').pop().toLowerCase();
@@ -1944,7 +1948,7 @@
                     } else if (imageUrl) {
                         const safetyCheck = await scanImageSafety(imageUrl);
                         if (!safetyCheck.safe) {
-                            alert(`🚫 حظر أمني: رابط الصورة رقم ${i} غير لائق!\nالسبب: ${safetyCheck.reason}`);
+                            alert(`🚨 تحذير أمني وقانوني شديد 🚨\n\nتم كشف وإيقاف محاولة رفع صورة غير لائقة!\n\n⚖️ تنبيه قانوني صارم:\nرفع أو محاولة رفع أي صور غير لائقة أو إباحية يمثل مخالفة صريحة وستخضع فوراً للعقاب والملاحقة القانونية المباشرة، بالإضافة إلى حظر حسابك وجهازك نهائياً من منصة T-REX Shop!\n\nالسبب: ${safetyCheck.reason}`);
                             throw new Error(`حظر أمني لرابط الصورة ${i}`);
                         }
                         imageUrls.push(imageUrl);

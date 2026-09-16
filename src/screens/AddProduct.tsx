@@ -257,10 +257,15 @@ export default function AddProduct({ navigation, route }: any) {
           const safety = await checkMobileImageSafety(imageUri);
           if (!safety.safe) {
             Alert.alert(
-              language === "ar" ? "حظر أمني 🚫" : "Security Block 🚫",
+              language === "ar" ? "🚨 تحذير أمني وقانوني شديد 🚨" : "🚨 Legal & Security Warning 🚨",
               language === "ar"
-                ? `الصورة رقم ${idx + 1} مرفوضة لأنها تحتوي على محتوى غير لائق!`
-                : `Image #${idx + 1} is rejected due to inappropriate content!`
+                ? `تم كشف وإيقاف محاولة رفع صورة غير لائقة!
+
+⚖️ تنبيه قانوني صارم:
+رفع أو محاولة رفع أي صور غير لائقة أو إباحية يمثل مخالفة صريحة وسيخضع صاحب الحساب فوراً للعقاب والملاحقة القانونية المباشرة وحظر الحساب والجهاز نهائياً!
+
+السبب: الصورة رقم ${idx + 1} غير ملائمة.`
+                : `Attempting or uploading inappropriate or explicit images is strictly prohibited and subject to immediate legal prosecution and permanent ban!`
             );
             setLoading(false);
             return;
