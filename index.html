@@ -3588,7 +3588,8 @@
                     if (currentCurrency.code !== 'YER') {
                         currentCurrency.rate = getSellRate(currentCurrency.code);
                         localStorage.setItem('currency', JSON.stringify(currentCurrency));
-                        renderProducts();
+                        registerProductsToMap(allProducts);
+                renderProducts();
                         updateCartDisplay();
                     }
                 } else {
@@ -3629,7 +3630,8 @@
             document.getElementById('currentCurrency').textContent = symbol;
             document.getElementById('currencyDropdown').classList.remove('show');
             localStorage.setItem('currency', JSON.stringify(currentCurrency));
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             renderFeatured(allProducts);
             updateCartDisplay();
         }
@@ -3940,7 +3942,8 @@
             }
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
             updateWishlistCount();
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
         }
 
         function getWishlistProducts() {
@@ -4004,7 +4007,8 @@
             wishlist = wishlist.filter(id => String(id) !== String(productId));
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
             updateWishlistCount();
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             openWishlistModal();
             showNotification('تم إزالة المنتج من المفضلة 💔');
         }
@@ -4035,7 +4039,8 @@
             wishlist = [];
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
             updateWishlistCount();
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
 
             closeModal();
             openCartOrderModal();
@@ -4057,7 +4062,8 @@
                 showNotification('تم إضافة المنتج للمقارنة 📊');
             }
             localStorage.setItem('compare', JSON.stringify(compareList));
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
         }
 
         // Notification System - Enhanced
@@ -4153,7 +4159,8 @@
             if (dropdown) {
                 dropdown.classList.remove('active');
             }
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -4178,7 +4185,8 @@
             filteredProducts = allProducts.filter(product =>
                 getSearchableText(product).includes(query)
             );
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             
             // Scroll to products
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
@@ -4269,7 +4277,8 @@
             openQuickView(product);
             const similarProducts = getSimilarProducts(product);
             filteredProducts = similarProducts.length ? [product, ...similarProducts] : [product];
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
             showNotification(`تم عرض المنتج والمنتجات المشابهة (${filteredProducts.length}) ✅`);
         }
@@ -4310,7 +4319,8 @@
             } else {
                 filteredProducts = allProducts.filter(product => product.category === category);
             }
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
             document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -4322,7 +4332,8 @@
             filteredProducts = allProducts.filter(product => 
                 product.price >= min && product.price <= max
             );
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
         }
 
         // Sort Products
@@ -4346,7 +4357,8 @@
                 default:
                     filteredProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             }
-            renderProducts();
+            registerProductsToMap(allProducts);
+                renderProducts();
         }
 
         // Order Modal Functions
@@ -4598,7 +4610,8 @@
                         product.review_count = reviews.length;
                         product.reviews_count = reviews.length;
                     }
-                    renderProducts();
+                    registerProductsToMap(allProducts);
+                renderProducts();
                     renderFeatured(allProducts);
                 }
                 nameInput.value = '';
@@ -4995,12 +5008,12 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             <p class="product-price" itemprop="price">${formatPrice(product.price, product.currency || 'SAR')}</p>
                             <div class="card-actions">
                                 <button class="add-to-cart" 
-                                        onclick="event.stopPropagation(); addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                                        onclick="event.stopPropagation(); addToCartById('${product.id}')"
                                         aria-label="أضف ${product.name} للسلة">
                                     <i class="fas fa-cart-plus"></i> أضف للسلة
                                 </button>
                                 <button class="btn-buy-now" 
-                                        onclick="event.stopPropagation(); openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                                        onclick="event.stopPropagation(); openQuickViewById('${product.id}')"
                                         aria-label="اشتري ${product.name} الآن">
                                     <i class="fab fa-whatsapp"></i> اشتري الآن
                                 </button>
@@ -5011,16 +5024,16 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 <i class="fas fa-share-alt"></i> مشاركة المنتج
                             </button>
                             <div class="product-card-share">
-                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
+                                <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProductById('${product.id}', 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
                                     <i class="fab fa-whatsapp"></i><span>واتساب</span>
                                 </button>
-                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
+                                <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProductById('${product.id}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
                                     <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                                 </button>
-                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${productId}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
+                                <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProductById('${product.id}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
                                     <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                                 </button>
-                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLink('${window.location.origin}/product/${productId}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                                <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLinkById('${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                     <i class="fas fa-copy"></i><span>نسخ</span>
                                 </button>
                             </div>
@@ -5111,6 +5124,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 allProducts = products || [];
                 filteredProducts = [...allProducts];
                 
+                registerProductsToMap(allProducts);
                 renderProducts();
                 renderFeatured(allProducts);
                 updateCartDisplay();
@@ -5663,6 +5677,92 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // ============================================
         // Social Sharing
         // ============================================
+        
+        // ============================================
+        // Product Action & Rich Sharing Helpers
+        // ============================================
+        window.productsMap = {};
+
+        function registerProductsToMap(products) {
+            if (!products || !Array.isArray(products)) return;
+            products.forEach(p => {
+                if (p && p.id != null) {
+                    window.productsMap[String(p.id)] = p;
+                }
+            });
+        }
+
+        function openQuickViewById(id) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            if (product) {
+                openQuickView(product);
+            } else {
+                console.warn('Product not found for ID:', id);
+            }
+        }
+
+        function addToCartById(id) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            if (product) {
+                addToCart(product);
+            }
+        }
+
+        function shareProductById(id, platform) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            const baseUrl = `${window.location.origin}/?product=${id}`;
+            
+            if (!product) {
+                shareProduct('منتج T-REX Shop', baseUrl, platform);
+                return;
+            }
+
+            const imgUrl = product.image_url || (product.images && product.images[0]) || '';
+            const formattedPrice = formatPrice(product.price, product.currency || 'SAR');
+
+            let messageText = `🦖 *${product.name}* - T-REX Shop\n`;
+            messageText += `💰 *السعر:* ${formattedPrice}\n`;
+            if (product.vendor_code) {
+                messageText += `🔑 *كود التاجر:* ${product.vendor_code}\n`;
+            }
+            if (imgUrl) {
+                messageText += `🖼️ *صورة المنتج:* ${imgUrl}\n`;
+            }
+            messageText += `🔗 *رابط التفاصيل والشراء المباشر:*\n${baseUrl}`;
+
+            const textEncoded = encodeURIComponent(messageText);
+            const urlEncoded = encodeURIComponent(baseUrl);
+
+            let shareUrl = '';
+            switch (platform) {
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${textEncoded}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`🦖 ${product.name} - ${formattedPrice}`)}&url=${urlEncoded}`;
+                    break;
+            }
+
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            }
+        }
+
+        function copyProductLinkById(id) {
+            const baseUrl = `${window.location.origin}/?product=${id}`;
+            navigator.clipboard.writeText(baseUrl).then(() => {
+                showNotification('تم نسخ رابط المنتج المباشر بنجاح! 📋');
+            }).catch(() => {
+                showNotification('تعذر نسخ الرابط تلقائياً! ❌');
+            });
+        }
+    
         function shareProduct(productName, productUrl, platform) {
             const url = encodeURIComponent(productUrl || window.location.href);
             const text = encodeURIComponent(`شاهد هذا المنتج: ${productName} من T-REX Shop!`);
