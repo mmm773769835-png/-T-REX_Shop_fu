@@ -361,24 +361,39 @@
             cursor: pointer;
             box-sizing: border-box;
         }
+        .header-icon-btn i {
+            color: #ffffff;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+        .notif-header-btn i {
+            color: #FFD700 !important;
+        }
+        .wishlist-header-btn i {
+            color: #ff4757 !important;
+        }
+        .cart-header-btn i {
+            color: #2ed573 !important;
+        }
         .header-icon-btn:hover {
             transform: translateY(-2px);
             background: rgba(255, 215, 0, 0.2);
             border-color: #FFD700;
-            color: #FFD700 !important;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .header-icon-btn:hover i {
+            transform: scale(1.15);
         }
         .wishlist-header-btn:hover {
             border-color: #ff4757;
             background: rgba(255, 71, 87, 0.15);
             box-shadow: 0 4px 15px rgba(255, 71, 87, 0.35);
         }
-        .wishlist-header-btn:hover i {
-            color: #ff4757;
-        }
         .cart-header-btn:hover {
-            border-color: #FFD700;
-            background: rgba(255, 215, 0, 0.2);
+            border-color: #2ed573;
+            background: rgba(46, 213, 115, 0.15);
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.35);
         }
 
         .cart-count {
@@ -408,18 +423,27 @@
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.08) !important;
             color: #FFD700 !important;
-            border: 1px solid rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3) !important;
             cursor: pointer;
             font-size: 17px;
             transition: all 0.25s ease;
+            box-shadow: none !important;
+        }
+        .settings-btn i {
+            color: #FFD700 !important;
+            font-size: 18px !important;
+            line-height: 1;
         }
         .settings-btn:hover {
-            transform: rotate(45deg) scale(1.05);
+            transform: rotate(45deg) scale(1.05) !important;
             background: #FFD700 !important;
+            border-color: #FFD700 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5) !important;
+        }
+        .settings-btn:hover i {
             color: #111 !important;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
 
         /* Unified Auth Button & Dual Dropdown */
@@ -1749,34 +1773,7 @@
             text-align: center;
             padding: 12px;
         }
-        .settings-btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-            border: 2px solid rgba(255,255,255,0.9) !important;
-            color: var(--dark) !important;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.55) !important;
-        }
-        .settings-btn:hover {
-            background: #ffffff !important;
-            color: var(--dark) !important;
-        }
-        .header-actions .cart-btn,
-        .header-actions .settings-btn,
-        .header-actions .login-btn,
-        .header-actions .currency-btn {
-            min-height: 42px;
-            border: 2px solid rgba(255,255,255,0.75);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.38);
-        }
-        .header-actions .cart-btn i,
-        .header-actions .settings-btn i {
-            text-shadow: 0 2px 5px rgba(0,0,0,0.45);
-        }
-        .header-actions .cart-btn:hover,
-        .header-actions .settings-btn:hover,
-        .header-actions .login-btn:hover,
-        .header-actions .currency-btn:hover {
-            transform: translateY(-2px);
-        }
+
         @keyframes heartBeat {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.3); }
