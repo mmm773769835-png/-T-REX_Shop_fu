@@ -1,4 +1,4 @@
-﻿-- ================================================================
+-- ================================================================
 -- T-REX Shop: إضافة جميع الأعمدة المطلوبة لجدول profiles و products
 -- نفِّذ هذا السكريبت كاملاً في Supabase → SQL Editor
 -- ================================================================
@@ -132,7 +132,11 @@ CREATE POLICY "products_vendor_delete" ON public.products
 -- 8. تحديث حسابات الأدمن القديمة تلقائياً
 UPDATE public.profiles
 SET role = 'admin', shop_name = COALESCE(shop_name, 'الإدارة الرئيسية T-REX'), vendor_code = 'VND-MAIN'
-WHERE email IN ('mmm773769835@gmail.com', 'trexshopmax@gmail.com');
+WHERE email = 'mmm773769835@gmail.com';
+
+UPDATE public.profiles
+SET role = 'admin', shop_name = COALESCE(shop_name, 'الإدارة الرئيسية T-REX'), vendor_code = 'VND-ADMIN2'
+WHERE email = 'trexshopmax@gmail.com';
 
 -- 9. إعادة تحميل السكيما
 NOTIFY pgrst, 'reload schema';
