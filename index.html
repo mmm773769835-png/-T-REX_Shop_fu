@@ -322,7 +322,7 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             position: relative;
             z-index: 10001;
         }
@@ -331,59 +331,295 @@
             text-decoration: none;
             font-weight: 600;
         }
-        .cart-btn {
+
+        /* Icon Group Toolbar (Notifications, Wishlist, Cart) */
+        .header-icon-group {
             display: flex;
             align-items: center;
             gap: 8px;
-            text-decoration: none;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--dark) !important;
-            padding: 10px 20px;
-            border-radius: 25px;
-            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.25);
         }
-        .wishlist-header-btn {
-            background: #fff;
-            color: #e6003c !important;
-            min-width: 46px;
-            width: 46px;
-            height: 46px;
-            padding: 0;
-            border: 2px solid #ff416c;
-            box-shadow: 0 10px 24px rgba(255, 65, 108, 0.32), inset 0 2px 4px rgba(255,255,255,0.85);
+
+        .header-icon-btn {
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            overflow: visible;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff !important;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-size: 17px;
+            cursor: pointer;
+            box-sizing: border-box;
         }
-        .wishlist-header-btn i {
-            font-size: 22px;
-            color: #e6003c;
-            filter: drop-shadow(0 2px 3px rgba(230,0,60,0.25));
+        .header-icon-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            color: #FFD700 !important;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
-        .wishlist-heart-symbol {
-            color: #e6003c;
-            font-size: 27px;
-            line-height: 1;
-            font-family: Arial, sans-serif;
-            font-weight: 900;
-            transform: translateY(1px);
-            text-shadow: 0 2px 4px rgba(230,0,60,0.22);
+        .wishlist-header-btn:hover {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.15);
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.35);
         }
+        .wishlist-header-btn:hover i {
+            color: #ff4757;
+        }
+        .cart-header-btn:hover {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+
         .cart-count {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff4444;
+            top: -6px;
+            right: -6px;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
             color: white;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            font-size: 12px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 4px;
+            border-radius: 10px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 2px solid #111;
             font-weight: 900;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Settings Gear Button */
+        .settings-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFD700 !important;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            cursor: pointer;
+            font-size: 17px;
+            transition: all 0.25s ease;
+        }
+        .settings-btn:hover {
+            transform: rotate(45deg) scale(1.05);
+            background: #FFD700 !important;
+            color: #111 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Unified Auth Button & Dual Dropdown */
+        .guest-auth-wrapper {
+            position: relative;
+        }
+        .unified-login-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #111 !important;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .unified-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            filter: brightness(1.05);
+        }
+        .unified-login-btn .arrow-icon {
+            font-size: 11px;
+            transition: transform 0.3s ease;
+        }
+        .guest-auth-wrapper.open .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .auth-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            width: 310px;
+            background: rgba(18, 20, 29, 0.98);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.15);
+            padding: 16px;
+            display: none;
+            z-index: 10005;
+            animation: fadeInDropdown 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .auth-dropdown-menu.show {
+            display: block;
+        }
+
+        @keyframes fadeInDropdown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-dropdown-header {
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .auth-dropdown-header h4 {
+            font-size: 15px;
+            color: #FFD700;
+            margin-bottom: 4px;
+            font-weight: 800;
+        }
+        .auth-dropdown-header p {
+            font-size: 12px;
+            color: #aaa;
+            margin: 0;
+        }
+
+        .auth-dropdown-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .auth-drop-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-align: right;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .customer-drop-btn {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            color: #fff;
+        }
+        .customer-drop-btn:hover {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #111;
+            transform: translateX(-3px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.35);
+        }
+        .customer-drop-btn:hover .auth-btn-icon {
+            background: rgba(0, 0, 0, 0.15);
+            color: #111;
+        }
+
+        .merchant-drop-btn {
+            background: rgba(40, 167, 69, 0.12);
+            border-color: rgba(40, 167, 69, 0.35);
+            color: #fff;
+        }
+        .merchant-drop-btn:hover {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: #fff;
+            transform: translateX(-3px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        .merchant-drop-btn:hover .auth-btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .auth-btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .customer-drop-btn .auth-btn-icon { color: #FFD700; }
+        .merchant-drop-btn .auth-btn-icon { color: #28a745; }
+
+        .auth-btn-text {
+            flex: 1;
+        }
+        .auth-btn-title {
+            display: block;
+            font-weight: 700;
+            font-size: 13.5px;
+            line-height: 1.2;
+        }
+        .auth-btn-desc {
+            display: block;
+            font-size: 11px;
+            opacity: 0.75;
+            margin-top: 3px;
+        }
+        .arrow-indicator {
+            font-size: 12px;
+            opacity: 0.6;
+            transition: transform 0.2s ease;
+        }
+        .auth-drop-btn:hover .arrow-indicator {
+            transform: translateX(-3px);
+            opacity: 1;
+        }
+
+        /* Password Field Eye Toggle Styling */
+        .password-field-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .password-field-wrapper input {
+            width: 100%;
+            padding-left: 45px !important;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            left: 12px;
+            background: transparent;
+            border: none;
+            color: #FFD700;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 5;
+            outline: none;
+        }
+        .password-toggle-btn:hover {
+            color: #fff;
+            transform: scale(1.15);
         }
         /* Hero Section */
         .hero {
@@ -2603,18 +2839,16 @@
             .trex-emoji { font-size: 18px; }
             .logo { gap: 8px; }
             .header-content { padding: 0 10px; }
-            .header-actions { gap: 4px; }
+            .header-actions { gap: 6px; }
             .currency-btn { padding: 5px 8px; font-size: 12px; }
             .currency-btn i { display: none; }
-            .settings-btn { width: 30px; height: 30px; font-size: 13px; margin-right: 0; }
-            .login-btn { padding: 7px 10px; font-size: 12px; min-width: 36px; }
-            .login-btn span { display: none; }
-            .vendor-login-btn { padding: 7px 10px; font-size: 12px; }
-            .google-mark { display: inline-flex !important; width: 20px; height: 20px; font-size: 14px; }
-            .cart-btn { width: 34px; height: 34px; min-width: 34px; padding: 0; justify-content: center; font-size: 14px; }
+            .settings-btn { width: 34px; height: 34px; font-size: 14px; }
+            .header-icon-btn { width: 34px; height: 34px; font-size: 14px; }
+            .unified-login-btn { padding: 7px 12px; font-size: 12.5px; gap: 4px; }
+            .auth-dropdown-menu { width: 280px; left: -20px; }
             .user-auth { margin-left: 0; }
             .user-avatar { width: 32px; height: 32px; }
-            .cart-count { width: 18px; height: 18px; font-size: 10px; top: -5px; right: -5px; }
+            .cart-count { min-width: 17px; height: 17px; font-size: 10px; top: -5px; right: -5px; }
             .footer-links { gap: 10px; font-size: 13px; }
             .copyright { font-size: 12px; }
             .cart-items { padding: 12px; }
@@ -2942,14 +3176,13 @@
             <nav class="nav-links">
                 <a href="/">الرئيسية</a>
                 <a href="#products">المنتجات</a>
-                <a href="/admin.html" class="nav-vendor-link"><i class="fas fa-store"></i> دخول التاجر</a>
             </nav>
 
-            <!-- Header Actions - Always visible -->
+            <!-- Header Actions - Organized Toolbar -->
             <div class="header-actions">
                 <!-- Currency Selector -->
                 <div class="currency-selector">
-                    <button class="currency-btn" onclick="toggleCurrency()">
+                    <button class="currency-btn" onclick="toggleCurrency()" title="اختيار العملة">
                         <span id="currentCurrency">🇸🇦 ر.س</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
@@ -2981,27 +3214,71 @@
                     </div>
                 </div>
 
-                <!-- Settings Gear -->
+                <!-- Settings Gear Icon -->
                 <button class="settings-btn" onclick="openSettings()" title="الإعدادات" aria-label="الإعدادات">
                     <i class="fas fa-cog"></i>
                 </button>
 
-                <!-- Wishlist -->
-                <a href="#" class="cart-btn wishlist-header-btn" onclick="openWishlistModal(); return false;" title="المفضلة" aria-label="المفضلة">
-                    <span class="wishlist-heart-symbol" aria-hidden="true">♥</span>
-                    <span class="cart-count" id="wishlistCount" data-count="0">0</span>
-                </a>
-
-                <!-- Vendor Auth Button -->
-                <a href="/admin.html" class="vendor-login-btn" title="دخول الموردين والتاجر">
-                    <i class="fas fa-store"></i> <span>دخول تاجر</span>
-                </a>
-
-                <!-- User Auth -->
-                <div class="user-auth" id="userAuth">
-                    <button class="login-btn" onclick="signInWithGoogle()" id="loginBtn">
-                        <span class="google-mark">G</span> <span>تسجيل الدخول</span>
+                <!-- Icon Group: Notifications, Wishlist, Cart side-by-side -->
+                <div class="header-icon-group">
+                    <!-- Notifications Button -->
+                    <button class="header-icon-btn notif-header-btn" onclick="openSettings()" title="الإشعارات" aria-label="الإشعارات">
+                        <i class="fas fa-bell"></i>
+                        <span class="cart-count notif-badge" id="notifCount">0</span>
                     </button>
+
+                    <!-- Wishlist Button -->
+                    <a href="#" class="header-icon-btn wishlist-header-btn" onclick="openWishlistModal(); return false;" title="المفضلة" aria-label="المفضلة">
+                        <i class="fas fa-heart"></i>
+                        <span class="cart-count" id="wishlistCount" data-count="0">0</span>
+                    </a>
+
+                    <!-- Cart Button -->
+                    <a href="#" class="header-icon-btn cart-header-btn" onclick="toggleCart(); return false;" title="سلة التسوق" aria-label="سلة التسوق">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount" data-count="0">0</span>
+                    </a>
+                </div>
+
+                <!-- Unified User Auth Dropdown -->
+                <div class="user-auth" id="userAuth">
+                    <div class="guest-auth-wrapper" id="guestAuthWrapper">
+                        <button class="login-btn unified-login-btn" onclick="toggleAuthDropdown(event)" id="loginBtn">
+                            <i class="fas fa-user-circle"></i>
+                            <span>تسجيل الدخول</span>
+                            <i class="fas fa-chevron-down arrow-icon"></i>
+                        </button>
+
+                        <div class="auth-dropdown-menu" id="authMenuDropdown">
+                            <div class="auth-dropdown-header">
+                                <h4>مرحباً بك في T-REX Shop 👋</h4>
+                                <p>اختر نوع حساب تسجيل الدخول للمتابعة</p>
+                            </div>
+                            <div class="auth-dropdown-body">
+                                <!-- Button 1: Customer Login -->
+                                <button type="button" class="auth-drop-btn customer-drop-btn" onclick="handleCustomerLoginChoice()">
+                                    <div class="auth-btn-icon"><i class="fas fa-shopping-bag"></i></div>
+                                    <div class="auth-btn-text">
+                                        <span class="auth-btn-title">تسجيل الدخول كعميل</span>
+                                        <span class="auth-btn-desc">للتسوق ومتابعة الطلبات السريعة</span>
+                                    </div>
+                                    <i class="fas fa-arrow-left arrow-indicator"></i>
+                                </button>
+
+                                <!-- Button 2: Merchant / Vendor Login -->
+                                <a href="/admin.html" class="auth-drop-btn merchant-drop-btn">
+                                    <div class="auth-btn-icon"><i class="fas fa-store"></i></div>
+                                    <div class="auth-btn-text">
+                                        <span class="auth-btn-title">تسجيل الدخول كتاجر</span>
+                                        <span class="auth-btn-desc">إدارة المتجر، المنتجات والمبيعات</span>
+                                    </div>
+                                    <i class="fas fa-arrow-left arrow-indicator"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logged in state -->
                     <div class="user-profile" id="userProfile" style="display: none;">
                         <img src="" alt="Profile" class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
                         <div class="user-dropdown" id="userDropdown">
@@ -3022,11 +3299,6 @@
                     </div>
                 </div>
 
-                <!-- Cart -->
-                <a href="#" class="cart-btn" onclick="toggleCart(); return false;" title="سلة التسوق" aria-label="سلة التسوق">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cartCount" data-count="0">0</span>
-                </a>
             </div>
         </div>
     </header>
@@ -3516,6 +3788,80 @@
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let compareList = JSON.parse(localStorage.getItem('compare')) || [];
         let currentCurrency = { code: 'SAR', symbol: '🇸🇦 ر.س', rate: 1 };
+        window.productsMap = {};
+
+        function registerProductsToMap(products) {
+            if (!products || !Array.isArray(products)) return;
+            products.forEach(p => {
+                if (p && p.id != null) {
+                    window.productsMap[String(p.id)] = p;
+                }
+            });
+        }
+
+        function openQuickViewById(id) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            if (product) {
+                openQuickView(product);
+            } else {
+                console.warn('Product not found for ID:', id);
+            }
+        }
+
+        function addToCartById(id) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            if (product) {
+                addToCart(product);
+            }
+        }
+
+        function shareProductById(id, platform) {
+            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            const baseUrl = `${window.location.origin}/?product=${id}`;
+            
+            if (!product) {
+                shareProduct('منتج T-REX Shop', baseUrl, platform);
+                return;
+            }
+
+            const imgUrl = product.image_url || (product.images && product.images[0]) || '';
+            const formattedPrice = formatPrice(product.price, product.currency || 'SAR');
+
+            let messageText = `🦖 *${product.name}* - T-REX Shop\n`;
+            messageText += `💰 *السعر:* ${formattedPrice}\n`;
+            if (product.vendor_code) {
+                messageText += `🔑 *كود التاجر:* ${product.vendor_code}\n`;
+            }
+            if (imgUrl) {
+                messageText += `🖼️ *صورة المنتج:* ${imgUrl}\n`;
+            }
+            messageText += `🔗 *رابط التفاصيل والشراء المباشر:*\n${baseUrl}`;
+
+            const textEncoded = encodeURIComponent(messageText);
+            const urlEncoded = encodeURIComponent(baseUrl);
+
+            let shareUrl = '';
+            switch (platform) {
+                case 'whatsapp':
+                    shareUrl = `https://api.whatsapp.com/send?text=${textEncoded}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`;
+                    break;
+            }
+
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        function copyProductLinkById(id) {
+            const baseUrl = `${window.location.origin}/?product=${id}`;
+            copyProductLink(baseUrl);
+        }
 
         // Currency symbols and flags map
         const currencyInfo = {
@@ -4645,6 +4991,7 @@
             const modalBody = document.getElementById('modalBody');
             modalContent.classList.remove('wishlist-modal-content');
             modalBody.classList.remove('wishlist-modal-body');
+            modal.classList.add('show');
             currentProduct = product;
             currentQuantity = 1;
             currentImageIndex = 0;
@@ -4882,8 +5229,10 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 ✅ يرجى تأكيد الطلب
             `.trim();
             
-            // Open WhatsApp
-            const whatsappUrl = `https://wa.me/+967773769835?text=${encodeURIComponent(message)}`;
+            // Open WhatsApp with clean numeric phone number
+            const targetPhone = (currentProduct && (currentProduct.vendor_phone || currentProduct.phone)) || '967773769835';
+            const cleanPhone = String(targetPhone).replace(/[^0-9]/g, '');
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             
             // Track the order
@@ -5163,7 +5512,49 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // ============================================
         
         // Current User
-        let currentUser = null;
+        // Toggle Unified Auth Dropdown Menu (Customer vs Merchant)
+        function toggleAuthDropdown(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('authMenuDropdown');
+            const wrapper = document.getElementById('guestAuthWrapper');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+                if (wrapper) wrapper.classList.toggle('open');
+            }
+        }
+
+        function handleCustomerLoginChoice() {
+            toggleAuthDropdown();
+            signInWithGoogle();
+        }
+
+        // Close auth dropdown on outside click
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('guestAuthWrapper');
+            const dropdown = document.getElementById('authMenuDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.classList.remove('show');
+                wrapper.classList.remove('open');
+            }
+        });
+
+        // Toggle Password Visibility (Eye Icon)
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const icon = btn.querySelector('i') || btn;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                btn.setAttribute('title', 'إخفاء كلمة المرور');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                btn.setAttribute('title', 'إظهار كلمة المرور');
+            }
+        }
 
         // Toggle User Menu
         function toggleUserMenu() {
