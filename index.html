@@ -3824,8 +3824,12 @@
             });
         }
 
+        function getProductById(id) {
+            return window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+        }
+
         function openQuickViewById(id) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            const product = getProductById(id);
             if (product) {
                 openQuickView(product);
             } else {
@@ -3834,15 +3838,80 @@
         }
 
         function addToCartById(id) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
+            const product = getProductById(id);
             if (product) {
                 addToCart(product);
             }
         }
 
+        function buyNowDirect(id) {
+            const product = getProductById(id);
+            if (!product) return;
+            openQuickView(product);
+            setTimeout(() => {
+                const orderForm = document.getElementById('quickOrderForm');
+                if (orderForm) {
+                    orderForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const nameInput = document.getElementById('quickCustomerName');
+                    if (nameInput) nameInput.focus();
+                }
+            }, 350);
+        }
+
+        function quickOrderInstantWhatsapp(id) {
+            const product = getProductById(id) || currentProduct;
+            if (!product) {
+                showNotification('خطأ: لا يوجد منتج محدد! ❌');
+                return;
+            }
+            const targetPhone = (product.vendor_phone || product.phone || '967773769835');
+            const cleanPhone = String(targetPhone).replace(/[^0-9]/g, '') || '967773769835';
+            const productUrl = `${window.location.origin}/?product=${encodeURIComponent(product.id)}`;
+            const formattedPrice = formatPrice(product.price, product.currency || 'SAR');
+            
+            let messageText = `⚡ *طلب فوري من T-REX Shop* 🦖\n\n`;
+            messageText += `📦 *المنتج:* ${product.name}\n`;
+            if (product.vendor_code) {
+                messageText += `🏪 *كود التاجر:* \`${product.vendor_code}\`\n`;
+            }
+            messageText += `💰 *السعر:* ${formattedPrice}\n`;
+            if (product.image_url) {
+                messageText += `🖼️ *صورة المنتج:* ${product.image_url}\n`;
+            }
+            messageText += `🔗 *رابط المنتج:* ${productUrl}\n\n`;
+            messageText += `السلام عليكم، أود شراء هذا المنتج فوراً! 🛍️`;
+
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(messageText)}`;
+            window.open(whatsappUrl, '_blank');
+            showNotification('تم فتح واتساب لإتمام الشراء الفوري! ✅');
+        }
+
+        function shareProduct(title, url, platform) {
+            const shareUrlText = url || window.location.href;
+            let messageText = `🦖 *${title || 'منتج T-REX Shop'}*\n🔗 *رابط التفاصيل والشراء المباشر:*\n${shareUrlText}`;
+            const textEncoded = encodeURIComponent(messageText);
+            const urlEncoded = encodeURIComponent(shareUrlText);
+
+            let shareUrl = '';
+            switch (platform) {
+                case 'whatsapp':
+                    shareUrl = `https://api.whatsapp.com/send?text=${textEncoded}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`;
+                    break;
+                case 'telegram':
+                    shareUrl = `https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`;
+                    break;
+            }
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
         function shareProductById(id, platform) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
-            const baseUrl = `${window.location.origin}/?product=${id}`;
+            const product = getProductById(id);
+            const baseUrl = `${window.location.origin}/?product=${encodeURIComponent(id)}`;
             
             if (!product) {
                 shareProduct('منتج T-REX Shop', baseUrl, platform);
@@ -3883,8 +3952,43 @@
             }
         }
 
+        function copyProductLink(url) {
+            const targetUrl = url || window.location.href;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(targetUrl).then(() => {
+                    showNotification('تم نسخ رابط المنتج بنجاح! 📋');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(targetUrl);
+                });
+            } else {
+                fallbackCopyTextToClipboard(targetUrl);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showNotification('تم نسخ رابط المنتج بنجاح! 📋');
+                } else {
+                    showNotification('تعذر نسخ الرابط تلقائياً ❌');
+                }
+            } catch (err) {
+                showNotification('تعذر نسخ الرابط ❌');
+            }
+            document.body.removeChild(textArea);
+        }
+
         function copyProductLinkById(id) {
-            const baseUrl = `${window.location.origin}/?product=${id}`;
+            const baseUrl = `${window.location.origin}/?product=${encodeURIComponent(id)}`;
             copyProductLink(baseUrl);
         }
 
@@ -4254,7 +4358,7 @@
 `;
                 itemsList += `   🔑 كود التاجر: ${item.vendor_code || 'VND-MAIN'}
 `;
-                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/product/${item.id}
+                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/?product=${item.id}
 `;
                 if (item.image_url || item.image) {
                     itemsList += `   🖼️ صورة المنتج المباشرة (معاينة): ${item.image_url || item.image}
@@ -4645,13 +4749,25 @@
         }
 
         function openSharedProduct(product) {
+            if (!product) return;
             openQuickView(product);
-            const similarProducts = getSimilarProducts(product);
-            filteredProducts = similarProducts.length ? [product, ...similarProducts] : [product];
+            filteredProducts = [...allProducts];
             registerProductsToMap(allProducts);
-                renderProducts();
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-            showNotification(`تم عرض المنتج والمنتجات المشابهة (${filteredProducts.length}) ✅`);
+            renderProducts();
+            setTimeout(() => {
+                const card = document.querySelector(`[data-product-id="${product.id}"]`) || document.getElementById(`product-${product.id}`);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.outline = '3px solid #FFD700';
+                    card.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.6)';
+                    setTimeout(() => {
+                        card.style.outline = '';
+                        card.style.boxShadow = '';
+                    }, 3500);
+                }
+            }, 300);
+            showNotification(`تم فتح تفاصيل المنتج "${product.name}" بنجاح ✅`);
         }
 
         function openProductFromUrl() {
@@ -4824,7 +4940,7 @@
             message += `📊 *الكمية:* ${currentQuantity}\n`;
             message += `💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}\n\n`;
             
-            const productUrl = `${window.location.origin}/product/${currentProduct.id}`;
+            const productUrl = `${window.location.origin}/?product=${currentProduct.id}`;
             message += `🔗 *رابط المنتج:* ${productUrl}\n`;
             if (currentProduct.image_url) {
                 message += `🖼️ *صورة المنتج:* ${currentProduct.image_url}\n\n`;
@@ -5124,7 +5240,10 @@
                             </div>
                             
                             <button type="submit" class="btn-buy-now" style="width: 100%; font-size: 16px; padding: 14px;">
-                                <i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب
+                                <i class="fab fa-whatsapp"></i> أرسل الطلب التفصيلي عبر واتساب
+                            </button>
+                            <button type="button" onclick="quickOrderInstantWhatsapp('${product.id}')" style="width: 100%; font-size: 15px; padding: 12px; margin-top: 10px; background: linear-gradient(135deg, #128C7E 0%, #25D366 100%); border: none; color: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s ease;">
+                                <i class="fab fa-whatsapp"></i> ⚡ شراء فوري سريع بضغطة واحدة عبر واتساب
                             </button>
                         </form>
                     </div>
@@ -5140,16 +5259,16 @@
                     <div class="modal-share-row">
                         <h4><i class="fas fa-share-alt"></i> مشاركة المنتج</h4>
                         <div class="social-share">
-                            <button class="share-btn share-whatsapp" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
+                            <button class="share-btn share-whatsapp" onclick="shareProductById('${product.id}', 'whatsapp')" title="مشاركة واتساب" aria-label="مشاركة واتساب">
                                 <i class="fab fa-whatsapp"></i><span>واتساب</span>
                             </button>
-                            <button class="share-btn share-facebook" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
+                            <button class="share-btn share-facebook" onclick="shareProductById('${product.id}', 'facebook')" title="مشاركة فيسبوك" aria-label="مشاركة فيسبوك">
                                 <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
                             </button>
-                            <button class="share-btn share-telegram" onclick="shareProduct('${product.name.replace(/'/g, '&#39;')}', '${window.location.origin}/product/${product.id}', 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
+                            <button class="share-btn share-telegram" onclick="shareProductById('${product.id}', 'telegram')" title="مشاركة تليجرام" aria-label="مشاركة تليجرام">
                                 <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
                             </button>
-                            <button class="share-btn share-copy" onclick="copyProductLink('${window.location.origin}/product/${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
+                            <button class="share-btn share-copy" onclick="copyProductLinkById('${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
                                 <i class="fas fa-copy"></i><span>نسخ الرابط</span>
                             </button>
                         </div>
@@ -5234,7 +5353,7 @@
             const total = currentProduct.price * currentQuantity;
             
             // Build WhatsApp message
-            const productUrl = `${window.location.origin}/product/${currentProduct.id}`;
+            const productUrl = `${window.location.origin}/?product=${currentProduct.id}`;
             const message = `
 🛒 *طلب جديد من T-REX Shop*
 
@@ -5387,7 +5506,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                     <i class="fas fa-cart-plus"></i> أضف للسلة
                                 </button>
                                 <button class="btn-buy-now" 
-                                        onclick="event.stopPropagation(); openQuickViewById('${product.id}')"
+                                        onclick="event.stopPropagation(); buyNowDirect('${product.id}')"
                                         aria-label="اشتري ${product.name} الآن">
                                     <i class="fab fa-whatsapp"></i> اشتري الآن
                                 </button>
@@ -6097,121 +6216,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
         // ============================================
         // Product Action & Rich Sharing Helpers
         // ============================================
-        window.productsMap = {};
 
-        function registerProductsToMap(products) {
-            if (!products || !Array.isArray(products)) return;
-            products.forEach(p => {
-                if (p && p.id != null) {
-                    window.productsMap[String(p.id)] = p;
-                }
-            });
-        }
-
-        function openQuickViewById(id) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
-            if (product) {
-                openQuickView(product);
-            } else {
-                console.warn('Product not found for ID:', id);
-            }
-        }
-
-        function addToCartById(id) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
-            if (product) {
-                addToCart(product);
-            }
-        }
-
-        function shareProductById(id, platform) {
-            const product = window.productsMap[String(id)] || (allProducts && allProducts.find(p => String(p.id) === String(id)));
-            const baseUrl = `${window.location.origin}/?product=${id}`;
-            
-            if (!product) {
-                shareProduct('منتج T-REX Shop', baseUrl, platform);
-                return;
-            }
-
-            const imgUrl = product.image_url || (product.images && product.images[0]) || '';
-            const formattedPrice = formatPrice(product.price, product.currency || 'SAR');
-
-            let messageText = `🦖 *${product.name}* - T-REX Shop\n`;
-            messageText += `💰 *السعر:* ${formattedPrice}\n`;
-            if (product.vendor_code) {
-                messageText += `🔑 *كود التاجر:* ${product.vendor_code}\n`;
-            }
-            if (imgUrl) {
-                messageText += `🖼️ *صورة المنتج:* ${imgUrl}\n`;
-            }
-            messageText += `🔗 *رابط التفاصيل والشراء المباشر:*\n${baseUrl}`;
-
-            const textEncoded = encodeURIComponent(messageText);
-            const urlEncoded = encodeURIComponent(baseUrl);
-
-            let shareUrl = '';
-            switch (platform) {
-                case 'whatsapp':
-                    shareUrl = `https://wa.me/?text=${textEncoded}`;
-                    break;
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}`;
-                    break;
-                case 'telegram':
-                    shareUrl = `https://t.me/share/url?url=${urlEncoded}&text=${textEncoded}`;
-                    break;
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`🦖 ${product.name} - ${formattedPrice}`)}&url=${urlEncoded}`;
-                    break;
-            }
-
-            if (shareUrl) {
-                window.open(shareUrl, '_blank', 'width=600,height=400');
-            }
-        }
-
-        function copyProductLinkById(id) {
-            const baseUrl = `${window.location.origin}/?product=${id}`;
-            navigator.clipboard.writeText(baseUrl).then(() => {
-                showNotification('تم نسخ رابط المنتج المباشر بنجاح! 📋');
-            }).catch(() => {
-                showNotification('تعذر نسخ الرابط تلقائياً! ❌');
-            });
-        }
-    
-        function shareProduct(productName, productUrl, platform) {
-            const url = encodeURIComponent(productUrl || window.location.href);
-            const text = encodeURIComponent(`شاهد هذا المنتج: ${productName} من T-REX Shop!`);
-            
-            let shareUrl = '';
-            switch(platform) {
-                case 'whatsapp':
-                    shareUrl = `https://wa.me/?text=${text}%0A${url}`;
-                    break;
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                    break;
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-                    break;
-                case 'telegram':
-                    shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
-                    break;
-            }
-            
-            if (shareUrl) {
-                window.open(shareUrl, '_blank', 'width=600,height=400');
-            }
-        }
-
-        function copyProductLink(productUrl) {
-            const url = productUrl || window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification('تم نسخ الرابط! 📋');
-            }).catch(() => {
-                showNotification('فشل نسخ الرابط! ❌');
-            });
-        }
 
         // ============================================
         // Stats Tracking - Real Data Only
