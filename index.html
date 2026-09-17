@@ -3846,16 +3846,35 @@
 
         function buyNowDirect(id) {
             const product = getProductById(id);
-            if (!product) return;
-            openQuickView(product);
-            setTimeout(() => {
-                const orderForm = document.getElementById('quickOrderForm');
-                if (orderForm) {
-                    orderForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const nameInput = document.getElementById('quickCustomerName');
-                    if (nameInput) nameInput.focus();
-                }
-            }, 350);
+            if (!product) {
+                showNotification('المنتج غير موجود ❌');
+                return;
+            }
+            currentProduct = product;
+            currentQuantity = 1;
+            openOrderModal();
+        }
+
+        function shareProductAction(id) {
+            const product = getProductById(id);
+            const baseUrl = `${window.location.origin}/?product=${encodeURIComponent(id)}`;
+            const title = product ? product.name : 'منتج T-REX Shop';
+            const priceText = product ? formatPrice(product.price, product.currency || 'SAR') : '';
+            const text = product ? `🦖 *${product.name}* - T-REX Shop\n💰 *السعر:* ${priceText}\n` : 'T-REX Shop\n';
+
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: text,
+                    url: baseUrl
+                }).catch((err) => {
+                    if (err && err.name !== 'AbortError') {
+                        copyProductLinkById(id);
+                    }
+                });
+            } else {
+                copyProductLinkById(id);
+            }
         }
 
         function quickOrderInstantWhatsapp(id) {
@@ -5512,8 +5531,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 </button>
                             </div>
                             <button class="product-share-action"
-                                    onclick="event.stopPropagation();"
-                                    aria-label="خيارات مشاركة ${product.name}">
+                                    onclick="event.stopPropagation(); shareProductAction('${product.id}')"
+                                    aria-label="مشاركة ${product.name}">
                                 <i class="fas fa-share-alt"></i> مشاركة المنتج
                             </button>
                             <div class="product-card-share">
