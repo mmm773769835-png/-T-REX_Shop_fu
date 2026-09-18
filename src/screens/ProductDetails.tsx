@@ -116,7 +116,7 @@ export default function ProductDetails({ route, navigation }: any) {
       loadReviews(currentProduct.id);
       
       // Increment views count in the background
-      const supabase = require('../services/supabaseClient').supabase;
+      const supabase = require('../config/supabase').supabase;
       supabase.rpc('increment_product_views', { product_id: currentProduct.id }).catch((e: any) => console.log('Views error', e));
       
       // Fetch Vendor Rating
