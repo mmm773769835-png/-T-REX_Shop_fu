@@ -3199,8 +3199,8 @@
                 </div>
             </a>
             <nav class="nav-links">
-                <a href="/">الرئيسية</a>
-                <a href="#products">المنتجات</a>
+                <a href="/" data-i18n="nav_home">الرئيسية</a>
+                <a href="#products" data-i18n="nav_products">المنتجات</a>
             </nav>
 
             <!-- Header Actions - Organized Toolbar -->
@@ -3342,8 +3342,8 @@
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)" oninput="searchProductsDropdown()" onfocus="showSearchDropdown()" onkeydown="if(event.key === 'Enter') searchProducts()">
-            <button class="search-btn" onclick="searchProducts()">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)" data-i18n="search_placeholder" data-i18n-attr="placeholder" oninput="searchProductsDropdown()" onfocus="showSearchDropdown()" onkeydown="if(event.key === 'Enter') searchProducts()">
+            <button class="search-btn" onclick="searchProducts()" data-i18n="search_btn">
                 <i class="fas fa-search"></i> بحث
             </button>
             <!-- Search Results Dropdown -->
@@ -3698,12 +3698,12 @@
 
                 <!-- Language Section -->
                 <div class="settings-section">
-                    <h3 class="settings-title"><i class="fas fa-language"></i> اللغة</h3>
+                    <h3 class="settings-title" data-i18n="language"><i class="fas fa-language"></i> اللغة</h3>
                     <div class="language-options">
-                        <button class="lang-btn active" onclick="changeLanguage('ar')">
+                        <button class="lang-btn active" onclick="changeLanguage('ar')" data-i18n="lang_ar">
                             🇸🇦 العربية
                         </button>
-                        <button class="lang-btn" onclick="changeLanguage('en')">
+                        <button class="lang-btn" onclick="changeLanguage('en')" data-i18n="lang_en">
                             🇺🇸 English
                         </button>
                     </div>
@@ -3711,15 +3711,15 @@
 
                 <!-- Main Settings Menu -->
                 <div class="settings-section" id="mainSettingsMenu">
-                    <h3 class="settings-title"><i class="fas fa-user-cog"></i> الحساب والإعدادات</h3>
+                    <h3 class="settings-title" data-i18n="account_and_settings"><i class="fas fa-user-cog"></i> الحساب والإعدادات</h3>
                     <div class="user-menu-items" style="padding: 0;">
-                        <a href="#" onclick="showEditProfile()">
+                        <a href="#" onclick="showEditProfile()" data-i18n="edit_profile">
                             <i class="fas fa-user-edit"></i> تعديل الملف الشخصي
                         </a>
-                        <a href="#" onclick="showChangeAccount()">
+                        <a href="#" onclick="showChangeAccount()" data-i18n="change_account">
                             <i class="fas fa-exchange-alt"></i> تغيير الحساب
                         </a>
-                        <a href="#" onclick="showAboutStore()">
+                        <a href="#" onclick="showAboutStore()" data-i18n="about_store">
                             <i class="fas fa-store"></i> حول المتجر
                         </a>
                     </div>
@@ -4477,10 +4477,10 @@
                                 <div style="color: var(--primary); font-weight: 800;">${formatPrice(product.price, product.currency || 'SAR')}</div>
                             </div>
                             <div class="wishlist-actions">
-                                <button class="icon-action-btn cart-action" onclick='addToCartFromWishlist(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="أضف للسلة" aria-label="أضف للسلة">
+                                <button class="icon-action-btn cart-action" onclick="addToCartFromWishlistById('${product.id}')" title="أضف للسلة" aria-label="أضف للسلة">
                                     <i class="fas fa-cart-plus"></i><span>السلة</span>
                                 </button>
-                                <button class="icon-action-btn buy-action" onclick='openQuickView(${JSON.stringify(product).replace(/'/g, '&#39;')})' title="شراء" aria-label="شراء">
+                                <button class="icon-action-btn buy-action" onclick="buyNowFromWishlist('${product.id}')" title="شراء" aria-label="شراء">
                                     <i class="fab fa-whatsapp"></i><span>شراء</span>
                                 </button>
                                 <button class="icon-action-btn remove-action" onclick="removeWishlistItem('${product.id}')" title="إزالة من المفضلة" aria-label="إزالة من المفضلة">
@@ -4502,14 +4502,37 @@
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
             updateWishlistCount();
             registerProductsToMap(allProducts);
-                renderProducts();
+            renderProducts();
             openWishlistModal();
             showNotification('تم إزالة المنتج من المفضلة 💔');
         }
 
+        function addToCartFromWishlistById(productId) {
+            const items = getWishlistProducts();
+            const product = items.find(item => String(item.id) === String(productId)) || getProductById(productId);
+            if (product) {
+                addToCart(product);
+                removeWishlistItem(productId);
+            }
+        }
+
+        function buyNowFromWishlist(productId) {
+            const items = getWishlistProducts();
+            const product = items.find(item => String(item.id) === String(productId)) || getProductById(productId);
+            if (!product) {
+                showNotification('المنتج غير موجود ❌');
+                return;
+            }
+            currentProduct = product;
+            currentQuantity = 1;
+            closeModal();
+            openOrderModal();
+        }
+
         function addToCartFromWishlist(product) {
-            addToCart(product);
-            removeWishlistItem(product.id);
+            if (product && product.id) {
+                addToCartFromWishlistById(product.id);
+            }
         }
 
         function addWishlistToCart() {
@@ -5475,8 +5498,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 return `
                     <div class="product-card" itemscope itemtype="https://schema.org/Product" data-product-id="${productId}">
                         ${schemaScript}
-                        ${isEnabled(product.is_new) ? '<span class="product-badge new">جديد</span>' : ''}
-                        ${isEnabled(product.is_hot) ? '<span class="product-badge hot">الأكثر مبيعاً</span>' : ''}
+                        ${isEnabled(product.is_new) ? `<span class="product-badge new">${t('badge_new')}</span>` : ''}
+                        ${isEnabled(product.is_hot) ? `<span class="product-badge hot">${t('badge_hot')}</span>` : ''}
                         ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
 
                         <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" 
@@ -5501,15 +5524,15 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                             
                             <div class="product-rating" title="تقييم ${product.rating || 0} من 5 نجوم">
                                 ${renderStars(product.rating || 0)}
-                                <span>(${product.reviews_count || 0} تقييم)</span>
+                                <span>(${product.reviews_count || 0} ${t('reviews_count')})</span>
                             </div>
                             <h3 class="product-name" itemprop="name">${product.name}</h3>
                             <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
                             <p class="product-vendor-badge" style="font-size: 11.5px; color: #17a2b8; font-weight: bold; margin: 2px 0 4px 0; background: rgba(23,162,184,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block;">
-                                <i class="fas fa-store" style="color: #FFD700;"></i> كود التاجر: ${product.vendor_code || 'VND-MAIN'}
+                                <i class="fas fa-store" style="color: #FFD700;"></i> ${t('vendor_code')}: ${product.vendor_code || 'VND-MAIN'}
                             </p>
                             <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
-                                <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: ${product.address || product.country || 'اليمن 🇾🇪'}
+                                <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> ${t('available_in')}: ${product.address || product.country || 'اليمن 🇾🇪'}
                             </p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
@@ -5522,31 +5545,31 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 <button class="add-to-cart" 
                                         onclick="event.stopPropagation(); addToCartById('${product.id}')"
                                         aria-label="أضف ${product.name} للسلة">
-                                    <i class="fas fa-cart-plus"></i> أضف للسلة
+                                    <i class="fas fa-cart-plus"></i> ${t('add_to_cart')}
                                 </button>
                                 <button class="btn-buy-now" 
                                         onclick="event.stopPropagation(); buyNowDirect('${product.id}')"
                                         aria-label="اشتري ${product.name} الآن">
-                                    <i class="fab fa-whatsapp"></i> اشتري الآن
+                                    <i class="fab fa-whatsapp"></i> ${t('buy_now')}
                                 </button>
                             </div>
                             <button class="product-share-action"
                                     onclick="event.stopPropagation(); shareProductAction('${product.id}')"
                                     aria-label="مشاركة ${product.name}">
-                                <i class="fas fa-share-alt"></i> مشاركة المنتج
+                                <i class="fas fa-share-alt"></i> ${t('share_product')}
                             </button>
                             <div class="product-card-share">
                                 <button class="share-btn share-whatsapp" onclick="event.stopPropagation(); shareProductById('${product.id}', 'whatsapp')" title="واتساب" aria-label="مشاركة واتساب">
-                                    <i class="fab fa-whatsapp"></i><span>واتساب</span>
+                                    <i class="fab fa-whatsapp"></i><span>${t('share_whatsapp')}</span>
                                 </button>
                                 <button class="share-btn share-facebook" onclick="event.stopPropagation(); shareProductById('${product.id}', 'facebook')" title="فيسبوك" aria-label="مشاركة فيسبوك">
-                                    <i class="fab fa-facebook-f"></i><span>فيسبوك</span>
+                                    <i class="fab fa-facebook-f"></i><span>${t('share_facebook')}</span>
                                 </button>
                                 <button class="share-btn share-telegram" onclick="event.stopPropagation(); shareProductById('${product.id}', 'telegram')" title="تليجرام" aria-label="مشاركة تليجرام">
-                                    <i class="fab fa-telegram-plane"></i><span>تليجرام</span>
+                                    <i class="fab fa-telegram-plane"></i><span>${t('share_telegram')}</span>
                                 </button>
                                 <button class="share-btn share-copy" onclick="event.stopPropagation(); copyProductLinkById('${product.id}')" title="نسخ الرابط" aria-label="نسخ رابط المنتج">
-                                    <i class="fas fa-copy"></i><span>نسخ</span>
+                                    <i class="fas fa-copy"></i><span>${t('share_copy')}</span>
                                 </button>
                             </div>
                         </div>
@@ -6124,41 +6147,257 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             showNotification(isActive ? 'تم تفعيل الإشعارات! 🔔' : 'تم تعطيل الإشعارات! 🔕');
         }
         
-        function changeLanguage(lang) {
-            // Update active button
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Save preference
-            localStorage.setItem('language', lang);
-            
-            if (lang === 'en') {
-                showNotification('Language changed to English! 🌐');
-            } else {
-                showNotification('تم تغيير اللغة إلى العربية! 🌐');
+        // ============================================
+        // i18n Translation Engine
+        // ============================================
+        const translations = {
+            ar: {
+                nav_home: 'الرئيسية',
+                nav_products: 'المنتجات',
+                search_placeholder: '🔍 ابحث عن منتج... (مثال: هاتف، لابتوب، سماعات)',
+                search_btn: 'بحث',
+                currency_title: 'اختيار العملة',
+                settings_title: 'الإعدادات',
+                notifications_title: 'الإشعارات',
+                wishlist_title: 'المفضلة',
+                cart_title: 'سلة التسوق',
+                login_btn: 'تسجيل الدخول',
+                welcome_msg: 'مرحباً بك في T-REX Shop 👋',
+                choose_account_type: 'اختر نوع حساب تسجيل الدخول للمتابعة',
+                login_customer_title: 'تسجيل الدخول كعميل',
+                login_customer_desc: 'للتسوق ومتابعة الطلبات السريعة',
+                login_merchant_title: 'تسجيل الدخول كتاجر',
+                login_merchant_desc: 'إدارة المتجر، المنتجات والمبيعات',
+                my_orders: 'طلباتي',
+                my_wishlist: 'المفضلة',
+                my_profile: 'الملف الشخصي',
+                merchant_panel: 'حساب المورد / الأدمن',
+                logout: 'تسجيل الخروج',
+                hero_title: '🦖 T-REX Shop',
+                hero_desc: 'اكتشف أفضل المنتجات بأسعار مميزة. تسوق الآن واستمتع بتجربة فريدة!',
+                hero_cta: 'تسوق الآن',
+                all_products: 'جميع المنتجات',
+                loading_products: 'جاري تحميل المنتجات...',
+                add_review: 'أضف تقييمك',
+                account_and_settings: 'الحساب والإعدادات',
+                language: 'اللغة',
+                lang_ar: '🇸🇦 العربية',
+                lang_en: '🇺🇸 English',
+                edit_profile: 'تعديل الملف الشخصي',
+                change_account: 'تغيير الحساب',
+                about_store: 'حول المتجر',
+                offer_notifications: 'إشعارات العروض',
+                offer_notifications_desc: 'تلقي إشعارات بالعروض والخصومات الجديدة',
+                order_notifications: 'إشعارات الطلبات',
+                order_notifications_desc: 'تلقي تحديثات حول طلباتك',
+                store_owner: 'مالك المتجر',
+                email: 'البريد الإلكتروني',
+                whatsapp_support: 'واتساب / دعم فني',
+                official_website: 'الموقع الرسمي',
+                address: 'العنوان',
+                change_photo: 'تغيير الصورة',
+                name: 'الاسم',
+                save_changes: 'حفظ التغييرات',
+                change_account_desc: 'يمكنك تسجيل الخروج وتسجيل الدخول بحساب Google آخر',
+                login_other_account: 'تسجيل الدخول بحساب آخر',
+                add_to_cart: 'أضف للسلة',
+                buy_now: 'اشتري الآن',
+                badge_new: 'جديد',
+                badge_hot: 'الأكثر مبيعاً',
+                share_product: 'مشاركة المنتج',
+                vendor_code: 'كود التاجر',
+                available_in: 'متوفر في',
+                no_matching_products: 'لا توجد منتجات مطابقة',
+                try_different_search: 'جرب بحثاً مختلفاً أو فلتر آخر',
+                reviews_count: 'تقييم',
+                share_whatsapp: 'واتساب',
+                share_facebook: 'فيسبوك',
+                share_telegram: 'تليجرام',
+                share_copy: 'نسخ',
+                cart_heading: 'سلة التسوق',
+                cart_empty_title: 'سلتك فارغة',
+                cart_empty_desc: 'لم تقم بإضافة أي منتجات للسلة بعد',
+                start_shopping: 'ابدأ التسوق',
+                subtotal: 'الإجمالي الفرعي',
+                shipping: 'الشحن',
+                free_shipping: 'مجاني',
+                total: 'الإجمالي النهائي',
+                checkout: 'إتمام الطلب',
+                clear_cart: 'تفريغ السلة',
+                wishlist_heading: 'قائمة المفضلة',
+                wishlist_empty_title: 'المفضلة فارغة',
+                wishlist_empty_desc: 'لم تقم بإضافة أي منتجات إلى المفضلة بعد',
+                quick_view: 'معاينة سريعة',
+                price: 'السعر:',
+                category: 'الفئة:',
+                description: 'الوصف:',
+                quantity: 'الكمية:',
+                lang_changed_en: 'Language changed to English! 🌐',
+                lang_changed_ar: 'تم تغيير اللغة إلى العربية! 🌐'
+            },
+            en: {
+                nav_home: 'Home',
+                nav_products: 'Products',
+                search_placeholder: '🔍 Search for a product... (e.g. phone, laptop, headphones)',
+                search_btn: 'Search',
+                currency_title: 'Select Currency',
+                settings_title: 'Settings',
+                notifications_title: 'Notifications',
+                wishlist_title: 'Wishlist',
+                cart_title: 'Shopping Cart',
+                login_btn: 'Sign In',
+                welcome_msg: 'Welcome to T-REX Shop 👋',
+                choose_account_type: 'Choose account type to continue',
+                login_customer_title: 'Sign in as Customer',
+                login_customer_desc: 'For shopping and tracking orders',
+                login_merchant_title: 'Sign in as Merchant',
+                login_merchant_desc: 'Manage store, products and sales',
+                my_orders: 'My Orders',
+                my_wishlist: 'Wishlist',
+                my_profile: 'My Profile',
+                merchant_panel: 'Vendor / Admin Account',
+                logout: 'Sign Out',
+                hero_title: '🦖 T-REX Shop',
+                hero_desc: 'Discover the best products at great prices. Shop now and enjoy a unique experience!',
+                hero_cta: 'Shop Now',
+                all_products: 'All Products',
+                loading_products: 'Loading products...',
+                add_review: 'Add Your Review',
+                account_and_settings: 'Account & Settings',
+                language: 'Language',
+                lang_ar: '🇸🇦 العربية',
+                lang_en: '🇺🇸 English',
+                edit_profile: 'Edit Profile',
+                change_account: 'Change Account',
+                about_store: 'About Store',
+                offer_notifications: 'Offer Notifications',
+                offer_notifications_desc: 'Receive notifications for new deals and discounts',
+                order_notifications: 'Order Notifications',
+                order_notifications_desc: 'Receive updates on your orders',
+                store_owner: 'Store Owner',
+                email: 'Email',
+                whatsapp_support: 'WhatsApp / Support',
+                official_website: 'Official Website',
+                address: 'Address',
+                change_photo: 'Change Photo',
+                name: 'Name',
+                save_changes: 'Save Changes',
+                change_account_desc: 'You can sign out and log in with another Google account',
+                login_other_account: 'Sign in with another account',
+                add_to_cart: 'Add to Cart',
+                buy_now: 'Buy Now',
+                badge_new: 'New',
+                badge_hot: 'Best Seller',
+                share_product: 'Share Product',
+                vendor_code: 'Vendor Code',
+                available_in: 'Available in',
+                no_matching_products: 'No matching products found',
+                try_different_search: 'Try a different search or filter',
+                reviews_count: 'reviews',
+                share_whatsapp: 'WhatsApp',
+                share_facebook: 'Facebook',
+                share_telegram: 'Telegram',
+                share_copy: 'Copy',
+                cart_heading: 'Shopping Cart',
+                cart_empty_title: 'Your cart is empty',
+                cart_empty_desc: 'You have not added any products to the cart yet',
+                start_shopping: 'Start Shopping',
+                subtotal: 'Subtotal',
+                shipping: 'Shipping',
+                free_shipping: 'Free',
+                total: 'Total',
+                checkout: 'Checkout',
+                clear_cart: 'Clear Cart',
+                wishlist_heading: 'My Wishlist',
+                wishlist_empty_title: 'Wishlist is empty',
+                wishlist_empty_desc: 'You have not added any items to your wishlist yet',
+                quick_view: 'Quick View',
+                price: 'Price:',
+                category: 'Category:',
+                description: 'Description:',
+                quantity: 'Quantity:',
+                lang_changed_en: 'Language changed to English! 🌐',
+                lang_changed_ar: 'Language changed to Arabic! 🌐'
             }
+        };
+
+        function t(key, fallback = '') {
+            const currentLang = localStorage.getItem('language') || 'ar';
+            return translations[currentLang]?.[key] || fallback || key;
         }
-        
-        // Load saved settings on page load
+
+        function applyTranslations(lang) {
+            const currentLang = lang || localStorage.getItem('language') || 'ar';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = (currentLang === 'en') ? 'ltr' : 'rtl';
+
+            // Set cookie for Google Translate fallback if active
+            const domain = window.location.hostname;
+            if (currentLang === 'en') {
+                document.cookie = "googtrans=/ar/en; path=/;";
+                if (domain) document.cookie = "googtrans=/ar/en; path=/; domain=" + domain;
+            } else {
+                document.cookie = "googtrans=/ar/ar; path=/;";
+                if (domain) document.cookie = "googtrans=/ar/ar; path=/; domain=" + domain;
+            }
+
+            // Update active buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                const onclickStr = btn.getAttribute('onclick') || '';
+                const isEn = onclickStr.includes("'en'");
+                if ((currentLang === 'en' && isEn) || (currentLang === 'ar' && !isEn)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Apply data-i18n attributes
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const attr = el.getAttribute('data-i18n-attr');
+                const translated = translations[currentLang]?.[key];
+                if (translated) {
+                    if (attr) {
+                        el.setAttribute(attr, translated);
+                    } else {
+                        const icon = el.querySelector('i');
+                        if (icon) {
+                            el.innerHTML = icon.outerHTML + ' ' + translated;
+                        } else {
+                            el.textContent = translated;
+                        }
+                    }
+                }
+            });
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            applyTranslations(lang);
+
+            if (typeof renderProducts === 'function') renderProducts();
+            if (typeof renderCart === 'function') renderCart();
+            if (typeof renderWishlist === 'function') renderWishlist();
+
+            const msg = (lang === 'en') ? translations.en.lang_changed_en : translations.ar.lang_changed_ar;
+            showNotification(msg);
+        }
+
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('settings') || '{}');
             
             if (settings.offers) {
-                document.getElementById('offerNotifications').classList.add('active');
+                document.getElementById('offerNotifications')?.classList.add('active');
             }
             if (settings.orders === false) {
-                document.getElementById('orderNotifications').classList.remove('active');
+                document.getElementById('orderNotifications')?.classList.remove('active');
             }
             
             const savedLang = localStorage.getItem('language') || 'ar';
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            if (savedLang === 'en') {
-                document.querySelectorAll('.lang-btn')[1]?.classList.add('active');
-            } else {
-                document.querySelectorAll('.lang-btn')[0]?.classList.add('active');
-            }
+            applyTranslations(savedLang);
         }
-        
+
         // Close settings modal on outside click
         document.getElementById('settingsModal').addEventListener('click', function(e) {
             if (e.target === this) closeSettings();
