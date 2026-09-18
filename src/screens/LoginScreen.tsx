@@ -242,6 +242,17 @@ export default function LoginScreen({ navigation }: any) {
           </Text>
         </TouchableOpacity>
 
+        {/* Merchant / Vendor Login Button */}
+        <TouchableOpacity 
+          style={styles.merchantBtn} 
+          onPress={() => navigation.navigate("AdminLogin")}
+        >
+          <Ionicons name="storefront-outline" size={18} color="#FFD700" />
+          <Text style={styles.merchantBtnText}>
+            {language === "ar" ? "تسجيل الدخول كتاجر / أدمن" : "Sign in as Merchant / Admin"}
+          </Text>
+        </TouchableOpacity>
+
         {/* Register Link */}
         <TouchableOpacity style={styles.registerLink} onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLinkText}>
@@ -379,6 +390,23 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
     marginBottom: 16,
   },
   guestBtnText: { color: "#888", fontSize: 14, fontWeight: "600" },
+  merchantBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    paddingVertical: 13,
+    borderRadius: 14,
+    marginBottom: 16,
+  },
+  merchantBtnText: {
+    color: '#FFD700',
+    fontWeight: '700',
+    fontSize: 14,
+  },
   registerLink: { alignItems: "center" },
   registerLinkText: { fontSize: 14, color: "#888" },
   registerLinkBold: { color: "#FFD700", fontWeight: "700" },
