@@ -724,19 +724,51 @@
             <div id="formMessage"></div>
             <form id="productForm">
                 <input type="hidden" id="productId">
-                <div class="form-row">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label><i class="fas fa-box" style="color:#FFD700;"></i> اسم المنتج *</label>
+                    <input type="text" id="productName" required placeholder="أدخل اسم المنتج بالكامل">
+                </div>
+
+                <!-- 3 Price Fields for Vendor Net Price + Customer Markup + Final Price -->
+                <div class="form-row" style="background:rgba(255,215,0,0.05); padding:15px; border-radius:12px; border:1px solid rgba(255,215,0,0.2); margin-bottom:15px;">
+                    <!-- الخانة 1: سعر التاجر الصافي -->
                     <div class="form-group">
-                        <label>اسم المنتج *</label>
-                        <input type="text" id="productName" required>
+                        <label style="color:#28a745; font-weight:bold;"><i class="fas fa-hand-holding-usd"></i> 1. سعر التاجر الصافي * <small style="color:#aaa;">(سعرك الصافي الذي تستلمه)</small></label>
+                        <input type="number" id="productVendorPrice" placeholder="مثال: 100" required min="0" step="0.01" oninput="calculateCustomerPriceFromVendorPrice()" style="border-color:#28a745;">
                     </div>
+
+                    <!-- الخانة 2: نسبة الزيادة للزبون -->
                     <div class="form-group">
-                        <label>السعر *</label>
-                        <input type="number" id="productPrice" required min="0" step="0.01">
+                        <label style="color:#FFD700; font-weight:bold;"><i class="fas fa-percentage"></i> 2. نسبة الزيادة للزبون (%) <small style="color:#aaa;">(فائدة/رسوم المتجر)</small></label>
+                        <input type="number" id="productMarkupPercent" value="10" readonly style="border-color:#FFD700; background:#1a1a1a; color:#FFD700; font-weight:bold; cursor:not-allowed;" title="نسبة الزيادة محددة تلقائياً بحسب شريحة السعر">
                     </div>
+
+                    <!-- الخانة 3: السعر النهائي المعروض للزبون بالمتجر -->
                     <div class="form-group">
-                        <label>السعر الأصلي (للخصم)</label>
-                        <input type="number" id="productOldPrice" min="0" step="0.01">
+                        <label style="color:#007bff; font-weight:bold;"><i class="fas fa-shopping-cart"></i> 3. السعر النهائي للزبون * <small style="color:#aaa;">(يظهر بالمتجر للزبائن)</small></label>
+                        <input type="number" id="productPrice" placeholder="تلقائي: 110" required min="0" step="0.01" oninput="calculateVendorPriceFromCustomerPrice()" style="border-color:#007bff;">
                     </div>
+                </div>
+
+                <!-- شريط التوضيح الهام للتاجر -->
+                <div id="priceCalculationNotice" style="background: rgba(40, 167, 69, 0.12); border: 1.5px solid #28a745; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; color: #fff; font-size: 13.5px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size: 22px;">💡</span>
+                        <div>
+                            <strong style="color: #28a745; font-size: 14px;">توضيح هام جداً (شفافية الأسعار ونسبة المتجر التلقائية):</strong>
+                            <p style="margin-top: 3px; color: #ddd; line-height: 1.5;">
+                                نسبة الزيادة تُحسب <strong style="color: #FFD700; text-decoration: underline;">زيادة فوق سعر التاجر الصافي</strong> ويتحملها الزبون في المتجر، <strong style="color: #00ff00;">ولن يُخصم أي جزء نهائياً من سعر التاجر الصافي!</strong>
+                            </p>
+                            <span id="priceSummaryBadge" style="display: block; margin-top: 6px; color: #FFD700; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 6px;">
+                                [ سعرك الصافي: 0 | الزيادة المضافة للزبون: +10% | سعر الزبون النهائي بالمتجر: 0 ]
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label><i class="fas fa-strikethrough" style="color:#aaa;"></i> السعر الأصلي السابق (اختياري - يظهر كشطب خصم للزبون بالمتجر)</label>
+                    <input type="number" id="productOldPrice" placeholder="مثال: 150 (إذا كنت تقدم خصماً للزبون)" min="0" step="0.01">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
