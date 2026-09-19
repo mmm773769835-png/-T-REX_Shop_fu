@@ -4980,20 +4980,87 @@
             showNotification(`تم فتح تفاصيل المنتج "${product.name}" بنجاح ✅`);
         }
 
-        function openProductFromUrl() {
-            let productId = new URLSearchParams(window.location.search).get('product');
-            if (!productId) {
-                const match = window.location.pathname.match(/\/product\/([a-zA-Z0-9-]+)/);
-                if (match) {
-                    productId = match[1];
+        let hasOpenedProductFromUrl = false;
+        async function openProductFromUrl() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let productId = urlParams.get('product') || 
+                                urlParams.get('productId') || 
+                                urlParams.get('product_id') || 
+                                urlParams.get('id');
+                
+                if (!productId && window.location.hash) {
+                    const hashMatch = window.location.hash.match(/product[=/]([a-zA-Z0-9-]+)/i);
+                    if (hashMatch) {
+                        productId = hashMatch[1];
+                    }
                 }
-            }
-            if (!productId || !allProducts.length) return;
-            const product = allProducts.find(item => String(item.id) === String(productId));
-            if (product) {
-                openSharedProduct(product);
+
+                if (!productId && window.location.pathname) {
+                    const pathMatch = window.location.pathname.match(/\/product\/([a-zA-Z0-9-]+)/i);
+                    if (pathMatch) {
+                        productId = pathMatch[1];
+                    }
+                }
+
+                if (!productId) return;
+                productId = String(productId).trim();
+                console.log('[DEEP_LINK] Detected product ID in URL:', productId);
+
+                if (hasOpenedProductFromUrl && currentProduct && String(currentProduct.id) === productId) {
+                    return;
+                }
+
+                // 1. Look in productsMap or allProducts
+                let product = getProductById(productId);
+
+                // 2. If not found in loaded products list, fetch directly from Supabase
+                if (!product) {
+                    console.log('[DEEP_LINK] Product not found in memory, fetching from Supabase for ID:', productId);
+                    try {
+                        const apiUrl = `${SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(productId)}&select=*`;
+                        const response = await fetch(apiUrl, {
+                            method: 'GET',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data && data.length > 0) {
+                                product = data[0];
+                                if (product && product.id != null) {
+                                    window.productsMap[String(product.id)] = product;
+                                    if (Array.isArray(allProducts) && !allProducts.some(p => String(p.id) === String(product.id))) {
+                                        allProducts.unshift(product);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (fetchErr) {
+                        console.error('[DEEP_LINK] Error fetching direct product:', fetchErr);
+                    }
+                }
+
+                if (product) {
+                    hasOpenedProductFromUrl = true;
+                    openSharedProduct(product);
+                } else {
+                    console.warn('[DEEP_LINK] Product not found for ID:', productId);
+                }
+            } catch (err) {
+                console.error('[DEEP_LINK] openProductFromUrl error:', err);
             }
         }
+
+        // Check URL for product parameters on DOM load and hash changes
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(openProductFromUrl, 300);
+        });
+        window.addEventListener('hashchange', openProductFromUrl);
+        window.addEventListener('popstate', openProductFromUrl);
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {

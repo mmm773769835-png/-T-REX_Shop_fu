@@ -240,14 +240,22 @@ const AppNavigator = () => {
 
   // إعدادات Deep Linking
   const linking = {
-    prefixes: ['trexshop://', 'https://trexshopmax.com'],
+    prefixes: [
+      'trexshop://',
+      'https://trexshopmax.com',
+      'https://www.trexshopmax.com',
+      'http://localhost:19006',
+      'http://localhost:8081',
+      'http://localhost:8080'
+    ],
     config: {
       screens: {
         MainTabs: 'home',
         AuthCallback: 'auth/callback',
         ProductDetails: {
-          path: '',
+          path: 'product/:productId',
           parse: {
+            productId: (productId: string) => productId,
             product: (productId: string) => productId,
           },
         },

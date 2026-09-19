@@ -174,6 +174,25 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     }
   }, [language, selectedCategory]);
 
+  // 🔗 Handling deep link product URL param on Web / Mobile
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location && window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetProductId = urlParams.get('product') || 
+                                urlParams.get('productId') || 
+                                urlParams.get('product_id') || 
+                                urlParams.get('id');
+        if (targetProductId) {
+          console.log('🔗 Deep link product param detected in HomeV2:', targetProductId);
+          navigation.navigate('ProductDetails', { productId: targetProductId });
+        }
+      }
+    } catch (e) {
+      console.log('Error checking deep link URL in HomeV2', e);
+    }
+  }, [navigation]);
+
   // تحديث المنتجات يدويًا (زر Refresh)
   const refreshProducts = () => {
     console.log("🔄 جاري تحديث المنتجات يدويًا...");

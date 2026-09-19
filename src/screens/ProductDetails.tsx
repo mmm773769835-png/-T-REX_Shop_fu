@@ -47,7 +47,10 @@ export default function ProductDetails({ route, navigation }: any) {
   const handleShareProduct = async () => {
     if (!currentProduct) return;
     try {
-      const shareUrl = `https://trexshopmax.com/?product=${currentProduct.id}`;
+      const baseUrl = (typeof window !== 'undefined' && window.location && window.location.origin)
+        ? window.location.origin
+        : 'https://trexshopmax.com';
+      const shareUrl = `${baseUrl}/?product=${encodeURIComponent(currentProduct.id)}`;
       const text = language === 'ar' 
         ? `شاهد هذا المنتج الرائع على متجر T-REX SHOP:\n${currentProduct.name}\n${shareUrl}`
         : `Check out this amazing product on T-REX SHOP:\n${currentProduct.name}\n${shareUrl}`;
