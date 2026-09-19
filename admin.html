@@ -670,10 +670,24 @@
 
     <!-- Dashboard -->
     <div class="dashboard" id="dashboard">
+        <!-- Super Admin Quick Switch Banner (Visible ONLY for Super Admin users) -->
+        <div id="superAdminSwitchBanner" style="display: none; background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #4a90e2; box-shadow: 0 4px 15px rgba(0,0,0,0.3); align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">👑</span>
+                <div>
+                    <strong style="color: #FFD700; font-size: 15px;">أنت متصفح الآن بصلاحية مدير النظام (Super Admin)</strong>
+                    <div style="font-size: 12.5px; opacity: 0.9;">أنت في لوحة التاجر لاستعراض وإضافة منتجاتك الخاصة. للانتقال للوحة التحكم الشاملة لكافة المنصة والتجار:</div>
+                </div>
+            </div>
+            <a href="trex-superadmin-secret-99835.html" style="background: #FFD700; color: #111; padding: 8px 18px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 13px; white-space: nowrap; box-shadow: 0 2px 8px rgba(255,215,0,0.4);">
+                ⚙️ الانتقال إلى لوحة الإدارة العليا (Super Admin) ⚡
+            </a>
+        </div>
+
         <div class="header">
             <div>
-                <h2>لوحة تحكم T-REX Shop</h2>
-                <p class="user-info" id="userInfo">مسؤول</p>
+                <h2>🏪 لوحة تحكم التاجر | T-REX Shop</h2>
+                <p class="user-info" id="userInfo">تاجر</p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
                 <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
@@ -839,39 +853,13 @@
                 <button type="submit" class="btn-submit" id="submitBtn">إضافة المنتج</button>
                 <button type="button" class="btn-submit" id="cancelBtn" onclick="resetForm()" style="background:linear-gradient(135deg, #666, #444); margin-right:10px; display:none;">إلغاء</button>
             </form>
-        <!-- Vendor Code Management Section (Admin Only & Vendor Activation) -->
+        <!-- Vendor Code Management Section (Vendor Activation) -->
         <div class="product-form" style="margin-bottom: 25px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFD700; padding-bottom: 12px; margin-bottom: 18px;">
-                <h3 style="margin: 0; color: #FFD700;"><i class="fas fa-key"></i> 🔑 أكواد تفعيل التمييز والبنر للتجار (مدد مخصصة)</h3>
+                <h3 style="margin: 0; color: #FFD700;"><i class="fas fa-key"></i> 🔑 تفعيل أو تجديد الاشتراك المميز لمتجرك</h3>
                 <span id="vendorSubscriptionStatus" style="font-size: 13px; font-weight: bold; background: rgba(255,215,0,0.15); padding: 6px 14px; border-radius: 20px; color: #FFD700;">
                     جاري التحقق من الاشتراك...
                 </span>
-            </div>
-
-            <!-- Admin Section: Generate Code -->
-            <div id="adminCodeGeneratorBox" style="display: none; background: rgba(255, 215, 0, 0.05); border: 1px dashed #FFD700; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
-                <h4 style="color: #fff; margin-top: 0; margin-bottom: 10px;">إدارة وتوليد الأكواد للمدير:</h4>
-                <p style="color: #aaa; font-size: 13px; margin-bottom: 12px;">حدد مدة الكود وقم بتوليده لإرساله للتاجر بعد استلام قيمة الاشتراك عبر الواتساب أو البريد.</p>
-                
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-                    <label style="color: #ccc; font-size: 13px; font-weight: bold;">مدة التفعيل:</label>
-                    <select id="codeDurationSelect" style="padding: 10px 15px; border-radius: 8px; background: #1a1a1a; color: #fff; border: 1px solid #FFD700; font-family: 'Cairo', sans-serif;">
-                        <option value="30">30 يوماً (شهر كامل)</option>
-                        <option value="60">60 يوماً (شهرين)</option>
-                        <option value="90">90 يوماً (3 أشهر)</option>
-                        <option value="365">365 يوماً (سنة كاملة 👑)</option>
-                        <option value="7">7 أيام (اشتراك تجريبي)</option>
-                    </select>
-                    <button type="button" class="btn-submit" onclick="generateActivationCodeAdmin()" style="width: auto; padding: 10px 24px; background: linear-gradient(135deg, #FFD700, #ffa500); color: #111;">
-                        <i class="fas fa-plus-circle"></i> توليد كود تفعيل 🔑
-                    </button>
-                </div>
-
-                <div id="generatedCodeDisplay" style="display: none; margin-top: 15px; padding: 12px; background: #1a1a1a; border-radius: 8px; border: 1px solid #FFD700;">
-                    <span style="color: #aaa; font-size: 13px;">كود التفعيل الجديد: </span>
-                    <strong id="newCodeValue" style="color: #FFD700; font-size: 18px; letter-spacing: 2px; margin: 0 10px;">TRX-30D-XXXXXX</strong>
-                    <button type="button" class="btn-edit" onclick="copyGeneratedCode()" style="padding: 4px 12px; font-size: 12px;">نسخ الكود 📋</button>
-                </div>
             </div>
 
             <!-- Live Vendor Countdown Timer Display Box -->
@@ -880,7 +868,7 @@
             <!-- Vendor Section: Redeem Code & Customer Support -->
             <div id="vendorRedeemCodeBox" style="background: #111; border: 1px solid #333; border-radius: 12px; padding: 18px;">
                 <h4 style="color: #fff; margin-top: 0; margin-bottom: 8px;">تفعيل أو تجديد كود الاشتراك (الجمع التراكمي للأيام):</h4>
-                <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">لإتاحة خيار تمييز المنتجات والظهور في بنر العروض، أدخل كود التفعيل المستلم من الدفع (التجديد يضيف الأيام فوق اشتراكك الحالي تلقائياً):</p>
+                <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">لإتاحة خيار تمييز المنتجات والظهور في بنر العروض، أدخل كود التفعيل المستلم من خدمة العملاء (التجديد يضيف الأيام فوق اشتراكك الحالي تلقائياً):</p>
                 <div style="display: flex; gap: 10px; max-width: 500px;">
                     <input type="text" id="activationCodeInput" placeholder="أدخل الكود هنا (مثال: TRX-30D-8921)" style="flex: 1; padding: 10px 15px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff; text-transform: uppercase;">
                     <button type="button" class="btn-submit" onclick="redeemVendorCodeWeb()" style="width: auto; padding: 10px 20px;">
@@ -895,9 +883,9 @@
         </div>
 
         <div class="products-table">
-            <h3>إدارة المنتجات والأكواد التسلسلية للتجار</h3>
+            <h3>📦 إدارة منتجات متجري</h3>
             <div class="admin-search-bar">
-                <input type="text" id="adminProductSearch" class="admin-search-input" placeholder="ابحث بكود التاجر (VND-1001) أو اسم المنتج أو الفئة..." oninput="searchAdminProducts()" onkeydown="if(event.key === 'Escape') clearAdminProductSearch()">
+                <input type="text" id="adminProductSearch" class="admin-search-input" placeholder="ابحث في منتجات متجرك (بالاسم أو الفئة)..." oninput="searchAdminProducts()" onkeydown="if(event.key === 'Escape') clearAdminProductSearch()">
                 <button type="button" class="admin-search-btn" onclick="searchAdminProducts()">بحث</button>
                 <button type="button" class="admin-search-btn" onclick="clearAdminProductSearch()">مسح</button>
                 <span id="adminSearchCount" class="admin-search-count">كل المنتجات</span>
@@ -909,7 +897,6 @@
                             <th>الصورة</th>
                             <th>الاسم</th>
                             <th>الفئة</th>
-                            <th>كود التاجر</th>
                             <th>سعر التاجر</th>
                             <th>سعر الزبون (+10%)</th>
                             <th>الحالة</th>
@@ -919,33 +906,6 @@
                     </thead>
                     <tbody id="productsTableBody">
                         <tr><td colspan="8" class="loading">جاري تحميل المنتجات...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- قسم دليل وإدارة أكواد التجار -->
-        <div class="products-table" id="vendorsSection" style="margin-top: 30px; display:none;">
-            <h3>🔑 دليل وأكواد التواصل مع التجار (Vendors Directory)</h3>
-            <div class="admin-search-bar">
-                <input type="text" id="adminVendorSearch" class="admin-search-input" placeholder="ابحث بكود التاجر (VND-1001) أو اسم المتجر أو الهاتف..." oninput="searchAdminVendors()">
-                <button type="button" class="admin-search-btn" onclick="searchAdminVendors()">بحث</button>
-            </div>
-            <div style="overflow-x:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>كود التاجر (Vendor Code)</th>
-                            <th>اسم المتجر / التاجر</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>رقم الهاتف للتواصل</th>
-                            <th>العنوان</th>
-                            <th>حالة اشتراك المميز 🔑</th>
-                            <th>التواصل والإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vendorsTableBody">
-                        <tr><td colspan="7" class="loading">جاري تحميل قائمة التجار...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1513,21 +1473,17 @@
 
         async function loadStats() {
             try {
-                const isAdmin = currentVendor && currentVendor.role === 'admin';
-                
-                let productsQuery = supabase
-                    .from('products')
-                    .select('*', { count: 'exact', head: true });
-                
-                if (!isAdmin) {
-                    if (!currentUser || !currentUser.id) {
-                        document.getElementById('totalProducts').textContent = '0';
-                        return;
-                    }
-                    productsQuery = productsQuery.eq('vendor_id', currentUser.id);
+                if (!currentUser || !currentUser.id) {
+                    document.getElementById('totalProducts').textContent = '0';
+                    document.getElementById('totalOrders').textContent = '0';
+                    document.getElementById('totalRevenue').textContent = '0';
+                    return;
                 }
-                
-                const { count: productsCount, error } = await productsQuery;
+
+                const { count: productsCount, error } = await supabase
+                    .from('products')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('vendor_id', currentUser.id);
                 
                 if (error) {
                     console.error('Stats products count error:', error);
@@ -1537,16 +1493,11 @@
                 }
                 
                 const today = new Date().toISOString().split('T')[0];
-                let ordersQuery = supabase
+                const { count: ordersCount } = await supabase
                     .from('orders')
                     .select('*', { count: 'exact', head: true })
+                    .eq('vendor_id', currentUser.id)
                     .gte('created_at', today);
-                    
-                if (!isAdmin && currentUser?.id) {
-                    ordersQuery = ordersQuery.eq('vendor_id', currentUser.id);
-                }
-                
-                const { count: ordersCount } = await ordersQuery;
                 
                 document.getElementById('totalOrders').textContent = ordersCount || 0;
                 document.getElementById('totalRevenue').textContent = '0';
@@ -1560,28 +1511,19 @@
         // ==========================================
         // PRODUCTS MANAGEMENT
         // ==========================================
-        let adminVendors = [];
-
         async function loadProducts() {
             try {
-                const isAdmin = currentVendor && currentVendor.role === 'admin';
-                
-                let query = supabase
-                    .from('products')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                // Vendors only see their own products
-                if (!isAdmin) {
-                    if (!currentUser || !currentUser.id) {
-                        adminProducts = [];
-                        renderAdminProducts([]);
-                        return;
-                    }
-                    query = query.eq('vendor_id', currentUser.id);
+                if (!currentUser || !currentUser.id) {
+                    adminProducts = [];
+                    renderAdminProducts([]);
+                    return;
                 }
                 
-                let { data: products, error } = await query;
+                let { data: products, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('vendor_id', currentUser.id)
+                    .order('created_at', { ascending: false });
                 
                 if (error) {
                     console.error('Error loading products:', error);

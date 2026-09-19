@@ -48,7 +48,7 @@ export default function VendorDashboard({ navigation, route }: any) {
   const [generatingCode, setGeneratingCode] = useState<boolean>(false);
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
 
-  const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+  const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
   const isAdminEmail = (email?: string) => !!(email && ADMIN_EMAILS.includes(email.trim().toLowerCase()));
 
   const currentUserId = user?.id || user?.uid;
