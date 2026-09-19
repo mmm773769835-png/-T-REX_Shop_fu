@@ -839,6 +839,44 @@
                 <button type="submit" class="btn-submit" id="submitBtn">إضافة المنتج</button>
                 <button type="button" class="btn-submit" id="cancelBtn" onclick="resetForm()" style="background:linear-gradient(135deg, #666, #444); margin-right:10px; display:none;">إلغاء</button>
             </form>
+        <!-- Vendor Code Management Section (Admin Only & Vendor Activation) -->
+        <div class="product-form" style="margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFD700; padding-bottom: 12px; margin-bottom: 18px;">
+                <h3 style="margin: 0; color: #FFD700;"><i class="fas fa-key"></i> 🔑 أكواد تفعيل التمييز والبنر للتجار (30 يوماً)</h3>
+                <span id="vendorSubscriptionStatus" style="font-size: 13px; font-weight: bold; background: rgba(255,215,0,0.15); padding: 6px 14px; border-radius: 20px; color: #FFD700;">
+                    جاري التحقق من الاشتراك...
+                </span>
+            </div>
+
+            <!-- Admin Section: Generate Code -->
+            <div id="adminCodeGeneratorBox" style="display: none; background: rgba(255, 215, 0, 0.05); border: 1px dashed #FFD700; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                <h4 style="color: #fff; margin-top: 0; margin-bottom: 10px;">إدارة توليد الأكواد للمدير:</h4>
+                <p style="color: #aaa; font-size: 13px; margin-bottom: 12px;">قم بتوليد كود تفعيل 30 يوماً وإرساله للتاجر بعد استلام قيمة الاشتراك عبر الواتساب أو البريد.</p>
+                <button type="button" class="btn-submit" onclick="generateActivationCodeAdmin()" style="width: auto; padding: 10px 24px; background: linear-gradient(135deg, #FFD700, #ffa500); color: #111;">
+                    <i class="fas fa-plus-circle"></i> توليد كود تفعيل (30 يوماً) 🔑
+                </button>
+                <div id="generatedCodeDisplay" style="display: none; margin-top: 15px; padding: 12px; background: #1a1a1a; border-radius: 8px; border: 1px solid #FFD700;">
+                    <span style="color: #aaa; font-size: 13px;">كود التفعيل الجديد: </span>
+                    <strong id="newCodeValue" style="color: #FFD700; font-size: 18px; letter-spacing: 2px; margin: 0 10px;">TRX-30D-XXXXXX</strong>
+                    <button type="button" class="btn-edit" onclick="copyGeneratedCode()" style="padding: 4px 12px; font-size: 12px;">نسخ الكود 📋</button>
+                </div>
+            </div>
+
+            <!-- Vendor Section: Redeem Code & Customer Support -->
+            <div id="vendorRedeemCodeBox" style="background: #111; border: 1px solid #333; border-radius: 12px; padding: 18px;">
+                <h4 style="color: #fff; margin-top: 0; margin-bottom: 8px;">تفعيل كود الاشتراك (30 يوماً):</h4>
+                <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">لإتاحة خيار تمييز المنتجات والظهور في بنر العروض، أدخل كود التفعيل المستلم من الدفع:</p>
+                <div style="display: flex; gap: 10px; max-width: 500px;">
+                    <input type="text" id="activationCodeInput" placeholder="أدخل الكود هنا (مثال: TRX-30D-8921)" style="flex: 1; padding: 10px 15px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff; text-transform: uppercase;">
+                    <button type="button" class="btn-submit" onclick="redeemVendorCodeWeb()" style="width: auto; padding: 10px 20px;">
+                        تفعيل 🔑
+                    </button>
+                </div>
+                <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid #222; font-size: 13px; color: #888; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <span><i class="fab fa-whatsapp" style="color: #25D366; font-size: 16px;"></i> خدمة العملاء والدفع عبر الواتساب: <strong style="color: #fff;">+967 770 000 000</strong></span>
+                    <span><i class="fas fa-envelope" style="color: #FFD700;"></i> البريد: <strong style="color: #fff;">admin@trexshopmax.com</strong></span>
+                </div>
+            </div>
         </div>
 
         <div class="products-table">
@@ -2224,8 +2262,149 @@
             });
         }
 
+        // Vendor Activation Codes & Paid Featured Subscription Logic
+        async function loadVendorSubscriptionInfo() {
+            if (!currentUser) return;
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, featured_until')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                const isVendorAdmin = profile && (profile.role === 'admin' || currentUser.email === 'trexshopmax@gmail.com');
+                const statusSpan = document.getElementById('vendorSubscriptionStatus');
+                const adminBox = document.getElementById('adminCodeGeneratorBox');
+
+                if (isVendorAdmin) {
+                    if (adminBox) adminBox.style.display = 'block';
+                    if (statusSpan) {
+                        statusSpan.textContent = '🌟 الحساب: مدير المنصة (اشتراك دائم)';
+                        statusSpan.style.color = '#25D366';
+                    }
+                } else {
+                    if (adminBox) adminBox.style.display = 'none';
+                    const featuredUntil = profile?.featured_until ? new Date(profile.featured_until) : null;
+                    const isActive = featuredUntil && featuredUntil > new Date();
+
+                    if (isActive) {
+                        if (statusSpan) {
+                            statusSpan.textContent = `✨ اشتراك المميز نشط حتى: ${featuredUntil.toLocaleDateString('ar-EG')} 🟢`;
+                            statusSpan.style.color = '#25D366';
+                        }
+                    } else {
+                        if (statusSpan) {
+                            statusSpan.textContent = '⚠️ خيار المميز والبنر مغلق (غير مشترك) 🔴';
+                            statusSpan.style.color = '#ff4444';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('[SUBSCRIPTION] Error checking profile status:', e);
+            }
+        }
+
+        async function generateActivationCodeAdmin() {
+            const randomCode = 'TRX-30D-' + Math.floor(100000 + Math.random() * 900000);
+            try {
+                const { data, error } = await supabase
+                    .from('activation_codes')
+                    .insert({
+                        code: randomCode,
+                        duration_days: 30,
+                        status: 'active'
+                    });
+
+                if (error) throw error;
+
+                document.getElementById('newCodeValue').textContent = randomCode;
+                document.getElementById('generatedCodeDisplay').style.display = 'block';
+                alert(`✅ تم توليد كود التفعيل بنجاح:\n${randomCode}\n\nيمكنك نسخه الآن وإرساله للتاجر عبر الواتساب.`);
+            } catch (err) {
+                alert('❌ خطأ في توليد الكود: ' + err.message);
+            }
+        }
+
+        function copyGeneratedCode() {
+            const codeText = document.getElementById('newCodeValue').textContent;
+            navigator.clipboard.writeText(codeText);
+            alert('📋 تم نسخ الكود: ' + codeText);
+        }
+
+        async function redeemVendorCodeWeb() {
+            const input = document.getElementById('activationCodeInput');
+            const codeStr = input ? input.value.trim().toUpperCase() : '';
+            if (!codeStr) {
+                alert('⚠️ يرجى أدخال كود التفعيل أولاً.');
+                return;
+            }
+
+            try {
+                const { data: codeData, error: codeErr } = await supabase
+                    .from('activation_codes')
+                    .select('*')
+                    .eq('code', codeStr)
+                    .eq('status', 'active')
+                    .single();
+
+                if (codeErr || !codeData) {
+                    alert('❌ كود التفعيل غير صحيح أو تم استخدامه سابقاً.');
+                    return;
+                }
+
+                const now = new Date();
+                const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+                // Mark code as used
+                await supabase
+                    .from('activation_codes')
+                    .update({
+                        status: 'used',
+                        used_by_vendor_id: currentUser.id,
+                        activated_at: now.toISOString(),
+                        expires_at: expiresAt.toISOString()
+                    })
+                    .eq('id', codeData.id);
+
+                // Update vendor profile
+                await supabase
+                    .from('profiles')
+                    .update({ featured_until: expiresAt.toISOString() })
+                    .eq('id', currentUser.id);
+
+                alert('🎉 تم تفعيل اشتراك المميز والبنر بنجاح لمدة 30 يوماً!\nينتهي في: ' + expiresAt.toLocaleDateString('ar-EG'));
+                input.value = '';
+                loadVendorSubscriptionInfo();
+            } catch (err) {
+                alert('❌ خطأ في تفعيل الكود: ' + err.message);
+            }
+        }
+
+        // Add event listener to check featured status before checking isFeatured
+        document.getElementById('isFeatured')?.addEventListener('change', async function(e) {
+            if (e.target.checked && currentUser) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, featured_until')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                const isVendorAdmin = profile && (profile.role === 'admin' || currentUser.email === 'trexshopmax@gmail.com');
+                const featuredUntil = profile?.featured_until ? new Date(profile.featured_until) : null;
+                const isActive = featuredUntil && featuredUntil > new Date();
+
+                if (!isVendorAdmin && !isActive) {
+                    e.target.checked = false;
+                    alert('🔒 خيار المنتجات المميزة والبنر خاص بالتجار المشتركين فقط.\n\nيرجى التواصل مع خدمة العملاء لطلب كود التفعيل (30 يوماً):\n📞 واتساب: +967 770 000 000\n✉️ البريد: admin@trexshopmax.com\n\nثم أدخل كود التفعيل في صندوق الأكواد بالأسفل للتفعيل فوراً.');
+                    document.getElementById('vendorRedeemCodeBox')?.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+
         // Initialize auth check on page load
-        checkAuth();
+        checkAuth().then(() => {
+            loadVendorSubscriptionInfo();
+        });
     </script>
 </body>
 </html>

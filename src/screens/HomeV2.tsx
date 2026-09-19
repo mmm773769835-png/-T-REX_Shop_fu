@@ -74,6 +74,7 @@ interface Product {
   originalPrice?: number;
   old_price?: number;
   is_new?: boolean;
+  is_featured?: boolean | string | number;
   stock?: number;
   attribute?: string;
   vendor_code?: string;
@@ -107,6 +108,12 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
   const { state: filterState } = useAdvancedFilters();
   const [currencyDropdownVisible, setCurrencyDropdownVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
   const searchDropdownResults = useMemo(() => {
     const normalizedSearch = normalizeText(searchQuery);
     if (!normalizedSearch) {
@@ -276,6 +283,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 originalPrice: item.original_price || item.old_price || item.originalPrice || null,
                 old_price: item.old_price || item.original_price || null,
                 is_new: item.is_new || false,
+                is_featured: item.is_featured || false,
                 stock: item.stock ?? item.quantity ?? null,
                 attribute: item.attribute || item.status || "",
                 vendor_code: item.vendor_code || "VND-MAIN",
@@ -323,7 +331,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   // 🛒 إضافة منتج إلى السلة (updated to use context)
   const handleAddToCart = (product: Product) => {
     addToCart(product);
-    Alert.alert("✅", language === "ar" ? `تم إضافة ${product.name} إلى السلة` : `${product.name} added to cart`);
+    showToast(language === "ar" ? `تم إضافة ${product.name} إلى السلة 🛒` : `${product.name} added to cart 🛒`);
   };
 
   // 🎨 عرض القسم
@@ -630,6 +638,111 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     </View>
   );
 
+  // 🌟 تصفية المنتجات المميزة
+  const featuredProducts = useMemo(() => {
+    return products.filter((p) => {
+      const val = p.is_featured;
+      return val === true || val === "true" || val === 1 || String(val) === "1";
+    });
+  }, [products]);
+
+  // 🎨 عرض المنتجات المميزة
+  const renderFeaturedProducts = () => {
+    if (featuredProducts.length === 0) return null;
+
+    return (
+      <View style={styles.featuredSectionContainer}>
+        <View style={styles.featuredHeader}>
+          <Ionicons name="star" size={18} color="#FFD700" style={{ marginEnd: 6 }} />
+          <Text style={[styles.featuredSectionTitle, { color: isDarkMode ? "#FFD700" : "#1a1a1a" }]}>
+            {language === "ar" ? "منتجات مميزة" : "Featured Products"}
+          </Text>
+        </View>
+        <FlatList
+          data={featuredProducts}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => `featured-${item.id}`}
+          contentContainerStyle={styles.featuredListContainer}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.featuredCard,
+                { backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff", borderColor: isDarkMode ? "#333" : "#e5e5e5" }
+              ]}
+              activeOpacity={0.85}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('ProductDetails', { product: item });
+              }}
+            >
+              <View style={styles.featuredImageContainer}>
+                <Image
+                  source={{ uri: (item.images && item.images.length > 0) ? item.images[0] : item.imageUrl }}
+                  style={styles.featuredProductImage}
+                  defaultSource={{ uri: 'https://via.placeholder.com/300x200/1a1a1a/FFD700?text=T-REX' }}
+                />
+                <View style={styles.featuredBadge}>
+                  <Ionicons name="star" size={10} color="#1a1a1a" />
+                  <Text style={styles.featuredBadgeText}>{language === 'ar' ? 'مميز' : 'Featured'}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.featuredCartBtn}
+                  onPress={() => handleAddToCart(item)}
+                >
+                  <Ionicons name="cart-outline" size={16} color="#1a1a1a" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.featuredInfo}>
+                <Text style={[styles.featuredProductName, { color: isDarkMode ? "#fff" : "#1a1a1a" }]} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                <Text style={styles.featuredProductPrice}>
+                  {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
+  };
+    // 🚀 عرض بنر العروض الترويجي
+  const renderPromoBanner = () => (
+    <View style={styles.promoBannerWrapper}>
+      <View style={[styles.promoBannerBox, { backgroundColor: isDarkMode ? "#1e1b4b" : "#2e1065" }]}>
+        <View style={styles.promoBannerContent}>
+          <View style={styles.promoBannerBadge}>
+            <Ionicons name="flash" size={12} color="#111" />
+            <Text style={styles.promoBannerBadgeText}>
+              {language === 'ar' ? 'عروض الموسم الكبرى' : 'Season Super Sale'}
+            </Text>
+          </View>
+          <Text style={styles.promoBannerTitle}>
+            {language === 'ar' ? 'خصومات تصل إلى 50%' : 'Up to 50% OFF'}
+          </Text>
+          <Text style={styles.promoBannerSub}>
+            {language === 'ar' ? 'تسوق أحدث المنتجات والساعات حصرياً' : 'Shop exclusive products & watches'}
+          </Text>
+        </View>
+        <Ionicons name="gift-outline" size={54} color="rgba(255,215,0,0.35)" />
+      </View>
+    </View>
+  );
+
+  // 💀 عرض بطاقات التحميل الهيكلي Skeleton
+  const renderSkeletons = () => (
+    <View style={styles.skeletonGrid}>
+      {[1, 2, 3, 4, 5, 6].map((key) => (
+        <View key={key} style={[styles.skeletonCard, { backgroundColor: isDarkMode ? "#1e1e1e" : "#e0e0e0" }]}>
+          <View style={[styles.skeletonImage, { backgroundColor: isDarkMode ? "#2a2a2a" : "#c5c5c5" }]} />
+          <View style={[styles.skeletonTextLine, { width: '80%', backgroundColor: isDarkMode ? "#2a2a2a" : "#c5c5c5" }]} />
+          <View style={[styles.skeletonTextLine, { width: '40%', backgroundColor: isDarkMode ? "#2a2a2a" : "#c5c5c5" }]} />
+        </View>
+      ))}
+    </View>
+  );
+
   // 🎨 عرض أقسام المنتجات
   const renderCategories = () => (
     <View style={styles.categoriesContainer}>
@@ -647,14 +760,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   // 🎨 عرض المنتجات
   const renderProducts = () => {
     if (loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007bff" />
-          <Text style={[styles.loadingText, { color: isDarkMode ? "#ccc" : "#666" }]}>
-            {language === "ar" ? "جاري تحميل المنتجات..." : "Loading products..."}
-          </Text>
-        </View>
-      );
+      return renderSkeletons();
     }
 
     if (error) {
@@ -704,7 +810,9 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     <View style={[styles.container, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
       {renderHeader()}
       {renderSearchBar()}
+      {renderPromoBanner()}
       {renderCategories()}
+      {renderFeaturedProducts()}
 
       {/* عنوان المنتجات */}
       <View style={[styles.sectionHeader, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
@@ -742,6 +850,14 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
         >
           <Ionicons name="add-circle" size={60} color="#007bff" />
         </TouchableOpacity>
+      )}
+
+      {/* 🔔 Toast Notification Banner */}
+      {toastMessage && (
+        <View style={styles.toastContainer}>
+          <Ionicons name="checkmark-circle" size={20} color="#FFD700" />
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </View>
       )}
       
       {/* القائمة الجانبية */}
@@ -1202,6 +1318,176 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  featuredSectionContainer: {
+    marginVertical: 10,
+  },
+  featuredHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  featuredSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  featuredListContainer: {
+    paddingHorizontal: 12,
+  },
+  featuredCard: {
+    width: 150,
+    borderRadius: 12,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  featuredImageContainer: {
+    width: '100%',
+    height: 110,
+    position: 'relative',
+  },
+  featuredProductImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  featuredBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#FFD700',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    gap: 2,
+  },
+  featuredBadgeText: {
+    color: '#1a1a1a',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  featuredCartBtn: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: '#FFD700',
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featuredInfo: {
+    padding: 8,
+  },
+  featuredProductName: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  featuredProductPrice: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#FFD700',
+  },
+  promoBannerWrapper: {
+    paddingHorizontal: 16,
+    marginVertical: 10,
+  },
+  promoBannerBox: {
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFD70050',
+    overflow: 'hidden',
+  },
+  promoBannerContent: {
+    flex: 1,
+  },
+  promoBannerBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    marginBottom: 6,
+  },
+  promoBannerBadgeText: {
+    color: '#111',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  promoBannerTitle: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '900',
+    marginBottom: 2,
+  },
+  promoBannerSub: {
+    color: '#cbd5e1',
+    fontSize: 12,
+  },
+  skeletonGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12,
+    justifyContent: 'space-between',
+  },
+  skeletonCard: {
+    width: '48%',
+    height: 220,
+    borderRadius: 14,
+    marginBottom: 12,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  skeletonImage: {
+    width: '100%',
+    height: 130,
+    borderRadius: 10,
+  },
+  skeletonTextLine: {
+    height: 14,
+    borderRadius: 6,
+  },
+  toastContainer: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+    backgroundColor: '#1a1a1ae6',
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 9999,
+  },
+  toastText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 });
 

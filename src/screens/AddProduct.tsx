@@ -10,7 +10,7 @@ const checkMobileImageSafety = async (imageUri: string): Promise<{ safe: boolean
 
 import * as React from "react";
 import { useState, useContext } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal, FlatList, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal, FlatList, Platform, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
@@ -33,10 +33,96 @@ export default function AddProduct({ navigation, route }: any) {
   const [category, setCategory] = useState(route?.params?.category || categories[0]);
   const [attribute, setAttribute] = useState(route?.params?.attribute || attributes[0]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [images, setImages] = useState<string[]>([]); // مصفوفة لتخزين عدة صور
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showAttributeModal, setShowAttributeModal] = useState(false);
+  const [userRole, setUserRole] = useState<string>('vendor');
+  const [featuredUntil, setFeaturedUntil] = useState<string | null>(null);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [activationInput, setActivationInput] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+
+  React.useEffect(() => {
+    const loadProfile = async () => {
+      if (user?.id) {
+        try {
+          const { data } = await dbService.get('profiles', { eq: { id: user.id } });
+          if (data && data.length > 0) {
+            setUserRole(data[0].role || 'vendor');
+            setFeaturedUntil(data[0].featured_until || null);
+          }
+        } catch (e) {
+          console.log('Error loading profile:', e);
+        }
+      }
+    };
+    loadProfile();
+  }, [user?.id]);
+
+  const handleToggleFeatured = () => {
+    if (userRole === 'admin') {
+      setIsFeatured(!isFeatured);
+      return;
+    }
+
+    const isActive = featuredUntil && new Date(featuredUntil) > new Date();
+    if (isActive) {
+      setIsFeatured(!isFeatured);
+    } else {
+      setShowCodeModal(true);
+    }
+  };
+
+  const handleRedeemCode = async () => {
+    const codeStr = activationInput.trim().toUpperCase();
+    if (!codeStr) {
+      Alert.alert(language === 'ar' ? 'تنبيه' : 'Warning', language === 'ar' ? 'يرجى إدخال كود التفعيل' : 'Please enter code');
+      return;
+    }
+
+    setRedeeming(true);
+    try {
+      const { data, error } = await dbService.get('activation_codes', { eq: { code: codeStr, status: 'active' } });
+      if (error || !data || data.length === 0) {
+        Alert.alert(language === 'ar' ? 'خطأ' : 'Error', language === 'ar' ? 'كود التفعيل غير صحيح أو تم استخدامه سابقاً' : 'Invalid or used code');
+        setRedeeming(false);
+        return;
+      }
+
+      const codeItem = data[0];
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      // Update activation code
+      await dbService.update('activation_codes', codeItem.id, {
+        status: 'used',
+        used_by_vendor_id: user?.id,
+        activated_at: now.toISOString(),
+        expires_at: expiresAt
+      });
+
+      // Update vendor profile
+      if (user?.id) {
+        await dbService.update('profiles', user.id, { featured_until: expiresAt });
+      }
+
+      setFeaturedUntil(expiresAt);
+      setIsFeatured(true);
+      setShowCodeModal(false);
+      setActivationInput("");
+
+      Alert.alert(
+        language === 'ar' ? 'تم التفعيل بنجاح! 🎉' : 'Activated! 🎉',
+        language === 'ar' ? `تم تفعيل اشتراك المميز والبنر لـ 30 يوماً!\nينتهي بتاريخ: ${new Date(expiresAt).toLocaleDateString('ar-EG')}` : `Featured subscription activated for 30 days!`
+      );
+    } catch (err: any) {
+      Alert.alert(language === 'ar' ? 'خطأ' : 'Error', err.message || 'فشل التفعيل');
+    } finally {
+      setRedeeming(false);
+    }
+  };
 
   // حساب نسبة فائدة المتجر والسعر النهائي بناءً على الشرائح التلقائية
   const getTieredMarkupPercent = (vPrice: number, curr = 'YER') => {
@@ -301,6 +387,7 @@ export default function AddProduct({ navigation, route }: any) {
         vendor_id: vendorId,
         vendor_code: vendorCode,
         paymentMethod,
+        is_featured: isFeatured,
         is_active: true, // Ensure the product is active by default
         images: imageUrls,
         image_url: imageUrls[0],
@@ -496,6 +583,23 @@ export default function AddProduct({ navigation, route }: any) {
           </TouchableOpacity>
         </View>
 
+        <Text style={styles.label}>{language === 'ar' ? 'تمييز المنتج ⭐' : 'Highlight Product ⭐'}</Text>
+        <TouchableOpacity 
+          style={[
+            styles.paymentButton, 
+            isFeatured ? { backgroundColor: '#FFD700', borderColor: '#FFD700' } : { backgroundColor: '#2a2a2a', borderColor: '#444' }, 
+            { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginBottom: 16 }
+          ]}
+          onPress={handleToggleFeatured}
+        >
+          <Ionicons name={isFeatured ? "star" : "star-outline"} size={20} color={isFeatured ? "#1a1a1a" : "#FFD700"} />
+          <Text style={{ color: isFeatured ? "#1a1a1a" : "#fff", fontWeight: "bold", fontSize: 14 }}>
+            {isFeatured 
+              ? (language === 'ar' ? 'المنتج مميز ⭐' : 'Product Featured ⭐')
+              : (language === 'ar' ? 'إضافة إلى المنتجات المميزة' : 'Mark as Featured')}
+          </Text>
+        </TouchableOpacity>
+
         {/* رفع الصور */}
         <View style={styles.imageSection}>
           <Text style={styles.label}>
@@ -618,6 +722,98 @@ export default function AddProduct({ navigation, route }: any) {
                 </TouchableOpacity>
               )}
             />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal for Code Activation & Customer Support */}
+      <Modal
+        visible={showCodeModal}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="key" size={22} color="#FFD700" />
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FFD700' }}>
+                  {language === 'ar' ? "تفعيل خيار المميز والبنر 🔑" : "Activate Featured Option 🔑"}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowCodeModal(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} style={{ marginVertical: 10 }}>
+              <Text style={{ color: '#ccc', fontSize: 13, lineHeight: 20, marginBottom: 14 }}>
+                {language === 'ar'
+                  ? "خيار المنتجات المميزة والبنر خاص بالتجار المشتركين فقط. قم بالتواصل مع خدمة العملاء للحصول على كود التفعيل لمدّة 30 يوماً بعد الدفع:"
+                  : "Featured products & banners are for active vendors only. Contact support to get your 30-day activation code:"}
+              </Text>
+
+              {/* Customer Support Info */}
+              <View style={{ backgroundColor: '#262626', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: '#333', marginBottom: 16, gap: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
+                  <Text style={{ color: '#fff', fontSize: 13 }}>
+                    {language === 'ar' ? "واتساب خدمة العملاء والدفع:" : "WhatsApp Support:"} <Text style={{ fontWeight: 'bold', color: '#25D366' }}>+967 770 000 000</Text>
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="mail" size={18} color="#FFD700" />
+                  <Text style={{ color: '#fff', fontSize: 13 }}>
+                    {language === 'ar' ? "البريد الإلكتروني:" : "Email:"} <Text style={{ fontWeight: 'bold', color: '#FFD700' }}>admin@trexshopmax.com</Text>
+                  </Text>
+                </View>
+              </View>
+
+              {/* Code Input */}
+              <Text style={{ color: '#FFD700', fontSize: 14, fontWeight: 'bold', marginBottom: 6 }}>
+                {language === 'ar' ? "أدخل كود التفعيل (30 يوماً):" : "Enter Activation Code (30 Days):"}
+              </Text>
+              <TextInput
+                style={{
+                  backgroundColor: '#0f0f0f',
+                  color: '#fff',
+                  borderWidth: 1,
+                  borderColor: '#FFD700',
+                  borderRadius: 10,
+                  padding: 12,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  letterSpacing: 2,
+                  textAlign: 'center',
+                  marginBottom: 16,
+                }}
+                placeholder="TRX-30D-XXXXXX"
+                placeholderTextColor="#666"
+                value={activationInput}
+                onChangeText={setActivationInput}
+                autoCapitalize="characters"
+              />
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#FFD700',
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  opacity: redeeming ? 0.7 : 1,
+                }}
+                disabled={redeeming}
+                onPress={handleRedeemCode}
+              >
+                {redeeming ? (
+                  <ActivityIndicator color="#111" />
+                ) : (
+                  <Text style={{ color: '#111', fontWeight: 'bold', fontSize: 16 }}>
+                    {language === 'ar' ? "تفعيل الكود الآن 🔑" : "Activate Code Now 🔑"}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </Modal>
