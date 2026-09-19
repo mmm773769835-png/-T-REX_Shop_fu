@@ -1280,67 +1280,65 @@
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
             const errorDiv = document.getElementById('loginError');
-            const autoBox = document.getElementById('quickAutoRegisterBox');
 
             btn.disabled = true;
             btn.textContent = 'جاري تسجيل الدخول...';
             errorDiv.classList.remove('show');
-            autoBox.style.display = 'none';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
+                const userEmail = email.toLowerCase();
+                const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
+
+                let authUser = null;
+
+                const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
                     email,
                     password
                 });
 
-                if (error) {
-                    if (error.message.includes('Invalid login credentials')) {
-                        autoBox.style.display = 'block';
+                if (signInErr) {
+                    if (signInErr.message.includes('Invalid login credentials')) {
+                        // Attempt auto-signup for vendor/admin
+                        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+                            email,
+                            password,
+                            options: { data: { role: isAdminEmail ? 'admin' : 'vendor', name: email.split('@')[0] } }
+                        });
+                        if (signUpErr) {
+                            if (signUpErr.message.includes('already registered')) {
+                                throw new Error('❌ كلمة المرور غير صحيحة. أعد المحاولة أو استخدم تسجيل الدخول عبر Google بنفس البريد.');
+                            }
+                            throw signUpErr;
+                        }
+                        authUser = signUpData.user;
+                    } else {
+                        throw signInErr;
                     }
-                    throw error;
+                } else {
+                    authUser = signInData.user;
                 }
 
-                currentUser = data.user;
+                if (!authUser) throw new Error('تعذر إكمال تسجيل الدخول، يرجى المحاولة مرة أخرى.');
 
-                // Load or ensure profile
-                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
-                const userEmail = (data.user.email || '').toLowerCase();
-                const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
+                currentUser = authUser;
 
                 let { data: profile } = await supabase
                     .from('profiles')
                     .select('*')
-                    .eq('id', data.user.id)
+                    .eq('id', authUser.id)
                     .single();
 
-                // VENDOR PAGE: Block admin login - redirect to superadmin
-                if (isAdminEmail) {
-                    await supabase.auth.signOut();
-                    errorDiv.textContent = '🔒 هذه الصفحة للتجار فقط. يرجى الدخول من لوحة الإدارة العليا.';
-                    errorDiv.classList.add('show');
-                    setTimeout(() => { window.location.href = 'trex-superadmin-secret-99835.html'; }, 2000);
-                    btn.disabled = false;
-                    btn.textContent = 'تسجيل الدخول';
-                    return;
-                }
-
-                // Block customers from entering
-                if (profile && profile.role !== 'vendor') {
-                    await supabase.auth.signOut();
-                    errorDiv.textContent = 'هذا الحساب غير مسجل كتاجر. يرجى إنشاء حساب تاجر جديد.';
-                    errorDiv.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'تسجيل الدخول';
-                    return;
-                }
-
-                if (!profile) {
-                    const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+                // Ensure profile exists and assign appropriate role (admin or vendor)
+                const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
+                if (!profile || (profile.role !== 'vendor' && profile.role !== 'admin')) {
+                    const vendorCode = profile?.vendor_code || (targetRole === 'admin' ? ('ADM-' + Math.floor(1000 + Math.random() * 9000)) : ('VND-' + Math.floor(1000 + Math.random() * 9000)));
                     profile = {
-                        id: data.user.id,
-                        email: data.user.email,
-                        role: 'vendor',
-                        shop_name: 'متجر ' + (data.user.email ? data.user.email.split('@')[0] : 'تاجر'),
+                        id: authUser.id,
+                        email: authUser.email,
+                        name: authUser.user_metadata?.full_name || profile?.name || (targetRole === 'admin' ? 'مدير النظام' : 'تاجر جديد'),
+                        role: targetRole,
+                        shop_name: profile?.shop_name || (targetRole === 'admin' ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (authUser.email ? authUser.email.split('@')[0] : 'تاجر')),
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
@@ -1355,7 +1353,7 @@
                 errorDiv.classList.add('show');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'تسجيل الدخول';
+                btn.textContent = 'تسجيل الدخول 🔑';
             }
         });
 
@@ -1438,7 +1436,7 @@
                 const pendingPhone = localStorage.getItem('pending_vendor_phone');
                 const pendingCountry = localStorage.getItem('pending_vendor_country');
 
-                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+                const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
                 const userEmail = (currentUser.email || '').toLowerCase();
                 const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
 
@@ -1448,36 +1446,16 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                // VENDOR PAGE: Redirect admins to their own admin page
-                if (isAdminEmail) {
-                    await supabase.auth.signOut();
-                    alert('🔒 لوحة التجار لا تقبل حسابات الإدارة.\nيرجى الدخول من لوحة الإدارة العليا.');
-                    window.location.href = 'trex-superadmin-secret-99835.html';
-                    return;
-                }
+                const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
 
-                // Reject non-vendor accounts (customers)
-                if (profile && profile.role !== 'vendor' && !pendingShopName) {
-                    await supabase.auth.signOut();
-                    alert('هذا الحساب مسجل كـ "زبون". يرجى التسجيل كتاجر جديد من تبويب "حساب تاجر جديد".');
-                    return;
-                }
-                
-                if (!profile && !pendingShopName && !isAdminEmail) {
-                    await supabase.auth.signOut();
-                    alert('لا يوجد حساب تاجر مرتبط بهذا البريد. يرجى إنشاء حساب تاجر جديد أولاً.');
-                    return;
-                }
-
-                if (!profile || pendingShopName || (isAdminEmail && profile?.role !== 'admin')) {
-                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
-                    const targetRole = isAdminEmail ? 'admin' : 'vendor';
+                if (!profile || pendingShopName || profile.role !== targetRole) {
+                    const vendorCode = profile?.vendor_code || (targetRole === 'admin' ? ('ADM-' + Math.floor(1000 + Math.random() * 9000)) : ('VND-' + Math.floor(1000 + Math.random() * 9000)));
                     const newProfile = {
                         id: currentUser.id,
                         email: currentUser.email,
-                        name: currentUser.user_metadata?.full_name || profile?.name || '',
+                        name: currentUser.user_metadata?.full_name || profile?.name || (targetRole === 'admin' ? 'مدير النظام' : 'تاجر'),
                         role: targetRole,
-                        shop_name: pendingShopName || profile?.shop_name || (isAdminEmail ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
+                        shop_name: pendingShopName || profile?.shop_name || (targetRole === 'admin' ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
                         phone: pendingPhone || profile?.phone || '',
                         address: pendingCountry || profile?.address || '',
                         vendor_code: vendorCode,
@@ -1486,8 +1464,9 @@
 
                     await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
                     profile = newProfile;
+                }
 
-                    localStorage.removeItem('pending_vendor_shop_name');
+                localStorage.removeItem('pending_vendor_shop_name');
                     localStorage.removeItem('pending_vendor_phone');
                     localStorage.removeItem('pending_vendor_country');
                 } else if (profile && (!profile.email || !profile.name)) {
