@@ -128,6 +128,49 @@ export default function AdminVendorsScreen({ navigation }: any) {
     );
   };
 
+  const applySubscription = async (vendorId: string, durationDays: number, currentUntil: string | null) => {
+    try {
+      setLoading(true);
+      const now = new Date();
+      let baseTime = now.getTime();
+      if (currentUntil && new Date(currentUntil) > now) {
+        baseTime = new Date(currentUntil).getTime();
+      }
+      const newExpiresAt = new Date(baseTime + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+      await dbService.update('profiles', vendorId, { featured_until: newExpiresAt });
+
+      Alert.alert(
+        language === 'ar' ? 'تم التفعيل بنجاح 🎉' : 'Activated Successfully 🎉',
+        language === 'ar'
+          ? `تم تفعيل/تجديد اشتراك التمييز لـ ${durationDays} يوماً إضافية!\nينتهي بتاريخ: ${new Date(newExpiresAt).toLocaleDateString('ar-EG')}`
+          : `Subscription extended for ${durationDays} days!`
+      );
+      fetchVendors();
+    } catch (err: any) {
+      Alert.alert(language === 'ar' ? 'خطأ' : 'Error', err.message || 'فشل التفعيل');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGrantSubscription = (vendorId: string, vendorName: string, currentUntil: string | null) => {
+    Alert.alert(
+      language === 'ar' ? '🔑 تفعيل/تجديد اشتراك التمييز للتاجر' : 'Activate/Extend Vendor Subscription',
+      language === 'ar'
+        ? `اختر مدة التفعيل المخصصة للتاجر "${vendorName}":`
+        : `Select duration for vendor "${vendorName}":`,
+      [
+        { text: language === 'ar' ? 'إلغاء' : 'Cancel', style: 'cancel' },
+        { text: '7 أيام (7 Days)', onPress: () => applySubscription(vendorId, 7, currentUntil) },
+        { text: '30 يوماً (30 Days)', onPress: () => applySubscription(vendorId, 30, currentUntil) },
+        { text: '60 يوماً (60 Days)', onPress: () => applySubscription(vendorId, 60, currentUntil) },
+        { text: '90 يوماً (90 Days)', onPress: () => applySubscription(vendorId, 90, currentUntil) },
+        { text: '365 يوماً (1 Year)', onPress: () => applySubscription(vendorId, 365, currentUntil) },
+      ]
+    );
+  };
+
   // تصفية التجار بحسب كود التاجر VND-XXXX أو الاسم أو اسم المتجر أو الهاتف
   const filteredVendors = vendors.filter((v) => {
     const q = searchQuery.trim().toLowerCase();
@@ -139,91 +182,118 @@ export default function AdminVendorsScreen({ navigation }: any) {
     return code.includes(q) || name.includes(q) || shop.includes(q) || phone.includes(q);
   });
 
-  const renderVendorItem = ({ item }: { item: any }) => (
-    <View style={[styles.vendorCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View style={styles.cardHeader}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.shopName, { color: colors.text }]}>
-            🏬 {item.shop_name || item.name || 'متجر تاجر'}
-          </Text>
-          <Text style={[styles.vendorName, { color: colors.textSecondary }]}>
-            👤 {item.name}
-          </Text>
+  const renderVendorItem = ({ item }: { item: any }) => {
+    const isFeaturedActive = item.featured_until && new Date(item.featured_until) > new Date();
+
+    return (
+      <View style={[styles.vendorCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.cardHeader}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.shopName, { color: colors.text }]}>
+              🏬 {item.shop_name || item.name || 'متجر تاجر'}
+            </Text>
+            <Text style={[styles.vendorName, { color: colors.textSecondary }]}>
+              👤 {item.name}
+            </Text>
+          </View>
+
+          <View style={styles.codeBadge}>
+            <Ionicons name="key-outline" size={14} color="#155724" />
+            <Text style={styles.codeBadgeText}>{item.vendor_code || 'VND-NONE'}</Text>
+          </View>
         </View>
 
-        <View style={styles.codeBadge}>
-          <Ionicons name="key-outline" size={14} color="#155724" />
-          <Text style={styles.codeBadgeText}>{item.vendor_code || 'VND-NONE'}</Text>
-        </View>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
-        <Text style={[styles.infoText, { color: colors.text }]}>
-          {item.phone || 'غير محدد'}
-        </Text>
-      </View>
-
-      {item.address ? (
         <View style={styles.infoRow}>
-          <Ionicons name="location-outline" size={16} color={colors.textSecondary} />
+          <Ionicons name="call-outline" size={16} color={colors.textSecondary} />
           <Text style={[styles.infoText, { color: colors.text }]}>
-            {item.address}
+            {item.phone || 'غير محدد'}
           </Text>
         </View>
-      ) : null}
 
-      <View style={styles.infoRow}>
-        <Ionicons name="cube-outline" size={16} color={colors.textSecondary} />
-        <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-          {language === 'ar' ? `عدد المنتجات: ${item.productCount}` : `Products Count: ${item.productCount}`}
-        </Text>
+        {item.address ? (
+          <View style={styles.infoRow}>
+            <Ionicons name="location-outline" size={16} color={colors.textSecondary} />
+            <Text style={[styles.infoText, { color: colors.text }]}>
+              {item.address}
+            </Text>
+          </View>
+        ) : null}
+
+        <View style={styles.infoRow}>
+          <Ionicons name="cube-outline" size={16} color={colors.textSecondary} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+            {language === 'ar' ? `عدد المنتجات: ${item.productCount}` : `Products Count: ${item.productCount}`}
+          </Text>
+        </View>
+
+        {/* حالة اشتراك المميز والبنر */}
+        <View style={styles.infoRow}>
+          <Ionicons name="star-outline" size={16} color={isFeaturedActive ? '#28a745' : '#ff4d4d'} />
+          <Text style={[styles.infoText, { color: isFeaturedActive ? '#28a745' : '#ff4d4d', fontWeight: 'bold' }]}>
+            {isFeaturedActive
+              ? (language === 'ar' ? `✨ اشتراك المميز نشط حتى: ${new Date(item.featured_until).toLocaleDateString('ar-EG')}` : `Featured active until ${new Date(item.featured_until).toLocaleDateString('en-US')}`)
+              : (language === 'ar' ? '⚠️ اشتراك المميز والبنر غير نشط' : 'Featured subscription inactive')}
+          </Text>
+        </View>
+
+        {/* أزرار الاتصال السريع والتواصل عبر الواتساب وحذف الحساب */}
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={[styles.contactBtn, { backgroundColor: '#28a745' }]}
+            onPress={() => handleWhatsAppVendor(item.phone)}
+          >
+            <Ionicons name="logo-whatsapp" size={16} color="#fff" />
+            <Text style={styles.contactBtnText}>
+              {language === 'ar' ? 'واتساب' : 'WhatsApp'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.contactBtn, { backgroundColor: '#007bff' }]}
+            onPress={() => handleCallVendor(item.phone)}
+          >
+            <Ionicons name="call" size={16} color="#fff" />
+            <Text style={styles.contactBtnText}>
+              {language === 'ar' ? 'اتصال' : 'Call'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.contactBtn, { backgroundColor: '#dc3545' }]}
+            onPress={() => handleDeleteVendor(item.id, item.shop_name || item.name || 'تاجر')}
+          >
+            <Ionicons name="trash-outline" size={16} color="#fff" />
+            <Text style={styles.contactBtnText}>
+              {language === 'ar' ? 'حذف الحساب' : 'Delete'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* أزرار الإدارة والتفعيل المباشر للتاجر */}
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+          <TouchableOpacity
+            style={[styles.contactBtn, { backgroundColor: '#FFD700', flex: 1, justifyContent: 'center' }]}
+            onPress={() => handleGrantSubscription(item.id, item.shop_name || item.name, item.featured_until)}
+          >
+            <Ionicons name="key" size={16} color="#1a1a1a" />
+            <Text style={[styles.contactBtnText, { color: '#1a1a1a' }]}>
+              {language === 'ar' ? 'تفعيل/تجديد الاشتراك 🔑' : 'Grant Subscription 🔑'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.contactBtn, { backgroundColor: '#17a2b8', flex: 1, justifyContent: 'center' }]}
+            onPress={() => navigation.navigate('VendorDashboard', { vendorId: item.id, vendorName: item.shop_name || item.name })}
+          >
+            <Ionicons name="cube" size={16} color="#fff" />
+            <Text style={styles.contactBtnText}>
+              {language === 'ar' ? 'منتجات التاجر 📦' : 'Products 📦'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* أزرار الاتصال السريع والتواصل عبر الواتساب وحذف الحساب */}
-      <View style={styles.actionsRow}>
-        <TouchableOpacity
-          style={[styles.contactBtn, { backgroundColor: '#28a745' }]}
-          onPress={() => handleWhatsAppVendor(item.phone)}
-        >
-          <Ionicons name="logo-whatsapp" size={16} color="#fff" />
-          <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'واتساب' : 'WhatsApp'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.contactBtn, { backgroundColor: '#007bff' }]}
-          onPress={() => handleCallVendor(item.phone)}
-        >
-          <Ionicons name="call" size={16} color="#fff" />
-          <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'اتصال' : 'Call'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.contactBtn, { backgroundColor: '#dc3545' }]}
-          onPress={() => handleDeleteVendor(item.id, item.shop_name || item.name || 'تاجر')}
-        >
-          <Ionicons name="trash-outline" size={16} color="#fff" />
-          <Text style={styles.contactBtnText}>
-            {language === 'ar' ? 'حذف الحساب' : 'Delete'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={[styles.contactBtn, { backgroundColor: '#17a2b8', marginTop: 10, width: '100%', justifyContent: 'center' }]}
-        onPress={() => navigation.navigate('VendorDashboard', { vendorId: item.id, vendorName: item.shop_name || item.name })}
-      >
-        <Ionicons name="cube" size={16} color="#fff" />
-        <Text style={styles.contactBtnText}>
-          {language === 'ar' ? 'إدارة منتجات التاجر' : 'Manage Vendor Products'}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

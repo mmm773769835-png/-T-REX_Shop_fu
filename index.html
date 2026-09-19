@@ -5762,7 +5762,18 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 featuredSwiperInstance = null;
             }
 
-            let featured = products.filter(p => isEnabled(p.is_featured)).slice(0, 8);
+            const now = new Date();
+            let featured = products.filter(p => {
+                if (!isEnabled(p.is_featured)) return false;
+                if (p.vendor_id && window.vendorProfilesMap && window.vendorProfilesMap[String(p.vendor_id)]) {
+                    const prof = window.vendorProfilesMap[String(p.vendor_id)];
+                    if (prof.role === 'admin') return true;
+                    const until = prof.featured_until ? new Date(prof.featured_until) : null;
+                    return until && until > now;
+                }
+                return true;
+            }).slice(0, 8);
+
             if (featured.length === 0 && products.length > 0) {
                 featured = products.slice(0, 8);
             }
@@ -5859,6 +5870,19 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 allProducts = products || [];
                 filteredProducts = [...allProducts];
                 
+                window.vendorProfilesMap = window.vendorProfilesMap || {};
+                try {
+                    const profRes = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=id,role,featured_until', {
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+                    });
+                    if (profRes.ok) {
+                        const profs = await profRes.json();
+                        profs.forEach(pr => { window.vendorProfilesMap[String(pr.id)] = pr; });
+                    }
+                } catch (pe) {
+                    console.warn('[PROFILES] Could not load vendor profiles map:', pe);
+                }
+
                 registerProductsToMap(allProducts);
                 renderProducts();
                 renderFeatured(allProducts);

@@ -108,6 +108,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   const [selectedCategory, setSelectedCategory] = useState(language === "ar" ? "جميع المنتجات" : "All Products");
   const { state: filterState } = useAdvancedFilters();
   const [currencyDropdownVisible, setCurrencyDropdownVisible] = useState(false);
+  const [profilesMap, setProfilesMap] = useState<Record<string, any>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -245,7 +246,18 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
             }));
             setAppCategories(mappedCats);
           }
-        } catch (e) { console.log('Categories fetch error', e); }
+        } catch (catErr) {
+          console.log('Categories fetch error', catErr);
+        }
+
+        try {
+          const { data: profsData } = await dbService.get('profiles');
+          if (profsData && profsData.length > 0) {
+            const map: Record<string, any> = {};
+            profsData.forEach((p: any) => { map[p.id] = p; });
+            setProfilesMap(map);
+          }
+        } catch (e) { console.log('Profiles fetch error', e); }
 
         const { data, error } = await dbService.get('products', {
           order: { column: 'created_at', ascending: false }
@@ -638,17 +650,28 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     </View>
   );
 
-  // 🌟 تصفية المنتجات المميزة
+  // 🌟 تصفية المنتجات المميزة مع فحص اشتراك التاجر
   const featuredProducts = useMemo(() => {
+    const now = new Date();
     let list = products.filter((p) => {
       const val = p.is_featured;
-      return val === true || val === "true" || val === 1 || String(val) === "1";
+      const isFeat = val === true || val === "true" || val === 1 || String(val) === "1";
+      if (!isFeat) return false;
+
+      if (p.vendor_id && profilesMap[p.vendor_id]) {
+        const prof = profilesMap[p.vendor_id];
+        if (prof.role === 'admin') return true;
+        const until = prof.featured_until ? new Date(prof.featured_until) : null;
+        return until && until > now;
+      }
+      return true;
     });
+
     if (list.length === 0 && products.length > 0) {
       list = products.slice(0, 6);
     }
     return list;
-  }, [products]);
+  }, [products, profilesMap]);
 
   // 🎨 عرض المنتجات المميزة
   const renderFeaturedProducts = () => {

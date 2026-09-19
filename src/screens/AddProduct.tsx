@@ -44,22 +44,39 @@ export default function AddProduct({ navigation, route }: any) {
   const [activationInput, setActivationInput] = useState("");
   const [redeeming, setRedeeming] = useState(false);
 
+  // Admin Code Generator state for AddProduct
+  const [selectedDuration, setSelectedDuration] = useState<number>(30);
+  const [generatingCode, setGeneratingCode] = useState<boolean>(false);
+  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+
+  const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+  const isAdminEmail = (email?: string) => !!(email && ADMIN_EMAILS.includes(email.trim().toLowerCase()));
+
   React.useEffect(() => {
     const loadProfile = async () => {
-      if (user?.id) {
+      const currentUserId = user?.id || user?.uid;
+      const currentUserEmail = (user?.email || '').toLowerCase();
+
+      if (currentUserId) {
         try {
-          const { data } = await dbService.get('profiles', { eq: { id: user.id } });
+          const { data } = await dbService.get('profiles', { eq: { id: currentUserId } });
           if (data && data.length > 0) {
-            setUserRole(data[0].role || 'vendor');
+            const r = data[0].role;
+            const isAdmin = r === 'admin' || r === 'superadmin' || isAdminEmail(currentUserEmail);
+            setUserRole(isAdmin ? 'admin' : (r || 'vendor'));
             setFeaturedUntil(data[0].featured_until || null);
+          } else if (isAdminEmail(currentUserEmail)) {
+            setUserRole('admin');
           }
         } catch (e) {
           console.log('Error loading profile:', e);
         }
+      } else if (isAdminEmail(currentUserEmail)) {
+        setUserRole('admin');
       }
     };
     loadProfile();
-  }, [user?.id]);
+  }, [user?.id, user?.uid, user?.email]);
 
   const handleToggleFeatured = () => {
     if (userRole === 'admin') {
@@ -92,8 +109,15 @@ export default function AddProduct({ navigation, route }: any) {
       }
 
       const codeItem = data[0];
+      const durationDays = codeItem.duration_days || 30;
       const now = new Date();
-      const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      let baseTime = now.getTime();
+      if (featuredUntil && new Date(featuredUntil) > now) {
+        baseTime = new Date(featuredUntil).getTime();
+      }
+
+      const expiresAt = new Date(baseTime + durationDays * 24 * 60 * 60 * 1000).toISOString();
 
       // Update activation code
       await dbService.update('activation_codes', codeItem.id, {
@@ -114,13 +138,44 @@ export default function AddProduct({ navigation, route }: any) {
       setActivationInput("");
 
       Alert.alert(
-        language === 'ar' ? 'تم التفعيل بنجاح! 🎉' : 'Activated! 🎉',
-        language === 'ar' ? `تم تفعيل اشتراك المميز والبنر لـ 30 يوماً!\nينتهي بتاريخ: ${new Date(expiresAt).toLocaleDateString('ar-EG')}` : `Featured subscription activated for 30 days!`
+        language === 'ar' ? 'تم التفعيل / التجديد بنجاح! 🎉' : 'Activated / Renewed! 🎉',
+        language === 'ar' ? `تم تفعيل/تجديد اشتراك المميز والبنر لـ ${durationDays} يوماً إضافية!\nينتهي بتاريخ: ${new Date(expiresAt).toLocaleDateString('ar-EG')}` : `Featured subscription renewed for ${durationDays} additional days!`
       );
     } catch (err: any) {
       Alert.alert(language === 'ar' ? 'خطأ' : 'Error', err.message || 'فشل التفعيل');
     } finally {
       setRedeeming(false);
+    }
+  };
+
+  // توليد كود تفعيل جديد للمدير
+  const handleAdminGenerateCode = async () => {
+    const prefix = `TRX-${selectedDuration}D-`;
+    const randomCode = prefix + Math.floor(100000 + Math.random() * 900000);
+    setGeneratingCode(true);
+
+    try {
+      const { error } = await dbService.add('activation_codes', {
+        code: randomCode,
+        duration_days: selectedDuration,
+        status: 'active',
+      });
+
+      if (error) {
+        Alert.alert(language === 'ar' ? 'خطأ' : 'Error', error.message || 'فشل توليد الكود');
+      } else {
+        setGeneratedCode(randomCode);
+        Alert.alert(
+          language === 'ar' ? 'تم توليد كود التفعيل بنجاح! 🔑' : 'Code Generated! 🔑',
+          language === 'ar'
+            ? `كود التفعيل: ${randomCode}\nالمدة: ${selectedDuration} يوماً\nيمكنك نسخ الكود وإرساله للتاجر.`
+            : `Code: ${randomCode}\nDuration: ${selectedDuration} days`
+        );
+      }
+    } catch (err: any) {
+      Alert.alert(language === 'ar' ? 'خطأ' : 'Error', err.message || 'فشل توليد الكود');
+    } finally {
+      setGeneratingCode(false);
     }
   };
 
@@ -747,10 +802,83 @@ export default function AddProduct({ navigation, route }: any) {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={{ marginVertical: 10 }}>
+              {/* Admin Code Generator Box inside Modal if user is Admin */}
+              {userRole === 'admin' ? (
+                <View style={{ backgroundColor: '#222', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#25D366', marginBottom: 16 }}>
+                  <Text style={{ color: '#25D366', fontWeight: 'bold', fontSize: 13, textAlign: 'center', marginBottom: 8 }}>
+                    👑 {language === 'ar' ? 'حساب مسؤول المنصة (مولّد أكواد التفعيل):' : 'Platform Admin (Code Generator):'}
+                  </Text>
+
+                  {/* Duration Pills */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                    {[
+                      { label: '7 أيام', days: 7 },
+                      { label: '30 يوماً', days: 30 },
+                      { label: '60 يوماً', days: 60 },
+                      { label: '90 يوماً', days: 90 },
+                      { label: 'سنة', days: 365 },
+                    ].map((item) => (
+                      <TouchableOpacity
+                        key={item.days}
+                        onPress={() => setSelectedDuration(item.days)}
+                        style={{
+                          backgroundColor: selectedDuration === item.days ? '#FFD700' : '#333',
+                          paddingVertical: 6,
+                          paddingHorizontal: 8,
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: selectedDuration === item.days ? '#FFD700' : '#555',
+                        }}
+                      >
+                        <Text style={{ color: selectedDuration === item.days ? '#000' : '#fff', fontWeight: 'bold', fontSize: 11 }}>
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={handleAdminGenerateCode}
+                    disabled={generatingCode}
+                    style={{ backgroundColor: '#28a745', borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}
+                  >
+                    {generatingCode ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13 }}>
+                        ⚡ {language === 'ar' ? `توليد كود تفعيل (${selectedDuration} يوماً)` : `Generate Code (${selectedDuration} Days)`}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+
+                  {generatedCode ? (
+                    <View style={{ marginTop: 10, backgroundColor: '#000', borderWidth: 1, borderColor: '#FFD700', borderRadius: 8, padding: 8, alignItems: 'center' }}>
+                      <Text style={{ color: '#aaa', fontSize: 11, marginBottom: 2 }}>
+                        {language === 'ar' ? 'الكود المنشأ حديثاً:' : 'New Generated Code:'}
+                      </Text>
+                      <Text style={{ color: '#FFD700', fontWeight: 'bold', fontSize: 16, fontFamily: 'monospace', letterSpacing: 1 }}>
+                        {generatedCode}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setActivationInput(generatedCode);
+                          Alert.alert(language === 'ar' ? 'تم تعبئة الكود' : 'Code Filled', `تم اختيار الكود: ${generatedCode}`);
+                        }}
+                        style={{ marginTop: 4, backgroundColor: '#FFD700', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6 }}
+                      >
+                        <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 11 }}>
+                          🔑 {language === 'ar' ? 'استخدام وتعبئة الكود تلقائياً' : 'Auto Fill Code'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+
               <Text style={{ color: '#ccc', fontSize: 13, lineHeight: 20, marginBottom: 14 }}>
                 {language === 'ar'
-                  ? "خيار المنتجات المميزة والبنر خاص بالتجار المشتركين فقط. قم بالتواصل مع خدمة العملاء للحصول على كود التفعيل لمدّة 30 يوماً بعد الدفع:"
-                  : "Featured products & banners are for active vendors only. Contact support to get your 30-day activation code:"}
+                  ? "خيار المنتجات المميزة والبنر خاص بالتجار المشتركين فقط. قم بالتواصل مع خدمة العملاء للحصول على كود التفعيل المخصص لمدّتك المختارة بعد الدفع:"
+                  : "Featured products & banners are for active vendors only. Contact support to get your custom activation code:"}
               </Text>
 
               {/* Customer Support Info */}
@@ -771,7 +899,7 @@ export default function AddProduct({ navigation, route }: any) {
 
               {/* Code Input */}
               <Text style={{ color: '#FFD700', fontSize: 14, fontWeight: 'bold', marginBottom: 6 }}>
-                {language === 'ar' ? "أدخل كود التفعيل (30 يوماً):" : "Enter Activation Code (30 Days):"}
+                {language === 'ar' ? "أدخل كود التفعيل المخصص (7، 30، 90، 365 يوماً):" : "Enter Activation Code:"}
               </Text>
               <TextInput
                 style={{
