@@ -1062,18 +1062,6 @@
                 }
             });
         }
-                    
-                    img.onerror = () => {
-                        if (typeof fileOrUrl !== 'string') URL.revokeObjectURL(src);
-                        return resolve({ safe: true });
-                    };
-                    
-                    img.src = src;
-                } catch (err) {
-                    return resolve({ safe: true });
-                }
-            });
-        }
     
         // ==========================================
         // SUPABASE CONFIGURATION - Using Environment Variables
@@ -1464,9 +1452,8 @@
 
                     await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
                     profile = newProfile;
-                }
 
-                localStorage.removeItem('pending_vendor_shop_name');
+                    localStorage.removeItem('pending_vendor_shop_name');
                     localStorage.removeItem('pending_vendor_phone');
                     localStorage.removeItem('pending_vendor_country');
                 } else if (profile && (!profile.email || !profile.name)) {
