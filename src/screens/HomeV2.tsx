@@ -640,10 +640,14 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
 
   // 🌟 تصفية المنتجات المميزة
   const featuredProducts = useMemo(() => {
-    return products.filter((p) => {
+    let list = products.filter((p) => {
       const val = p.is_featured;
       return val === true || val === "true" || val === 1 || String(val) === "1";
     });
+    if (list.length === 0 && products.length > 0) {
+      list = products.slice(0, 6);
+    }
+    return list;
   }, [products]);
 
   // 🎨 عرض المنتجات المميزة

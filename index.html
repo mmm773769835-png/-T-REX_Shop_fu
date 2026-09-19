@@ -3490,6 +3490,23 @@
         </div>
     </section>
 
+    <!-- Promo Banner Carousel -->
+    <section class="promo-banner-section">
+        <div class="promo-banner-card">
+            <div class="promo-banner-content">
+                <span class="promo-banner-badge"><i class="fas fa-bolt"></i> عروض الموسم الكبرى</span>
+                <h2 class="promo-banner-title">خصومات تصل إلى 50% على أفضل المنتجات</h2>
+                <p class="promo-banner-subtitle">تسوق أحدث المنتجات والساعات والمجوهرات بأسعار حصريّة وتوصيل سريع</p>
+                <button class="promo-banner-btn" onclick="document.getElementById('products-container').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fas fa-shopping-bag"></i> استكشف العروض الآن
+                </button>
+            </div>
+            <div class="promo-banner-icon" style="font-size: 80px; color: rgba(255, 215, 0, 0.25); text-shadow: 0 0 20px rgba(255,215,0,0.5);">
+                <i class="fas fa-gift"></i>
+            </div>
+        </div>
+    </section>
+
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-box">
@@ -5745,7 +5762,10 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 featuredSwiperInstance = null;
             }
 
-            const featured = products.filter(p => isEnabled(p.is_featured)).slice(0, 8);
+            let featured = products.filter(p => isEnabled(p.is_featured)).slice(0, 8);
+            if (featured.length === 0 && products.length > 0) {
+                featured = products.slice(0, 8);
+            }
             
             if (featured.length === 0) {
                 container.innerHTML = '';
@@ -5789,9 +5809,23 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             });
         }
 
+        function renderSkeletonLoaders(count = 8) {
+            const container = document.getElementById('products-container');
+            if (!container) return;
+            container.innerHTML = Array(count).fill(0).map(() => `
+                <div class="skeleton-card">
+                    <div class="skeleton-img skeleton-pulse"></div>
+                    <div class="skeleton-title skeleton-pulse"></div>
+                    <div class="skeleton-text skeleton-pulse"></div>
+                    <div class="skeleton-price skeleton-pulse"></div>
+                </div>
+            `).join('');
+        }
+
         // Load Products from Supabase
         async function loadProducts() {
             const container = document.getElementById('products-container');
+            renderSkeletonLoaders(8);
             
             try {
                 console.log('[PRODUCTS] Loading products from Supabase...');
