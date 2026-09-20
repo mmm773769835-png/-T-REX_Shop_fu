@@ -689,7 +689,13 @@
                 <h2 id="mainHeaderTitle">🏪 لوحة تحكم التاجر | T-REX Shop</h2>
                 <p class="user-info" id="userInfo">تاجر</p>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                <button type="button" id="btnAdminVendorsNav" onclick="scrollToVendorsDirectory()" style="display: none; background: linear-gradient(135deg, #17a2b8, #117a8b); color: #fff; border: 1.5px solid #FFD700; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; cursor: pointer; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(23,162,184,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    🔑 دليل وأكواد التجار
+                </button>
+                <button type="button" id="btnAdminGenCodeNav" onclick="scrollToCodeGenerator()" style="display: none; background: linear-gradient(135deg, #FFD700, #ffa500); color: #111; border: 1.5px solid #FFD700; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; cursor: pointer; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255,215,0,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    ⚡ مولّد أكواد التفعيل
+                </button>
                 <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
                 <button class="btn-logout" id="btnDeleteAccount" onclick="deleteMyVendorAccount()" style="display: none; background: transparent; color: #ff4444; border: 1px solid #ff4444;">حذف حسابي نهائياً</button>
             </div>
@@ -1488,6 +1494,13 @@
                 searchInput.placeholder = isAdmin ? 'ابحث بكود التاجر (VND-XXXX) أو اسم المنتج أو الفئة...' : 'ابحث في منتجات متجرك (بالاسم أو الفئة)...';
             }
 
+            // Header quick navigation buttons for Super Admin
+            const vendorsNavBtn = document.getElementById('btnAdminVendorsNav');
+            if (vendorsNavBtn) vendorsNavBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+
+            const genCodeNavBtn = document.getElementById('btnAdminGenCodeNav');
+            if (genCodeNavBtn) genCodeNavBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+
             // Delete Account button only for merchants, hidden for Super Admins
             const btnDelete = document.getElementById('btnDeleteAccount');
             if (btnDelete) {
@@ -1495,6 +1508,26 @@
             }
             
             loadDashboardData();
+        }
+
+        function scrollToVendorsDirectory() {
+            const sec = document.getElementById('vendorsSection');
+            if (sec) {
+                sec.style.display = 'block';
+                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const searchInput = document.getElementById('adminVendorSearch');
+                if (searchInput) {
+                    setTimeout(() => searchInput.focus(), 600);
+                }
+            }
+        }
+
+        function scrollToCodeGenerator() {
+            const box = document.getElementById('adminCodeGeneratorBox');
+            if (box) {
+                box.style.display = 'block';
+                box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         // Check Auth on Load & Handle Google OAuth Callback
