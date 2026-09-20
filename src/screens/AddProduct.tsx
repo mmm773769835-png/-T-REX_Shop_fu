@@ -888,7 +888,7 @@ export default function AddProduct({ navigation, route }: any) {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
                   <Text style={{ color: '#fff', fontSize: 13 }}>
-                    {language === 'ar' ? "واتساب خدمة العملاء والدفع:" : "WhatsApp Support:"} <Text style={{ fontWeight: 'bold', color: '#25D366' }}>+967 770 000 000</Text>
+                    {language === 'ar' ? "واتساب خدمة العملاء والدفع:" : "WhatsApp Support:"} <Text style={{ fontWeight: 'bold', color: '#25D366' }}>+967 773 769 835</Text>
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
