@@ -380,6 +380,13 @@ export default function ProductDetails({ route, navigation }: any) {
                 </Text>
               </View>
             )}
+
+            <View style={[styles.chip, { backgroundColor: '#2b2b2b', borderColor: '#333', borderWidth: 1 }]}>
+              <Ionicons name="eye-outline" size={12} color="#FFD700" />
+              <Text style={[styles.chipText, { color: '#FFD700', fontWeight: 'bold' }]}>
+                {language === 'ar' ? `👁️ ${currentProduct.views_count || 0} مشاهدة` : `👁️ ${currentProduct.views_count || 0} Views`}
+              </Text>
+            </View>
           </View>
 
           {/* Description */}

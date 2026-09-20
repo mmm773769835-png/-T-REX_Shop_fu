@@ -450,6 +450,12 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
               </Text>
             </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 215, 0, 0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+              <Ionicons name="eye-outline" size={12} color="#FFD700" style={{ marginRight: 3 }} />
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#FFD700' }}>
+                {(item as any).views_count || 0}
+              </Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -738,9 +744,17 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 <Text style={[styles.featuredProductName, { color: isDarkMode ? "#fff" : "#1a1a1a" }]} numberOfLines={1}>
                   {item.name}
                 </Text>
-                <Text style={styles.featuredProductPrice}>
-                  {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+                  <Text style={styles.featuredProductPrice}>
+                    {formatPriceWithSource(item.price, item.currency || 'SAR', currency)}
+                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 215, 0, 0.15)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                    <Ionicons name="eye-outline" size={11} color="#FFD700" style={{ marginRight: 2 }} />
+                    <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#FFD700' }}>
+                      {(item as any).views_count || 0}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </TouchableOpacity>
           )}
