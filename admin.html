@@ -686,7 +686,7 @@
 
         <div class="header">
             <div>
-                <h2>🏪 لوحة تحكم التاجر | T-REX Shop</h2>
+                <h2 id="mainHeaderTitle">🏪 لوحة تحكم التاجر | T-REX Shop</h2>
                 <p class="user-info" id="userInfo">تاجر</p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
@@ -1447,9 +1447,18 @@
             const userEmail = (currentUser?.email || '').toLowerCase();
             const isAdmin = ADMIN_EMAILS.includes(userEmail) || currentVendor?.role === 'admin';
 
+            // Dynamic header title
+            const mainHeaderTitle = document.getElementById('mainHeaderTitle');
+            if (mainHeaderTitle) {
+                mainHeaderTitle.textContent = isAdmin 
+                    ? '👑 لوحة الإدارة العليا (Super Admin) | T-REX Shop' 
+                    : '🏪 لوحة تحكم التاجر | T-REX Shop';
+            }
+
             let userInfoText = '';
             if (isAdmin) {
-                const adminName = currentVendor?.name || 'مدير النظام (Super Admin)';
+                const rawName = (currentVendor?.name || '').trim();
+                const adminName = (!rawName || rawName === 'تاجر' || rawName === 'تاجر جديد') ? 'مدير النظام الرئيسي' : rawName;
                 const emailBadge = currentUser?.email ? ` | 📧 ${currentUser.email}` : '';
                 userInfoText = `👑 ${adminName} (Super Admin)` + emailBadge;
             } else {
@@ -1479,9 +1488,10 @@
                 searchInput.placeholder = isAdmin ? 'ابحث بكود التاجر (VND-XXXX) أو اسم المنتج أو الفئة...' : 'ابحث في منتجات متجرك (بالاسم أو الفئة)...';
             }
 
+            // Delete Account button only for merchants, hidden for Super Admins
             const btnDelete = document.getElementById('btnDeleteAccount');
-            if(btnDelete) {
-                btnDelete.style.display = 'block';
+            if (btnDelete) {
+                btnDelete.style.display = isAdmin ? 'none' : 'block';
             }
             
             loadDashboardData();

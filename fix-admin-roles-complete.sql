@@ -16,12 +16,13 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS created_at  TIMESTAMPTZ DEFAULT NOW(),
   ADD COLUMN IF NOT EXISTS updated_at  TIMESTAMPTZ DEFAULT NOW();
 
--- 2. ترقية الحسابات المحددة إلى مدير النظام (Super Admin) وتفرغ أكواد التاجر الخاصة بها
+-- 2. ترقية الحسابات المحددة إلى مدير النظام (Super Admin) وتفريغ أكواد التاجر وتعيين اسمها كمدير نظام
 UPDATE public.profiles
 SET 
   role = 'admin',
+  name = 'مدير النظام الرئيسي',
   vendor_code = NULL,
-  shop_name = COALESCE(NULLIF(shop_name, ''), 'الإدارة الرئيسية T-REX'),
+  shop_name = 'الإدارة الرئيسية T-REX',
   updated_at = NOW()
 WHERE LOWER(TRIM(email)) IN (
   'mmm773769835@gmail.com',
@@ -35,7 +36,8 @@ SET
   email = u.email,
   role = 'admin',
   vendor_code = NULL,
-  name = COALESCE(NULLIF(p.name, ''), NULLIF(u.raw_user_meta_data->>'full_name', ''), 'مدير النظام')
+  name = 'مدير النظام الرئيسي',
+  shop_name = 'الإدارة الرئيسية T-REX'
 FROM auth.users u
 WHERE p.id = u.id 
   AND LOWER(TRIM(u.email)) IN ('mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com');
@@ -45,7 +47,7 @@ INSERT INTO public.profiles (id, email, name, role, shop_name, updated_at)
 SELECT 
   id,
   email,
-  COALESCE(raw_user_meta_data->>'full_name', 'مدير النظام'),
+  'مدير النظام الرئيسي',
   'admin',
   'الإدارة الرئيسية T-REX',
   NOW()
@@ -54,6 +56,8 @@ WHERE LOWER(TRIM(email)) IN ('mmm773769835@gmail.com', 'trexshopmax@gmail.com', 
 ON CONFLICT (id) DO UPDATE
 SET 
   role = 'admin',
+  name = 'مدير النظام الرئيسي',
+  shop_name = 'الإدارة الرئيسية T-REX',
   vendor_code = NULL,
   updated_at = NOW();
 
