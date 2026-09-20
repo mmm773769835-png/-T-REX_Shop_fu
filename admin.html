@@ -1375,6 +1375,13 @@
                     .eq('id', authUser.id)
                     .single();
 
+                if (profile && (profile.is_deleted || profile.status === 'deleted' || profile.role === 'deleted')) {
+                    await supabase.auth.signOut();
+                    currentUser = null;
+                    currentVendor = null;
+                    throw new Error('❌ هذا الحساب تم حذفه نهائياً ولا يمكن الدخول منه مرة أخرى.');
+                }
+
                 // Ensure profile exists and assign appropriate role (admin or vendor)
                 const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
                 if (!profile || (profile.role !== 'vendor' && profile.role !== 'admin')) {
@@ -1426,11 +1433,18 @@
                         
                     if(prodError) throw prodError;
 
-                    // 2. Delete the profile
+                    // 2. Mark profile as deleted permanently so they CANNOT log in again
                     const { error: profError } = await supabase
                         .from('profiles')
-                        .delete()
-                        .eq('id', currentUser.id);
+                        .upsert({
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            role: 'deleted',
+                            status: 'deleted',
+                            is_deleted: true,
+                            featured_until: null,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'id' });
                         
                     if(profError) throw profError;
                     
@@ -1556,6 +1570,17 @@
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
+
+                if (profile && (profile.is_deleted || profile.status === 'deleted' || profile.role === 'deleted')) {
+                    await supabase.auth.signOut();
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    currentUser = null;
+                    currentVendor = null;
+                    alert('❌ هذا الحساب تم حذفه نهائياً ولا يمكن الدخول منه مرة أخرى.');
+                    window.location.reload();
+                    return;
+                }
 
                 const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
 
@@ -1776,10 +1801,11 @@
                     console.warn('Vendors fetch error:', error);
                 }
                 
+                const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
                 let vendorList = (profiles || []).filter(v => {
-                    const hasVendorSigns = v.role === 'vendor' || !!v.vendor_code || !!v.shop_name;
-                    if (v.role === 'admin' && !v.vendor_code && !v.shop_name) return false;
-                    return hasVendorSigns;
+                    if (v.is_deleted || v.status === 'deleted' || v.role === 'deleted') return false;
+                    const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase()) || v.role === 'admin' || (v.vendor_code || '').startsWith('ADM-');
+                    return !isMasterAdmin;
                 });
 
                 if (vendorList.length === 0) {

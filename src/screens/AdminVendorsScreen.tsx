@@ -33,10 +33,11 @@ export default function AdminVendorsScreen({ navigation }: any) {
       if (error) {
         console.error('Error fetching vendors:', error);
       } else {
+        const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
         const vendorProfiles = (profData || []).filter((v: any) => {
-          const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
-          if (v.role === 'admin' && !v.vendor_code && !v.shop_name) return false;
-          return hasVendorSigns;
+          if (v.is_deleted || v.status === 'deleted' || v.role === 'deleted') return false;
+          const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase()) || v.role === 'admin' || (v.vendor_code || '').startsWith('ADM-');
+          return !isMasterAdmin;
         });
 
         // حساب عدد المنتجات لكل تاجر
