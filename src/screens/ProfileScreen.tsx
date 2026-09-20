@@ -43,7 +43,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
           if (data && data.length > 0) {
             const userData = data[0];
-            if (userData.is_deleted || userData.status === 'deleted' || userData.role === 'deleted') {
+            if (userData.role === 'deleted' || userData.vendor_code === 'DELETED' || userData.shop_name === 'حساب محذوف') {
               await signOut();
               Alert.alert(
                 language === "ar" ? "حساب محذوف ❌" : "Deleted Account ❌",
@@ -267,10 +267,9 @@ const ProfileScreen = ({ navigation }: any) => {
                   id: authUser.uid,
                   email: authUser.email,
                   role: 'deleted',
-                  status: 'deleted',
-                  is_deleted: true,
                   vendor_code: 'DELETED',
                   shop_name: 'حساب محذوف',
+                  name: 'حساب محذوف',
                   featured_until: null,
                   updated_at: new Date().toISOString()
                 });

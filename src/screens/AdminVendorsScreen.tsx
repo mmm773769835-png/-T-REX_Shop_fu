@@ -34,7 +34,7 @@ export default function AdminVendorsScreen({ navigation }: any) {
         console.error('Error fetching vendors:', error);
       } else {
         const vendorProfiles = (profData || []).filter((v: any) => {
-          if (v.is_deleted || v.status === 'deleted' || v.role === 'deleted') return false;
+          if (v.role === 'deleted' || v.vendor_code === 'DELETED' || v.shop_name === 'حساب محذوف') return false;
           const isPureAdmin = (v.role === 'admin' || (v.vendor_code || '').startsWith('ADM-')) && v.role !== 'vendor' && !(v.vendor_code || '').startsWith('VND-');
           if (isPureAdmin) return false;
           return v.role === 'vendor' || (v.vendor_code || '').startsWith('VND-') || !!v.shop_name;
@@ -106,10 +106,9 @@ export default function AdminVendorsScreen({ navigation }: any) {
               // 2. تحديث البروفايل ليصبح محذوفاً بدلاً من الحذف الفيزيائي لمنع إعادة توليد كود جديد
               await dbService.update('profiles', vendorId, {
                 role: 'deleted',
-                status: 'deleted',
-                is_deleted: true,
                 vendor_code: 'DELETED',
                 shop_name: 'حساب محذوف',
+                name: 'حساب محذوف',
                 featured_until: null,
                 updated_at: new Date().toISOString()
               });

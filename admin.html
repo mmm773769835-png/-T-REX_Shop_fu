@@ -1375,7 +1375,7 @@
                     .eq('id', authUser.id)
                     .single();
 
-                if (profile && (profile.is_deleted || profile.status === 'deleted' || profile.role === 'deleted')) {
+                if (profile && (profile.role === 'deleted' || profile.vendor_code === 'DELETED' || profile.shop_name === 'حساب محذوف')) {
                     await supabase.auth.signOut();
                     currentUser = null;
                     currentVendor = null;
@@ -1433,15 +1433,16 @@
                         
                     if(prodError) throw prodError;
 
-                    // 2. Mark profile as deleted permanently so they CANNOT log in again
+                    // 2. Mark profile as deleted permanently using valid table columns
                     const { error: profError } = await supabase
                         .from('profiles')
                         .upsert({
                             id: currentUser.id,
                             email: currentUser.email,
                             role: 'deleted',
-                            status: 'deleted',
-                            is_deleted: true,
+                            vendor_code: 'DELETED',
+                            shop_name: 'حساب محذوف',
+                            name: 'حساب محذوف',
                             featured_until: null,
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'id' });
@@ -1571,7 +1572,7 @@
                     .eq('id', currentUser.id)
                     .single();
 
-                if (profile && (profile.is_deleted || profile.status === 'deleted' || profile.role === 'deleted')) {
+                if (profile && (profile.role === 'deleted' || profile.vendor_code === 'DELETED' || profile.shop_name === 'حساب محذوف')) {
                     await supabase.auth.signOut();
                     localStorage.clear();
                     sessionStorage.clear();
@@ -1802,7 +1803,7 @@
                 }
                 
                 let vendorList = (profiles || []).filter(v => {
-                    if (v.is_deleted || v.status === 'deleted' || v.role === 'deleted') return false;
+                    if (v.role === 'deleted' || v.vendor_code === 'DELETED' || v.shop_name === 'حساب محذوف') return false;
                     const isPureAdmin = (v.role === 'admin' || (v.vendor_code || '').startsWith('ADM-')) && v.role !== 'vendor' && !(v.vendor_code || '').startsWith('VND-');
                     if (isPureAdmin) return false;
                     return v.role === 'vendor' || (v.vendor_code || '').startsWith('VND-') || !!v.shop_name;
@@ -1943,10 +1944,9 @@
                 await supabase.from('products').delete().eq('vendor_id', vendorId);
                 await supabase.from('profiles').update({
                     role: 'deleted',
-                    status: 'deleted',
-                    is_deleted: true,
                     vendor_code: 'DELETED',
                     shop_name: 'حساب محذوف',
+                    name: 'حساب محذوف',
                     featured_until: null,
                     updated_at: new Date().toISOString()
                 }).eq('id', vendorId);
