@@ -1847,7 +1847,9 @@
                         ${isFeatured ? `<button onclick="cancelVendorSubscriptionWeb('${v.id}')" style="background:#dc3545; color:#fff; padding:6px 10px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-left:3px; margin-bottom: 4px;">🛑 إيقاف الاشتراك</button>` : ''}
                         ${cleanPhone ? `
                             <a href="https://wa.me/${cleanPhone}" target="_blank" style="background:#28a745; color:#fff; padding:6px 9px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:3px; display:inline-block; margin-bottom: 4px;">💬 واتساب</a>
+                            <a href="tel:${cleanPhone}" style="background:#007bff; color:#fff; padding:6px 9px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:3px; display:inline-block; margin-bottom: 4px;">📞 اتصال</a>
                         ` : ''}
+                        <button onclick="deleteAdminVendor('${v.id}', '${nameEscaped}')" style="background:#dc3545; color:#fff; padding:6px 10px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-bottom: 4px;">🗑️ حذف</button>
                     </td>
                 </tr>
             `}).join('');
@@ -1893,13 +1895,31 @@
                     .eq('id', vendorId);
 
                 if (error) {
-                    alert('❌ خطأ أثناء التفعيل: ' + error.message);
+                    if (error.message && (error.message.includes('featured_until') || error.message.includes('schema cache'))) {
+                        alert(`⚠️ العمود (featured_until) غير موجود في جدول (profiles) في قاعدة بيانات Supabase!\n\nيرجى فتح Supabase ← SQL Editor وتشغيل السكريبت التالي لحل المشكلة فوراً:\n\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS featured_until TIMESTAMPTZ;\nNOTIFY pgrst, 'reload schema';`);
+                    } else {
+                        alert('❌ خطأ أثناء التفعيل: ' + error.message);
+                    }
                 } else {
-                    alert(`🎉 تم تفعيل/تجديد اشتراك التمييز والبنر للتاجر "${vendorName}" بنجاح لمدة (${durationDays} يوماً) إضافية!`);
+                    alert(`🎉 تم تفعيل/تجديد اشتراك التمييز والبنر للتاجر "${vendorName}" بنجاح لمدة (${durationDays} يوماً) إضافية!\n\nينتهي بتاريخ:\n📅 ${newExpiresAt.toLocaleDateString('ar-EG')} - ${newExpiresAt.toLocaleTimeString('ar-EG')}`);
                     loadVendors();
                 }
             } catch (err) {
                 alert('❌ فشل التفعيل: ' + err.message);
+            }
+        }
+
+        async function deleteAdminVendor(vendorId, vendorName) {
+            if (!confirm(`هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة المنتجات التابعة له؟`)) return;
+            try {
+                await supabase.from('products').delete().eq('vendor_id', vendorId);
+                await supabase.from('profiles').delete().eq('id', vendorId);
+                alert('✅ تم حذف حساب التاجر بنجاح!');
+                if (typeof loadVendors === 'function') loadVendors();
+                if (typeof loadDashboardData === 'function') loadDashboardData();
+            } catch (err) {
+                console.error('Delete vendor error:', err);
+                alert('❌ فشل في حذف حساب التاجر: ' + err.message);
             }
         }
 
@@ -1991,144 +2011,7 @@
             if (count) count.textContent = `${products.length} منتج`;
         }
 
-        // ==========================================
-        // VENDORS MANAGEMENT FOR ADMIN
-        // ==========================================
-        async function loadVendors() {
-            try {
-                // Fetch ALL profiles to catch older vendors, then filter in JS to avoid PostgREST syntax issues
-                const { data: profiles, error } = await supabase
-                    .from('profiles')
-                    .select('*');
-                
-                if (error) {
-                    console.warn('Vendors fetch error:', error);
-                    document.getElementById('vendorsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#aaa;">لا يوجد تجار أو يرجى تنفيذ سكريبت SQL في Supabase</td></tr>';
-                    return;
-                }
-                
-                // Exclude the master admin accounts
-                const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
-                
-                adminVendors = (profiles || []).filter(v => {
-                    const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase());
-                    const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
-                    return hasVendorSigns && !isMasterAdmin;
-                });
-                
-                renderAdminVendors(adminVendors);
-            } catch (err) {
-                console.error('loadVendors error:', err);
-            }
-        }
 
-        function renderAdminVendors(vendors) {
-            const tbody = document.getElementById('vendorsTableBody');
-            if (!vendors || vendors.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">لا يوجد تجار مسجلين حالياً</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = vendors.map(v => {
-                const cleanPhone = (v.phone || '').replace(/[^0-9]/g, '');
-                const nameEscaped = (v.shop_name || v.name || 'التاجر').replace(/'/g, "\\'");
-                const isFeatured = v.featured_until && new Date(v.featured_until) > new Date();
-                const untilText = isFeatured
-                    ? `✨ نشط حتى: ${new Date(v.featured_until).toLocaleDateString('ar-EG')}`
-                    : '⚠️ غير نشط';
-
-                return `
-                <tr>
-                    <td><span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:6px; font-weight:bold; border:1px solid #28a745;">${v.vendor_code || 'VND-NEW'}</span></td>
-                    <td><strong>${v.shop_name || 'متجر تاجر'}</strong><br><small style="color:#aaa;">${v.name}</small></td>
-                    <td><a href="mailto:${v.email || ''}" style="color:#17a2b8;">${v.email || 'غير محدد'}</a></td>
-                    <td><span style="color:#FFD700; font-weight:bold;">${v.phone || 'غير محدد'}</span></td>
-                    <td>${v.address || 'غير محدد'}</td>
-                    <td>
-                        <span style="background: ${isFeatured ? 'rgba(40,167,69,0.15)' : 'rgba(220,53,69,0.15)'}; color: ${isFeatured ? '#28a745' : '#ff4444'}; padding: 4px 10px; border-radius: 6px; font-weight: bold; border: 1px solid ${isFeatured ? '#28a745' : '#ff4444'}; font-size: 11px; display: inline-block;">
-                            ${untilText}
-                        </span>
-                    </td>
-                    <td>
-                        <button onclick="grantVendorSubscriptionAdmin('${v.id}', '${nameEscaped}', '${v.featured_until || ''}')" style="background:linear-gradient(135deg, #FFD700, #ffa500); color:#111; padding:6px 12px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-left:5px; margin-bottom: 4px;">🔑 تفعيل/تمديد الاشتراك</button>
-                        ${cleanPhone ? `
-                            <a href="https://wa.me/${cleanPhone}" target="_blank" style="background:#28a745; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:5px; display:inline-block; margin-bottom: 4px;">💬 واتساب</a>
-                            <a href="tel:${cleanPhone}" style="background:#007bff; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:5px; display:inline-block; margin-bottom: 4px;">📞 اتصال</a>
-                        ` : ''}
-                        <button onclick="deleteAdminVendor('${v.id}', '${nameEscaped}')" style="background:#dc3545; color:#fff; padding:6px 12px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-bottom: 4px;">🗑️ حذف</button>
-                    </td>
-                </tr>
-            `}).join('');
-        }
-
-        async function grantVendorSubscriptionAdmin(vendorId, vendorName, currentUntilIso) {
-            const durationStr = prompt(`🔑 تفعيل/تجديد اشتراك التمييز والبنر للتاجر "${vendorName}":\n\nأدخل عدد الأيام المطلوب تفعيلها (مثال: 7 أو 30 أو 90 أو 365):`, '30');
-            if (!durationStr) return;
-            const durationDays = parseInt(durationStr, 10);
-            if (isNaN(durationDays) || durationDays <= 0) {
-                alert('❌ يرجى إدخال عدد أيام صحيح!');
-                return;
-            }
-
-            try {
-                const now = new Date();
-                let baseTime = now.getTime();
-                if (currentUntilIso) {
-                    const curUntil = new Date(currentUntilIso);
-                    if (curUntil > now) baseTime = curUntil.getTime();
-                }
-                const newExpiresAt = new Date(baseTime + durationDays * 24 * 60 * 60 * 1000);
-
-                const { error } = await supabase
-                    .from('profiles')
-                    .update({ featured_until: newExpiresAt.toISOString() })
-                    .eq('id', vendorId);
-
-                if (error) {
-                    if (error.message && (error.message.includes('featured_until') || error.message.includes('schema cache'))) {
-                        alert(`⚠️ العمود (featured_until) غير موجود في جدول (profiles) في قاعدة بيانات Supabase!\n\nيرجى فتح Supabase ← SQL Editor وتشغيل السكريبت التالي لحل المشكلة فوراً:\n\nALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS featured_until TIMESTAMPTZ;\nNOTIFY pgrst, 'reload schema';`);
-                    } else {
-                        alert('❌ خطأ أثناء التفعيل: ' + error.message);
-                    }
-                } else {
-                    alert(`🎉 تم تفعيل/تجديد اشتراك التمييز والبنر للتاجر "${vendorName}" بنجاح لمدة (${durationDays} يوماً) إضافية!\n\nينتهي بتاريخ:\n📅 ${newExpiresAt.toLocaleDateString('ar-EG')} - ${newExpiresAt.toLocaleTimeString('ar-EG')}`);
-                    loadVendors();
-                }
-            } catch (err) {
-                alert('❌ فشل التفعيل: ' + err.message);
-            }
-        }
-
-        async function deleteAdminVendor(vendorId, vendorName) {
-            if (!confirm(`هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة المنتجات التابعة له؟`)) return;
-            try {
-                // 1. Delete vendor's products
-                await supabase.from('products').delete().eq('vendor_id', vendorId);
-                // 2. Delete vendor profile
-                await supabase.from('profiles').delete().eq('id', vendorId);
-                alert('✅ تم حذف حساب التاجر بنجاح!');
-                loadDashboardData();
-            } catch (err) {
-                console.error('Delete vendor error:', err);
-                alert('❌ فشل في حذف حساب التاجر: ' + err.message);
-            }
-        }
-
-        function searchAdminVendors() {
-            const query = (document.getElementById('adminVendorSearch').value || '').trim().toLowerCase();
-            if (!query) {
-                renderAdminVendors(adminVendors);
-                return;
-            }
-            const filtered = adminVendors.filter(v => {
-                const code = (v.vendor_code || '').toLowerCase();
-                const name = (v.name || '').toLowerCase();
-                const shop = (v.shop_name || '').toLowerCase();
-                const phone = (v.phone || '').toLowerCase();
-                return code.includes(query) || name.includes(query) || shop.includes(query) || phone.includes(query);
-            });
-            renderAdminVendors(filtered);
-        }
 
         function normalizeAdminSearch(value) {
             return String(value || '')
