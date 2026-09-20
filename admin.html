@@ -1774,10 +1774,10 @@
                     console.warn('Vendors fetch error:', error);
                 }
                 
-                const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
                 let vendorList = (profiles || []).filter(v => {
-                    const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase()) || v.role === 'admin';
-                    return !isMasterAdmin;
+                    const hasVendorSigns = v.role === 'vendor' || !!v.vendor_code || !!v.shop_name;
+                    if (v.role === 'admin' && !v.vendor_code && !v.shop_name) return false;
+                    return hasVendorSigns;
                 });
 
                 if (vendorList.length === 0) {

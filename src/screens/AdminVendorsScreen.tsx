@@ -33,12 +33,10 @@ export default function AdminVendorsScreen({ navigation }: any) {
       if (error) {
         console.error('Error fetching vendors:', error);
       } else {
-        const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
-        // Filter in JS: Must be a vendor OR have a shop name/code, AND must NOT be a master admin
         const vendorProfiles = (profData || []).filter((v: any) => {
-          const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase()) || v.role === 'admin';
           const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
-          return hasVendorSigns && !isMasterAdmin;
+          if (v.role === 'admin' && !v.vendor_code && !v.shop_name) return false;
+          return hasVendorSigns;
         });
 
         // حساب عدد المنتجات لكل تاجر
