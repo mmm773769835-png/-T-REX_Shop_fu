@@ -43,7 +43,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
           if (data && data.length > 0) {
             const userData = data[0];
-            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
             const userEmail = authUser.email || "";
             const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
             
@@ -57,7 +57,7 @@ const ProfileScreen = ({ navigation }: any) => {
               profileImage: userData.photo_url || userData.profile_image || getDefaultUserImage(),
             });
           } else {
-            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+            const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
             const userEmail = authUser.email || "";
             const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
             
@@ -73,7 +73,7 @@ const ProfileScreen = ({ navigation }: any) => {
           }
         } catch (error) {
           console.error("خطأ في جلب معلومات المستخدم:", error);
-          const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+          const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
           const userEmail = authUser.email || "";
           const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
           
@@ -333,6 +333,15 @@ const ProfileScreen = ({ navigation }: any) => {
               <View style={{ marginTop: 10, paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#e8f8ec', borderRadius: 20, borderWidth: 1, borderColor: '#28a745', alignItems: 'center' }}>
                 <Text style={{ color: '#28a745', fontWeight: 'bold', fontSize: 13 }}>
                   🏬 {localUser.shopName || "متجر تاجر"} | {localUser.vendorCode}
+                </Text>
+              </View>
+            )}
+
+            {/* شارة مدير النظام إذا كان أدمن */}
+            {localUser.role === 'admin' && (
+              <View style={{ marginTop: 10, paddingVertical: 6, paddingHorizontal: 14, backgroundColor: '#fff9e6', borderRadius: 20, borderWidth: 1, borderColor: '#FFD700', alignItems: 'center' }}>
+                <Text style={{ color: '#b8860b', fontWeight: 'bold', fontSize: 13 }}>
+                  👑 {language === "ar" ? "مدير النظام (Super Admin)" : "Super Admin"}
                 </Text>
               </View>
             )}

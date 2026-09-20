@@ -191,6 +191,45 @@ export default function VendorDashboard({ navigation, route }: any) {
     }
   };
 
+  // إيقاف الاشتراك التجاري
+  const handleCancelSubscription = () => {
+    Alert.alert(
+      language === 'ar' ? 'تأكيد إيقاف الاشتراك 🛑' : 'Confirm Subscription Pause',
+      language === 'ar'
+        ? 'هل أنت متأكد من رغبتك في إيقاف اشتراك التمييز والبنر الحالي؟ سيتم إلغاء التفعيل فوراً.'
+        : 'Are you sure you want to pause/cancel the active featured subscription?',
+      [
+        { text: language === 'ar' ? 'إلغاء' : 'Cancel', style: 'cancel' },
+        {
+          text: language === 'ar' ? 'تأكيد الإيقاف' : 'Confirm Pause',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await dbService.update('profiles', targetVendorId, { featured_until: null });
+              setFeaturedUntil(null);
+              setCountdown(null);
+              Alert.alert(
+                language === 'ar' ? 'تم الإيقاف' : 'Paused',
+                language === 'ar'
+                  ? 'تم إيقاف الاشتراك التجاري بنجاح. يمكنك إعادة التفعيل في أي وقت بإدخال كود تفعيل جديد.'
+                  : 'Subscription has been paused successfully.'
+              );
+            } catch (err: any) {
+              console.error('Error cancelling subscription:', err);
+              Alert.alert(
+                language === 'ar' ? 'خطأ' : 'Error',
+                language === 'ar' ? 'حدث خطأ أثناء محاولة إيقاف الاشتراك' : 'Failed to pause subscription'
+              );
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   // توليد كود تفعيل جديد للمدير
   const handleAdminGenerateCode = async () => {
     const prefix = `TRX-${selectedDuration}D-`;
@@ -441,6 +480,29 @@ export default function VendorDashboard({ navigation, route }: any) {
               </Text>
             </View>
           </View>
+
+          {/* Pause Subscription Button */}
+          <TouchableOpacity
+            onPress={handleCancelSubscription}
+            style={{
+              marginTop: 12,
+              backgroundColor: 'rgba(255, 77, 77, 0.12)',
+              borderColor: '#ff4d4d',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingVertical: 9,
+              paddingHorizontal: 14,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <Ionicons name="pause-circle-outline" size={18} color="#ff4d4d" />
+            <Text style={{ color: '#ff4d4d', fontWeight: 'bold', fontSize: 13 }}>
+              {language === 'ar' ? 'إيقاف الاشتراك 🛑' : 'Pause Subscription 🛑'}
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : userRole !== 'admin' ? (
         <View style={{ backgroundColor: 'rgba(255, 68, 68, 0.1)', borderColor: '#ff4444', borderWidth: 1, borderRadius: 12, padding: 14 }}>

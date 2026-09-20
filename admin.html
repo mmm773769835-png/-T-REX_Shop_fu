@@ -1447,12 +1447,20 @@
             const userEmail = (currentUser?.email || '').toLowerCase();
             const isAdmin = ADMIN_EMAILS.includes(userEmail) || currentVendor?.role === 'admin';
 
-            const shopTitle = currentVendor?.shop_name ? `🏬 ${currentVendor.shop_name}` : (currentUser?.email || 'تاجر / مسؤول');
-            const vendorCodeBadge = currentVendor?.vendor_code ? ` | كود التاجر: [ ${currentVendor.vendor_code} ]` : '';
-            const countryBadge = currentVendor?.address ? ` | 📍 ${currentVendor.address}` : '';
-            const roleBadge = isAdmin ? ' | 👑 مسؤول (Super Admin)' : ' | 🏪 تاجر (Vendor)';
+            let userInfoText = '';
+            if (isAdmin) {
+                const adminName = currentVendor?.name || 'مدير النظام (Super Admin)';
+                const emailBadge = currentUser?.email ? ` | 📧 ${currentUser.email}` : '';
+                userInfoText = `👑 ${adminName} (Super Admin)` + emailBadge;
+            } else {
+                const shopTitle = currentVendor?.shop_name ? `🏬 ${currentVendor.shop_name}` : (currentUser?.email || 'تاجر');
+                const vendorCodeBadge = currentVendor?.vendor_code ? ` | كود التاجر: [ ${currentVendor.vendor_code} ]` : '';
+                const countryBadge = currentVendor?.address ? ` | 📍 ${currentVendor.address}` : '';
+                const roleBadge = ' | 🏪 تاجر (Vendor)';
+                userInfoText = shopTitle + vendorCodeBadge + countryBadge + roleBadge;
+            }
 
-            document.getElementById('userInfo').innerText = shopTitle + vendorCodeBadge + countryBadge + roleBadge;
+            document.getElementById('userInfo').innerText = userInfoText;
 
             // Admin features visibility
             const adminCodeBox = document.getElementById('adminCodeGeneratorBox');
@@ -1788,6 +1796,7 @@
                     <td><span style="color:#bbb; font-size:12px;">📅 ${regDate}</span></td>
                     <td>
                         <button onclick="grantVendorSubscriptionAdmin('${v.id}', '${nameEscaped}', '${v.featured_until || ''}')" style="background:linear-gradient(135deg, #FFD700, #ffa500); color:#111; padding:6px 10px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-left:3px; margin-bottom: 4px;">🔑 تفعيل/تمديد الاشتراك</button>
+                        ${isFeatured ? `<button onclick="cancelVendorSubscriptionWeb('${v.id}')" style="background:#dc3545; color:#fff; padding:6px 10px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-left:3px; margin-bottom: 4px;">🛑 إيقاف الاشتراك</button>` : ''}
                         ${cleanPhone ? `
                             <a href="https://wa.me/${cleanPhone}" target="_blank" style="background:#28a745; color:#fff; padding:6px 9px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:3px; display:inline-block; margin-bottom: 4px;">💬 واتساب</a>
                         ` : ''}
@@ -2606,7 +2615,7 @@
 
                     if (isActive) {
                         if (statusSpan) {
-                            statusSpan.textContent = `✨ اشتراك المميز نشط حتى: ${featuredUntil.toLocaleDateString('ar-EG')} 🟢`;
+                            statusSpan.innerHTML = `✨ اشتراك المميز نشط حتى: ${featuredUntil.toLocaleDateString('ar-EG')} 🟢 <button onclick="cancelVendorSubscriptionWeb()" style="background:#ff4d4d; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer; margin-right:10px; font-weight:bold;">🛑 إيقاف الاشتراك</button>`;
                             statusSpan.style.color = '#25D366';
                         }
                         startVendorCountdownTimer(featuredUntil.toISOString());
@@ -2728,6 +2737,36 @@
                 loadVendorSubscriptionInfo();
             } catch (err) {
                 alert('❌ خطأ في تفعيل الكود: ' + err.message);
+            }
+        }
+
+        async function cancelVendorSubscriptionWeb(vendorId) {
+            const targetId = vendorId || currentUser?.id;
+            if (!targetId) return;
+
+            const confirmMsg = vendorId
+                ? '🛑 هل أنت متأكد من رغبتك في إيقاف اشتراك هذا التاجر وإلغاء ميزات التمييز والبنر؟'
+                : '🛑 هل أنت متأكد من رغبتك في إيقاف اشتراكك التجاري الحالي؟';
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ featured_until: null })
+                    .eq('id', targetId);
+
+                if (error) throw error;
+
+                alert('✅ تم إيقاف الاشتراك بنجاح.');
+                if (typeof loadVendorSubscriptionInfo === 'function') {
+                    loadVendorSubscriptionInfo();
+                }
+                if (typeof loadVendors === 'function') {
+                    loadVendors();
+                }
+            } catch (err) {
+                alert('❌ خطأ في إيقاف الاشتراك: ' + err.message);
             }
         }
 

@@ -33,10 +33,10 @@ export default function AdminVendorsScreen({ navigation }: any) {
       if (error) {
         console.error('Error fetching vendors:', error);
       } else {
-        const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com'];
+        const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
         // Filter in JS: Must be a vendor OR have a shop name/code, AND must NOT be a master admin
         const vendorProfiles = (profData || []).filter((v: any) => {
-          const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase());
+          const isMasterAdmin = adminEmails.includes((v.email || '').toLowerCase()) || v.role === 'admin';
           const hasVendorSigns = v.role === 'vendor' || !!v.shop_name || !!v.vendor_code;
           return hasVendorSigns && !isMasterAdmin;
         });
@@ -171,6 +171,37 @@ export default function AdminVendorsScreen({ navigation }: any) {
     );
   };
 
+  const handleCancelVendorSubscription = (vendorId: string, vendorName: string) => {
+    Alert.alert(
+      language === 'ar' ? 'إيقاف اشتراك التاجر 🛑' : 'Pause Vendor Subscription',
+      language === 'ar'
+        ? `هل أنت متأكد من رغبتك في إيقاف اشتراك التاجر "${vendorName}" وإلغاء ميزات التمييز والبنر؟`
+        : `Are you sure you want to pause subscription for "${vendorName}"?`,
+      [
+        { text: language === 'ar' ? 'إلغاء' : 'Cancel', style: 'cancel' },
+        {
+          text: language === 'ar' ? 'تأكيد الإيقاف' : 'Confirm Pause',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await dbService.update('profiles', vendorId, { featured_until: null });
+              Alert.alert(
+                language === 'ar' ? 'تم الإيقاف' : 'Paused',
+                language === 'ar' ? `تم إيقاف اشتراك التاجر "${vendorName}" بنجاح.` : 'Subscription paused'
+              );
+              fetchVendors();
+            } catch (err: any) {
+              Alert.alert(
+                language === 'ar' ? 'خطأ' : 'Error',
+                err.message || 'فشل إيقاف الاشتراك'
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   // تصفية التجار بحسب كود التاجر VND-XXXX أو الاسم أو اسم المتجر أو الهاتف
   const filteredVendors = vendors.filter((v) => {
     const q = searchQuery.trim().toLowerCase();
@@ -270,26 +301,40 @@ export default function AdminVendorsScreen({ navigation }: any) {
         </View>
 
         {/* أزرار الإدارة والتفعيل المباشر للتاجر */}
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-          <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#FFD700', flex: 1, justifyContent: 'center' }]}
-            onPress={() => handleGrantSubscription(item.id, item.shop_name || item.name, item.featured_until)}
-          >
-            <Ionicons name="key" size={16} color="#1a1a1a" />
-            <Text style={[styles.contactBtnText, { color: '#1a1a1a' }]}>
-              {language === 'ar' ? 'تفعيل/تجديد الاشتراك 🔑' : 'Grant Subscription 🔑'}
-            </Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'column', gap: 8, marginTop: 10 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity
+              style={[styles.contactBtn, { backgroundColor: '#FFD700', flex: 1, justifyContent: 'center' }]}
+              onPress={() => handleGrantSubscription(item.id, item.shop_name || item.name, item.featured_until)}
+            >
+              <Ionicons name="key" size={16} color="#1a1a1a" />
+              <Text style={[styles.contactBtnText, { color: '#1a1a1a' }]}>
+                {language === 'ar' ? 'تفعيل/تجديد الاشتراك 🔑' : 'Grant Subscription 🔑'}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#17a2b8', flex: 1, justifyContent: 'center' }]}
-            onPress={() => navigation.navigate('VendorDashboard', { vendorId: item.id, vendorName: item.shop_name || item.name })}
-          >
-            <Ionicons name="cube" size={16} color="#fff" />
-            <Text style={styles.contactBtnText}>
-              {language === 'ar' ? 'منتجات التاجر 📦' : 'Products 📦'}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.contactBtn, { backgroundColor: '#17a2b8', flex: 1, justifyContent: 'center' }]}
+              onPress={() => navigation.navigate('VendorDashboard', { vendorId: item.id, vendorName: item.shop_name || item.name })}
+            >
+              <Ionicons name="cube" size={16} color="#fff" />
+              <Text style={styles.contactBtnText}>
+                {language === 'ar' ? 'منتجات التاجر 📦' : 'Products 📦'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {isFeaturedActive && (
+            <TouchableOpacity
+              style={[styles.contactBtn, { backgroundColor: 'rgba(255, 77, 77, 0.15)', borderColor: '#ff4d4d', borderWidth: 1, justifyContent: 'center' }]}
+              onPress={() => handleCancelVendorSubscription(item.id, item.shop_name || item.name)}
+            >
+              <Ionicons name="pause-circle-outline" size={16} color="#ff4d4d" />
+              <Text style={[styles.contactBtnText, { color: '#ff4d4d' }]}>
+                {language === 'ar' ? 'إيقاف اشتراك التاجر 🛑' : 'Pause Vendor Subscription 🛑'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
