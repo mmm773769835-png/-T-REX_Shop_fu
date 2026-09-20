@@ -1941,7 +1941,15 @@
             if (!confirm(`هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة المنتجات التابعة له؟`)) return;
             try {
                 await supabase.from('products').delete().eq('vendor_id', vendorId);
-                await supabase.from('profiles').delete().eq('id', vendorId);
+                await supabase.from('profiles').update({
+                    role: 'deleted',
+                    status: 'deleted',
+                    is_deleted: true,
+                    vendor_code: 'DELETED',
+                    shop_name: 'حساب محذوف',
+                    featured_until: null,
+                    updated_at: new Date().toISOString()
+                }).eq('id', vendorId);
                 alert('✅ تم حذف حساب التاجر بنجاح!');
                 if (typeof loadVendors === 'function') loadVendors();
                 if (typeof loadDashboardData === 'function') loadDashboardData();

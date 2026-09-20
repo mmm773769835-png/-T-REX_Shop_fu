@@ -103,9 +103,16 @@ export default function AdminVendorsScreen({ navigation }: any) {
               setLoading(true);
               // 1. حذف كافة المنتجات الخاصة بالتاجر
               await dbService.delete('products', { eq: { vendor_id: vendorId } });
-              // 2. حذف البروفايل الخاص بالتاجر
-              await dbService.delete('profiles', vendorId);
-              await dbService.delete('users', vendorId);
+              // 2. تحديث البروفايل ليصبح محذوفاً بدلاً من الحذف الفيزيائي لمنع إعادة توليد كود جديد
+              await dbService.update('profiles', vendorId, {
+                role: 'deleted',
+                status: 'deleted',
+                is_deleted: true,
+                vendor_code: 'DELETED',
+                shop_name: 'حساب محذوف',
+                featured_until: null,
+                updated_at: new Date().toISOString()
+              });
               
               Alert.alert(
                 language === 'ar' ? 'تم الحذف' : 'Deleted',

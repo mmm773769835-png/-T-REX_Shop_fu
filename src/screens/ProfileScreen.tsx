@@ -43,6 +43,14 @@ const ProfileScreen = ({ navigation }: any) => {
 
           if (data && data.length > 0) {
             const userData = data[0];
+            if (userData.is_deleted || userData.status === 'deleted' || userData.role === 'deleted') {
+              await signOut();
+              Alert.alert(
+                language === "ar" ? "حساب محذوف ❌" : "Deleted Account ❌",
+                language === "ar" ? "هذا الحساب تم حذفه نهائياً ولا يمكن الدخول منه مرة أخرى." : "This account has been permanently deleted and cannot log in again."
+              );
+              return;
+            }
             const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
             const userEmail = authUser.email || "";
             const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
@@ -255,8 +263,17 @@ const ProfileScreen = ({ navigation }: any) => {
                 if (localUser.role === 'vendor') {
                   await dbService.delete('products', { eq: { vendor_id: authUser.uid } });
                 }
-                await dbService.delete('profiles', authUser.uid);
-                await dbService.delete('users', authUser.uid);
+                await dbService.upsert('profiles', {
+                  id: authUser.uid,
+                  email: authUser.email,
+                  role: 'deleted',
+                  status: 'deleted',
+                  is_deleted: true,
+                  vendor_code: 'DELETED',
+                  shop_name: 'حساب محذوف',
+                  featured_until: null,
+                  updated_at: new Date().toISOString()
+                });
               }
               await signOut();
               Alert.alert(
