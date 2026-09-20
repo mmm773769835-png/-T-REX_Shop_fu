@@ -5397,15 +5397,20 @@
             product.views_count = newViews;
 
             try {
-                const { error } = await supabase.rpc('increment_product_views', { product_id: String(product.id) });
-                if (error) {
-                    console.warn('RPC increment_product_views error, trying direct update fallback:', error);
+                if (typeof supabase !== 'undefined' && supabase.rpc) {
+                    const res = await supabase.rpc('increment_product_views', { product_id: String(product.id) });
+                    if (res && res.error) {
+                        await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
+                    }
+                } else if (typeof supabase !== 'undefined' && supabase.from) {
                     await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
                 }
             } catch (err) {
                 console.warn('Views increment catch, trying direct update fallback:', err);
                 try {
-                    await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
+                    if (typeof supabase !== 'undefined' && supabase.from) {
+                        await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
+                    }
                 } catch (e) {
                     console.error('Direct views_count update failed:', e);
                 }
@@ -5413,31 +5418,44 @@
         }
 
         function openQuickView(product) {
-            // Increment views and fetch rating in background
-            if (product && product.id) {
-                incrementProductViews(product);
-            }
-            if (product && product.vendor_id) {
-                supabase.rpc('get_vendor_rating', { v_id: product.vendor_id }).then(({data}) => {
-                    if (data && data > 0) {
-                        const ratingEl = document.getElementById('quickVendorRating');
-                        if (ratingEl) ratingEl.innerHTML = '(⭐ ' + data + ')';
-                    }
-                }).catch(e => console.log('Rating fetch err', e));
-            }
+            if (!product) return;
 
+            // 1. Render and open modal IMMEDIATELY
             const modal = document.getElementById('productModal');
+            if (!modal) return;
+
             const modalContent = modal.querySelector('.modal-content');
             const modalBody = document.getElementById('modalBody');
-            modalContent.classList.remove('wishlist-modal-content');
-            modalBody.classList.remove('wishlist-modal-body');
+            if (modalContent) modalContent.classList.remove('wishlist-modal-content');
+            if (modalBody) modalBody.classList.remove('wishlist-modal-body');
             modal.classList.add('show');
+
             currentProduct = product;
             currentQuantity = 1;
             currentImageIndex = 0;
 
             const thumbnails = getProductImages(product);
             const mainImage = thumbnails[0] || NO_IMAGE;
+
+            // 2. Background async tasks (increment views & vendor rating) - completely safe
+            setTimeout(() => {
+                if (product.id) {
+                    incrementProductViews(product);
+                }
+                if (product.vendor_id && typeof supabase !== 'undefined' && supabase.rpc) {
+                    (async () => {
+                        try {
+                            const res = await supabase.rpc('get_vendor_rating', { v_id: product.vendor_id });
+                            if (res && res.data && res.data > 0) {
+                                const ratingEl = document.getElementById('quickVendorRating');
+                                if (ratingEl) ratingEl.innerHTML = '(⭐ ' + res.data + ')';
+                            }
+                        } catch (e) {
+                            console.log('Rating fetch err', e);
+                        }
+                    })();
+                }
+            }, 50);
 
             modalBody.innerHTML = `
                 <div class="product-gallery">
