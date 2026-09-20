@@ -5390,10 +5390,32 @@
             }
         }
 
+        async function incrementProductViews(product) {
+            if (!product || !product.id) return;
+            const currentViews = parseInt(product.views_count || 0, 10);
+            const newViews = currentViews + 1;
+            product.views_count = newViews;
+
+            try {
+                const { error } = await supabase.rpc('increment_product_views', { product_id: String(product.id) });
+                if (error) {
+                    console.warn('RPC increment_product_views error, trying direct update fallback:', error);
+                    await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
+                }
+            } catch (err) {
+                console.warn('Views increment catch, trying direct update fallback:', err);
+                try {
+                    await supabase.from('products').update({ views_count: newViews }).eq('id', product.id);
+                } catch (e) {
+                    console.error('Direct views_count update failed:', e);
+                }
+            }
+        }
+
         function openQuickView(product) {
             // Increment views and fetch rating in background
             if (product && product.id) {
-                supabase.rpc('increment_product_views', { product_id: product.id }).catch(e => console.log('Views error', e));
+                incrementProductViews(product);
             }
             if (product && product.vendor_id) {
                 supabase.rpc('get_vendor_rating', { v_id: product.vendor_id }).then(({data}) => {

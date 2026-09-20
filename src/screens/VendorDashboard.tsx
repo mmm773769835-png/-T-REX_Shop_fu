@@ -311,9 +311,17 @@ export default function VendorDashboard({ navigation, route }: any) {
             )}
           </View>
 
-          <Text style={[styles.vendorPriceText, { color: colors.textSecondary }]}>
-            {language === 'ar' ? `سعرك الصافي: ${item.vendor_price || item.price} د.ل` : `Net Price: ${item.vendor_price || item.price}`}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={[styles.vendorPriceText, { color: colors.textSecondary }]}>
+              {language === 'ar' ? `سعرك الصافي: ${item.vendor_price || item.price} د.ل` : `Net Price: ${item.vendor_price || item.price}`}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 215, 0, 0.15)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+              <Ionicons name="eye-outline" size={13} color="#FFD700" style={{ marginRight: 3 }} />
+              <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#FFD700' }}>
+                {item.views_count || 0}
+              </Text>
+            </View>
+          </View>
 
           <Text style={[styles.customerPriceText, { color: '#28a745' }]}>
             {language === 'ar' ? `السعر المعروض (+10%): ${item.price} د.ل` : `Customer Price (+10%): ${item.price}`}

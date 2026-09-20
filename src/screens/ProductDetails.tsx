@@ -118,9 +118,23 @@ export default function ProductDetails({ route, navigation }: any) {
     if (currentProduct) {
       loadReviews(currentProduct.id);
       
-      // Increment views count in the background
+      // Increment views count with RPC and direct fallback
       const supabase = require('../config/supabase').supabase;
-      supabase.rpc('increment_product_views', { product_id: currentProduct.id }).catch((e: any) => console.log('Views error', e));
+      const currentViews = currentProduct.views_count || 0;
+      const newViews = currentViews + 1;
+      currentProduct.views_count = newViews;
+
+      supabase.rpc('increment_product_views', { product_id: currentProduct.id })
+        .then(({ error }: any) => {
+          if (error) {
+            console.warn('RPC views error, trying direct update fallback:', error);
+            supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+          }
+        })
+        .catch((e: any) => {
+          console.warn('RPC views error, trying direct update fallback:', e);
+          supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+        });
       
       // Fetch Vendor Rating
       if (currentProduct.vendor_id) {
