@@ -893,11 +893,16 @@
             </form>
         <!-- Vendor Code Management Section (Admin Only & Vendor Activation) -->
         <div class="product-form" style="margin-bottom: 25px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFD700; padding-bottom: 12px; margin-bottom: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFD700; padding-bottom: 12px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
                 <h3 style="margin: 0; color: #FFD700;"><i class="fas fa-key"></i> 🔑 أجزاء التفعيل وإدارة الاشتراكات المميزة</h3>
-                <span id="vendorSubscriptionStatus" style="font-size: 13px; font-weight: bold; background: rgba(255,215,0,0.15); padding: 6px 14px; border-radius: 20px; color: #FFD700;">
-                    جاري التحقق من الاشتراك...
-                </span>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span id="vendorSubscriptionStatus" style="font-size: 13px; font-weight: bold; background: rgba(255,215,0,0.15); padding: 6px 14px; border-radius: 20px; color: #FFD700;">
+                        جاري التحقق من الاشتراك...
+                    </span>
+                    <button type="button" id="btnCancelVendorSubWeb" onclick="cancelVendorSubscriptionWeb()" style="display: none; background: linear-gradient(135deg, #ff4d4d, #cc0000); color: #fff; border: 1px solid #ff4d4d; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,77,77,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                        🛑 إيقاف الاشتراك
+                    </button>
+                </div>
             </div>
 
             <!-- Admin Section: Generate Code (Visible ONLY for Super Admin) -->
@@ -2615,6 +2620,11 @@
                                 <div style="font-size: 11px; color: #aaa;">ثواني</div>
                             </div>
                         </div>
+                        <div style="margin-top: 15px;">
+                            <button type="button" onclick="cancelVendorSubscriptionWeb()" style="background: linear-gradient(135deg, #ff4d4d, #cc0000); color: #fff; border: 1px solid #ff4d4d; padding: 9px 24px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(255,77,77,0.35); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                                🛑 إيقاف الاشتراك التجاري
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -2643,6 +2653,9 @@
                         statusSpan.textContent = '🌟 الحساب: مدير المنصة (اشتراك دائم)';
                         statusSpan.style.color = '#25D366';
                     }
+                    const cancelBtn = document.getElementById('btnCancelVendorSubWeb');
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+
                     if (timerDisplay) {
                         timerDisplay.style.display = 'block';
                         timerDisplay.innerHTML = `
@@ -2656,17 +2669,21 @@
                     const featuredUntil = profile?.featured_until ? new Date(profile.featured_until) : null;
                     const isActive = featuredUntil && featuredUntil > new Date();
 
+                    const cancelBtn = document.getElementById('btnCancelVendorSubWeb');
+
                     if (isActive) {
                         if (statusSpan) {
-                            statusSpan.innerHTML = `✨ اشتراك المميز نشط حتى: ${featuredUntil.toLocaleDateString('ar-EG')} 🟢 <button onclick="cancelVendorSubscriptionWeb()" style="background:#ff4d4d; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer; margin-right:10px; font-weight:bold;">🛑 إيقاف الاشتراك</button>`;
+                            statusSpan.textContent = `✨ اشتراك المميز نشط حتى: ${featuredUntil.toLocaleDateString('ar-EG')} 🟢`;
                             statusSpan.style.color = '#25D366';
                         }
+                        if (cancelBtn) cancelBtn.style.display = 'inline-flex';
                         startVendorCountdownTimer(featuredUntil.toISOString());
                     } else {
                         if (statusSpan) {
                             statusSpan.textContent = '⚠️ خيار المميز والبنر مغلق (غير مشترك) 🔴';
                             statusSpan.style.color = '#ff4444';
                         }
+                        if (cancelBtn) cancelBtn.style.display = 'none';
                         if (vendorCountdownTimerInterval) {
                             clearInterval(vendorCountdownTimerInterval);
                             vendorCountdownTimerInterval = null;
