@@ -672,24 +672,19 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
   // 🌟 تصفية المنتجات المميزة مع فحص اشتراك التاجر
   const featuredProducts = useMemo(() => {
     const now = new Date();
-    let list = products.filter((p) => {
-      const val = p.is_featured;
-      const isFeat = val === true || val === "true" || val === 1 || String(val) === "1";
-      if (!isFeat) return false;
-
+    return products.filter((p) => {
       if (p.vendor_id && profilesMap[p.vendor_id]) {
         const prof = profilesMap[p.vendor_id];
-        if (prof.role === 'admin') return true;
+        if (prof.role === 'admin') {
+          const val = p.is_featured;
+          return val === true || val === "true" || val === 1 || String(val) === "1";
+        }
         const until = prof.featured_until ? new Date(prof.featured_until) : null;
         return until && until > now;
       }
-      return true;
-    });
-
-    if (list.length === 0 && products.length > 0) {
-      list = products.slice(0, 6);
-    }
-    return list;
+      const val = p.is_featured;
+      return val === true || val === "true" || val === 1 || String(val) === "1";
+    }).slice(0, 12);
   }, [products, profilesMap]);
 
   // 🎨 عرض المنتجات المميزة

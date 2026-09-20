@@ -5871,23 +5871,27 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
 
             const now = new Date();
             let featured = products.filter(p => {
-                if (!isEnabled(p.is_featured)) return false;
                 if (p.vendor_id && window.vendorProfilesMap && window.vendorProfilesMap[String(p.vendor_id)]) {
                     const prof = window.vendorProfilesMap[String(p.vendor_id)];
-                    if (prof.role === 'admin') return true;
+                    if (prof.role === 'admin') return isEnabled(p.is_featured);
                     const until = prof.featured_until ? new Date(prof.featured_until) : null;
                     return until && until > now;
                 }
-                return true;
-            }).slice(0, 8);
+                return isEnabled(p.is_featured);
+            }).slice(0, 12);
 
-            if (featured.length === 0 && products.length > 0) {
-                featured = products.slice(0, 8);
-            }
-            
             if (featured.length === 0) {
                 container.innerHTML = '';
+                const featuredSection = document.getElementById('featuredSection') || container.closest('.featured-section') || container.parentElement;
+                if (featuredSection && featuredSection !== document.body) {
+                    featuredSection.style.display = 'none';
+                }
                 return;
+            }
+
+            const featuredSection = document.getElementById('featuredSection') || container.closest('.featured-section') || container.parentElement;
+            if (featuredSection && featuredSection !== document.body) {
+                featuredSection.style.display = 'block';
             }
 
             registerProductsToMap(featured);
