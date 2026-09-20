@@ -569,6 +569,18 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
         >
           <Ionicons name="search" size={24} color="#FFD700" />
         </TouchableOpacity>
+
+        {isAdmin && (
+          <TouchableOpacity 
+            style={[styles.searchButton, { marginLeft: 6 }]}
+            onPress={() => {
+              // @ts-ignore
+              navigation.navigate('AdminVendors');
+            }}
+          >
+            <Ionicons name="people-circle-outline" size={24} color="#FFD700" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {currencyDropdownVisible && (
