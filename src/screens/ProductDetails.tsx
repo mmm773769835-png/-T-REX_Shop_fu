@@ -24,6 +24,7 @@ import { useReviews } from '../contexts/ReviewsContext';
 import Button from "../shared/components/Button";
 import { sanitizeImageUrl, getDefaultProductImage } from '../utils/imageUtils';
 import { dbService } from '../services/SupabaseService';
+import { supabase } from '../config/supabase';
 
 export default function ProductDetails({ route, navigation }: any) {
   // استقبال product من التنقل العادي أو productId من Deep Link
@@ -116,31 +117,37 @@ export default function ProductDetails({ route, navigation }: any) {
   // Load reviews and increment views when product is loaded
   useEffect(() => {
     if (currentProduct) {
-      loadReviews(currentProduct.id);
+      if (typeof loadReviews === 'function') {
+        loadReviews(currentProduct.id);
+      }
       
       // Increment views count with RPC and direct fallback
-      const supabase = require('../config/supabase').supabase;
       const currentViews = currentProduct.views_count || 0;
       const newViews = currentViews + 1;
       currentProduct.views_count = newViews;
 
-      supabase.rpc('increment_product_views', { product_id: currentProduct.id })
-        .then(({ error }: any) => {
-          if (error) {
-            console.warn('RPC views error, trying direct update fallback:', error);
-            supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+      if (supabase && typeof supabase.rpc === 'function') {
+        (async () => {
+          try {
+            const { error } = await supabase.rpc('increment_product_views', { product_id: currentProduct.id });
+            if (error && supabase?.from) {
+              await supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+            }
+          } catch {
+            if (supabase?.from) {
+              await supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+            }
           }
-        })
-        .catch((e: any) => {
-          console.warn('RPC views error, trying direct update fallback:', e);
-          supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
-        });
-      
-      // Fetch Vendor Rating
-      if (currentProduct.vendor_id) {
-        supabase.rpc('get_vendor_rating', { v_id: currentProduct.vendor_id }).then(({data}: any) => {
-           if(data !== null) setVendorRating(data);
-        }).catch((e: any) => console.log('Rating error', e));
+
+          if (currentProduct.vendor_id) {
+            try {
+              const { data } = await supabase.rpc('get_vendor_rating', { v_id: currentProduct.vendor_id });
+              if (data !== null) setVendorRating(data);
+            } catch (e: any) {
+              console.log('Rating error', e);
+            }
+          }
+        })();
       }
     }
   }, [currentProduct]);
@@ -418,13 +425,13 @@ export default function ProductDetails({ route, navigation }: any) {
                 {language === "ar" ? "المراجعات" : "Reviews"}
               </Text>
               <View style={styles.ratingContainer}>
-                <Text style={styles.averageRating}>{getAverageRating(currentProduct.id).toFixed(1)}</Text>
+                <Text style={styles.averageRating}>{(getAverageRating ? getAverageRating(currentProduct.id) : 0).toFixed(1)}</Text>
                 <Ionicons name="star" size={16} color="#FFD700" />
                 <Ionicons name="chevron-forward" size={16} color="#888" />
               </View>
             </View>
             <Text style={styles.reviewsCount}>
-              {getReviewsByProduct(currentProduct.id).length} {language === "ar" ? "مراجعة" : "reviews"}
+              {(getReviewsByProduct ? getReviewsByProduct(currentProduct.id) : []).length} {language === "ar" ? "مراجعة" : "reviews"}
             </Text>
           </TouchableOpacity>
         </View>

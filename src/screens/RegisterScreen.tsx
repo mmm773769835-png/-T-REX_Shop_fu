@@ -181,9 +181,26 @@ export default function RegisterScreen({ navigation }: any) {
     if (password !== confirmPassword) {
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "كلمات المرور غير متطابقة" : "Passwords do not match"
+        language === "ar" ? "كلمتا المرور غير متطابقتين" : "Passwords do not match"
       );
       return;
+    }
+
+    if (isVendor) {
+      if (!shopName.trim()) {
+        Alert.alert(
+          language === "ar" ? "تنبيه" : "Notice",
+          language === "ar" ? "يرجى إدخال اسم المتجر للحساب التجاري" : "Please enter shop name for vendor account"
+        );
+        return;
+      }
+      if (!phone.trim()) {
+        Alert.alert(
+          language === "ar" ? "تنبيه" : "Notice",
+          language === "ar" ? "يرجى إدخال رقم الهاتف للتواصل مع التجار" : "Please enter phone number for vendor account"
+        );
+        return;
+      }
     }
 
     if (isVendor) {
@@ -314,20 +331,24 @@ export default function RegisterScreen({ navigation }: any) {
             name: name.trim(),
             email: email.trim(),
             phone: phone.trim() || "",
-            profile_image: photoURL,
-            avatar_url: photoURL,
             role: userRole,
-            shop_name: isVendor ? shopName.trim() : null,
+            shop_name: isVendor ? (shopName.trim() || `متجر ${name.trim()}`) : null,
             address: address.trim() || "",
             vendor_code: generatedVendorCode,
             updated_at: new Date().toISOString(),
+          };
+
+          const userPayload = {
+            ...profilePayload,
+            profile_image: photoURL,
+            avatar_url: photoURL,
           };
 
           const { error: profileError } = await dbService.upsert('profiles', profilePayload);
           if (profileError) {
             console.error("Profiles creation error:", profileError);
           }
-          await dbService.upsert('users', profilePayload);
+          await dbService.upsert('users', userPayload);
         }
 
         if (signedUser) {
