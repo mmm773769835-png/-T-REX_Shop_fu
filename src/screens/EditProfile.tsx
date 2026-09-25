@@ -58,16 +58,30 @@ const EditProfile = ({ navigation, route }: any) => {
         throw new Error('Missing user id');
       }
 
-      // حفظ بيانات المستخدم في Supabase
-      const { error } = await dbService.upsert('users', {
+      // جلب البروفايل الحالي للحفاظ على كود التاجر والـ role
+      const { data: existingProfiles } = await dbService.get('profiles', { eq: { id: user.uid } });
+      const currentProfile = (existingProfiles && existingProfiles[0]) ? existingProfiles[0] : null;
+
+      const userRole = currentProfile?.role || 'customer';
+      const vendorCode = currentProfile?.vendor_code || null;
+      const shopName = currentProfile?.shop_name || null;
+
+      const payload: any = {
         id: user.uid,
         name,
         email: user.email,
         phone,
         photo_url: photoURL || getDefaultUserImage(),
-        role: 'customer',
+        profile_image: photoURL || getDefaultUserImage(),
+        role: userRole,
         updated_at: new Date().toISOString(),
-      });
+      };
+
+      if (vendorCode) payload.vendor_code = vendorCode;
+      if (shopName) payload.shop_name = shopName;
+
+      const { error } = await dbService.upsert('profiles', payload);
+      await dbService.upsert('users', payload);
 
       if (error) {
         throw error;

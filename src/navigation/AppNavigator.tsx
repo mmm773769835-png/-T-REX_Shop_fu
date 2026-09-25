@@ -37,6 +37,7 @@ import EditProfile from '../screens/EditProfile';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import AboutScreen from '../screens/AboutScreen';
 import SecurityPolicyScreen from '../screens/SecurityPolicyScreen';
+import HelpScreen from '../screens/HelpScreen';
 import AuthCallbackScreen from '../screens/AuthCallbackScreen';
 import VendorDashboard from '../screens/VendorDashboard';
 import AdminVendorsScreen from '../screens/AdminVendorsScreen';
@@ -466,6 +467,11 @@ const AppNavigator = () => {
             title: getHeaderTitle('SecurityPolicy', 'Security & Privacy'),
             headerShown: true,
           })}
+        />
+        <Stack.Screen
+          name="Help"
+          component={HelpScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -1863,7 +1863,7 @@
                     <td><span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:6px; font-weight:bold; border:1px solid #28a745;">${v.vendor_code || 'VND-NEW'}</span></td>
                     <td><strong>🏪 ${v.shop_name || 'متجر تاجر'}</strong><br><small style="color:#aaa;">👤 ${v.name || 'غير محدد'}</small></td>
                     <td><a href="mailto:${v.email || ''}" style="color:#17a2b8; font-weight:600;">✉️ ${v.email || 'غير محدد'}</a></td>
-                    <td><span style="color:#FFD700; font-weight:bold;">📞 ${v.phone || 'غير محدد'}</span></td>
+                    <td><span onclick="editVendorPhoneAdmin('${v.id}', '${nameEscaped}', '${v.phone || ''}')" style="color:#FFD700; font-weight:bold; cursor:pointer;" title="انقر لتعديل أو إدخال رقم الهاتف">📞 ${v.phone || 'غير محدد ✏️'}</span></td>
                     <td>📍 ${v.address || 'غير محدد'}</td>
                     <td>
                         <span style="background: ${isFeatured ? 'rgba(40,167,69,0.15)' : 'rgba(220,53,69,0.15)'}; color: ${isFeatured ? '#28a745' : '#ff4444'}; padding: 4px 10px; border-radius: 6px; font-weight: bold; border: 1px solid ${isFeatured ? '#28a745' : '#ff4444'}; font-size: 11px; display: inline-block;">
@@ -1877,11 +1877,40 @@
                         ${cleanPhone ? `
                             <a href="https://wa.me/${cleanPhone}" target="_blank" style="background:#28a745; color:#fff; padding:6px 9px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:3px; display:inline-block; margin-bottom: 4px;">💬 واتساب</a>
                             <a href="tel:${cleanPhone}" style="background:#007bff; color:#fff; padding:6px 9px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px; margin-left:3px; display:inline-block; margin-bottom: 4px;">📞 اتصال</a>
-                        ` : ''}
+                        ` : `
+                            <button onclick="editVendorPhoneAdmin('${v.id}', '${nameEscaped}', '${v.phone || ''}')" style="background:#17a2b8; color:#fff; padding:6px 9px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-left:3px; margin-bottom: 4px;">✏️ إدخال هاتف</button>
+                        `}
                         <button onclick="deleteAdminVendor('${v.id}', '${nameEscaped}')" style="background:#dc3545; color:#fff; padding:6px 10px; border-radius:6px; border:none; font-weight:bold; font-size:12px; cursor:pointer; margin-bottom: 4px;">🗑️ حذف</button>
                     </td>
                 </tr>
             `}).join('');
+        }
+
+        async function editVendorPhoneAdmin(vendorId, vendorName, currentPhone) {
+            const newPhone = prompt(`📞 إدخال / تعديل رقم هاتف التواصل للتاجر "${vendorName}":\n(مثال: +967771234567 أو 771234567)`, currentPhone || '');
+            if (newPhone === null) return;
+            const trimmedPhone = newPhone.trim();
+            if (!trimmedPhone) {
+                alert('⚠️ لم يتم إدخال رقم هاتف!');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ phone: trimmedPhone, updated_at: new Date().toISOString() })
+                    .eq('id', vendorId);
+
+                if (error) {
+                    alert('❌ حدث خطأ في تحديث رقم الهاتف: ' + error.message);
+                } else {
+                    alert('✅ تم حفظ رقم الهاتف بنجاح وتم تفعيل أزرار الاتصال والواتساب!');
+                    loadVendors();
+                }
+            } catch (err) {
+                console.error('Error updating vendor phone:', err);
+                alert('❌ حدث خطأ: ' + err.message);
+            }
         }
 
         function searchAdminVendors() {

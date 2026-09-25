@@ -588,11 +588,14 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   },
   imageContainer: {
     position: "relative",
+    width: "100%",
+    aspectRatio: 1,
+    overflow: "hidden",
   },
   productImage: {
     width: "100%",
-    height: 150,
-    resizeMode: "contain",
+    height: "100%",
+    resizeMode: "cover",
   },
   categoryBadge: {
     position: "absolute",

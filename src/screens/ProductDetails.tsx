@@ -113,33 +113,40 @@ export default function ProductDetails({ route, navigation }: any) {
   // استخدام المنتج الممرر مباشرة أو المنتج المجلوب من Firebase
   const currentProduct = product || fetchedProduct;
   const [vendorRating, setVendorRating] = useState<number | null>(null);
+  const [viewsCount, setViewsCount] = useState<number>(currentProduct?.views_count || 0);
+  const viewsIncrementedRef = useRef<string | null>(null);
 
   // Load reviews and increment views when product is loaded
   useEffect(() => {
-    if (currentProduct) {
+    if (currentProduct && currentProduct.id) {
       if (typeof loadReviews === 'function') {
         loadReviews(currentProduct.id);
       }
-      
-      // Increment views count with RPC and direct fallback
-      const currentViews = currentProduct.views_count || 0;
-      const newViews = currentViews + 1;
-      currentProduct.views_count = newViews;
 
-      if (supabase && typeof supabase.rpc === 'function') {
+      const initialViews = Number(currentProduct.views_count) || 0;
+
+      if (viewsIncrementedRef.current !== currentProduct.id) {
+        viewsIncrementedRef.current = currentProduct.id;
+        const newViews = initialViews + 1;
+        currentProduct.views_count = newViews;
+        setViewsCount(newViews);
+
         (async () => {
           try {
-            const { error } = await supabase.rpc('increment_product_views', { product_id: currentProduct.id });
-            if (error && supabase?.from) {
-              await supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
-            }
-          } catch {
-            if (supabase?.from) {
-              await supabase.from('products').update({ views_count: newViews }).eq('id', currentProduct.id);
+            await dbService.update('products', currentProduct.id, { views_count: newViews });
+          } catch (e) {
+            console.log('dbService views error', e);
+          }
+
+          if (supabase && typeof supabase.rpc === 'function') {
+            try {
+              await supabase.rpc('increment_product_views', { product_id: currentProduct.id });
+            } catch (e) {
+              console.log('RPC increment error', e);
             }
           }
 
-          if (currentProduct.vendor_id) {
+          if (currentProduct.vendor_id && supabase && typeof supabase.rpc === 'function') {
             try {
               const { data } = await supabase.rpc('get_vendor_rating', { v_id: currentProduct.vendor_id });
               if (data !== null) setVendorRating(data);
@@ -148,9 +155,11 @@ export default function ProductDetails({ route, navigation }: any) {
             }
           }
         })();
+      } else {
+        setViewsCount(currentProduct.views_count || initialViews);
       }
     }
-  }, [currentProduct]);
+  }, [currentProduct?.id]);
 
   if (loading) {
     return (
@@ -306,7 +315,7 @@ export default function ProductDetails({ route, navigation }: any) {
             <Image
               source={{ uri: sanitizeImageUrl(item) }}
               style={styles.productImage}
-              resizeMode="contain"
+              resizeMode="cover"
               onError={() => setImageFailed(true)}
             />
           </TouchableOpacity>
@@ -391,7 +400,7 @@ export default function ProductDetails({ route, navigation }: any) {
             <View style={[styles.chip, { backgroundColor: '#2b2b2b', borderColor: '#333', borderWidth: 1 }]}>
               <Ionicons name="eye-outline" size={12} color="#FFD700" />
               <Text style={[styles.chipText, { color: '#FFD700', fontWeight: 'bold' }]}>
-                {language === 'ar' ? `👁️ ${currentProduct.views_count || 0} مشاهدة` : `👁️ ${currentProduct.views_count || 0} Views`}
+                {language === 'ar' ? `👁️ ${viewsCount} مشاهدة` : `👁️ ${viewsCount} Views`}
               </Text>
             </View>
           </View>
@@ -476,7 +485,7 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   backBtn: { padding: 6 },
   title: { fontSize: 17, fontWeight: "800", color: "#FFD700", letterSpacing: 1 },
   wishlistButton: { padding: 6 },
-  productImage: { width: "100%", height: 300, resizeMode: "contain" },
+  productImage: { width: "100%", height: 320, resizeMode: "cover" },
   imageSwiper: { width: '100%', height: 300 },
   imageSlide: {
     width: Dimensions.get('window').width, height: 300,

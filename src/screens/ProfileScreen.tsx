@@ -34,8 +34,20 @@ const ProfileScreen = ({ navigation }: any) => {
     const fetchUserData = async () => {
       if (authUser) {
         try {
-          // جلب بيانات الحساب من profiles أولاً ثم users
+          // 1. جلب بيانات الحساب من profiles أولاً باستخدام id
           let { data, error } = await dbService.get('profiles', { eq: { id: authUser.uid } });
+
+          // 2. إذا لم توجد نتيجة بالـ id، يتم البحث فوراً بالبريد الإلكتروني المباشر
+          if ((!data || data.length === 0) && authUser.email) {
+            const emailRes = await dbService.get('profiles', { eq: { email: authUser.email.trim() } });
+            if (emailRes.data && emailRes.data.length > 0) {
+              data = emailRes.data;
+              // مزامنة معرف الحساب الحقيقي id في قاعدة بيانات Supabase لسرعة الفحص مستقبلاً
+              await dbService.update('profiles', { eq: { email: authUser.email.trim() } }, { id: authUser.uid });
+            }
+          }
+
+          // 3. محاولة إضافية من جدول users إذا لم يتوفر في profiles
           if (!data || data.length === 0) {
             const res = await dbService.get('users', { eq: { id: authUser.uid } });
             data = res.data;
@@ -54,16 +66,25 @@ const ProfileScreen = ({ navigation }: any) => {
             const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
             const userEmail = authUser.email || "";
             const isMasterAdmin = adminEmails.includes(userEmail.trim().toLowerCase());
+
+            const isVendorOrAdmin = isMasterAdmin || userData.role === 'admin' || userData.role === 'vendor' || (userData.vendor_code && userData.vendor_code.startsWith('VND-'));
+            const calculatedRole = isMasterAdmin ? 'admin' : (userData.role === 'admin' ? 'admin' : (isVendorOrAdmin ? 'vendor' : 'customer'));
             
             setLocalUser({
-              name: userData.name || authUser.displayName || "مستخدم جديد",
+              name: userData.name || authUser.displayName || (calculatedRole === 'vendor' ? "تاجر" : "مستخدم جديد"),
               email: authUser.email || "غير متوفر",
               phone: userData.phone || authUser.phoneNumber || "غير متوفر",
-              role: isMasterAdmin ? 'admin' : (userData.role || "customer"),
-              shopName: userData.shop_name || "",
+              role: calculatedRole,
+              shopName: userData.shop_name || (calculatedRole === 'vendor' ? "متجر تاجر" : ""),
               vendorCode: userData.vendor_code || "",
               profileImage: userData.photo_url || userData.profile_image || getDefaultUserImage(),
             });
+
+            // تجهيز القيم لنمرذجة تعديل بياتات المتجر
+            setUpgradeName(userData.name && userData.name !== 'غير محدد' ? userData.name : '');
+            setUpgradeShopName(userData.shop_name && userData.shop_name !== 'غير محدد' ? userData.shop_name : '');
+            setUpgradePhone(userData.phone && userData.phone !== 'غير محدد' ? userData.phone : '');
+            setUpgradeAddress(userData.address && userData.address !== 'غير محدد' ? userData.address : '');
           } else {
             const adminEmails = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
             const userEmail = authUser.email || "";
@@ -135,7 +156,23 @@ const ProfileScreen = ({ navigation }: any) => {
     setUpgrading(true);
     try {
       if (!authUser?.uid) return;
-      const generatedCode = `VND-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // التأكد مما إذا كان لدى التاجر كود مسبق لعدم تغييره عند تعديل البيانات
+      let finalVendorCode = (localUser.vendorCode && localUser.vendorCode !== 'DELETED') ? localUser.vendorCode : '';
+
+      if (!finalVendorCode) {
+        // فحص قاعدة البيانات للتأكد قبل توليد كود جديد
+        const { data: dbProf } = await dbService.get('profiles', { eq: { id: authUser.uid } });
+        if (dbProf && dbProf[0] && dbProf[0].vendor_code && dbProf[0].vendor_code !== 'DELETED') {
+          finalVendorCode = dbProf[0].vendor_code;
+        }
+      }
+
+      const isNewCode = !finalVendorCode;
+      if (isNewCode) {
+        finalVendorCode = `VND-${Math.floor(1000 + Math.random() * 9000)}`;
+      }
+
       const payload = {
         id: authUser.uid,
         name: finalName,
@@ -144,7 +181,7 @@ const ProfileScreen = ({ navigation }: any) => {
         shop_name: upgradeShopName.trim(),
         address: upgradeAddress.trim(),
         role: 'vendor',
-        vendor_code: generatedCode,
+        vendor_code: finalVendorCode,
         updated_at: new Date().toISOString(),
       };
 
@@ -157,21 +194,31 @@ const ProfileScreen = ({ navigation }: any) => {
         role: 'vendor',
         shopName: upgradeShopName.trim(),
         phone: upgradePhone.trim(),
-        vendorCode: generatedCode,
+        vendorCode: finalVendorCode,
       });
 
       setShowUpgradeModal(false);
-      Alert.alert(
-        language === "ar" ? "تهانينا! 🎉" : "Congratulations! 🎉",
-        language === "ar" 
-          ? `تم ترقية حسابك إلى تاجر بنجاح! كود التاجر الخاص بك هو: ${generatedCode}`
-          : `Your account has been upgraded to vendor! Your vendor code is: ${generatedCode}`
-      );
+
+      if (isNewCode) {
+        Alert.alert(
+          language === "ar" ? "تهانينا! 🎉" : "Congratulations! 🎉",
+          language === "ar" 
+            ? `تم ترقية حسابك إلى تاجر بنجاح! كود التاجر الخاص بك هو: ${finalVendorCode}`
+            : `Your account has been upgraded to vendor! Your vendor code is: ${finalVendorCode}`
+        );
+      } else {
+        Alert.alert(
+          language === "ar" ? "تم التحديث ✅" : "Updated Successfully ✅",
+          language === "ar" 
+            ? `تم تحديث بيانات المتجر بنجاح (كود التاجر الحالي: ${finalVendorCode})`
+            : `Store profile updated successfully! (Vendor Code: ${finalVendorCode})`
+        );
+      }
     } catch (err) {
-      console.error("Upgrade error:", err);
+      console.error("Upgrade/Edit error:", err);
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "فشل في ترقية الحساب" : "Failed to upgrade account"
+        language === "ar" ? "فشل في حفظ البيانات" : "Failed to update profile"
       );
     } finally {
       setUpgrading(false);
@@ -391,9 +438,41 @@ const ProfileScreen = ({ navigation }: any) => {
         )}
       </View>
 
-      {/* لوحة التاجر إذا كان تاجر أو أدمن */}
+      {/* 🏬 لوحة تحكم التاجر والأدمن للتحكم بالمنتجات والمحل */}
       {!isGuest && (localUser.role === 'vendor' || localUser.role === 'admin') && (
         <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+          {/* كود التاجر والمحل Banner */}
+          <View style={{
+            backgroundColor: isDarkMode ? '#1e1b4b' : '#2e1065',
+            padding: 16,
+            borderRadius: 16,
+            borderWidth: 1.5,
+            borderColor: '#FFD700',
+            marginBottom: 12,
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Ionicons name="storefront" size={24} color="#FFD700" />
+                <View>
+                  <Text style={{ color: '#FFD700', fontWeight: 'bold', fontSize: 16 }}>
+                    🏬 {localUser.shopName || "متجري"}
+                  </Text>
+                  <Text style={{ color: '#aaa', fontSize: 12, marginTop: 2 }}>
+                    {language === "ar" ? "حساب تاجر معتمد" : "Verified Merchant Account"}
+                  </Text>
+                </View>
+              </View>
+              {!!localUser.vendorCode && (
+                <View style={{ backgroundColor: '#FFD700', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                  <Text style={{ color: '#111', fontWeight: 'bold', fontSize: 13 }}>
+                    {localUser.vendorCode}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* زر 1: لوحة منتجات التاجر وتعديلها */}
           <TouchableOpacity
             style={{
               backgroundColor: '#28a745',
@@ -402,22 +481,74 @@ const ProfileScreen = ({ navigation }: any) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
+              marginBottom: 10,
               elevation: 2,
             }}
             onPress={() => navigation.navigate("VendorDashboard" as never)}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <Ionicons name="cube-outline" size={24} color="#fff" />
+              <Ionicons name="grid-outline" size={22} color="#fff" />
               <View>
-                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-                  {language === "ar" ? "لوحة منتجات التاجر" : "Vendor Dashboard"}
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 15 }}>
+                  {language === "ar" ? "لوحة إدارة منتجات التاجر 📦" : "Manage My Store Products 📦"}
                 </Text>
-                <Text style={{ color: '#e8f8ec', fontSize: 12 }}>
-                  {language === "ar" ? "إضافة وتعديل وحذف منتجاتك" : "Manage your products"}
+                <Text style={{ color: '#e8f8ec', fontSize: 11 }}>
+                  {language === "ar" ? "عرض وتعديل وحذف منتجات متجرك" : "View, edit & delete your products"}
                 </Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#fff" />
+            <Ionicons name="chevron-forward" size={18} color="#fff" />
+          </TouchableOpacity>
+
+          {/* زر 2: إضافة منتج جديد مباشرة */}
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#FFD700',
+              padding: 14,
+              borderRadius: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+              elevation: 2,
+            }}
+            onPress={() => navigation.navigate("AddProduct" as never)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Ionicons name="add-circle" size={22} color="#111" />
+              <View>
+                <Text style={{ color: '#111', fontWeight: 'bold', fontSize: 15 }}>
+                  {language === "ar" ? "إضافة منتج جديد للمتجر ➕" : "Add New Store Product ➕"}
+                </Text>
+                <Text style={{ color: '#333', fontSize: 11 }}>
+                  {language === "ar" ? "رفع صور ومنتج جديد فوراً" : "Upload images and new product"}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#111" />
+          </TouchableOpacity>
+
+          {/* زر 3: تعديل بيانات وعنوان المتجر (لحل مشكلة غير محدد) */}
+          <TouchableOpacity
+            style={{
+              backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0',
+              borderWidth: 1,
+              borderColor: isDarkMode ? '#444' : '#ddd',
+              padding: 12,
+              borderRadius: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+            onPress={() => setShowUpgradeModal(true)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Ionicons name="create-outline" size={20} color="#FFD700" />
+              <Text style={{ color: isDarkMode ? '#fff' : '#111', fontWeight: 'bold', fontSize: 13 }}>
+                {language === "ar" ? "تعديل اسم المتجر والهاتف والعنوان ⚙️" : "Edit Store Name, Phone & Address ⚙️"}
+              </Text>
+            </View>
+            <Ionicons name="pencil" size={16} color="#FFD700" />
           </TouchableOpacity>
         </View>
       )}
@@ -507,7 +638,9 @@ const ProfileScreen = ({ navigation }: any) => {
           <View style={{ width: '100%', backgroundColor: colors.card, borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#FFD700' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
               <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>
-                {language === "ar" ? "الترقية إلى حساب تاجر 🏪" : "Upgrade to Vendor Account"}
+                {localUser.vendorCode || localUser.role === 'vendor'
+                  ? (language === "ar" ? "تعديل بيانات المتجر 🏪" : "Edit Store Profile 🏪")
+                  : (language === "ar" ? "الترقية إلى حساب تاجر 🏪" : "Upgrade to Vendor Account 🏪")}
               </Text>
               <TouchableOpacity onPress={() => setShowUpgradeModal(false)}>
                 <Ionicons name="close" size={24} color={colors.text} />
@@ -610,8 +743,10 @@ const ProfileScreen = ({ navigation }: any) => {
             >
               <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
                 {upgrading 
-                  ? (language === "ar" ? "جاري الترقية..." : "Upgrading...")
-                  : (language === "ar" ? "تأكيد الترقية وتوليد كود التاجر" : "Confirm Upgrade")}
+                  ? (language === "ar" ? "جاري الحفظ..." : "Saving...")
+                  : (localUser.vendorCode 
+                      ? (language === "ar" ? "حفظ وتحديث البيانات 💾" : "Save Changes 💾")
+                      : (language === "ar" ? "تأكيد الترقية وتوليد كود التاجر" : "Confirm Upgrade"))}
               </Text>
             </TouchableOpacity>
           </View>

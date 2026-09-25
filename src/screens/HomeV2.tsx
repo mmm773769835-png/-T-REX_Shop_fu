@@ -12,6 +12,7 @@ import {
   Dimensions,
   Alert,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -79,6 +80,8 @@ interface Product {
   attribute?: string;
   vendor_code?: string;
   vendor_id?: string;
+  views_count?: number;
+  condition?: string;
 }
 
 interface RouteParams {
@@ -318,7 +321,9 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
                 stock: item.stock ?? item.quantity ?? null,
                 attribute: item.attribute || item.status || "",
                 vendor_code: item.vendor_code || "VND-MAIN",
-                vendor_id: item.vendor_id || null
+                vendor_id: item.vendor_id || null,
+                views_count: item.views_count || 0,
+                condition: item.condition || "new"
               });
             } else {
               console.warn("⚠️ تم تجاهل وثيقة بها بيانات ناقصة:", item.id, item);
@@ -824,87 +829,80 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
     </View>
   );
 
-  // 🎨 عرض المنتجات
-  const renderProducts = () => {
-    if (loading) {
-      return renderSkeletons();
-    }
-
-    if (error) {
-      return (
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={48} color="#ff4444" />
-          <Text style={[styles.errorText, { color: isDarkMode ? "#ff8888" : "#ff4444" }]}>
-            {error}
-          </Text>
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={refreshProducts}
-          >
-            <Text style={styles.retryText}>{language === "ar" ? "إعادة المحاولة" : "Retry"}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    if (filteredProducts.length === 0) {
-      return (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="cube" size={48} color={isDarkMode ? "#666" : "#ccc"} />
-          <Text style={[styles.emptyText, { color: isDarkMode ? "#999" : "#999" }]}>
-            {language === "ar" ? "لا توجد منتجات متاحة" : "No products available"}
-          </Text>
-        </View>
-      );
-    }
-
-    return (
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderProduct}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.productsList}
-        showsVerticalScrollIndicator={false}
-        refreshing={loading}
-        onRefresh={refreshProducts}
-      />
-    );
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
       {renderHeader()}
-      {renderSearchBar()}
-      {renderPromoBanner()}
-      {renderCategories()}
-      {renderFeaturedProducts()}
-
-      {/* عنوان المنتجات */}
-      <View style={[styles.sectionHeader, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
-        <Text style={[styles.sectionTitle, { color: isDarkMode ? "#FFD700" : "#1a1a1a" }]}>
-          {language === "ar" ? "🛍️ المنتجات" : "🛍️ Products"}
-        </Text>
-        <View style={styles.sectionActions}>
-          <TouchableOpacity
-            style={[styles.filterButton, filterState.isFilterApplied && styles.activeFilterButton]}
-            onPress={() => navigation.navigate('Filters')}
-          >
-            <Ionicons name="options-outline" size={16} color={filterState.isFilterApplied ? "#111" : "#FFD700"} />
-            <Text style={[styles.filterButtonText, filterState.isFilterApplied && styles.activeFilterButtonText]}>
-              {language === "ar" ? "فلتر" : "Filter"}
-            </Text>
-          </TouchableOpacity>
-          <Text style={[styles.sectionCount, { color: isDarkMode ? "#888" : "#888" }]}>
-            {filteredProducts.length} {language === "ar" ? "منتج" : "items"}
-          </Text>
-        </View>
-      </View>
       
-      <View style={styles.content}>
-        {renderProducts()}
-      </View>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 140 }}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refreshProducts}
+            colors={["#FFD700"]}
+            tintColor="#FFD700"
+          />
+        }
+      >
+        {renderSearchBar()}
+        {renderPromoBanner()}
+        {renderCategories()}
+        {renderFeaturedProducts()}
+
+        {/* عنوان المنتجات */}
+        <View style={[styles.sectionHeader, { backgroundColor: isDarkMode ? "#111" : "#f0f0f0" }]}>
+          <Text style={[styles.sectionTitle, { color: isDarkMode ? "#FFD700" : "#1a1a1a" }]}>
+            {language === "ar" ? "🛍️ المنتجات" : "🛍️ Products"}
+          </Text>
+          <View style={styles.sectionActions}>
+            <TouchableOpacity
+              style={[styles.filterButton, filterState.isFilterApplied && styles.activeFilterButton]}
+              onPress={() => navigation.navigate('Filters')}
+            >
+              <Ionicons name="options-outline" size={16} color={filterState.isFilterApplied ? "#111" : "#FFD700"} />
+              <Text style={[styles.filterButtonText, filterState.isFilterApplied && styles.activeFilterButtonText]}>
+                {language === "ar" ? "فلتر" : "Filter"}
+              </Text>
+            </TouchableOpacity>
+            <Text style={[styles.sectionCount, { color: isDarkMode ? "#888" : "#888" }]}>
+              {filteredProducts.length} {language === "ar" ? "منتج" : "items"}
+            </Text>
+          </View>
+        </View>
+
+        {/* شبكة المنتجات الموحدة للسحب والتمرير المباشر */}
+        {loading ? (
+          renderSkeletons()
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Ionicons name="alert-circle" size={48} color="#ff4444" />
+            <Text style={[styles.errorText, { color: isDarkMode ? "#ff8888" : "#ff4444" }]}>
+              {error}
+            </Text>
+            <TouchableOpacity style={styles.retryButton} onPress={refreshProducts}>
+              <Text style={styles.retryText}>{language === "ar" ? "إعادة المحاولة" : "Retry"}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : filteredProducts.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="cube" size={48} color={isDarkMode ? "#666" : "#ccc"} />
+            <Text style={[styles.emptyText, { color: isDarkMode ? "#999" : "#999" }]}>
+              {language === "ar" ? "لا توجد منتجات متاحة" : "No products available"}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.productsGrid}>
+            {filteredProducts.map((item) => (
+              <View key={item.id} style={styles.gridCardWrapper}>
+                {renderProduct({ item })}
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
       
       {/* زر إضافة منتج للمشرفين */}
       {isAdmin && (
@@ -929,11 +927,15 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
       
       {/* القائمة الجانبية */}
       <SidebarV2 
+        isVisible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
         onAddProduct={() => {
+          setSidebarVisible(false);
           // @ts-ignore
           navigation.navigate("AddProduct");
         }}
         onLoginLogout={async () => {
+          setSidebarVisible(false);
           if (isLoggedIn) {
             // Logout
             await signOut();
@@ -949,6 +951,7 @@ const HomeV2: React.FC = ({ route, navigation }: any) => {
         }}
         isAdmin={isAdmin}
         isLoggedIn={isLoggedIn}
+        navigation={navigation}
       />
     </View>
   );
@@ -967,6 +970,8 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: "#2a2a2a",
+    zIndex: 99999,
+    elevation: 99999,
   },
   headerCenter: {
     alignItems: "center",
@@ -1009,18 +1014,19 @@ const styles = StyleSheet.create({
   },
   currencyDropdown: {
     position: "absolute",
-    top: 60,
+    top: 90,
     right: 16,
     backgroundColor: "#1a1a1a",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#333",
-    zIndex: 1000,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "#FFD700",
+    zIndex: 999999,
+    elevation: 999999,
+    minWidth: 120,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
   },
   currencyOption: {
     flexDirection: "row",
@@ -1263,6 +1269,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  productsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+  },
+  gridCardWrapper: {
+    width: "48%",
+    marginBottom: 10,
+  },
   productsList: {
     padding: 10,
     paddingBottom: 30,
@@ -1271,23 +1287,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   productCard: {
-    flex: 0.48,
-    borderRadius: 16,
-    margin: 5,
-    overflow: "hidden",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-  },
-  productImage: {
     width: "100%",
-    height: 160,
-    resizeMode: "contain",
+    borderRadius: 14,
+    overflow: "hidden",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255, 215, 0, 0.22)",
   },
   imageContainer: {
     position: "relative",
+    width: "100%",
+    aspectRatio: 1,
+    backgroundColor: "#181818",
+    overflow: "hidden",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 215, 0, 0.15)",
+  },
+  productImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   imageOverlay: {
     position: "absolute",

@@ -4,7 +4,7 @@
  * Default product image URL - HTTPS so it loads on Android/iOS
  * (data:image/svg not always supported in React Native Image)
  */
-const DEFAULT_PRODUCT_IMAGE_URL = 'https://placehold.co/300x300/e5e5e5/999999?text=Product';
+const DEFAULT_PRODUCT_IMAGE_URL = 'https://trexshopmax.com/logo.png';
 
 /**
  * Get default product image URL

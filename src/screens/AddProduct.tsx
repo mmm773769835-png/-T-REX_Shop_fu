@@ -28,6 +28,7 @@ export default function AddProduct({ navigation, route }: any) {
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [vendorPrice, setVendorPrice] = useState("");
+  const [currency, setCurrency] = useState<'YER' | 'SAR' | 'USD'>('YER');
   const [description, setDescription] = useState("");
   const [condition, setCondition] = useState<'new' | 'used'>('new');
   const categories = language === 'ar' ? PRODUCT_CATEGORIES.ar : PRODUCT_CATEGORIES.en;
@@ -46,13 +47,53 @@ export default function AddProduct({ navigation, route }: any) {
   const [activationInput, setActivationInput] = useState("");
   const [redeeming, setRedeeming] = useState(false);
 
+  const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
+  const isAdminEmail = (email?: string) => !!(email && ADMIN_EMAILS.includes(email.trim().toLowerCase()));
+
   // Admin Code Generator state for AddProduct
   const [selectedDuration, setSelectedDuration] = useState<number>(30);
   const [generatingCode, setGeneratingCode] = useState<boolean>(false);
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
 
-  const ADMIN_EMAILS = ['mmm773769835@gmail.com', 'trexshopmax@gmail.com', 'mmm712874799@gmail.com'];
-  const isAdminEmail = (email?: string) => !!(email && ADMIN_EMAILS.includes(email.trim().toLowerCase()));
+  const editProduct = route?.params?.editProduct || null;
+  const isEditMode = !!editProduct;
+
+  React.useEffect(() => {
+    if (editProduct) {
+      if (editProduct.name) setName(editProduct.name);
+      
+      const vPrice = editProduct.vendor_price !== undefined && editProduct.vendor_price !== null
+        ? String(editProduct.vendor_price)
+        : (editProduct.price !== undefined && editProduct.price !== null ? String(editProduct.price) : "");
+      setVendorPrice(vPrice);
+
+      if (editProduct.currency && ['YER', 'SAR', 'USD'].includes(editProduct.currency)) {
+        setCurrency(editProduct.currency as any);
+      }
+      if (editProduct.description) setDescription(editProduct.description);
+      if (editProduct.condition) setCondition(editProduct.condition);
+      if (editProduct.category) setCategory(editProduct.category);
+      if (editProduct.attribute) setAttribute(editProduct.attribute);
+      if (editProduct.payment_method || editProduct.paymentMethod) {
+        setPaymentMethod(editProduct.payment_method || editProduct.paymentMethod);
+      }
+      if (editProduct.is_featured !== undefined) {
+        setIsFeatured(!!editProduct.is_featured);
+      }
+
+      let existingImgs: string[] = [];
+      if (Array.isArray(editProduct.images) && editProduct.images.length > 0) {
+        existingImgs = editProduct.images;
+      } else if (editProduct.image_url) {
+        existingImgs = [editProduct.image_url];
+      } else if (editProduct.image) {
+        existingImgs = [editProduct.image];
+      }
+      if (existingImgs.length > 0) {
+        setImages(existingImgs);
+      }
+    }
+  }, [route?.params?.editProduct]);
 
   React.useEffect(() => {
     const loadProfile = async () => {
@@ -195,7 +236,7 @@ export default function AddProduct({ navigation, route }: any) {
   };
 
   const parsedVendorPrice = parseFloat(vendorPrice) || 0;
-  const currentMarkupPct = getTieredMarkupPercent(parsedVendorPrice, 'YER');
+  const currentMarkupPct = getTieredMarkupPercent(parsedVendorPrice, currency);
   const finalPriceForCustomer = parseFloat((parsedVendorPrice * (1 + currentMarkupPct / 100)).toFixed(2));
   const markupAmount = parseFloat((finalPriceForCustomer - parsedVendorPrice).toFixed(2));
 
@@ -248,38 +289,32 @@ export default function AddProduct({ navigation, route }: any) {
 
   const uploadImage = async (uri: string) => {
     try {
-      // التحقق من صحة URI
       if (!uri || typeof uri !== 'string') {
         console.warn("Invalid image URI provided");
         return getDefaultProductImage();
       }
 
-      const filename = `${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
-
-      // التحقق من نوع الصورة لتجنب خطأ ArrayBuffer
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      // رفع الصورة إلى Supabase Storage
-      const { data, error } = await storageService.upload('product-images', filename, blob);
-
-      if (error) {
-        console.error("Error uploading image:", error);
-        Alert.alert(
-          language === "ar" ? "تحذير" : "Warning",
-          language === "ar" ? "فشل في رفع الصورة. سيتم استخدام صورة افتراضية." : "Failed to upload image. Default image will be used."
-        );
-        return getDefaultProductImage();
+      if (uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('data:image')) {
+        return uri;
       }
 
-      const downloadURL = storageService.getPublicUrl('product-images', filename);
-      return downloadURL;
+      const filename = `${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+      const { publicUrl } = await storageService.uploadLocalImage('product-images', filename, uri, 'products');
+
+      if (publicUrl && typeof publicUrl === 'string' && publicUrl.length > 5) {
+        return publicUrl;
+      }
+
+      if (uri.startsWith('file://') || uri.startsWith('content://')) {
+        return uri;
+      }
+
+      return getDefaultProductImage();
     } catch (error) {
-      console.error("Error uploading image:", error);
-      Alert.alert(
-        language === "ar" ? "تحذير" : "Warning",
-        language === "ar" ? "فشل في رفع الصورة. سيتم استخدام صورة افتراضية." : "Failed to upload image. Default image will be used."
-      );
+      console.error("Error uploading image catch:", error);
+      if (uri && (uri.startsWith('file://') || uri.startsWith('content://') || uri.startsWith('http'))) {
+        return uri;
+      }
       return getDefaultProductImage();
     }
   };
@@ -360,7 +395,7 @@ export default function AddProduct({ navigation, route }: any) {
       return;
     }
 
-    const markupPct = getTieredMarkupPercent(priceNum, 'YER');
+    const markupPct = getTieredMarkupPercent(priceNum, currency);
     const calculatedCustomerPrice = parseFloat((priceNum * (1 + markupPct / 100)).toFixed(2));
     
     if (!description.trim()) {
@@ -424,47 +459,58 @@ export default function AddProduct({ navigation, route }: any) {
       }
 
       // جلب vendor_code الخاص بالتاجر الحالي إذا وُجد
-      let vendorId = user?.uid || null;
+      let vendorId = user?.uid || user?.id || null;
       let vendorCode = null;
-      if (user?.uid) {
-        const { data: profData } = await dbService.get('profiles', { eq: { id: user.uid } });
+      if (vendorId) {
+        const { data: profData } = await dbService.get('profiles', { eq: { id: vendorId } });
         if (profData && profData.length > 0) {
           vendorCode = profData[0].vendor_code || null;
         }
       }
 
-      const productData = {
+      const productData: any = {
         name: name.trim(),
         vendor_price: priceNum,
-        price: calculatedCustomerPrice, // السعر للزبون بعد إضافة 10%
+        price: calculatedCustomerPrice, // السعر للزبون بعد إضافة التدرج
         description: description.trim(),
-        category,
-        attribute,
-        condition, // 'new' أو 'used'
+        category: category || 'إلكترونيات',
+        condition: condition || 'new', // 'new' أو 'used'
         vendor_id: vendorId,
         vendor_code: vendorCode,
-        paymentMethod,
+        payment_method: paymentMethod || 'cash',
         is_featured: isFeatured,
         is_active: true, // Ensure the product is active by default
         images: imageUrls,
-        image_url: imageUrls[0],
-        imageUrls,
-        primaryImage: imageUrls[0],
-        createdAt: new Date().toISOString(),
+        image_url: imageUrls[0] || getDefaultProductImage(),
+        currency: currency,
+        updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await dbService.add('products', productData);
+      if (!isEditMode) {
+        productData.created_at = new Date().toISOString();
+      }
 
-      if (error) {
-        throw error;
+      let dbResult: any;
+      if (isEditMode && editProduct?.id) {
+        dbResult = await dbService.update('products', editProduct.id, productData);
+      } else {
+        dbResult = await dbService.add('products', productData);
+      }
+
+      if (dbResult.error) {
+        console.error("Error saving product into Supabase:", dbResult.error);
+        throw dbResult.error;
       }
 
       Alert.alert(
         language === "ar" ? "تم بنجاح! 🎉" : "Success! 🎉",
-        language === "ar" 
-          ? `تم حفظ المنتج بنجاح!\nسعرك الصافي: ${priceNum} د.ل\nالسعر المعروض للزبون (+10%): ${calculatedCustomerPrice} د.ل`
-          : `Product added successfully!\nNet Price: ${priceNum}\nCustomer Price (+10%): ${calculatedCustomerPrice}`
+        isEditMode
+          ? (language === "ar" ? "تم تحديث بيانات المنتج بنجاح!" : "Product updated successfully!")
+          : (language === "ar" 
+              ? `تم حفظ المنتج بنجاح!\nسعرك الصافي: ${priceNum} ${currency}\nالسعر المعروض للزبون: ${calculatedCustomerPrice} ${currency}`
+              : `Product added successfully!`)
       );
+
       // إعادة تعيين النموذج
       setName("");
       setVendorPrice("");
@@ -472,13 +518,13 @@ export default function AddProduct({ navigation, route }: any) {
       setImages([]);
       // @ts-ignore
       navigation.goBack();
-    } catch (error) {
-      console.error("Error adding product:", error);
+    } catch (error: any) {
+      console.error("Error saving product:", error);
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
         language === "ar" 
-          ? "فشل في إضافة المنتج. يرجى التحقق من الاتصال بالإنترنت والمحاولة مرة أخرى."
-          : "Failed to add product. Please check your internet connection and try again."
+          ? `فشل في حفظ المنتج: ${error?.message || 'يرجى التحقق من الاتصال بالإنترنت والمحاولة مرة أخرى.'}`
+          : `Failed to save product: ${error?.message || 'Please check connection and try again.'}`
       );
     } finally {
       setLoading(false);
@@ -491,7 +537,11 @@ export default function AddProduct({ navigation, route }: any) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.title}>{language === 'ar' ? 'إضافة منتج جديد' : 'Add New Product'}</Text>
+        <Text style={styles.title}>
+          {isEditMode
+            ? (language === 'ar' ? '✏️ تعديل المنتج' : '✏️ Edit Product')
+            : (language === 'ar' ? 'إضافة منتج جديد' : 'Add New Product')}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -543,10 +593,42 @@ export default function AddProduct({ navigation, route }: any) {
           maxLength={100}
         />
 
-        <Text style={styles.label}>{language === 'ar' ? 'سعرك الصافي بالدينار (الخاص بك كتاجر) *' : 'Your Net Price *'}</Text>
+        {/* اختيار عملة التسعير */}
+        <Text style={styles.label}>{language === 'ar' ? 'عملة التسعير *' : 'Pricing Currency *'}</Text>
+        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
+          {[
+            { code: 'YER', label: '🇾🇪 ر.ي (يمني)' },
+            { code: 'SAR', label: '🇸🇦 ر.س (سعودي)' },
+            { code: 'USD', label: '🇺🇸 $ (دولار)' },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.code}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 4,
+                borderRadius: 8,
+                borderWidth: 1.5,
+                borderColor: currency === item.code ? '#007bff' : '#d0d0d0',
+                backgroundColor: currency === item.code ? '#e7f3ff' : '#f8f9fa',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => setCurrency(item.code as any)}
+            >
+              <Text style={{ fontWeight: 'bold', color: currency === item.code ? '#007bff' : '#444', fontSize: 12.5 }}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.label}>
+          {language === 'ar' ? `سعرك الصافي بـ (${currency === 'YER' ? 'الريال اليمني' : currency === 'SAR' ? 'الريال السعودي' : 'الدولار الأمريكي'}) (الخاص بك كتاجر) *` : `Your Net Price (${currency}) *`}
+        </Text>
         <TextInput
           style={styles.input}
-          placeholder={language === 'ar' ? "أدخل سعرك الصافي (مثال: 100)" : "Enter net price"}
+          placeholder={language === 'ar' ? `أدخل سعرك الصافي بـ ${currency} (مثال: 100)` : `Enter net price in ${currency}`}
           value={vendorPrice}
           onChangeText={(text) => {
             if (/^\d*\.?\d*$/.test(text)) {
@@ -564,17 +646,17 @@ export default function AddProduct({ navigation, route }: any) {
               💡 {language === 'ar' ? 'شفافية التسعير ورسوم المتجر التلقائية:' : 'Pricing Transparency & Auto Store Fees:'}
             </Text>
             <Text style={{ fontSize: 13, color: '#1e3a8a' }}>
-              • {language === 'ar' ? `سعرك الصافي المحفوظ (الذي تسستلمه): ${parsedVendorPrice} د.ل` : `Your Saved Net Price: ${parsedVendorPrice}`}
+              • {language === 'ar' ? `سعرك الصافي المحفوظ (الذي تستلمه): ${parsedVendorPrice} ${currency}` : `Your Saved Net Price: ${parsedVendorPrice} ${currency}`}
             </Text>
             <Text style={{ fontSize: 13, color: '#1e3a8a', marginTop: 2 }}>
-              • {language === 'ar' ? `شريحة زيادة المتجر التلقائية: +${currentMarkupPct}% (+${markupAmount} د.ل)` : `Auto Store Markup: +${currentMarkupPct}%`}
+              • {language === 'ar' ? `شريحة زيادة المتجر التلقائية: +${currentMarkupPct}% (+${markupAmount} ${currency})` : `Auto Store Markup: +${currentMarkupPct}% (+${markupAmount} ${currency})`}
             </Text>
             <Text style={{ fontSize: 13, color: '#1e3a8a', fontWeight: 'bold', marginTop: 4 }}>
-              • {language === 'ar' ? `السعر النهائي المعروض للزبون بالمتجر: ${finalPriceForCustomer} د.ل` : `Final Price for Customer: ${finalPriceForCustomer}`}
+              • {language === 'ar' ? `السعر النهائي المعروض للزبون بالمتجر: ${finalPriceForCustomer} ${currency}` : `Final Price for Customer: ${finalPriceForCustomer} ${currency}`}
             </Text>
             <View style={{ marginTop: 8, padding: 8, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 6 }}>
               <Text style={{ fontSize: 11.5, color: '#555', fontWeight: 'bold' }}>
-                📊 {language === 'ar' ? 'شرائح زيادة المتجر التلقائية:' : 'Auto Fee Tiers:'}
+                📊 {language === 'ar' ? 'شرائح زيادة المتجر التلقائية (معادلة بالريال اليمني):' : 'Auto Fee Tiers (YER Equiv):'}
               </Text>
               <Text style={{ fontSize: 11, color: '#666' }}>
                 • 1 - 5,000 ر.ي (أو ما يعادلها): 10% | • 5,001 - 100,000 ر.ي: 5% | • أكثر من 100,000 ر.ي: 3%
@@ -710,7 +792,13 @@ export default function AddProduct({ navigation, route }: any) {
 
         <View style={styles.buttonContainer}>
           <Button 
-            title={loading ? (language === 'ar' ? "جاري الإضافة..." : "Adding...") : (language === 'ar' ? "إضافة المنتج" : "Add Product")} 
+            title={
+              loading
+                ? (language === 'ar' ? "جاري الحفظ..." : "Saving...")
+                : (isEditMode
+                    ? (language === 'ar' ? "💾 حفظ التعديلات" : "💾 Save Changes")
+                    : (language === 'ar' ? "إضافة المنتج" : "Add Product"))
+            } 
             onPress={handleAddProduct}
             disabled={loading}
           />

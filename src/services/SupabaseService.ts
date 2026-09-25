@@ -259,10 +259,22 @@ export const dbService = {
     return { data: result, error };
   },
 
-  // Update data in a table
-  update: async (table: string, id: string, data: any) => {
-    const { data: result, error } = await supabase.from(table).update(data).eq('id', id).select();
-    return { data: result, error };
+  // Update data in a table (by ID string or filter object)
+  update: async (table: string, idOrFilter: string | any, data: any) => {
+    if (typeof idOrFilter === 'string') {
+      const { data: result, error } = await supabase.from(table).update(data).eq('id', idOrFilter).select();
+      return { data: result, error };
+    } else if (idOrFilter && idOrFilter.eq) {
+      let query = supabase.from(table).update(data);
+      Object.keys(idOrFilter.eq).forEach(key => {
+        query = query.eq(key, idOrFilter.eq[key]);
+      });
+      const { data: result, error } = await query.select();
+      return { data: result, error };
+    } else {
+      const { data: result, error } = await supabase.from(table).update(data).eq('id', idOrFilter).select();
+      return { data: result, error };
+    }
   },
 
   // Delete data from a table (by ID string or filter object)
@@ -292,12 +304,110 @@ export const dbService = {
   },
 };
 
+// Utility to convert Base64 string to Uint8Array/ArrayBuffer for Supabase Storage Upload in React Native
+export const base64ToUint8Array = (base64: string): Uint8Array => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const lookup = new Uint8Array(256);
+  for (let i = 0; i < chars.length; i++) {
+    lookup[chars.charCodeAt(i)] = i;
+  }
+
+  let bufferLength = base64.length * 0.75;
+  if (base64.endsWith('==')) bufferLength -= 2;
+  else if (base64.endsWith('=')) bufferLength -= 1;
+
+  const bytes = new Uint8Array(Math.floor(bufferLength));
+  let p = 0;
+  for (let i = 0; i < base64.length; i += 4) {
+    const encoded1 = lookup[base64.charCodeAt(i)];
+    const encoded2 = lookup[base64.charCodeAt(i + 1)];
+    const encoded3 = lookup[base64.charCodeAt(i + 2)];
+    const encoded4 = lookup[base64.charCodeAt(i + 3)];
+
+    bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+    if (base64[i + 2] !== '=') {
+      bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+    }
+    if (base64[i + 3] !== '=') {
+      bytes[p++] = ((encoded3 & 3) << 6) | encoded4;
+    }
+  }
+  return bytes;
+};
+
 // Storage functions
 export const storageService = {
   // Upload file
-  upload: async (bucket: string, path: string, file: any) => {
-    const { data, error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+  upload: async (bucket: string, path: string, file: any, options: any = { upsert: true }) => {
+    const { data, error } = await supabase.storage.from(bucket).upload(path, file, options);
     return { data, error };
+  },
+
+  // Safely upload local file URI from Expo/React Native
+  // Safely upload local file URI from Expo/React Native
+  uploadLocalImage: async (
+    bucket: string,
+    path: string,
+    uri: string,
+    fallbackBucket?: string
+  ): Promise<{ publicUrl: string | null; error: any }> => {
+    try {
+      if (!uri || typeof uri !== 'string') {
+        return { publicUrl: null, error: new Error('Invalid URI') };
+      }
+
+      if (uri.startsWith('http://') || uri.startsWith('https://') || uri.startsWith('data:image')) {
+        return { publicUrl: uri, error: null };
+      }
+
+      const FileSystem = require('expo-file-system');
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const byteArray = base64ToUint8Array(base64);
+      const bucketsToTry = Array.from(new Set([bucket, fallbackBucket, 'product-images', 'products', 'public'].filter(Boolean) as string[]));
+
+      let uploadSuccessUrl: string | null = null;
+      let lastError: any = null;
+
+      for (const bkt of bucketsToTry) {
+        try {
+          const { data, error } = await supabase.storage.from(bkt).upload(path, byteArray, {
+            contentType: 'image/jpeg',
+            upsert: true,
+          });
+
+          if (!error) {
+            const { data: publicData } = supabase.storage.from(bkt).getPublicUrl(path);
+            if (publicData && publicData.publicUrl) {
+              uploadSuccessUrl = publicData.publicUrl;
+              break;
+            }
+          } else {
+            lastError = error;
+            console.warn(`Upload to bucket '${bkt}' failed:`, error.message);
+          }
+        } catch (bktErr) {
+          lastError = bktErr;
+        }
+      }
+
+      if (uploadSuccessUrl) {
+        return { publicUrl: uploadSuccessUrl, error: null };
+      }
+
+      // Fallback: If network/RLS storage fails, store as Base64 Data URI so the image is never lost
+      if (base64) {
+        const dataUri = `data:image/jpeg;base64,${base64}`;
+        return { publicUrl: dataUri, error: null };
+      }
+
+      return { publicUrl: null, error: lastError || new Error('Upload failed') };
+    } catch (err: any) {
+      console.error('uploadLocalImage exception:', err);
+      return { publicUrl: null, error: err };
+    }
   },
 
   // Get public URL
@@ -312,3 +422,4 @@ export const storageService = {
     return { error };
   },
 };
+

@@ -16,7 +16,7 @@ import { dbService } from '../services/SupabaseService';
 import { useAuth } from '../contexts/AuthContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { getDefaultProductImage } from '../utils/imageUtils';
+import { getDefaultProductImage, sanitizeImageUrl } from '../utils/imageUtils';
 
 export default function VendorDashboard({ navigation, route }: any) {
   const { user } = useAuth();
@@ -292,12 +292,18 @@ export default function VendorDashboard({ navigation, route }: any) {
   };
 
   const renderProductItem = ({ item }: { item: any }) => {
-    const imageUrl = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : item.primaryImage) || getDefaultProductImage();
+    const rawImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : (item.imageUrl || item.image || item.primaryImage));
+    const imageUrl = sanitizeImageUrl(rawImage);
     const isUsed = item.condition === 'used';
+    const curr = item.currency || 'YER';
 
     return (
       <View style={[styles.productCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <Image source={{ uri: imageUrl }} style={styles.productImage} />
+        <Image 
+          source={{ uri: imageUrl }} 
+          style={styles.productImage}
+          resizeMode="cover"
+        />
 
         <View style={styles.productDetails}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -313,7 +319,7 @@ export default function VendorDashboard({ navigation, route }: any) {
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={[styles.vendorPriceText, { color: colors.textSecondary }]}>
-              {language === 'ar' ? `سعرك الصافي: ${item.vendor_price || item.price} د.ل` : `Net Price: ${item.vendor_price || item.price}`}
+              {language === 'ar' ? `سعرك الصافي: ${item.vendor_price || item.price} ${curr}` : `Net Price: ${item.vendor_price || item.price} ${curr}`}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 215, 0, 0.15)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
               <Ionicons name="eye-outline" size={13} color="#FFD700" style={{ marginRight: 3 }} />
@@ -324,7 +330,7 @@ export default function VendorDashboard({ navigation, route }: any) {
           </View>
 
           <Text style={[styles.customerPriceText, { color: '#28a745' }]}>
-            {language === 'ar' ? `السعر المعروض (+10%): ${item.price} د.ل` : `Customer Price (+10%): ${item.price}`}
+            {language === 'ar' ? `السعر المعروض للزبون: ${item.price} ${curr}` : `Customer Price: ${item.price} ${curr}`}
           </Text>
 
           <View style={styles.cardActions}>

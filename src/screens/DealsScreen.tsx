@@ -186,11 +186,14 @@ const getStyles = (isDarkMode: boolean, colors: any) => StyleSheet.create({
   },
   dealImageContainer: {
     position: "relative",
+    width: "100%",
+    aspectRatio: 1,
+    overflow: "hidden",
   },
   dealImage: {
     width: "100%",
-    height: 180,
-    resizeMode: "contain",
+    height: "100%",
+    resizeMode: "cover",
   },
   discountBadge: {
     position: "absolute",
