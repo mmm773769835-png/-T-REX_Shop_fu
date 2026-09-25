@@ -5478,6 +5478,7 @@
                     <p class="modal-description" style="margin-bottom: 15px; line-height: 1.6;">${product.description || 'لا يوجد وصف'}</p>
                     <div style="margin-bottom: 20px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 8px;">
                         <strong>📁 الفئة:</strong> ${product.category || 'غير محدد'}<br>
+                        <strong>🏷️ حالة المنتج:</strong> ${product.condition === 'used' ? '<span style="color:#ff9800; font-weight:bold;">🏷️ مستعمل (Used)</span>' : '<span style="color:#28a745; font-weight:bold;">✨ جديد (Brand New)</span>'}<br>
                         <strong>📦 المخزون:</strong> ✅ متوفر<br>
                         ${product.vendor_code ? `<strong>👤 التاجر:</strong> <span style="color:#FFD700; font-weight:bold;">${product.vendor_code} <span id="quickVendorRating" style="font-size:12px;"></span></span>` : ''}
                     </div>
@@ -5775,6 +5776,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                         ${schemaScript}
                         ${isEnabled(product.is_new) ? `<span class="product-badge new">${t('badge_new')}</span>` : ''}
                         ${isEnabled(product.is_hot) ? `<span class="product-badge hot">${t('badge_hot')}</span>` : ''}
+                        ${product.condition === 'used' ? `<span class="product-badge used" style="background: #ff9800; color: #fff;">🏷️ مستعمل</span>` : ''}
                         ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
 
                         <button class="wishlist-btn ${isWishlisted ? 'active' : ''}" 
