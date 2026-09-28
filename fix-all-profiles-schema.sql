@@ -10,6 +10,7 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS shop_name   TEXT,
   ADD COLUMN IF NOT EXISTS phone       TEXT,
   ADD COLUMN IF NOT EXISTS address     TEXT,
+  ADD COLUMN IF NOT EXISTS country     TEXT,
   ADD COLUMN IF NOT EXISTS vendor_code TEXT UNIQUE,
   ADD COLUMN IF NOT EXISTS role        TEXT DEFAULT 'customer'
     CHECK (role IN ('customer', 'vendor', 'admin')),
@@ -20,7 +21,18 @@ ALTER TABLE public.profiles
 ALTER TABLE public.products
   ADD COLUMN IF NOT EXISTS vendor_id    UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS vendor_code  TEXT,
+  ADD COLUMN IF NOT EXISTS country      TEXT,
+  ADD COLUMN IF NOT EXISTS address      TEXT,
   ADD COLUMN IF NOT EXISTS views_count  INTEGER DEFAULT 0;
+
+-- 2.1 التحديث الرجعي لربط منتجات التجار القديمة بدولهم المسجلة تلقائياً
+UPDATE public.products p
+SET country = COALESCE(pr.country, pr.address),
+    address = COALESCE(pr.address, pr.country)
+FROM public.profiles pr
+WHERE p.vendor_id = pr.id
+  AND (p.country IS NULL OR p.country = '' OR p.country = 'اليمن 🇾🇪')
+  AND (pr.country IS NOT NULL OR pr.address IS NOT NULL);
 
 -- 3. دالة توليد vendor_code تلقائياً عند إنشاء تاجر
 CREATE OR REPLACE FUNCTION public.generate_vendor_code()

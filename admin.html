@@ -1288,6 +1288,7 @@
                     role: 'vendor',
                     shop_name: shopName,
                     phone: phone,
+                    country: country,
                     address: address,
                     vendor_code: vendorCode,
                     updated_at: new Date().toISOString()
@@ -1601,7 +1602,8 @@
                         role: targetRole,
                         shop_name: pendingShopName || profile?.shop_name || (targetRole === 'admin' ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
                         phone: pendingPhone || profile?.phone || '',
-                        address: pendingCountry || profile?.address || '',
+                        country: pendingCountry || profile?.country || '',
+                        address: profile?.address || pendingCountry || '',
                         vendor_code: vendorCode,
                         updated_at: new Date().toISOString()
                     };
@@ -2336,7 +2338,12 @@
                     productData.vendor_id = currentUser.id;
                     productData.vendor_code = currentVendor.vendor_code || '';
                 }
-                
+
+                if (currentVendor) {
+                    if (currentVendor.country) productData.country = currentVendor.country;
+                    if (currentVendor.address) productData.address = currentVendor.address;
+                }
+
                 if (!editingProductId) {
                     productData.created_at = new Date().toISOString();
                     if (!productData.vendor_code && currentVendor?.vendor_code) {

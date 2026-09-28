@@ -458,13 +458,17 @@ export default function AddProduct({ navigation, route }: any) {
         imageUrls = [getDefaultProductImage()];
       }
 
-      // جلب vendor_code الخاص بالتاجر الحالي إذا وُجد
+      // جلب vendor_code والدولة الخاص بالتاجر الحالي إذا وُجد
       let vendorId = user?.uid || user?.id || null;
       let vendorCode = null;
+      let vendorCountry = null;
+      let vendorAddress = null;
       if (vendorId) {
         const { data: profData } = await dbService.get('profiles', { eq: { id: vendorId } });
         if (profData && profData.length > 0) {
           vendorCode = profData[0].vendor_code || null;
+          vendorCountry = profData[0].country || profData[0].address || null;
+          vendorAddress = profData[0].address || profData[0].country || null;
         }
       }
 
@@ -477,6 +481,8 @@ export default function AddProduct({ navigation, route }: any) {
         condition: condition || 'new', // 'new' أو 'used'
         vendor_id: vendorId,
         vendor_code: vendorCode,
+        country: vendorCountry,
+        address: vendorAddress,
         payment_method: paymentMethod || 'cash',
         is_featured: isFeatured,
         is_active: true, // Ensure the product is active by default

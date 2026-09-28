@@ -4578,6 +4578,8 @@
             
             // Track the order
             trackOrder();
+            const cartGeneratedOrderId = 'ORD-' + Date.now().toString().slice(-6);
+            recordReferralOrder(cartGeneratedOrderId, cart, totalSar, 'SAR');
             
             // Show success message
             showNotification('تم فتح واتساب لإرسال الطلب! ✅');
@@ -5055,12 +5057,108 @@
             }
         }
 
+        // Referral & Affiliate Link Tracking System
+        async function checkAndTrackReferral() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let refCode = urlParams.get('ref') || urlParams.get('referral') || urlParams.get('aff');
+                if (!refCode && window.location.hash) {
+                    const hashMatch = window.location.hash.match(/ref[=/]([a-zA-Z0-9_]+)/i);
+                    if (hashMatch) refCode = hashMatch[1];
+                }
+                if (refCode) {
+                    refCode = String(refCode).trim().toUpperCase();
+                    localStorage.setItem('trex_referral_code', refCode);
+                    sessionStorage.setItem('trex_referral_code', refCode);
+                    document.cookie = `trex_referral_code=${refCode}; path=/; max-age=2592000`; // 30 days
+                    
+                    // Record click asynchronously in Supabase
+                    if (typeof supabase !== 'undefined' && supabase.from) {
+                        const { data: influencer } = await supabase
+                            .from('influencers')
+                            .select('id, influencer_code')
+                            .eq('influencer_code', refCode)
+                            .single();
+                        
+                        if (influencer) {
+                            await supabase.from('referral_clicks').insert([{
+                                influencer_id: influencer.id,
+                                influencer_code: refCode,
+                                user_agent: navigator.userAgent
+                            }]);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('[REFERRAL] Click track error:', e);
+            }
+        }
+
+        async function recordReferralOrder(orderId, products, orderTotal, currency = 'SAR') {
+            try {
+                const refCode = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+                if (!refCode || typeof supabase === 'undefined' || !supabase.from) return;
+
+                const { data: influencer } = await supabase
+                    .from('influencers')
+                    .select('id, influencer_code, commission_rate, status')
+                    .eq('influencer_code', refCode)
+                    .single();
+
+                if (!influencer || influencer.status !== 'active') return;
+
+                const rate = Number(influencer.commission_rate || 10.00);
+                const commissionAmount = Number((orderTotal * (rate / 100)).toFixed(2));
+
+                const productDetails = Array.isArray(products) ? products.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    quantity: p.quantity || 1
+                })) : [{ name: products.name || 'منتج', price: products.price || orderTotal, quantity: 1 }];
+
+                // Insert referral order
+                const { error } = await supabase
+                    .from('referral_orders')
+                    .insert([{
+                        influencer_id: influencer.id,
+                        influencer_code: refCode,
+                        order_id: String(orderId),
+                        product_details: productDetails,
+                        order_total: orderTotal,
+                        commission_rate: rate,
+                        commission_amount: commissionAmount,
+                        currency: currency,
+                        commission_status: 'pending'
+                    }]);
+
+                if (!error) {
+                    const { data: wallet } = await supabase
+                        .from('influencer_wallets')
+                        .select('*')
+                        .eq('influencer_id', influencer.id)
+                        .single();
+
+                    if (wallet) {
+                        const newPending = Number(wallet.pending_balance || 0) + commissionAmount;
+                        await supabase
+                            .from('influencer_wallets')
+                            .update({ pending_balance: newPending, updated_at: new Date().toISOString() })
+                            .eq('influencer_id', influencer.id);
+                    }
+                }
+            } catch (err) {
+                console.warn('[REFERRAL] Order record warning:', err);
+            }
+        }
+
         // Check URL for product parameters on DOM load and hash changes
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(openProductFromUrl, 300);
+            setTimeout(checkAndTrackReferral, 500);
         });
-        window.addEventListener('hashchange', openProductFromUrl);
-        window.addEventListener('popstate', openProductFromUrl);
+        window.addEventListener('hashchange', () => { openProductFromUrl(); checkAndTrackReferral(); });
+        window.addEventListener('popstate', () => { openProductFromUrl(); checkAndTrackReferral(); });
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
@@ -5457,7 +5555,10 @@
                 }
             }, 50);
 
-            modalBody.innerHTML = `
+                    const vendorProfQuick = (product.vendor_id && window.vendorProfilesMap) ? window.vendorProfilesMap[String(product.vendor_id)] : null;
+                    const locationTextQuick = product.address || product.country || (vendorProfQuick ? (vendorProfQuick.country || vendorProfQuick.address) : null) || 'اليمن 🇾🇪';
+
+                    modalBody.innerHTML = `
                 <div class="product-gallery">
                     <img src="${mainImage}" alt="${product.name}" class="main-image" id="mainProductImage" style="cursor:pointer;" onclick="window.open(this.src, '_blank')" title="اضغط لفتح الصورة مباشرة بحجمها الكامل 🖼️">
                     <div class="thumbnail-container">
@@ -5479,6 +5580,7 @@
                     <div style="margin-bottom: 20px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 8px;">
                         <strong>📁 الفئة:</strong> ${product.category || 'غير محدد'}<br>
                         <strong>🏷️ حالة المنتج:</strong> ${product.condition === 'used' ? '<span style="color:#ff9800; font-weight:bold;">🏷️ مستعمل (Used)</span>' : '<span style="color:#28a745; font-weight:bold;">✨ جديد (Brand New)</span>'}<br>
+                        <strong>📍 التوفر:</strong> <span style="color:#28a745; font-weight:bold;">${locationTextQuick}</span><br>
                         <strong>📦 المخزون:</strong> ✅ متوفر<br>
                         ${product.vendor_code ? `<strong>👤 التاجر:</strong> <span style="color:#FFD700; font-weight:bold;">${product.vendor_code} <span id="quickVendorRating" style="font-size:12px;"></span></span>` : ''}
                     </div>
@@ -5699,6 +5801,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
             
             // Track the order
             trackOrder();
+            const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
+            recordReferralOrder(generatedOrderId, currentProduct, total, currentProduct.currency || 'SAR');
             
             showNotification('تم فتح واتساب لإرسال الطلب! ✅');
             
@@ -5739,6 +5843,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 const isWishlisted = wishlist.some(id => String(id) === productId);
                 const hasDiscount = product.original_price && product.original_price > product.price;
                 const discountPercent = hasDiscount ? Math.round((1 - product.price / product.original_price) * 100) : 0;
+
+                const vendorProf = (product.vendor_id && window.vendorProfilesMap) ? window.vendorProfilesMap[String(product.vendor_id)] : null;
+                const locationText = product.address || product.country || (vendorProf ? (vendorProf.country || vendorProf.address) : null) || 'اليمن 🇾🇪';
                 
                 // SEO: Create structured data for product
                 const productSchema = {
@@ -5809,7 +5916,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                                 <i class="fas fa-store" style="color: #FFD700;"></i> ${t('vendor_code')}: ${product.vendor_code || 'VND-MAIN'}
                             </p>
                             <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
-                                <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> ${t('available_in')}: ${product.address || product.country || 'اليمن 🇾🇪'}
+                                <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> ${t('available_in')}: ${locationText}
                             </p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
@@ -5985,7 +6092,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}` : ''}
                 
                 window.vendorProfilesMap = window.vendorProfilesMap || {};
                 try {
-                    const profRes = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=id,role,featured_until', {
+                    const profRes = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=id,role,featured_until,address,country', {
                         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
                     });
                     if (profRes.ok) {
