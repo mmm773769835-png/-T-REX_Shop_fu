@@ -974,10 +974,10 @@
                 }
 
                 tbody.innerHTML = orders.map(ord => {
-                    const statusBadge = ord.commission_status === 'approved' ? '<span class="badge badge-approved">مؤكدة ✅</span>' :
+                    const statusBadge = ord.commission_status === 'approved' ? '<span class="badge badge-approved">مؤكدة والمبلغ بمحفظتك ✅</span>' :
                                         ord.commission_status === 'paid' ? '<span class="badge badge-paid">تم التحويل 💰</span>' :
-                                        ord.commission_status === 'rejected' ? '<span class="badge badge-rejected">ملغاة ❌</span>' :
-                                        '<span class="badge badge-pending">قيد المراجعة ⏳</span>';
+                                        ord.commission_status === 'rejected' ? '<span class="badge badge-rejected">ملغاة (تم إرجاع/إلغاء الطلب) ❌</span>' :
+                                        '<span class="badge badge-pending">قيد الانتظار والمراجعة ⏳ (بانتظار عدم إرجاع المنتجات)</span>';
 
                     const itemsList = Array.isArray(ord.product_details) ? ord.product_details.map(p => p.name || 'منتج').join(', ') : 'منتجات عامة';
 

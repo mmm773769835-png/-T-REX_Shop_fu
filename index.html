@@ -4595,6 +4595,12 @@
             if (notes) {
                 message += `📝 *ملاحظات:* ${notes}\n`;
             }
+
+            const activeRefCode = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+            if (activeRefCode) {
+                message += `\n🏷️ *كود التسويق (المؤثر):* [ ${activeRefCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${activeRefCode}).\n`;
+            }
+
             message += `\n🕐 *تاريخ الطلب:* ${new Date().toLocaleString('ar-SA')}`;
             
             // WhatsApp number (your number)
@@ -5816,8 +5822,10 @@ ${currentProduct.image_url ? `🖼️ *صورة المنتج:* ${currentProduct.
 📱 *الهاتف:* ${phone}
 🌍 *الدولة:* ${country}
 📍 *العنوان:* ${address}
-${notes ? `📝 *ملاحظات:* ${notes}` : ''}
-
+${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
+    const ref = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+    return ref ? `🏷️ *كود التسويق (المؤثر):* [ ${ref} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر (${ref}).\n` : '';
+})()}
 ✅ يرجى تأكيد الطلب
             `.trim();
             
