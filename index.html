@@ -3337,6 +3337,14 @@
 </head>
 <body>
     <!-- T-REX Shop Website - Fixed Version -->
+    <!-- Top Announcement Bar for Influencers & Affiliates -->
+    <div style="background: linear-gradient(90deg, #0d3b66, #00b4d8); color: #ffffff; font-size: 13.5px; font-weight: 600; text-align: center; padding: 7px 15px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); position: relative; z-index: 1001; flex-wrap: wrap;">
+        <span>📣 <strong>فرصة للمؤثرين والمسوقين:</strong> انضم الآن لبوابة التسويق بالعمولة واكسب عمولات فورية عبر رابط إحالتك الخاص!</span>
+        <a href="affiliate.html" style="background: #00e676; color: #000; text-decoration: none; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,230,118,0.4); white-space: nowrap;">
+            <i class="fas fa-bullhorn"></i> دخول بوابة المؤثرين 💰
+        </a>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content">
@@ -3352,6 +3360,8 @@
             <nav class="nav-links">
                 <a href="/" data-i18n="nav_home">الرئيسية</a>
                 <a href="#products" data-i18n="nav_products">المنتجات</a>
+                <a href="affiliate.html" style="color: #00e676; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-bullhorn"></i> التسويق بالعمولة</a>
+                <a href="admin.html" style="font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-store"></i> لوحة التاجر</a>
             </nav>
 
             <!-- Header Actions - Organized Toolbar -->
@@ -3450,6 +3460,16 @@
                                     </div>
                                     <i class="fas fa-arrow-left arrow-indicator"></i>
                                 </a>
+
+                                <!-- Button 3: Influencer / Affiliate Portal -->
+                                <a href="/affiliate.html" class="auth-drop-btn affiliate-drop-btn" style="background: rgba(0, 230, 118, 0.08); border-color: rgba(0, 230, 118, 0.3); text-decoration: none;">
+                                    <div class="auth-btn-icon" style="color: #00e676;"><i class="fas fa-bullhorn"></i></div>
+                                    <div class="auth-btn-text">
+                                        <span class="auth-btn-title" style="color: #00e676;">بوابة المؤثرين والمكاسب 💰</span>
+                                        <span class="auth-btn-desc">التسويق بالعمولة وسحب الأرباح</span>
+                                    </div>
+                                    <i class="fas fa-arrow-left arrow-indicator" style="color: #00e676;"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -3467,6 +3487,7 @@
                                 <a href="#" onclick="showOrders()"><i class="fas fa-shopping-bag"></i> طلباتي</a>
                                 <a href="#" onclick="showWishlist()"><i class="fas fa-heart"></i> المفضلة</a>
                                 <a href="#" onclick="showProfile()"><i class="fas fa-user"></i> الملف الشخصي</a>
+                                <a href="/affiliate.html" style="color: #00e676; font-weight: bold;"><i class="fas fa-bullhorn"></i> بوابة المسوقين والمؤثرين</a>
                                 <a href="/admin.html"><i class="fas fa-store"></i> حساب المورد / الأدمن</a>
                                 <div class="divider"></div>
                                 <a href="#" onclick="signOut()" class="logout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
@@ -3484,9 +3505,14 @@
         <div class="hero-content">
             <h1>🦖 T-REX Shop</h1>
             <p>اكتشف أفضل المنتجات بأسعار مميزة. تسوق الآن واستمتع بتجربة فريدة!</p>
-            <a href="#products" class="cta-btn">
-                <i class="fas fa-shopping-bag"></i> تسوق الآن
-            </a>
+            <div style="margin-top: 18px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="#products" class="cta-btn">
+                    <i class="fas fa-shopping-bag"></i> تسوق الآن
+                </a>
+                <a href="affiliate.html" class="cta-btn" style="background: linear-gradient(135deg, #00e676, #00b4d8); color: #000; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(0,230,118,0.4);">
+                    <i class="fas fa-bullhorn"></i> انضم كـ مؤثر / مسوق بالعمولة 💰
+                </a>
+            </div>
         </div>
     </section>
 
@@ -3747,6 +3773,8 @@
         <div class="footer-links">
             <a href="/">الرئيسية</a>
             <a href="#products">المنتجات</a>
+            <a href="affiliate.html" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة (المؤثرين)</a>
+            <a href="admin.html">🏪 حساب التاجر والأدمن</a>
             <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">تواصل معنا</a>
             <a href="terms-of-use.html">شروط الاستخدام</a>
             <a href="privacy-policy.html">سياسة الخصوصية</a>
