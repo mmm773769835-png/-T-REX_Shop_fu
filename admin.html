@@ -690,7 +690,7 @@
                 <p class="user-info" id="userInfo">تاجر</p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                <a href="trex-superadmin-secret-99835.html#influencersAdminSection" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1.5px solid #00e676; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,230,118,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                <a id="btnInfluencerPortalNav" href="trex-superadmin-secret-99835.html#influencersAdminSection" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1.5px solid #00e676; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,230,118,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                     📣 إدارة وتفعيل المؤثرين والعمولات
                 </a>
                 <button type="button" id="btnAdminVendorsNav" onclick="scrollToVendorsDirectory()" style="display: none; background: linear-gradient(135deg, #17a2b8, #117a8b); color: #fff; border: 1.5px solid #FFD700; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; cursor: pointer; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(23,162,184,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
@@ -1393,6 +1393,14 @@
                     throw new Error('❌ هذا الحساب تم حذفه نهائياً ولا يمكن الدخول منه مرة أخرى.');
                 }
 
+                // Check if account is an influencer account
+                if (!isAdminEmail && (await checkInfluencerAccount(authUser.email))) {
+                    await supabase.auth.signOut();
+                    currentUser = null;
+                    currentVendor = null;
+                    throw new Error('⚠️ هذا البريد الإلكتروني مسجل كحساب "مؤثر / تسويق بالعمولة" وليس كـ "تاجر". يرجى تسجيل الدخول عبر بوابة المؤثرين (affiliate.html).');
+                }
+
                 // Ensure profile exists and assign appropriate role (admin or vendor)
                 const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
                 if (!profile || (profile.role !== 'vendor' && profile.role !== 'admin')) {
@@ -1534,6 +1542,17 @@
             const genCodeNavBtn = document.getElementById('btnAdminGenCodeNav');
             if (genCodeNavBtn) genCodeNavBtn.style.display = isAdmin ? 'inline-flex' : 'none';
 
+            const infNavBtn = document.getElementById('btnInfluencerPortalNav');
+            if (infNavBtn) {
+                if (isAdmin) {
+                    infNavBtn.href = "trex-superadmin-secret-99835.html#influencersAdminSection";
+                    infNavBtn.innerHTML = "📣 إدارة وتفعيل المؤثرين والعمولات";
+                } else {
+                    infNavBtn.href = "affiliate.html";
+                    infNavBtn.innerHTML = "📣 بوابة المسوقين والمؤثرين";
+                }
+            }
+
             // Delete Account button only for merchants, hidden for Super Admins
             const btnDelete = document.getElementById('btnDeleteAccount');
             if (btnDelete) {
@@ -1560,6 +1579,20 @@
             if (box) {
                 box.style.display = 'block';
                 box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        async function checkInfluencerAccount(email) {
+            if (!email) return false;
+            try {
+                const { data } = await supabase
+                    .from('influencers')
+                    .select('id, email')
+                    .eq('email', email.toLowerCase())
+                    .maybeSingle();
+                return !!data;
+            } catch (e) {
+                return false;
             }
         }
 
@@ -1592,6 +1625,18 @@
                     alert('❌ هذا الحساب تم حذفه نهائياً ولا يمكن الدخول منه مرة أخرى.');
                     window.location.reload();
                     return;
+                }
+
+                if (!isAdminEmail && userEmail && (await checkInfluencerAccount(userEmail))) {
+                    const { count } = await supabase.from('products').select('id', { count: 'exact', head: true }).eq('vendor_id', currentUser.id);
+                    if (!count || count === 0) {
+                        await supabase.auth.signOut();
+                        currentUser = null;
+                        currentVendor = null;
+                        alert('⚠️ هذا البريد الإلكتروني مسجل كحساب "مؤثر / تسويق بالعمولة" وليس كحساب "تاجر".\nيتم توجيهك الآن إلى بوابة المؤثرين الخاصة بك.');
+                        window.location.href = 'affiliate.html';
+                        return;
+                    }
                 }
 
                 const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
