@@ -93,11 +93,16 @@ DROP POLICY IF EXISTS "profiles_public_read" ON public.profiles;
 CREATE POLICY "profiles_public_read" ON public.profiles
   FOR SELECT USING (true);
 
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin');
+$$;
+
 DROP POLICY IF EXISTS "profiles_admin_all" ON public.profiles;
-CREATE POLICY "profiles_admin_all" ON public.profiles
-  FOR ALL USING (
-    auth.uid() = id OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+DROP POLICY IF EXISTS "profiles_self_manage" ON public.profiles;
+CREATE POLICY "profiles_self_manage" ON public.profiles
+  FOR ALL USING (auth.uid() = id OR public.is_admin())
+  WITH CHECK (auth.uid() = id OR public.is_admin());
 
 -- 7. إعادة تحميل السكيما في Supabase
 NOTIFY pgrst, 'reload schema';
