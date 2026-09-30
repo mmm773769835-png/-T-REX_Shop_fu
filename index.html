@@ -3390,9 +3390,6 @@
                     </div>
                 </div>
 
-                <!-- Referral Influencer Code Header Badge -->
-                <div id="referralHeaderBadge" style="display: none; background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,230,118,0.2);"></div>
-
                 <!-- Settings Gear Icon -->
                 <button class="settings-btn" onclick="openSettings()" title="الإعدادات" aria-label="الإعدادات">
                     <i class="fas fa-cog"></i>
@@ -5083,7 +5080,7 @@
             }
         }
 
-        // Referral & Affiliate Link Tracking System
+        // Referral & Affiliate Link Tracking System (Silent Background Tracking)
         async function checkAndTrackReferral() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -5098,14 +5095,9 @@
                 }
                 if (refCode) {
                     refCode = String(refCode).trim().toUpperCase();
-                    const previousCode = localStorage.getItem('trex_referral_code');
                     localStorage.setItem('trex_referral_code', refCode);
                     sessionStorage.setItem('trex_referral_code', refCode);
                     document.cookie = `trex_referral_code=${refCode}; path=/; max-age=2592000`; // 30 days
-                    
-                    if (typeof showNotification === 'function' && previousCode !== refCode) {
-                        showNotification(`🎉 تم تفعيل رابط الإحالة للمؤثر بكود: (${refCode}) ✅`);
-                    }
 
                     // Record click asynchronously in Supabase
                     if (typeof supabase !== 'undefined' && supabase.from) {
@@ -5124,38 +5116,13 @@
                         }
                     }
                 }
-                
-                // Update UI badges
-                updateReferralUIBadges();
             } catch (e) {
                 console.warn('[REFERRAL] Click track error:', e);
             }
         }
 
         function updateReferralUIBadges() {
-            const activeRef = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
-            if (!activeRef) return;
-
-            // Header badge
-            let headerBadge = document.getElementById('referralHeaderBadge');
-            if (headerBadge) {
-                headerBadge.style.display = 'inline-flex';
-                headerBadge.innerHTML = `<i class="fas fa-bullhorn"></i> كود المؤثر: ${activeRef}`;
-            }
-
-            // Cart order modal badge
-            let cartRefNotice = document.getElementById('cartReferralNotice');
-            if (cartRefNotice) {
-                cartRefNotice.style.display = 'block';
-                cartRefNotice.innerHTML = `🏷️ <strong>كود المؤثر المطبق:</strong> <span style="background:#00e676; color:#000; padding:2px 8px; border-radius:4px; font-weight:bold;">${activeRef}</span>`;
-            }
-
-            // Quick order modal badge
-            let quickRefNotice = document.getElementById('quickReferralNotice');
-            if (quickRefNotice) {
-                quickRefNotice.style.display = 'block';
-                quickRefNotice.innerHTML = `🏷️ <strong>كود المؤثر المطبق:</strong> <span style="background:#00e676; color:#000; padding:2px 8px; border-radius:4px; font-weight:bold;">${activeRef}</span>`;
-            }
+            // Kept empty to ensure referral tracking runs strictly in background without cluttering UI
         }
 
         async function recordReferralOrder(orderId, products, orderTotal, currency = 'SAR') {
@@ -5664,7 +5631,6 @@
                             <i class="fas fa-shopping-bag"></i> إتمام الطلب مباشرة
                         </h3>
                         <form id="quickOrderForm" onsubmit="submitQuickOrder(event)">
-                            <div id="quickReferralNotice" style="display: none; background: rgba(0, 230, 118, 0.12); border: 1px solid #00e676; padding: 10px; border-radius: 8px; margin-bottom: 12px; color: #00e676; font-size: 13px; font-weight: bold; text-align: center;"></div>
                             <div class="form-group" style="margin-bottom: 12px;">
                                 <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-user"></i> الاسم الكامل *</label>
                                 <input type="text" id="quickCustomerName" required placeholder="أدخل اسمك الكامل" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
@@ -7411,7 +7377,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             </div>
             
             <form class="order-form" id="cartOrderForm" onsubmit="submitCartOrder(event)" style="padding: 0 20px 20px;">
-                <div id="cartReferralNotice" style="display: none; background: rgba(0, 230, 118, 0.12); border: 1px solid #00e676; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #00e676; font-size: 13px; font-weight: bold; text-align: center;"></div>
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> الاسم الكامل *</label>
                     <input type="text" id="cartCustomerName" required placeholder="أدخل اسمك الكامل">

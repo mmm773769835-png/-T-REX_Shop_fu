@@ -1453,13 +1453,14 @@
                     if(prodError) throw prodError;
 
                     // 2. Mark profile as deleted permanently using valid table columns
+                    const delCode = 'DEL-' + Date.now() + '-' + String(currentUser.id).slice(-4);
                     const { error: profError } = await supabase
                         .from('profiles')
                         .upsert({
                             id: currentUser.id,
                             email: currentUser.email,
                             role: 'deleted',
-                            vendor_code: 'DELETED',
+                            vendor_code: delCode,
                             shop_name: 'حساب محذوف',
                             name: 'حساب محذوف',
                             featured_until: null,
@@ -2028,14 +2029,19 @@
             if (!confirm(`هل أنت متأكد من حذف حساب التاجر "${vendorName}" وكافة المنتجات التابعة له؟`)) return;
             try {
                 await supabase.from('products').delete().eq('vendor_id', vendorId);
-                await supabase.from('profiles').update({
+                const delCode = 'DEL-' + Date.now() + '-' + String(vendorId).slice(-4);
+                const { error } = await supabase.from('profiles').update({
                     role: 'deleted',
-                    vendor_code: 'DELETED',
+                    vendor_code: delCode,
                     shop_name: 'حساب محذوف',
                     name: 'حساب محذوف',
                     featured_until: null,
                     updated_at: new Date().toISOString()
                 }).eq('id', vendorId);
+
+                if (error) {
+                    await supabase.from('profiles').delete().eq('id', vendorId);
+                }
                 alert('✅ تم حذف حساب التاجر بنجاح!');
                 if (typeof loadVendors === 'function') loadVendors();
                 if (typeof loadDashboardData === 'function') loadDashboardData();
