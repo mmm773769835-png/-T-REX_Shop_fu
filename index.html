@@ -5162,8 +5162,32 @@
 
         async function recordReferralOrder(orderId, products, orderTotal, currency = 'SAR') {
             try {
-                const refCode = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
-                if (!refCode || typeof supabase === 'undefined' || !supabase.from) return;
+                const refCode = getActiveReferralCode();
+                if (typeof supabase === 'undefined' || !supabase.from) return;
+
+                const productDetails = Array.isArray(products) ? products.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    quantity: p.quantity || 1
+                })) : [{ name: products.name || 'منتج', price: products.price || orderTotal, quantity: 1 }];
+
+                // 1. Try to record in general store orders table in Supabase if it exists
+                try {
+                    await supabase.from('orders').insert([{
+                        id: String(orderId),
+                        product_details: productDetails,
+                        order_total: orderTotal,
+                        currency: currency || 'SAR',
+                        influencer_code: refCode || null,
+                        created_at: new Date().toISOString()
+                    }]);
+                } catch (e) {
+                    console.log('[SUPABASE] General orders table insert optional fallback:', e);
+                }
+
+                // 2. Record in referral_orders table for influencer commission if refCode exists
+                if (!refCode) return;
 
                 const { data: influencer } = await supabase
                     .from('influencers')
@@ -5182,13 +5206,6 @@
 
                 // Calculate commission in base YER
                 const commissionAmountInYER = Number((orderTotalInYER * (rate / 100)).toFixed(2));
-
-                const productDetails = Array.isArray(products) ? products.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    price: p.price,
-                    quantity: p.quantity || 1
-                })) : [{ name: products.name || 'منتج', price: products.price || orderTotal, quantity: 1 }];
 
                 // Insert referral order with base YER commission
                 const { error } = await supabase
