@@ -5139,7 +5139,14 @@
                 if (!influencer || influencer.status !== 'active') return;
 
                 const rate = Number(influencer.commission_rate || 10.00);
-                const commissionAmount = Number((orderTotal * (rate / 100)).toFixed(2));
+
+                // Convert order total from order currency to base YER
+                const orderCurrency = currency || 'YER';
+                const orderRateInYER = (typeof exchangeRates !== 'undefined' && exchangeRates[orderCurrency]) ? exchangeRates[orderCurrency] : 1.0;
+                const orderTotalInYER = Number(orderTotal) * orderRateInYER;
+
+                // Calculate commission in base YER
+                const commissionAmountInYER = Number((orderTotalInYER * (rate / 100)).toFixed(2));
 
                 const productDetails = Array.isArray(products) ? products.map(p => ({
                     id: p.id,
@@ -5148,7 +5155,7 @@
                     quantity: p.quantity || 1
                 })) : [{ name: products.name || 'منتج', price: products.price || orderTotal, quantity: 1 }];
 
-                // Insert referral order
+                // Insert referral order with base YER commission
                 const { error } = await supabase
                     .from('referral_orders')
                     .insert([{
@@ -5158,8 +5165,8 @@
                         product_details: productDetails,
                         order_total: orderTotal,
                         commission_rate: rate,
-                        commission_amount: commissionAmount,
-                        currency: currency,
+                        commission_amount: commissionAmountInYER,
+                        currency: 'YER',
                         commission_status: 'pending'
                     }]);
 
@@ -5171,10 +5178,10 @@
                         .single();
 
                     if (wallet) {
-                        const newPending = Number(wallet.pending_balance || 0) + commissionAmount;
+                        const newPending = Number(wallet.pending_balance || 0) + commissionAmountInYER;
                         await supabase
                             .from('influencer_wallets')
-                            .update({ pending_balance: newPending, updated_at: new Date().toISOString() })
+                            .update({ pending_balance: newPending, currency: 'YER', updated_at: new Date().toISOString() })
                             .eq('influencer_id', influencer.id);
                     }
                 }
