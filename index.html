@@ -4585,7 +4585,7 @@
                 message += `📝 *ملاحظات:* ${notes}\n`;
             }
 
-            const activeRefCode = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+            const activeRefCode = getActiveReferralCode();
             if (activeRefCode) {
                 message += `\n🏷️ *كود التسويق (المؤثر):* [ ${activeRefCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${activeRefCode}).\n`;
             }
@@ -5092,40 +5092,63 @@
             }
         }
 
-        // Referral & Affiliate Link Tracking System (Silent Background Tracking)
+        // Referral & Affiliate Link Tracking System (Immediate Multi-Source Extraction)
+        function getActiveReferralCode() {
+            let code = null;
+            try {
+                code = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+            } catch (e) {}
+
+            if (!code) {
+                try {
+                    const cookieMatch = document.cookie.match(/(?:^|;\s*)trex_referral_code=([^;]+)/);
+                    if (cookieMatch) code = decodeURIComponent(cookieMatch[1]);
+                } catch (e) {}
+            }
+            if (!code) {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    code = urlParams.get('ref') || urlParams.get('referral') || urlParams.get('aff');
+                } catch (e) {}
+            }
+            if (!code && window.location.hash) {
+                const hashMatch = window.location.hash.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
+                if (hashMatch) code = hashMatch[1];
+            }
+            if (!code && window.location.href) {
+                const hrefMatch = window.location.href.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
+                if (hrefMatch) code = hrefMatch[1];
+            }
+            if (code) {
+                code = String(code).trim().toUpperCase();
+                try {
+                    localStorage.setItem('trex_referral_code', code);
+                    sessionStorage.setItem('trex_referral_code', code);
+                    document.cookie = `trex_referral_code=${code}; path=/; max-age=2592000`; // 30 days
+                } catch (e) {}
+            }
+            return code || null;
+        }
+
+        // Run immediate referral extraction on script load
+        getActiveReferralCode();
+
         async function checkAndTrackReferral() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                let refCode = urlParams.get('ref') || urlParams.get('referral') || urlParams.get('aff');
-                if (!refCode && window.location.hash) {
-                    const hashMatch = window.location.hash.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
-                    if (hashMatch) refCode = hashMatch[1];
-                }
-                if (!refCode && window.location.href) {
-                    const hrefMatch = window.location.href.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
-                    if (hrefMatch) refCode = hrefMatch[1];
-                }
-                if (refCode) {
-                    refCode = String(refCode).trim().toUpperCase();
-                    localStorage.setItem('trex_referral_code', refCode);
-                    sessionStorage.setItem('trex_referral_code', refCode);
-                    document.cookie = `trex_referral_code=${refCode}; path=/; max-age=2592000`; // 30 days
-
-                    // Record click asynchronously in Supabase
-                    if (typeof supabase !== 'undefined' && supabase.from) {
-                        const { data: influencer } = await supabase
-                            .from('influencers')
-                            .select('id, influencer_code')
-                            .eq('influencer_code', refCode)
-                            .single();
-                        
-                        if (influencer) {
-                            await supabase.from('referral_clicks').insert([{
-                                influencer_id: influencer.id,
-                                influencer_code: refCode,
-                                user_agent: navigator.userAgent
-                            }]);
-                        }
+                const refCode = getActiveReferralCode();
+                if (refCode && typeof supabase !== 'undefined' && supabase.from) {
+                    const { data: influencer } = await supabase
+                        .from('influencers')
+                        .select('id, influencer_code')
+                        .eq('influencer_code', refCode)
+                        .single();
+                    
+                    if (influencer) {
+                        await supabase.from('referral_clicks').insert([{
+                            influencer_id: influencer.id,
+                            influencer_code: refCode,
+                            user_agent: navigator.userAgent
+                        }]);
                     }
                 }
             } catch (e) {
@@ -5840,7 +5863,7 @@ ${currentProduct.image_url ? `🖼️ *صورة المنتج:* ${currentProduct.
 🌍 *الدولة:* ${country}
 📍 *العنوان:* ${address}
 ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
-    const ref = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+    const ref = getActiveReferralCode();
     return ref ? `🏷️ *كود التسويق (المؤثر):* [ ${ref} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر (${ref}).\n` : '';
 })()}
 ✅ يرجى تأكيد الطلب
@@ -5855,7 +5878,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             // Track and save order receipt
             trackOrder();
             const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
-            const activeRefCodeQuick = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
+            const activeRefCodeQuick = getActiveReferralCode();
             recordReferralOrder(generatedOrderId, currentProduct, total, currentProduct.currency || 'SAR');
             saveUserOrderReceipt({
                 order_id: generatedOrderId,
