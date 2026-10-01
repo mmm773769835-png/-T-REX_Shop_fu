@@ -2722,36 +2722,9 @@
             }
         }
 
-        async function generateActivationCodeAdmin() {
-            const durationSelect = document.getElementById('codeDurationSelect');
-            const durationDays = parseInt(durationSelect ? durationSelect.value : '30', 10);
-            const prefix = `TRX-${durationDays}D-`;
-            const randomCode = prefix + Math.floor(100000 + Math.random() * 900000);
 
-            try {
-                const { data, error } = await supabase
-                    .from('activation_codes')
-                    .insert({
-                        code: randomCode,
-                        duration_days: durationDays,
-                        status: 'active'
-                    });
 
-                if (error) throw error;
 
-                document.getElementById('newCodeValue').textContent = randomCode;
-                document.getElementById('generatedCodeDisplay').style.display = 'block';
-                alert(`✅ تم توليد كود تفعيل لمدة (${durationDays} يوماً) بنجاح:\n${randomCode}\n\nيمكنك نسخه الآن وإرساله للتاجر عبر الواتساب.`);
-            } catch (err) {
-                alert('❌ خطأ في توليد الكود: ' + err.message);
-            }
-        }
-
-        function copyGeneratedCode() {
-            const codeText = document.getElementById('newCodeValue').textContent;
-            navigator.clipboard.writeText(codeText);
-            alert('📋 تم نسخ الكود: ' + codeText);
-        }
 
         async function redeemVendorCodeWeb() {
             const input = document.getElementById('activationCodeInput');
