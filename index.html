@@ -7268,91 +7268,131 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
             
             try {
-                // Get existing reviews
-                let reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+                const userName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'مستخدم';
+                const userAvatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FFD700&color=000`;
                 
-                // Check if user already reviewed
-                const existingReviewIndex = reviews.findIndex(r => r.user_id === currentUser.id);
-                
-                const reviewData = {
-                    id: existingReviewIndex >= 0 ? reviews[existingReviewIndex].id : Date.now(),
+                const reviewRecord = {
                     user_id: currentUser.id,
-                    user_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'مستخدم',
-                    user_avatar: currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.email || 'U')}&background=FFD700&color=000`,
+                    user_name: userName,
+                    user_avatar: userAvatar,
                     rating: currentRating,
                     text: reviewText,
-                    date: new Date().toISOString()
+                    is_approved: true,
+                    created_at: new Date().toISOString()
                 };
-                
-                if (existingReviewIndex >= 0) {
-                    // Update existing review
-                    reviews[existingReviewIndex] = reviewData;
-                    showNotification('تم تحديث تقييمك بنجاح! ⭐');
-                } else {
-                    // Add new review
-                    reviews.unshift(reviewData);
-                    showNotification('شكراً لتقييمك! ⭐ تم إضافته بنجاح');
+
+                // 1. Insert into Supabase store_reviews table for global visibility
+                if (typeof supabase !== 'undefined' && supabase.from) {
+                    const { error } = await supabase
+                        .from('store_reviews')
+                        .insert([reviewRecord]);
+                    if (error) {
+                        console.warn('[REVIEWS] Supabase insert warning:', error);
+                    }
                 }
-                
-                // Save to localStorage
+
+                // 2. Also save to local storage as fallback
+                let reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+                const existingIndex = reviews.findIndex(r => r.user_id === currentUser.id);
+                if (existingIndex >= 0) {
+                    reviews[existingIndex] = { ...reviewRecord, date: reviewRecord.created_at };
+                } else {
+                    reviews.unshift({ ...reviewRecord, date: reviewRecord.created_at });
+                }
                 localStorage.setItem('trex_reviews', JSON.stringify(reviews));
+
+                showNotification('شكراً لتقييمك! ⭐ تم إضافته ونشره للجميع بنجاح');
                 
                 // Close modal and refresh reviews display
                 closeReviewModal();
-                loadAndDisplayReviews();
+                await loadAndDisplayReviews();
                 
             } catch (error) {
                 console.error('Error submitting review:', error);
                 showNotification('حدث خطأ أثناء إرسال التقييم! ❌');
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال التقييم';
             }
         }
 
-        function loadAndDisplayReviews() {
-            const reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+        let initialDefaultReviewsHtml = '';
+
+        async function loadAndDisplayReviews() {
             const reviewsList = document.querySelector('.reviews-list');
-            
-            if (reviews.length === 0) {
-                // Keep default reviews if no user reviews
+            if (!reviewsList) return;
+
+            // Preserve initial default HTML if not captured yet
+            if (!initialDefaultReviewsHtml) {
+                initialDefaultReviewsHtml = reviewsList.innerHTML;
+            }
+
+            let reviews = [];
+
+            // 1. Fetch live global store reviews from Supabase
+            try {
+                if (typeof supabase !== 'undefined' && supabase.from) {
+                    const { data, error } = await supabase
+                        .from('store_reviews')
+                        .select('*')
+                        .eq('is_approved', true)
+                        .order('created_at', { ascending: false });
+                    
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        reviews = data;
+                    }
+                }
+            } catch (e) {
+                console.warn('[REVIEWS] Supabase load error:', e);
+            }
+
+            // 2. Fallback to localStorage if Supabase returned no rows
+            if (!reviews || reviews.length === 0) {
+                try {
+                    reviews = JSON.parse(localStorage.getItem('trex_reviews') || '[]');
+                } catch (e) {}
+            }
+
+            if (!reviews || reviews.length === 0) {
+                // Keep default HTML if no reviews anywhere
                 return;
             }
-            
-            // Combine default reviews with user reviews
-            const defaultReviews = reviewsList.innerHTML;
-            
+
             // Build user reviews HTML
             const userReviewsHtml = reviews.map(review => {
-                const date = new Date(review.date);
+                const date = new Date(review.created_at || review.date || Date.now());
                 const timeAgo = getTimeAgo(date);
-                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const stars = '★'.repeat(Number(review.rating) || 5) + '☆'.repeat(5 - (Number(review.rating) || 5));
+                const avatar = review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name || 'U')}&background=FFD700&color=000`;
                 
                 return `
                     <div class="review-card">
                         <div class="review-header">
                             <div class="reviewer-info">
-                                <img src="${review.user_avatar}" alt="${review.user_name}" class="reviewer-avatar">
+                                <img src="${avatar}" alt="${escapeHtml(review.user_name || 'مستخدم')}" class="reviewer-avatar" onerror="this.src='https://ui-avatars.com/api/?name=U&background=FFD700&color=000'">
                                 <div>
-                                    <div class="reviewer-name">${review.user_name}</div>
+                                    <div class="reviewer-name">${escapeHtml(review.user_name || 'مستخدم')}</div>
                                     <div class="review-date">${timeAgo}</div>
                                 </div>
                             </div>
                             <div class="review-rating" style="color: var(--primary);">${stars}</div>
                         </div>
-                        ${review.text ? `<div class="review-text">${review.text}</div>` : ''}
+                        ${review.text ? `<div class="review-text">${escapeHtml(review.text)}</div>` : ''}
                     </div>
                 `;
             }).join('');
-            
-            // Update reviews list
-            reviewsList.innerHTML = userReviewsHtml + reviewsList.innerHTML;
-            
-            // Update rating summary
-            const totalReviews = reviews.length + 256; // Add default count
+
+            // Update reviews list (real reviews first, followed by default background reviews)
+            reviewsList.innerHTML = userReviewsHtml + initialDefaultReviewsHtml;
+
+            // Update rating summary header
+            const totalReviews = reviews.length + 256;
             const avgRating = calculateAverageRating(reviews);
             
-            document.querySelector('.rating-big').textContent = avgRating.toFixed(1);
-            document.querySelector('.rating-count').textContent = `بناءً على ${totalReviews} تقييم`;
+            const ratingBigEl = document.querySelector('.rating-big');
+            const ratingCountEl = document.querySelector('.rating-count');
+            if (ratingBigEl) ratingBigEl.textContent = avgRating.toFixed(1);
+            if (ratingCountEl) ratingCountEl.textContent = `بناءً على ${totalReviews} تقييم`;
         }
 
         function getTimeAgo(date) {
