@@ -4599,10 +4599,22 @@
             // Open WhatsApp
             window.open(whatsappUrl, '_blank');
             
-            // Track the order
+            // Track and save order receipt
             trackOrder();
             const cartGeneratedOrderId = 'ORD-' + Date.now().toString().slice(-6);
             recordReferralOrder(cartGeneratedOrderId, cart, totalSar, 'SAR');
+            saveUserOrderReceipt({
+                order_id: cartGeneratedOrderId,
+                date: new Date().toISOString(),
+                items: JSON.parse(JSON.stringify(cart)),
+                total: totalSar,
+                currency: 'SAR',
+                influencer_code: activeRefCode || null,
+                customer_name: name,
+                customer_phone: phone,
+                customer_country: country,
+                customer_address: address
+            });
             
             // Show success message
             showNotification('تم فتح واتساب لإرسال الطلب! ✅');
@@ -5840,10 +5852,29 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             
-            // Track the order
+            // Track and save order receipt
             trackOrder();
             const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
+            const activeRefCodeQuick = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
             recordReferralOrder(generatedOrderId, currentProduct, total, currentProduct.currency || 'SAR');
+            saveUserOrderReceipt({
+                order_id: generatedOrderId,
+                date: new Date().toISOString(),
+                items: [{
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    quantity: currentQuantity,
+                    currency: currentProduct.currency || 'SAR'
+                }],
+                total: total,
+                currency: currentProduct.currency || 'SAR',
+                influencer_code: activeRefCodeQuick || null,
+                customer_name: name,
+                customer_phone: phone,
+                customer_country: country,
+                customer_address: address
+            });
             
             showNotification('تم فتح واتساب لإرسال الطلب! ✅');
             
@@ -6472,13 +6503,133 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             }
         }
 
-        // User Menu Actions
+        // Order Receipt Helper
+        function saveUserOrderReceipt(order) {
+            try {
+                let userOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+                userOrders.unshift(order);
+                if (userOrders.length > 50) userOrders = userOrders.slice(0, 50);
+                localStorage.setItem('user_orders', JSON.stringify(userOrders));
+            } catch (e) {
+                console.warn('Save order receipt error:', e);
+            }
+        }
+
+        function resendOrderReceiptToWhatsApp(orderId) {
+            try {
+                const userOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+                const ord = userOrders.find(o => String(o.order_id) === String(orderId));
+                if (!ord) return showNotification('تعذر العثور على بيانات السند ❌');
+
+                let itemsText = '';
+                if (Array.isArray(ord.items)) {
+                    ord.items.forEach((item, idx) => {
+                        itemsText += `${idx + 1}. 📦 *${item.name}* (x${item.quantity || 1}) - ${formatPrice(item.price * (item.quantity || 1), item.currency || ord.currency || 'SAR')}\n`;
+                    });
+                } else {
+                    itemsText = `1. 📦 *${ord.product_name || 'منتج'}* - ${formatPrice(ord.total, ord.currency || 'SAR')}\n`;
+                }
+
+                let message = `📜 *سند طلب سابق من T-REX Shop* 🦖\n\n`;
+                message += `*رقم السند:* \`${ord.order_id}\`\n`;
+                message += `*المنتجات:*\n${itemsText}\n`;
+                message += `💰 *الإجمالي:* ${formatPrice(ord.total, ord.currency || 'SAR')}\n\n`;
+                message += `👤 *معلومات العميل:*\n• الاسم: ${ord.customer_name || 'عميل'}\n• الهاتف: ${ord.customer_phone || ''}\n• العنوان: ${ord.customer_address || ''}\n`;
+
+                if (ord.influencer_code) {
+                    message += `\n🏷️ *كود التسويق (المؤثر):* [ ${ord.influencer_code} ]\n📌 *تنبيه:* هذا السند مرتبط برابط المؤثر (${ord.influencer_code}).\n`;
+                }
+
+                message += `\n🕐 *تاريخ السند:* ${new Date(ord.date).toLocaleString('ar-SA')}`;
+
+                const whatsappUrl = `https://wa.me/967773769835?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            } catch (e) {
+                showNotification('خطأ في إرسال السند للواتساب ❌');
+            }
+        }
+
+        // User Menu Actions: Full Order Receipts & History Modal
         function showOrders() {
-            if (!currentUser) {
-                showNotification('يجب تسجيل الدخول أولاً! 🔒');
+            const modal = document.getElementById('productModal');
+            const modalBody = document.getElementById('modalBody');
+            if (!modal || !modalBody) return;
+
+            let userOrders = [];
+            try {
+                userOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+            } catch (e) {}
+
+            if (userOrders.length === 0) {
+                modalBody.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-receipt" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--text); margin-bottom: 10px;">لا توجد سندات شراء مسجلة بعد 📦</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 25px;">عند الشراء أو طلب أي منتج سيظهر سند الشراء وكود المؤثر المحوّل هنا فوراً.</p>
+                        <button class="btn-buy-now" onclick="closeModal()" style="width: 200px;">
+                            <i class="fas fa-store"></i> تصفّح المنتجات
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('show');
+                if (document.getElementById('userDropdown')) document.getElementById('userDropdown').classList.remove('show');
                 return;
             }
-            showNotification('عرض الطلبات - قيد التطوير 📦');
+
+            modalBody.innerHTML = `
+                <h2 style="color: var(--primary); margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-file-invoice-dollar"></i> سندات الشراء والطلبات السابقة
+                </h2>
+                <div style="display: grid; gap: 15px; max-height: 65vh; overflow-y: auto; padding-left: 5px;">
+                    ${userOrders.map(ord => {
+                        const dateStr = new Date(ord.date).toLocaleString('ar-SA');
+                        const refCodeBadge = ord.influencer_code ? `
+                            <div style="background: rgba(0, 230, 118, 0.12); border: 1px solid #00e676; border-radius: 8px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; color: #00e676; font-weight: bold; font-size: 13px; margin-top: 8px;">
+                                🏷️ <span>كود المؤثر المحوّل:</span> <strong style="background: #00e676; color: #000; padding: 2px 8px; border-radius: 4px;">${ord.influencer_code}</strong>
+                            </div>
+                        ` : '<div style="color: #888; font-size: 12px; margin-top: 6px;">شراء مباشر (بدون رابط إحالة)</div>';
+
+                        const itemsDetails = Array.isArray(ord.items) ? ord.items.map(item => `
+                            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #ccc; border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 5px 0;">
+                                <span>📦 ${item.name} (${item.quantity || 1}×)</span>
+                                <span style="color: var(--primary); font-weight: bold;">${formatPrice(item.price * (item.quantity || 1), item.currency || ord.currency || 'SAR')}</span>
+                            </div>
+                        `).join('') : `
+                            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #ccc;">
+                                <span>📦 ${ord.product_name || 'منتج'}</span>
+                                <span style="color: var(--primary); font-weight: bold;">${formatPrice(ord.total, ord.currency || 'SAR')}</span>
+                            </div>
+                        `;
+
+                        return `
+                            <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; text-align: right;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span style="color: var(--primary); font-weight: 800; font-size: 15px;">📜 سند رقم: ${ord.order_id}</span>
+                                    <span style="color: #888; font-size: 12px;">🕒 ${dateStr}</span>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.3); padding: 10px 14px; border-radius: 10px; margin-bottom: 10px;">
+                                    ${itemsDetails}
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                    <div>
+                                        <div style="color: #fff; font-weight: bold; font-size: 14px;">الإجمالي: <span style="color: var(--primary); font-size: 16px;">${formatPrice(ord.total, ord.currency || 'SAR')}</span></div>
+                                        ${refCodeBadge}
+                                    </div>
+                                    <button class="btn-buy-now" style="width: auto; padding: 6px 14px; font-size: 12px; background: #25D366; border-color: #25D366;" onclick="resendOrderReceiptToWhatsApp('${ord.order_id}')">
+                                        <i class="fab fa-whatsapp"></i> فتح السند بالواتساب
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <button class="btn-buy-now" onclick="closeModal()" style="margin-top: 20px; width: 100%;">
+                    <i class="fas fa-check"></i> إغلاق
+                </button>
+            `;
+
+            modal.classList.add('show');
+            if (document.getElementById('userDropdown')) document.getElementById('userDropdown').classList.remove('show');
         }
 
         function showWishlist() {
