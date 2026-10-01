@@ -2496,29 +2496,70 @@
             }
         }
 
+        async function deleteProductImagesFromStorage(product) {
+            if (!product) return;
+            try {
+                const urls = [];
+                if (product.image_url) urls.push(product.image_url);
+                if (Array.isArray(product.images)) {
+                    product.images.forEach(u => { if (u && !urls.includes(u)) urls.push(u); });
+                }
+                
+                const filePaths = [];
+                urls.forEach(url => {
+                    if (typeof url === 'string' && url.includes('/storage/v1/object/public/products/')) {
+                        const path = url.split('/storage/v1/object/public/products/')[1];
+                        if (path) filePaths.push(decodeURIComponent(path));
+                    }
+                });
+
+                if (filePaths.length > 0 && typeof supabase !== 'undefined' && supabase.storage) {
+                    const { error } = await supabase.storage.from('products').remove(filePaths);
+                    if (error) {
+                        console.warn('[STORAGE_CLEANUP] Remove storage files warning:', error);
+                    } else {
+                        console.log('[STORAGE_CLEANUP] Removed product images from storage:', filePaths);
+                    }
+                }
+            } catch (e) {
+                console.warn('[STORAGE_CLEANUP] Exception while deleting product images:', e);
+            }
+        }
+
         async function deleteProduct(id) {
             if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
             
             try {
+                // Fetch product details to obtain image URLs for Storage cleanup & ownership verification
+                const { data: product } = await supabase
+                    .from('products')
+                    .select('id, vendor_id, image_url, images')
+                    .eq('id', id)
+                    .single();
+                
+                if (!product) {
+                    alert('❌ المنتج غير موجود أو تم حذفه سابقاً');
+                    return;
+                }
+
                 // Vendor ownership check
                 if (currentVendor && currentVendor.role === 'vendor') {
-                    const { data: product } = await supabase
-                        .from('products')
-                        .select('vendor_id')
-                        .eq('id', id)
-                        .single();
-                    if (product && product.vendor_id !== currentUser.id) {
+                    if (product.vendor_id !== currentUser.id) {
                         alert('❌ لا يمكنك حذف منتج لا يخصك');
                         return;
                     }
                 }
                 
+                // 1. Delete physical image files from Supabase Storage
+                await deleteProductImagesFromStorage(product);
+                
+                // 2. Delete database row from products table
                 const { error } = await supabase.from('products').delete().eq('id', id);
                 if (error) throw error;
                 
                 loadProducts();
                 loadStats();
-                alert('✅ تم حذف المنتج بنجاح');
+                alert('✅ تم حذف المنتج وصوره الفيزيائية من السيرفر بنجاح');
                 
             } catch (error) {
                 alert('❌ خطأ: ' + error.message);
