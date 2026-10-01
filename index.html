@@ -7317,6 +7317,13 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
         }
 
         let initialDefaultReviewsHtml = '';
+        let globalLoadedReviews = [];
+        let visibleReviewsLimit = 10;
+
+        function showMoreReviews() {
+            visibleReviewsLimit += 10;
+            renderReviewsWithPagination();
+        }
 
         async function loadAndDisplayReviews() {
             const reviewsList = document.querySelector('.reviews-list');
@@ -7353,13 +7360,23 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                 } catch (e) {}
             }
 
-            if (!reviews || reviews.length === 0) {
-                // Keep default HTML if no reviews anywhere
+            globalLoadedReviews = reviews || [];
+            renderReviewsWithPagination();
+        }
+
+        function renderReviewsWithPagination() {
+            const reviewsList = document.querySelector('.reviews-list');
+            if (!reviewsList) return;
+
+            if (!globalLoadedReviews || globalLoadedReviews.length === 0) {
                 return;
             }
 
+            const totalCount = globalLoadedReviews.length;
+            const slicedReviews = globalLoadedReviews.slice(0, visibleReviewsLimit);
+
             // Build user reviews HTML
-            const userReviewsHtml = reviews.map(review => {
+            const userReviewsHtml = slicedReviews.map(review => {
                 const date = new Date(review.created_at || review.date || Date.now());
                 const timeAgo = getTimeAgo(date);
                 const stars = '★'.repeat(Number(review.rating) || 5) + '☆'.repeat(5 - (Number(review.rating) || 5));
@@ -7383,11 +7400,32 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             }).join('');
 
             // Update reviews list (real reviews first, followed by default background reviews)
-            reviewsList.innerHTML = userReviewsHtml + initialDefaultReviewsHtml;
+            reviewsList.innerHTML = userReviewsHtml + (slicedReviews.length < totalCount ? '' : initialDefaultReviewsHtml);
+
+            // Manage Show More button below reviews section
+            let wrapper = document.getElementById('showMoreReviewsWrapper');
+            if (!wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.id = 'showMoreReviewsWrapper';
+                wrapper.style.textAlign = 'center';
+                wrapper.style.marginTop = '20px';
+                reviewsList.parentNode.insertBefore(wrapper, reviewsList.nextSibling);
+            }
+
+            const remaining = totalCount - visibleReviewsLimit;
+            if (remaining > 0) {
+                wrapper.innerHTML = `
+                    <button id="showMoreReviewsBtn" onclick="showMoreReviews()" class="btn-buy-now" style="width: auto; min-width: 220px; padding: 12px 28px; font-size: 15px; font-weight: bold; background: rgba(255, 215, 0, 0.12); color: var(--primary); border: 2px solid var(--primary); border-radius: 12px; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-chevron-down"></i> عرض المزيد من التقييمات (${remaining} متبقي)
+                    </button>
+                `;
+            } else {
+                wrapper.innerHTML = '';
+            }
 
             // Update rating summary header
-            const totalReviews = reviews.length + 256;
-            const avgRating = calculateAverageRating(reviews);
+            const totalReviews = totalCount + 256;
+            const avgRating = calculateAverageRating(globalLoadedReviews);
             
             const ratingBigEl = document.querySelector('.rating-big');
             const ratingCountEl = document.querySelector('.rating-count');

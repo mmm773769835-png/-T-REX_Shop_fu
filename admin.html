@@ -1899,6 +1899,13 @@
             }
         }
 
+        let visibleVendorsLimit = 10;
+
+        function showMoreVendors() {
+            visibleVendorsLimit += 10;
+            renderAdminVendors(adminVendors);
+        }
+
         function renderAdminVendors(vendors) {
             const tbody = document.getElementById('vendorsTableBody');
             if (!tbody) return;
@@ -1907,7 +1914,10 @@
                 return;
             }
 
-            tbody.innerHTML = vendors.map(v => {
+            const total = vendors.length;
+            const sliced = vendors.slice(0, visibleVendorsLimit);
+
+            tbody.innerHTML = sliced.map(v => {
                 const cleanPhone = (v.phone || '').replace(/[^0-9]/g, '');
                 const nameEscaped = (v.shop_name || v.name || 'التاجر').replace(/'/g, "\\'");
                 const regDate = (v.created_at || v.updated_at) ? new Date(v.created_at || v.updated_at).toLocaleString('ar-YE', { dateStyle: 'short', timeStyle: 'short' }) : 'غير محدد';
@@ -1942,6 +1952,30 @@
                     </td>
                 </tr>
             `}).join('');
+
+            // Show More Vendors Button
+            let wrapper = document.getElementById('vendorsShowMoreWrapper');
+            const tableContainer = tbody.closest('.table-responsive') || tbody.closest('table') || tbody.parentNode;
+            if (!wrapper && tableContainer) {
+                wrapper = document.createElement('div');
+                wrapper.id = 'vendorsShowMoreWrapper';
+                wrapper.style.textAlign = 'center';
+                wrapper.style.marginTop = '15px';
+                tableContainer.parentNode.insertBefore(wrapper, tableContainer.nextSibling);
+            }
+
+            if (wrapper) {
+                const remaining = total - visibleVendorsLimit;
+                if (remaining > 0) {
+                    wrapper.innerHTML = `
+                        <button onclick="showMoreVendors()" class="btn-action btn-outline" style="background: rgba(255, 215, 0, 0.12); color: #FFD700; border: 2px solid #FFD700; padding: 10px 24px; font-weight: bold; cursor: pointer; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-chevron-down"></i> عرض المزيد من حسابات التجار (${remaining} متبقي)
+                        </button>
+                    `;
+                } else {
+                    wrapper.innerHTML = '';
+                }
+            }
         }
 
         async function editVendorPhoneAdmin(vendorId, vendorName, currentPhone) {
@@ -2108,6 +2142,13 @@
             });
         }
 
+        let visibleProductsLimit = 10;
+
+        function showMoreProducts() {
+            visibleProductsLimit += 10;
+            renderAdminProducts(adminProducts);
+        }
+
         function renderAdminProducts(products) {
             const tbody = document.getElementById('productsTableBody');
             const count = document.getElementById('adminSearchCount');
@@ -2120,7 +2161,10 @@
                 return;
             }
 
-            tbody.innerHTML = products.map(p => `
+            const total = products.length;
+            const sliced = products.slice(0, visibleProductsLimit);
+
+            tbody.innerHTML = sliced.map(p => `
                     <tr data-id="${p.id}">
                         <td><img src="${p.image_url || 'https://placehold.co/60x60/222/FFD700?text=T-REX'}" class="product-img" alt="${p.name}"></td>
                         <td>${p.name}</td>
@@ -2136,7 +2180,32 @@
                         </td>
                     </tr>
                 `).join('');
-            if (count) count.textContent = `${products.length} منتج`;
+            
+            if (count) count.textContent = `${total} منتج (معروض ${sliced.length})`;
+
+            // Show More Products Button
+            let wrapper = document.getElementById('productsShowMoreWrapper');
+            const tableContainer = tbody.closest('.table-responsive') || tbody.closest('table') || tbody.parentNode;
+            if (!wrapper && tableContainer) {
+                wrapper = document.createElement('div');
+                wrapper.id = 'productsShowMoreWrapper';
+                wrapper.style.textAlign = 'center';
+                wrapper.style.marginTop = '15px';
+                tableContainer.parentNode.insertBefore(wrapper, tableContainer.nextSibling);
+            }
+
+            if (wrapper) {
+                const remaining = total - visibleProductsLimit;
+                if (remaining > 0) {
+                    wrapper.innerHTML = `
+                        <button onclick="showMoreProducts()" class="btn-action btn-outline" style="background: rgba(255, 215, 0, 0.12); color: #FFD700; border: 2px solid #FFD700; padding: 10px 24px; font-weight: bold; cursor: pointer; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-chevron-down"></i> عرض المزيد من المنتجات (${remaining} متبقي)
+                        </button>
+                    `;
+                } else {
+                    wrapper.innerHTML = '';
+                }
+            }
         }
 
 
