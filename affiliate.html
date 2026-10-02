@@ -541,6 +541,20 @@
             <button onclick="logout()" class="btn-action btn-outline"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
         </div>
 
+        <!-- 2.5 REJECTED SCREEN -->
+        <div id="rejectedScreen" class="auth-card" style="display: none; text-align: center;">
+            <i class="fas fa-times-circle" style="font-size: 60px; color: var(--danger); margin-bottom: 20px;"></i>
+            <h2 style="color: var(--danger); margin-bottom: 12px;">نعتذر، لم يتم قبول الطلب ❌</h2>
+            <p style="color: #ddd; line-height: 1.6; margin-bottom: 20px;">
+                تم مراجعة طلب انضمامك لبرنامج المؤثرين في متجر <strong>T-REX Shop</strong>.<br>
+                سبب عدم القبول: <strong style="color: #ff6b35;" id="rejectedReason">عدد المتابعين بحسابك أقل من الحد الأدنى المطلوب (3,000 متابع)</strong>.
+            </p>
+            <div style="background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; color: #eee;">
+                📌 يمكنك إعادة التقديم مجدداً فور وصول عدد متابعيك على وسائل التواصل إلى 3,000 متابع على الأقل.
+            </div>
+            <button onclick="logout()" class="btn-action btn-outline"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </div>
+
         <!-- 3. MAIN INFLUENCER DASHBOARD -->
         <div id="dashboardScreen" style="display: none;">
 
@@ -927,6 +941,8 @@
                     showPendingScreen();
                 } else if (data.status === 'active') {
                     await showDashboardScreen();
+                } else if (data.status === 'rejected') {
+                    showRejectedScreen();
                 } else {
                     showToast('❌ تم تعليق هذا الحساب من قبل إدارة المتجر');
                 }
@@ -951,6 +967,8 @@
                     showPendingScreen();
                 } else if (data.status === 'active') {
                     await showDashboardScreen();
+                } else if (data.status === 'rejected') {
+                    showRejectedScreen();
                 }
             } catch (e) { console.error(e); }
         }
@@ -959,6 +977,7 @@
         function showPendingScreen() {
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'none';
+            if (document.getElementById('rejectedScreen')) document.getElementById('rejectedScreen').style.display = 'none';
             document.getElementById('pendingScreen').style.display = 'block';
 
             document.getElementById('pendingName').textContent = currentInfluencer.full_name;
@@ -966,10 +985,24 @@
             document.getElementById('pendingCode').textContent = currentInfluencer.influencer_code;
         }
 
+        // Display Rejected Screen
+        function showRejectedScreen() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('pendingScreen').style.display = 'none';
+            if (document.getElementById('rejectedScreen')) {
+                document.getElementById('rejectedScreen').style.display = 'block';
+                if (currentInfluencer && currentInfluencer.rejection_reason) {
+                    document.getElementById('rejectedReason').textContent = currentInfluencer.rejection_reason;
+                }
+            }
+        }
+
         // Display Dashboard Screen
         async function showDashboardScreen() {
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('pendingScreen').style.display = 'none';
+            if (document.getElementById('rejectedScreen')) document.getElementById('rejectedScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
 
             document.getElementById('dashWelcome').textContent = `أهلاً بك 👑 ${currentInfluencer.full_name}`;
@@ -1224,6 +1257,7 @@
             document.getElementById('authScreen').style.display = 'block';
             document.getElementById('pendingScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'none';
+            if (document.getElementById('rejectedScreen')) document.getElementById('rejectedScreen').style.display = 'none';
             showToast('تم تسجيل الخروج بنجاح');
         }
     </script>
