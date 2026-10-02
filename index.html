@@ -4632,7 +4632,6 @@
                 message += `📝 *ملاحظات:* ${notes}\n`;
             }
 
-            const activeRefCode = getActiveReferralCode();
             if (activeRefCode) {
                 message += `\n🏷️ *كود التسويق (المؤثر):* [ ${activeRefCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${activeRefCode}).\n`;
             }
@@ -5978,7 +5977,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             // Track and save order receipt
             trackOrder();
             const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
-            const activeRefCodeQuick = getActiveReferralCode();
             recordReferralOrder(generatedOrderId, currentProduct, total, currentProduct.currency || 'SAR');
             saveUserOrderReceipt({
                 order_id: generatedOrderId,
