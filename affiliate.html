@@ -475,25 +475,46 @@
                     <!-- Bank Details -->
                     <div id="payoutBankFields">
                         <div class="form-row">
-                            <div class="form-group"><input type="text" id="bankName" placeholder="اسم البنك (مثال: بنك الراجحي / بنك اليمن)"></div>
-                            <div class="form-group"><input type="text" id="bankBeneficiary" placeholder="اسم المستفيد الكامل"></div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-university"></i> اسم البنك *</label>
+                                <input type="text" id="bankName" placeholder="مثال: بنك الراجحي / بنك اليمن الدولي">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-user-check"></i> اسم المستفيد الكامل *</label>
+                                <input type="text" id="bankBeneficiary" placeholder="أدخل اسم صاحب الحساب الكامل">
+                            </div>
                         </div>
-                        <div class="form-group"><input type="text" id="bankIban" placeholder="رقم الحساب / الـ IBAN"></div>
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-credit-card"></i> رقم الحساب / IBAN *</label>
+                            <input type="text" id="bankIban" placeholder="أدخل رقم الحساب أو الآيبان">
+                        </div>
                     </div>
 
                     <!-- Wallet Details -->
                     <div id="payoutWalletFields" style="display: none;">
                         <div class="form-row">
-                            <div class="form-group"><input type="text" id="walletName" placeholder="اسم المحفظة (مثال: كاش / جوالي / STC Pay)"></div>
-                            <div class="form-group"><input type="text" id="walletNumber" placeholder="رقم المحفظة / الهاتف"></div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-wallet"></i> اسم المحفظة الإلكترونية *</label>
+                                <input type="text" id="walletName" placeholder="مثال: كاش / جوالي / جيب / STC Pay">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-phone"></i> رقم المحفظة / الهاتف *</label>
+                                <input type="text" id="walletNumber" placeholder="مثال: 773377309">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Transfer Details -->
                     <div id="payoutTransferFields" style="display: none;">
                         <div class="form-row">
-                            <div class="form-group"><input type="text" id="transferNetwork" placeholder="اسم شبكة الصرافة (مثال: النجم / الكريمي / الحوشبي)"></div>
-                            <div class="form-group"><input type="text" id="transferReceiver" placeholder="اسم المستلم الرباعي ورقم الهوية"></div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-building"></i> اسم شبكة الصرافة *</label>
+                                <input type="text" id="transferNetwork" placeholder="مثال: النجم / الكريمي / الحوشبي">
+                            </div>
+                            <div class="form-group">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #ddd;"><i class="fas fa-id-card"></i> اسم المستلم ورقم الهوية *</label>
+                                <input type="text" id="transferReceiver" placeholder="الاسم الرباعي ورقم الهوية">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -825,12 +846,24 @@
                 payoutDetails.bankName = document.getElementById('bankName').value.trim();
                 payoutDetails.beneficiary = document.getElementById('bankBeneficiary').value.trim();
                 payoutDetails.iban = document.getElementById('bankIban').value.trim();
+                if (!payoutDetails.bankName || !payoutDetails.beneficiary || !payoutDetails.iban) {
+                    showToast('⚠️ يرجى تعبئة جميع بيانات الحساب البنكي (اسم البنك، اسم المستفيد، ورقم الحساب/IBAN)!');
+                    return;
+                }
             } else if (payoutType === 'wallet') {
                 payoutDetails.walletName = document.getElementById('walletName').value.trim();
                 payoutDetails.walletNumber = document.getElementById('walletNumber').value.trim();
+                if (!payoutDetails.walletName || !payoutDetails.walletNumber) {
+                    showToast('⚠️ يرجى تعبئة جميع بيانات المحفظة الإلكترونية (اسم المحفظة ورقم المحفظة/الهاتف)!');
+                    return;
+                }
             } else if (payoutType === 'transfer') {
                 payoutDetails.network = document.getElementById('transferNetwork').value.trim();
                 payoutDetails.receiver = document.getElementById('transferReceiver').value.trim();
+                if (!payoutDetails.network || !payoutDetails.receiver) {
+                    showToast('⚠️ يرجى تعبئة جميع بيانات التحويل المحلي (اسم شبكة الصرافة واسم المستلم الرباعي)!');
+                    return;
+                }
             }
 
             const codeSuffix = Math.floor(1000 + Math.random() * 9000);
