@@ -742,6 +742,26 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkcW5yc3J3emlmcnpzZWl4cmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTk5MzQsImV4cCI6MjA5MzMzNTkzNH0.dh2SotKNPpIjttwERWph243yfeV_6rlnkKVfcoEbcGM';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Helper: Clean expired Supabase Auth tokens if stale JWT is present
+        async function cleanExpiredJwtSession() {
+            try { await supabase.auth.signOut(); } catch (e) {}
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith('sb-') || k.includes('auth-token') || k.includes('supabase'))) {
+                        localStorage.removeItem(k);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Auto check on load
+        supabase.auth.getSession().then(({ error }) => {
+            if (error && String(error.message || '').toLowerCase().includes('jwt')) {
+                cleanExpiredJwtSession();
+            }
+        }).catch(() => {});
+
         // State Variables
         let currentInfluencer = null;
         let currentWallet = null;
@@ -884,7 +904,7 @@
             const influencerCode = `AFF_${codeSuffix}`;
 
             try {
-                const { data, error } = await supabase
+                let insertRes = await supabase
                     .from('influencers')
                     .insert([{
                         influencer_code: influencerCode,
@@ -900,14 +920,39 @@
                     .select()
                     .single();
 
-                if (error) throw error;
+                if (insertRes.error && String(insertRes.error.message || '').toLowerCase().includes('jwt')) {
+                    await cleanExpiredJwtSession();
+                    insertRes = await supabase
+                        .from('influencers')
+                        .insert([{
+                            influencer_code: influencerCode,
+                            full_name: fullName,
+                            email: email,
+                            phone: phone,
+                            password_hash: password,
+                            social_links: socialLinks,
+                            payout_details: payoutDetails,
+                            commission_rate: 10.00,
+                            status: 'pending'
+                        }])
+                        .select()
+                        .single();
+                }
+
+                if (insertRes.error) throw insertRes.error;
+                const data = insertRes.data;
 
                 localStorage.setItem('affiliate_influencer_id', data.id);
                 currentInfluencer = data;
                 showPendingScreen();
                 showToast('✅ تم تسجيل حسابك بنجاح وهو الآن قيد المراجعة!');
             } catch (err) {
-                showToast('❌ خطأ في إنشاء الحساب: ' + (err.message || 'حاول استخدام بريد مختلف'));
+                if (String(err.message || '').toLowerCase().includes('jwt')) {
+                    await cleanExpiredJwtSession();
+                    showToast('⚠️ تم تحديث الجلسة. يرجى الضغط مرة أخرى على زر إنشاء الحساب للمتابعة!');
+                } else {
+                    showToast('❌ خطأ في إنشاء الحساب: ' + (err.message || 'حاول استخدام بريد مختلف'));
+                }
             }
         }
 
@@ -918,16 +963,27 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const { data, error } = await supabase
+                let selectRes = await supabase
                     .from('influencers')
                     .select('*')
                     .eq('email', email)
                     .single();
 
-                if (error || !data) {
+                if (selectRes.error && String(selectRes.error.message || '').toLowerCase().includes('jwt')) {
+                    await cleanExpiredJwtSession();
+                    selectRes = await supabase
+                        .from('influencers')
+                        .select('*')
+                        .eq('email', email)
+                        .single();
+                }
+
+                if (selectRes.error || !selectRes.data) {
                     showToast('❌ البريد الإلكتروني غير مسجل في نظام المؤثرين');
                     return;
                 }
+
+                const data = selectRes.data;
 
                 if (data.password_hash && data.password_hash !== password) {
                     showToast('❌ كلمة المرور غير صحيحة');
@@ -954,13 +1010,23 @@
         // Load Influencer Data
         async function loadInfluencerData(id) {
             try {
-                const { data, error } = await supabase
+                let res = await supabase
                     .from('influencers')
                     .select('*')
                     .eq('id', id)
                     .single();
 
-                if (error || !data) return;
+                if (res.error && String(res.error.message || '').toLowerCase().includes('jwt')) {
+                    await cleanExpiredJwtSession();
+                    res = await supabase
+                        .from('influencers')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+                }
+
+                if (res.error || !res.data) return;
+                const data = res.data;
                 currentInfluencer = data;
 
                 if (data.status === 'pending') {

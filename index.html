@@ -3989,6 +3989,24 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        async function cleanExpiredJwtSession() {
+            try { await supabase.auth.signOut(); } catch (e) {}
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith('sb-') || k.includes('auth-token') || k.includes('supabase'))) {
+                        localStorage.removeItem(k);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        supabase.auth.getSession().then(({ error }) => {
+            if (error && String(error.message || '').toLowerCase().includes('jwt')) {
+                cleanExpiredJwtSession();
+            }
+        }).catch(() => {});
+
         // Global State
         let allProducts = [];
         let filteredProducts = [];
