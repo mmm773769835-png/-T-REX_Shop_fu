@@ -439,7 +439,7 @@
                 <!-- Social Links -->
                 <div style="background: rgba(255,215,0,0.05); padding: 15px; border-radius: 12px; margin-bottom: 18px; border: 1px dashed var(--border-color);">
                     <label style="color: var(--primary); font-weight: bold; margin-bottom: 10px; display: block;">
-                        🌐 روابط حساباتك على شبكات التواصل الاجتماعي (اختياري / يُوصى به):
+                        🌐 روابط حساباتك على شبكات التواصل الاجتماعي (إجباري - أدخل رابط حساب واحد على الأقل *):
                     </label>
                     <div class="form-row">
                         <div class="form-group">
@@ -810,6 +810,13 @@
                 youtube: document.getElementById('socialYoutube').value.trim(),
                 facebook: document.getElementById('socialFacebook').value.trim()
             };
+
+            const hasSocialLink = Object.values(socialLinks).some(link => link.length > 0);
+            if (!hasSocialLink) {
+                showToast('⚠️ يرجى إدخال رابط حساب واحد على الأقل على وسائل التواصل الاجتماعي (تيك توك، إنستغرام، يوتيوب، أو فيسبوك)!');
+                document.getElementById('socialTiktok').focus();
+                return;
+            }
 
             const payoutType = document.getElementById('payoutType').value;
             let payoutDetails = { type: payoutType };

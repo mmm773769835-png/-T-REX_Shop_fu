@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Linking, Platform, Share } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Linking, Platform, Share, Modal, FlatList } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../shared/components/Button";
@@ -7,7 +8,35 @@ import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
-import { dbService, storageService } from '../services/SupabaseService';
+import { dbService, storageService, supabase } from '../services/SupabaseService';
+
+const COUNTRIES = [
+  { name: 'اليمن', flag: '🇾🇪', code: '+967' },
+  { name: 'السعودية', flag: '🇸🇦', code: '+966' },
+  { name: 'الإمارات', flag: '🇦🇪', code: '+971' },
+  { name: 'الكويت', flag: '🇰🇼', code: '+965' },
+  { name: 'قطر', flag: '🇶🇦', code: '+974' },
+  { name: 'البحرين', flag: '🇧🇭', code: '+973' },
+  { name: 'عمان', flag: '🇴🇲', code: '+968' },
+  { name: 'مصر', flag: '🇪🇬', code: '+20' },
+  { name: 'الأردن', flag: '🇯🇴', code: '+962' },
+  { name: 'لبنان', flag: '🇱🇧', code: '+961' },
+  { name: 'العراق', flag: '🇮🇶', code: '+964' },
+  { name: 'سوريا', flag: '🇸🇾', code: '+963' },
+  { name: 'السودان', flag: '🇸🇩', code: '+249' },
+  { name: 'المغرب', flag: '🇲🇦', code: '+212' },
+  { name: 'تونس', flag: '🇹🇳', code: '+216' },
+  { name: 'الجزائر', flag: '🇩🇿', code: '+213' },
+  { name: 'ليبيا', flag: '🇱🇾', code: '+218' },
+  { name: 'الولايات المتحدة', flag: '🇺🇸', code: '+1' },
+  { name: 'المملكة المتحدة', flag: '🇬🇧', code: '+44' },
+  { name: 'كندا', flag: '🇨🇦', code: '+1' },
+  { name: 'أستراليا', flag: '🇦🇺', code: '+61' },
+  { name: 'ألمانيا', flag: '🇩🇪', code: '+49' },
+  { name: 'فرنسا', flag: '🇫🇷', code: '+33' },
+  { name: 'تركيا', flag: '🇹🇷', code: '+90' },
+  { name: 'أخرى', flag: '🌍', code: '' }
+];
 
 const OrderConfirm = ({ route, navigation }: any) => {
   const { isDarkMode, colors } = useContext(ThemeContext);
@@ -29,14 +58,32 @@ const OrderConfirm = ({ route, navigation }: any) => {
   const formattedTotal = formatPriceWithSource(totalInYER, 'YER', currency);
   
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState("اليمن");
+  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [phone, setPhone] = useState("+967 ");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const finalTotal = totalInYER;
 
+  const handleSelectCountry = (c: typeof COUNTRIES[0]) => {
+    setCountry(c.name);
+    setShowCountryModal(false);
+    if (c.code && (!phone || !phone.startsWith(c.code))) {
+      setPhone(c.code + ' ');
+    }
+  };
+
   const styles = getStyles(isDarkMode, colors);
+
+  // جلب كود الإحالة من التخزين
+  useEffect(() => {
+    AsyncStorage.getItem('trex_referral_code').then(code => {
+      if (code) setReferralCode(code);
+    }).catch(() => {});
+  }, []);
 
   // إضافة console.log عند تحميل الشاشة
   useEffect(() => {
@@ -121,6 +168,9 @@ const OrderConfirm = ({ route, navigation }: any) => {
         ? `• الاسم: ${name || 'غير محدد'}\n`
         : `• Name: ${name || 'Not specified'}\n`;
       message += language === "ar"
+        ? `• الدولة: ${country || 'اليمن'}\n`
+        : `• Country: ${country || 'Yemen'}\n`;
+      message += language === "ar"
         ? `• الهاتف: ${phone || 'غير محدد'}\n`
         : `• Phone: ${phone || 'Not specified'}\n`;
       message += language === "ar"
@@ -155,6 +205,12 @@ const OrderConfirm = ({ route, navigation }: any) => {
             minute: '2-digit'
           });
       
+      if (referralCode) {
+        message += language === "ar"
+          ? `\n🏷️ *كود التسويق (المؤثر):* [ ${referralCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${referralCode}).\n`
+          : `\n🏷️ *Influencer Code:* [ ${referralCode} ]\n📌 *Notice:* Order placed via influencer referral (${referralCode}).\n`;
+      }
+
       message += language === "ar"
         ? `\n🕐 التاريخ والوقت: ${dateTime}`
         : `\n🕐 Date & Time: ${dateTime}`;
@@ -474,11 +530,21 @@ const OrderConfirm = ({ route, navigation }: any) => {
             placeholderTextColor="#666"
           />
         </View>
+        <TouchableOpacity
+          style={styles.inputWrapper}
+          onPress={() => setShowCountryModal(true)}
+        >
+          <Ionicons name="globe-outline" size={18} color="#FFD700" style={styles.inputIcon} />
+          <Text style={[styles.input, { paddingTop: 14, color: country ? colors.text : '#666', flex: 1 }]}>
+            {country ? `${COUNTRIES.find(c => c.name === country)?.flag || '🌍'} ${country}` : (language === "ar" ? "اختر الدولة *" : "Select Country *")}
+          </Text>
+          <Ionicons name="chevron-down" size={18} color="#888" style={{ marginRight: 10, alignSelf: 'center' }} />
+        </TouchableOpacity>
         <View style={styles.inputWrapper}>
           <Ionicons name="call-outline" size={18} color="#888" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder={language === "ar" ? "رقم الهاتف" : "Phone Number"}
+            placeholder={language === "ar" ? "رقم الهاتف *" : "Phone Number *"}
             keyboardType="phone-pad"
             value={phone}
             onChangeText={setPhone}
@@ -563,6 +629,36 @@ const OrderConfirm = ({ route, navigation }: any) => {
         </TouchableOpacity>
       </View>
       <View style={{ height: 30 }} />
+
+      {/* Country Selection Modal */}
+      <Modal visible={showCountryModal} animationType="slide" transparent>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', padding: 20 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: isDarkMode ? '#333' : '#eee' }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: isDarkMode ? '#fff' : '#000' }}>
+                {language === 'ar' ? 'اختر الدولة' : 'Select Country'}
+              </Text>
+              <TouchableOpacity onPress={() => setShowCountryModal(false)} style={{ padding: 5 }}>
+                <Ionicons name="close-circle-outline" size={26} color={isDarkMode ? '#FFD700' : '#000'} />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={COUNTRIES}
+              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: isDarkMode ? '#282828' : '#eee' }}
+                  onPress={() => handleSelectCountry(item)}
+                >
+                  <Text style={{ fontSize: 22, marginRight: 12 }}>{item.flag}</Text>
+                  <Text style={{ fontSize: 16, color: isDarkMode ? '#fff' : '#000', flex: 1, textAlign: 'left' }}>{item.name}</Text>
+                  {item.code ? <Text style={{ fontSize: 14, color: '#FFD700', fontWeight: 'bold' }}>{item.code}</Text> : null}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

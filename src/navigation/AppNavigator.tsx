@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -210,6 +211,23 @@ const AppNavigator = () => {
   const { isDarkMode, colors } = useContext(ThemeContext);
   const { language } = useContext(LanguageContext);
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const processReferralUrl = (url: string | null) => {
+      if (!url) return;
+      try {
+        const match = url.match(/(?:ref|referral|aff|influencer|code)[=\/]([a-zA-Z0-9_-]+)/i);
+        if (match && match[1]) {
+          const code = match[1].toUpperCase();
+          AsyncStorage.setItem('trex_referral_code', code);
+        }
+      } catch (e) {}
+    };
+
+    Linking.getInitialURL().then(processReferralUrl).catch(() => {});
+    const subscription = Linking.addEventListener('url', (event) => processReferralUrl(event.url));
+    return () => subscription.remove();
+  }, []);
 
   // دالة لترجمة العناوين
   const getHeaderTitle = (routeName: string, defaultTitle: string) => {

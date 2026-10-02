@@ -4066,9 +4066,10 @@
                 showNotification('خطأ: لا يوجد منتج محدد! ❌');
                 return;
             }
+            const activeRefCode = getActiveReferralCode();
             const targetPhone = (product.vendor_phone || product.phone || '967773769835');
             const cleanPhone = String(targetPhone).replace(/[^0-9]/g, '') || '967773769835';
-            const productUrl = `${window.location.origin}/?product=${encodeURIComponent(product.id)}`;
+            const productUrl = `${window.location.origin}/?product=${encodeURIComponent(product.id)}${activeRefCode ? `&ref=${encodeURIComponent(activeRefCode)}` : ''}`;
             const formattedPrice = formatPrice(product.price, product.currency || 'SAR');
             
             let messageText = `⚡ *طلب فوري من T-REX Shop* 🦖\n\n`;
@@ -4080,11 +4081,37 @@
             if (product.image_url) {
                 messageText += `🖼️ *صورة المنتج:* ${product.image_url}\n`;
             }
-            messageText += `🔗 *رابط المنتج:* ${productUrl}\n\n`;
-            messageText += `السلام عليكم، أود شراء هذا المنتج فوراً! 🛍️`;
+            messageText += `🔗 *رابط المنتج:* ${productUrl}\n`;
+            if (activeRefCode) {
+                messageText += `\n🏷️ *كود التسويق (المؤثر):* [ ${activeRefCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${activeRefCode}).\n`;
+            }
+            messageText += `\nالسلام عليكم، أود شراء هذا المنتج فوراً! 🛍️`;
 
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(messageText)}`;
             window.open(whatsappUrl, '_blank');
+
+            // Record referral order and receipt
+            const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
+            recordReferralOrder(generatedOrderId, product, product.price, product.currency || 'SAR');
+            saveUserOrderReceipt({
+                order_id: generatedOrderId,
+                date: new Date().toISOString(),
+                items: [{
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    currency: product.currency || 'SAR'
+                }],
+                total: product.price,
+                currency: product.currency || 'SAR',
+                influencer_code: activeRefCode || null,
+                customer_name: 'طلب فوري',
+                customer_phone: '',
+                customer_country: '',
+                customer_address: ''
+            });
+
             showNotification('تم فتح واتساب لإتمام الشراء الفوري! ✅');
         }
 
@@ -4550,6 +4577,7 @@
             // Calculate total
             let totalSar = 0;
             let itemsList = '';
+            const activeRefCode = getActiveReferralCode();
             cart.forEach((item, idx) => {
                 const itemTotal = item.price * item.quantity;
                 totalSar += toSar(itemTotal, item.currency || 'SAR');
@@ -4562,7 +4590,7 @@
 `;
                 itemsList += `   🔑 كود التاجر: ${item.vendor_code || 'VND-MAIN'}
 `;
-                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/?product=${item.id}
+                itemsList += `   🔗 رابط المنتج: ${window.location.origin}/?product=${item.id}${activeRefCode ? `&ref=${encodeURIComponent(activeRefCode)}` : ''}
 `;
                 if (item.image_url || item.image) {
                     itemsList += `   🖼️ صورة المنتج المباشرة (معاينة): ${item.image_url || item.image}
@@ -5095,6 +5123,35 @@
         // Referral & Affiliate Link Tracking System (Immediate Multi-Source Extraction)
         function getActiveReferralCode() {
             let code = null;
+
+            // 1. Check URL parameters first so new referral links immediately override cached codes
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                code = urlParams.get('ref') || urlParams.get('referral') || urlParams.get('aff') || urlParams.get('influencer') || urlParams.get('code');
+            } catch (e) {}
+
+            if (!code && window.location.hash) {
+                const hashMatch = window.location.hash.match(/(?:ref|referral|aff|influencer|code)[=\/]([a-zA-Z0-9_-]+)/i);
+                if (hashMatch) code = hashMatch[1];
+            }
+
+            if (!code && window.location.href) {
+                const hrefMatch = window.location.href.match(/(?:ref|referral|aff|influencer|code)[=\/]([a-zA-Z0-9_-]+)/i);
+                if (hrefMatch) code = hrefMatch[1];
+            }
+
+            // Save to storage if code came from URL
+            if (code) {
+                code = String(code).trim().toUpperCase();
+                try {
+                    localStorage.setItem('trex_referral_code', code);
+                    sessionStorage.setItem('trex_referral_code', code);
+                    document.cookie = `trex_referral_code=${code}; path=/; max-age=2592000`; // 30 days
+                } catch (e) {}
+                return code;
+            }
+
+            // 2. Fallback to storage/cookies if URL does not contain a referral code
             try {
                 code = localStorage.getItem('trex_referral_code') || sessionStorage.getItem('trex_referral_code');
             } catch (e) {}
@@ -5105,29 +5162,8 @@
                     if (cookieMatch) code = decodeURIComponent(cookieMatch[1]);
                 } catch (e) {}
             }
-            if (!code) {
-                try {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    code = urlParams.get('ref') || urlParams.get('referral') || urlParams.get('aff');
-                } catch (e) {}
-            }
-            if (!code && window.location.hash) {
-                const hashMatch = window.location.hash.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
-                if (hashMatch) code = hashMatch[1];
-            }
-            if (!code && window.location.href) {
-                const hrefMatch = window.location.href.match(/(?:ref|referral|aff)[=\/]([a-zA-Z0-9_-]+)/i);
-                if (hrefMatch) code = hrefMatch[1];
-            }
-            if (code) {
-                code = String(code).trim().toUpperCase();
-                try {
-                    localStorage.setItem('trex_referral_code', code);
-                    sessionStorage.setItem('trex_referral_code', code);
-                    document.cookie = `trex_referral_code=${code}; path=/; max-age=2592000`; // 30 days
-                } catch (e) {}
-            }
-            return code || null;
+
+            return code ? String(code).trim().toUpperCase() : null;
         }
 
         // Run immediate referral extraction on script load
@@ -5395,6 +5431,7 @@
             
             // Calculate total
             const total = currentProduct.price * currentQuantity;
+            const activeRefCode = getActiveReferralCode();
             
             // Build WhatsApp message
             const vendorCodeDisplay = currentProduct.vendor_code || 'VND-MAIN';
@@ -5405,7 +5442,7 @@
             message += `📊 *الكمية:* ${currentQuantity}\n`;
             message += `💵 *الإجمالي:* ${formatPrice(total, currentProduct.currency || 'SAR')}\n\n`;
             
-            const productUrl = `${window.location.origin}/?product=${currentProduct.id}`;
+            const productUrl = `${window.location.origin}/?product=${currentProduct.id}${activeRefCode ? `&ref=${encodeURIComponent(activeRefCode)}` : ''}`;
             message += `🔗 *رابط المنتج:* ${productUrl}\n`;
             if (currentProduct.image_url) {
                 message += `🖼️ *صورة المنتج:* ${currentProduct.image_url}\n\n`;
@@ -5419,17 +5456,43 @@
             if (notes) {
                 message += `📝 *ملاحظات:* ${notes}\n`;
             }
+
+            if (activeRefCode) {
+                message += `\n🏷️ *كود التسويق (المؤثر):* [ ${activeRefCode} ]\n📌 *تنبيه:* تم هذا الطلب عبر رابط إحالة المؤثر بكود (${activeRefCode}).\n`;
+            }
+
             message += `\n🕐 *تاريخ الطلب:* ${new Date().toLocaleString('ar-SA')}`;
             
-            // WhatsApp number (your number)
-            const whatsappNumber = '967773769835';
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            // WhatsApp number
+            const targetPhone = (currentProduct && (currentProduct.vendor_phone || currentProduct.phone)) || '967773769835';
+            const cleanPhone = String(targetPhone).replace(/[^0-9]/g, '') || '967773769835';
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
             
             // Open WhatsApp
             window.open(whatsappUrl, '_blank');
             
-            // Track the order
+            // Track order & save referral & receipt
             trackOrder();
+            const generatedOrderId = 'ORD-' + Date.now().toString().slice(-6);
+            recordReferralOrder(generatedOrderId, currentProduct, total, currentProduct.currency || 'SAR');
+            saveUserOrderReceipt({
+                order_id: generatedOrderId,
+                date: new Date().toISOString(),
+                items: [{
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    quantity: currentQuantity,
+                    currency: currentProduct.currency || 'SAR'
+                }],
+                total: total,
+                currency: currentProduct.currency || 'SAR',
+                influencer_code: activeRefCode || null,
+                customer_name: name,
+                customer_phone: phone,
+                customer_country: country,
+                customer_address: address
+            });
             
             // Show success message
             showNotification('تم فتح واتساب لإرسال الطلب! ✅');
@@ -5696,11 +5759,6 @@
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 12px;">
-                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-phone"></i> رقم الواتساب *</label>
-                                <input type="tel" id="quickCustomerPhone" required placeholder="مثال: +967773769835" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
-                            </div>
-                            
-                            <div class="form-group" style="margin-bottom: 12px;">
                                 <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-globe"></i> الدولة *</label>
                                 <select id="quickCustomerCountry" required onchange="updatePhoneCountryCode(this.value, 'quickCustomerPhone')" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
                                     <option value="">اختر الدولة</option>
@@ -5723,6 +5781,11 @@
                                     <option value="ليبيا">ليبيا 🇱🇾</option>
                                     <option value="أخرى">أخرى 🌍</option>
                                 </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 5px; font-size: 13px;"><i class="fas fa-phone"></i> رقم الواتساب *</label>
+                                <input type="tel" id="quickCustomerPhone" required placeholder="مثال: +967773769835" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: #fff;">
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 12px;">
@@ -5862,9 +5925,10 @@
             
             // Calculate total
             const total = currentProduct.price * currentQuantity;
+            const activeRefCodeQuick = getActiveReferralCode();
             
             // Build WhatsApp message
-            const productUrl = `${window.location.origin}/?product=${currentProduct.id}`;
+            const productUrl = `${window.location.origin}/?product=${currentProduct.id}${activeRefCodeQuick ? `&ref=${encodeURIComponent(activeRefCodeQuick)}` : ''}`;
             const message = `
 🛒 *طلب جديد من T-REX Shop*
 
@@ -7578,11 +7642,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
-                    <input type="tel" id="customerPhone" required placeholder="مثال: +967773769835">
-                </div>
-                
-                <div class="form-group">
                     <label><i class="fas fa-globe"></i> الدولة *</label>
                     <select id="customerCountry" required onchange="updatePhoneCountryCode(this.value, 'customerPhone')">
                         <option value="">اختر الدولة</option>
@@ -7612,6 +7671,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                         <option value="تركيا">تركيا 🇹🇷</option>
                         <option value="أخرى">أخرى 🌍</option>
                     </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
+                    <input type="tel" id="customerPhone" required placeholder="مثال: +967773769835">
                 </div>
                 
                 <div class="form-group">
@@ -7659,11 +7723,6 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-phone"></i> رقم الواتساب *</label>
-                    <input type="tel" id="cartCustomerPhone" required placeholder="مثال: +967777777777" pattern="[\+\d\s\-\(\)]{8,20}">
-                </div>
-                
-                <div class="form-group">
                     <label><i class="fas fa-globe"></i> الدولة *</label>
                     <select id="cartCustomerCountry" required onchange="updatePhoneCountryCode(this.value, 'cartCustomerPhone')">
                         <option value="">اختر الدولة</option>
@@ -7693,6 +7752,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                         <option value="تركيا">تركيا 🇹🇷</option>
                         <option value="أخرى">أخرى 🌍</option>
                     </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> رقم الواتساب *</label>
+                    <input type="tel" id="cartCustomerPhone" required placeholder="مثال: +967777777777" pattern="[\+\d\s\-\(\)]{8,20}">
                 </div>
                 
                 <div class="form-group">
