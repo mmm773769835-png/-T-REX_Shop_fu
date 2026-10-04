@@ -605,6 +605,35 @@ const OrderConfirm = ({ route, navigation }: any) => {
         </View>
       </View>
 
+      {/* Influencer Code Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="pricetag-outline" size={20} color="#00e676" />
+          <Text style={styles.sectionTitle}>
+            {language === "ar" ? "كود التسويق / المؤثر (اختياري)" : "Influencer Code (Optional)"}
+          </Text>
+        </View>
+        <View style={styles.inputWrapper}>
+          <Ionicons name="pricetag" size={18} color="#00e676" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder={language === "ar" ? "أدخل كود المؤثر (مثال: INF-1234)" : "Enter Influencer Code (e.g. INF-1234)"}
+            value={referralCode || ''}
+            onChangeText={(val) => setReferralCode(val.trim() ? val.trim() : null)}
+            autoCapitalize="characters"
+            placeholderTextColor="#666"
+          />
+        </View>
+        {referralCode ? (
+          <View style={{ backgroundColor: 'rgba(0,230,118,0.15)', borderWidth: 1, borderColor: '#00e676', padding: 10, borderRadius: 8, marginTop: 8, flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="checkmark-circle" size={18} color="#00e676" style={{ marginRight: 6 }} />
+            <Text style={{ color: colors.text, fontSize: 13, fontWeight: 'bold' }}>
+              {language === "ar" ? `مميّز: سيتم إدراج كود المؤثر (${referralCode}) بالسند والطلب` : `Featured: Influencer code (${referralCode}) will be attached to receipt`}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
       {/* Payment Method */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
