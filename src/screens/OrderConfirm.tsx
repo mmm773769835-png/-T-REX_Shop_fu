@@ -8,7 +8,7 @@ import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
-import { dbService, storageService, supabase } from '../services/SupabaseService';
+import supabase, { dbService, storageService } from '../services/SupabaseService';
 
 const COUNTRIES = [
   { name: 'اليمن', flag: '🇾🇪', code: '+967' },
@@ -383,6 +383,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
         name,
         phone,
         address,
+        country: country || "اليمن",
         paymentMethod,
         receiptUrl: receiptUrl || "",
         items: cleanedItems,
@@ -392,6 +393,7 @@ const OrderConfirm = ({ route, navigation }: any) => {
         total: finalTotal,
         vendor_code: primaryVendorCode,
         vendor_id: primaryVendorId,
+        influencer_code: referralCode || null,
         createdAt: new Date().toISOString(),
       };
 
@@ -402,6 +404,44 @@ const OrderConfirm = ({ route, navigation }: any) => {
       try {
         await dbService.add('orders', orderData);
         console.log('✅ OrderConfirm: تم حفظ الطلب بنجاح في قاعدة البيانات Supabase');
+
+        // إذا وجد كود إحالة للمؤثر، يتم تسجيل العمولة في جدول referral_orders
+        if (referralCode && supabase) {
+          try {
+            const { data: influencer } = await supabase
+              .from('influencers')
+              .select('id, influencer_code, commission_rate, status')
+              .eq('influencer_code', referralCode)
+              .single();
+
+            if (influencer && influencer.status === 'active') {
+              const rate = Number(influencer.commission_rate || 10.00);
+              const commissionAmountInYER = Number((finalTotal * (rate / 100)).toFixed(2));
+
+              await supabase
+                .from('referral_orders')
+                .insert([{
+                  influencer_id: influencer.id,
+                  influencer_code: referralCode,
+                  order_id: String(orderId),
+                  product_details: cleanedItems.map((p: any) => ({
+                    id: p.id,
+                    name: p.title || p.name,
+                    price: p.price,
+                    quantity: p.quantity || 1
+                  })),
+                  order_total: finalTotal,
+                  commission_rate: rate,
+                  commission_amount: commissionAmountInYER,
+                  currency: 'YER',
+                  created_at: new Date().toISOString()
+                }]);
+              console.log('✅ OrderConfirm: تم تسجيل العائد في جدول referral_orders للمؤثر بنجاح');
+            }
+          } catch (refErr) {
+            console.warn('⚠️ OrderConfirm: تعذر تسجيل العائد في referral_orders:', refErr);
+          }
+        }
       } catch (dbErr) {
         console.warn('⚠️ OrderConfirm: لم يتم حفظ الطلب في قاعدة البيانات، المتابعة عبر الواتساب:', dbErr);
       }
