@@ -669,6 +669,58 @@
         </div>
     </div>
 
+    <!-- Google First-Time Vendor Onboarding Modal -->
+    <div id="googleVendorOnboardingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(6px); padding: 15px;">
+        <div style="background: #1a1a1a; border: 2px solid #FFD700; border-radius: 16px; padding: 25px; max-width: 480px; width: 100%; box-shadow: 0 10px 30px rgba(255,215,0,0.25); color: #fff; text-align: right; direction: rtl;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 42px; margin-bottom: 8px;">🏪</div>
+                <h2 style="color: #FFD700; font-size: 21px; margin-bottom: 8px;">إكمال بيانات حساب التاجر</h2>
+                <p style="color: #bbb; font-size: 13.5px; line-height: 1.5;">مرحباً بك! يرجى استكمال بيانات متجرك ورقم الهاتف لتفعيل حساب التاجر والحصول على كود التاجر الخاص بك.</p>
+            </div>
+
+            <form id="googleOnboardingForm" onsubmit="submitGoogleVendorOnboarding(event)">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; color: #FFD700; font-size: 13px; margin-bottom: 5px;"><i class="fas fa-store"></i> اسم التاجر / المتجر *</label>
+                    <input type="text" id="googleRegShopName" required placeholder="مثال: متجر الأمل للإلكترونيات" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; color: #FFD700; font-size: 13px; margin-bottom: 5px;"><i class="fas fa-globe"></i> الدولة *</label>
+                    <select id="googleRegCountry" required style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px;" onchange="updateGoogleOnboardingPhoneCode(this.value)">
+                        <option value="اليمن 🇾🇪">اليمن 🇾🇪 (+967)</option>
+                        <option value="السعودية 🇸🇦">السعودية 🇸🇦 (+966)</option>
+                        <option value="الإمارات 🇦🇪">الإمارات 🇦🇪 (+971)</option>
+                        <option value="الكويت 🇰🇼">الكويت 🇰🇼 (+965)</option>
+                        <option value="البحرين 🇧🇭">البحرين 🇧🇭 (+973)</option>
+                        <option value="عُمان 🇴🇲">عُمان 🇴🇲 (+968)</option>
+                        <option value="قطر 🇶🇦">قطر 🇶🇦 (+974)</option>
+                        <option value="أخرى">دولة أخرى</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; color: #FFD700; font-size: 13px; margin-bottom: 5px;"><i class="fas fa-phone"></i> رقم الهاتف / الواتساب (مع المفتاح) *</label>
+                    <input type="tel" id="googleRegPhone" required value="+967 " placeholder="+967 771234567" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; color: #FFD700; font-size: 13px; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> عنوان التاجر / المحل *</label>
+                    <input type="text" id="googleRegAddress" required placeholder="أدخل العنوان بالتفصيل (المدينة، الشارع)" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px;">
+                </div>
+
+                <div id="googleOnboardingError" style="display: none; color: #ff4d4d; background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; border-radius: 8px; padding: 10px; font-size: 13px; margin-bottom: 15px; text-align: center;"></div>
+
+                <button type="submit" id="googleOnboardingSubmitBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; border-radius: 10px; color: #000; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;">
+                    🚀 حفظ وتفعيل حساب التاجر
+                </button>
+
+                <button type="button" onclick="cancelGoogleOnboarding()" style="width: 100%; padding: 12px; background: transparent; border: 1px solid #666; border-radius: 10px; color: #bbb; font-weight: 600; font-size: 13.5px; cursor: pointer;">
+                    ❌ إلغاء وتسجيل الخروج
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Dashboard -->
     <div class="dashboard" id="dashboard">
         <!-- Super Admin Quick Switch Banner (Visible ONLY for Super Admin users) -->
@@ -1186,6 +1238,124 @@
             }
         }
 
+        function updateGoogleOnboardingPhoneCode(country) {
+            const dialCodes = {
+                'اليمن 🇾🇪': '+967 ',
+                'السعودية 🇸🇦': '+966 ',
+                'الإمارات 🇦🇪': '+971 ',
+                'الكويت 🇰🇼': '+965 ',
+                'البحرين 🇧🇭': '+973 ',
+                'عُمان 🇴🇲': '+968 ',
+                'قطر 🇶🇦': '+974 ',
+                'أخرى': '+'
+            };
+            const phoneInput = document.getElementById('googleRegPhone');
+            if (phoneInput) {
+                phoneInput.value = dialCodes[country] || '+967 ';
+            }
+        }
+
+        function showGoogleVendorOnboardingModal(existingProfile) {
+            const modal = document.getElementById('googleVendorOnboardingModal');
+            if (!modal) return;
+
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+
+            const shopNameInput = document.getElementById('googleRegShopName');
+            const phoneInput = document.getElementById('googleRegPhone');
+            const addressInput = document.getElementById('googleRegAddress');
+
+            if (existingProfile?.shop_name && !existingProfile.shop_name.startsWith('متجر ')) {
+                shopNameInput.value = existingProfile.shop_name;
+            } else {
+                shopNameInput.value = currentUser?.user_metadata?.full_name || '';
+            }
+
+            if (existingProfile?.phone && existingProfile.phone.trim() !== '') {
+                phoneInput.value = existingProfile.phone;
+            }
+
+            if (existingProfile?.address) {
+                addressInput.value = existingProfile.address;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        async function cancelGoogleOnboarding() {
+            await supabase.auth.signOut();
+            localStorage.clear();
+            sessionStorage.clear();
+            currentUser = null;
+            currentVendor = null;
+            const modal = document.getElementById('googleVendorOnboardingModal');
+            if (modal) modal.style.display = 'none';
+            window.location.reload();
+        }
+
+        async function submitGoogleVendorOnboarding(e) {
+            e.preventDefault();
+            const shopName = document.getElementById('googleRegShopName').value.trim();
+            const country = document.getElementById('googleRegCountry').value;
+            const phone = document.getElementById('googleRegPhone').value.trim();
+            const address = document.getElementById('googleRegAddress').value.trim();
+            const errorDiv = document.getElementById('googleOnboardingError');
+            const submitBtn = document.getElementById('googleOnboardingSubmitBtn');
+
+            if (!shopName) {
+                errorDiv.textContent = '❌ يرجى كتابة اسم التاجر / المتجر.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (!phone || phone === '+967' || phone === '+966' || phone.replace(/\D/g, '').length < 6) {
+                errorDiv.textContent = '❌ يرجى إدخال رقم هاتف صحيح للتواصل (مع رمز الدولة).';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (!address) {
+                errorDiv.textContent = '❌ يرجى كتابة عنوان التاجر.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري تفعيل الحساب...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const vendorCode = 'VND-' + Math.floor(1000 + Math.random() * 9000);
+                const newProfile = {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    name: currentUser.user_metadata?.full_name || shopName,
+                    role: 'vendor',
+                    shop_name: shopName,
+                    phone: phone,
+                    country: country,
+                    address: address,
+                    vendor_code: vendorCode,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error: upsertErr } = await supabase.from('profiles').upsert(newProfile, { onConflict: 'id' });
+                if (upsertErr) throw upsertErr;
+
+                currentVendor = newProfile;
+                document.getElementById('googleVendorOnboardingModal').style.display = 'none';
+                showDashboard();
+            } catch (err) {
+                console.error('Error completing vendor profile:', err);
+                errorDiv.textContent = '❌ حدث خطأ أثناء حفظ البيانات: ' + (err.message || 'حاول مجدداً');
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 حفظ وتفعيل حساب التاجر';
+            }
+        }
+
         async function signInWithGoogleVendor(mode) {
             if (mode === 'register') {
                 const shopName = document.getElementById('regShopName').value.trim();
@@ -1661,15 +1831,39 @@
 
                 const targetRole = (isAdminEmail || profile?.role === 'admin') ? 'admin' : 'vendor';
 
-                if (!profile || pendingShopName || profile.role !== targetRole) {
-                    const vendorCode = profile?.vendor_code || (targetRole === 'admin' ? ('ADM-' + Math.floor(1000 + Math.random() * 9000)) : ('VND-' + Math.floor(1000 + Math.random() * 9000)));
+                // 1. Super Admin Role
+                if (targetRole === 'admin') {
+                    if (!profile) {
+                        const adminCode = 'ADM-' + Math.floor(1000 + Math.random() * 9000);
+                        profile = {
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            name: currentUser.user_metadata?.full_name || 'مدير النظام',
+                            role: 'admin',
+                            shop_name: 'الإدارة الرئيسية T-REX',
+                            phone: '',
+                            country: '',
+                            address: '',
+                            vendor_code: adminCode,
+                            updated_at: new Date().toISOString()
+                        };
+                        await supabase.from('profiles').upsert(profile, { onConflict: 'id' });
+                    }
+                    currentVendor = profile;
+                    showDashboard();
+                    return;
+                }
+
+                // 2. Vendor Role with Pending Registration Data (User filled new vendor form before Google sign-in)
+                if (pendingShopName && pendingPhone) {
+                    const vendorCode = profile?.vendor_code || ('VND-' + Math.floor(1000 + Math.random() * 9000));
                     const newProfile = {
                         id: currentUser.id,
                         email: currentUser.email,
-                        name: currentUser.user_metadata?.full_name || profile?.name || (targetRole === 'admin' ? 'مدير النظام' : 'تاجر'),
-                        role: targetRole,
-                        shop_name: pendingShopName || profile?.shop_name || (targetRole === 'admin' ? 'الإدارة الرئيسية T-REX' : 'متجر ' + (currentUser.email ? currentUser.email.split('@')[0] : 'تاجر')),
-                        phone: pendingPhone || profile?.phone || '',
+                        name: currentUser.user_metadata?.full_name || profile?.name || pendingShopName,
+                        role: 'vendor',
+                        shop_name: pendingShopName,
+                        phone: pendingPhone,
                         country: pendingCountry || profile?.country || '',
                         address: profile?.address || pendingCountry || '',
                         vendor_code: vendorCode,
@@ -1682,17 +1876,29 @@
                     localStorage.removeItem('pending_vendor_shop_name');
                     localStorage.removeItem('pending_vendor_phone');
                     localStorage.removeItem('pending_vendor_country');
-                } else if (profile && (!profile.email || !profile.name)) {
-                    // Self-heal existing profiles that miss email or name
-                    const updatedEmail = profile.email || currentUser.email;
-                    const updatedName = profile.name || currentUser.user_metadata?.full_name || 'تاجر';
-                    await supabase.from('profiles').update({ email: updatedEmail, name: updatedName }).eq('id', profile.id);
-                    profile.email = updatedEmail;
-                    profile.name = updatedName;
+
+                    currentVendor = profile;
+                    showDashboard();
+                    return;
                 }
 
-                currentVendor = profile;
-                showDashboard();
+                // 3. Existing Vendor Profile with Complete Phone & Shop Name
+                if (profile && profile.role === 'vendor' && profile.phone && profile.phone.trim() !== '' && profile.shop_name && !profile.shop_name.startsWith('متجر ')) {
+                    if (!profile.email || !profile.name) {
+                        const updatedEmail = profile.email || currentUser.email;
+                        const updatedName = profile.name || currentUser.user_metadata?.full_name || 'تاجر';
+                        await supabase.from('profiles').update({ email: updatedEmail, name: updatedName }).eq('id', profile.id);
+                        profile.email = updatedEmail;
+                        profile.name = updatedName;
+                    }
+                    currentVendor = profile;
+                    showDashboard();
+                    return;
+                }
+
+                // 4. First-time or Incomplete Vendor Profile (No Phone or Default Shop Name)
+                // Show Onboarding Modal to prompt for Shop Name, Phone, and Address BEFORE granting access
+                showGoogleVendorOnboardingModal(profile);
             }
         }
 
