@@ -3990,6 +3990,72 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // ==============================================================
+        // T-REX Live Ops: Web Presence & Error Logger
+        // ==============================================================
+        window._trexSupabaseClient = supabase;
+        (function initWebLiveOps() {
+            try {
+                // 1. Presence tracking for web visitors
+                const webPresenceChannel = supabase.channel('online_presence', {
+                    config: {
+                        presence: {
+                            key: 'web_' + Math.random().toString(36).substring(2, 9)
+                        }
+                    }
+                });
+                webPresenceChannel.subscribe(async (status) => {
+                    if (status === 'SUBSCRIBED') {
+                        await webPresenceChannel.track({
+                            platform: 'web',
+                            path: window.location.pathname,
+                            online_at: new Date().toISOString()
+                        });
+                    }
+                });
+
+                // 2. Global uncaught error catcher
+                window.onerror = function(msg, src, line, col, err) {
+                    try {
+                        if (!msg) return;
+                        const sMsg = String(msg);
+                        if (src && (src.includes('googlesyndication') || src.includes('doubleclick') || src.includes('adservice'))) return;
+                        if (sMsg.includes('ResizeObserver') || sMsg.includes('Script error')) return;
+
+                        supabase.from('system_error_logs').insert([{
+                            platform: 'web',
+                            error_message: sMsg,
+                            stack_trace: err?.stack || `${src}:${line}:${col}`,
+                            screen_or_url: window.location.pathname || '/',
+                            device_info: { userAgent: navigator.userAgent, screen: `${window.innerWidth}x${window.innerHeight}` },
+                            severity: 'medium',
+                            status: 'new'
+                        }]).then(() => {}).catch(() => {});
+                    } catch(e) {}
+                };
+
+                window.addEventListener('unhandledrejection', function(evt) {
+                    try {
+                        const reason = evt.reason;
+                        const msg = reason?.message || String(reason || '');
+                        if (!msg || msg.includes('aborted') || msg.includes('Failed to fetch') || msg.includes('NetworkError')) return;
+
+                        supabase.from('system_error_logs').insert([{
+                            platform: 'web',
+                            error_message: 'Unhandled Promise: ' + msg,
+                            stack_trace: reason?.stack || '',
+                            screen_or_url: window.location.pathname || '/',
+                            device_info: { userAgent: navigator.userAgent },
+                            severity: 'medium',
+                            status: 'new'
+                        }]).then(() => {}).catch(() => {});
+                    } catch(e) {}
+                });
+            } catch(e) {
+                console.warn('LiveOps init note:', e);
+            }
+        })();
+
         async function cleanExpiredJwtSession() {
             try { await supabase.auth.signOut(); } catch (e) {}
             try {

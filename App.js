@@ -20,6 +20,8 @@ import { useAuth } from './src/contexts/AuthContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 // Import ToastProvider for notifications
 import ToastProvider from './src/services/ToastService';
+import SystemMonitorService from './src/services/SystemMonitorService';
+import AppUpdateModal from './src/components/AppUpdateModal';
 
 export default function App() {
   // App component initialization
@@ -73,11 +75,15 @@ const AppWithLoader = () => {
     
     if (checkEnvironment()) {
       // AutoUpdateService disabled for web compatibility
-      // AppState is not available on web platform
-      // const autoUpdateService = AutoUpdateService.getInstance();
-      // autoUpdateService.startAutoUpdateMonitoring();
       console.log('[DEBUG] AutoUpdateService disabled for web compatibility');
       
+      // Start Realtime Presence tracking for App
+      try {
+        SystemMonitorService.startPresenceTracking();
+      } catch (e) {
+        console.warn('Presence tracking init note:', e);
+      }
+
       // Simulate app initialization delay
       const timer = setTimeout(() => {
         // Set app ready state
@@ -86,8 +92,6 @@ const AppWithLoader = () => {
       
       return () => {
         clearTimeout(timer);
-        // Clean up AutoUpdateService when app unmounts
-        // autoUpdateService.stopAutoUpdateMonitoring();
       };
     }
   }, []);
@@ -113,9 +117,14 @@ const AppWithLoader = () => {
     );
   }
   
-  // Render navigator
+  // Render navigator with Update Modal
   try {
-    return <AppNavigator />;
+    return (
+      <>
+        <AppNavigator />
+        <AppUpdateModal />
+      </>
+    );
   } catch (navError) {
     // Handle navigation errors
     throw navError;

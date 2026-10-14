@@ -752,6 +752,9 @@
                 <button type="button" id="btnAdminGenCodeNav" onclick="scrollToCodeGenerator()" style="display: none; background: linear-gradient(135deg, #FFD700, #ffa500); color: #111; border: 1.5px solid #FFD700; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 13.5px; cursor: pointer; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255,215,0,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                     ⚡ مولّد أكواد التفعيل
                 </button>
+                <a id="btnMonitorHubNav" href="trex-monitor-hub.html" target="_blank" style="display: none; background: linear-gradient(135deg, #FF0055, #7928CA); color: #fff; border: 1.5px solid #FFD700; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 13.5px; text-decoration: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255,0,85,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'" title="فتح شاشة العمليات والمراقبة المباشرة">
+                    ⚡ غرفة العمليات والمراقبة المباشرة
+                </a>
                 <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
                 <button class="btn-logout" id="btnDeleteAccount" onclick="deleteMyVendorAccount()" style="display: none; background: transparent; color: #ff4444; border: 1px solid #ff4444;">حذف حسابي نهائياً</button>
             </div>
@@ -1731,6 +1734,9 @@
 
             const genCodeNavBtn = document.getElementById('btnAdminGenCodeNav');
             if (genCodeNavBtn) genCodeNavBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+
+            const monitorHubNavBtn = document.getElementById('btnMonitorHubNav');
+            if (monitorHubNavBtn) monitorHubNavBtn.style.display = isAdmin ? 'inline-flex' : 'none';
 
             const infNavBtn = document.getElementById('btnInfluencerPortalNav');
             if (infNavBtn) {

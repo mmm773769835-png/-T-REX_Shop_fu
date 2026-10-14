@@ -1,5 +1,7 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import * as React from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import SystemMonitorService from '../services/SystemMonitorService';
 
 interface Props {
   children: ReactNode;
@@ -34,6 +36,17 @@ class ErrorBoundary extends Component<Props, State> {
     // تسجيل الخطأ في console
     console.error('❌ ErrorBoundary caught an error:', error, errorInfo);
     
+    // إرسال الخطأ فوراً إلى مركز المراقبة السحابي
+    try {
+      SystemMonitorService.logError(
+        error?.message || 'ErrorBoundary Caught Error',
+        (error?.stack || '') + '\nComponentStack:\n' + (errorInfo?.componentStack || ''),
+        'ErrorBoundary'
+      );
+    } catch (e) {
+      console.warn('Failed to report error to SystemMonitorService:', e);
+    }
+
     // تحديث الحالة بمعلومات الخطأ
     this.setState({
       error,
