@@ -1,33 +1,467 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Homepage -->
   <url>
     <loc>https://trexshopmax.com/</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://trexshopmax.com/#products</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://trexshopmax.com/privacy-policy.html</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://trexshopmax.com/terms-of-use.html</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://trexshopmax.com/admin.html</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <!-- Product: باكج لافيرن LAVERNE الفخم 3 عطور بتغليف ملكي ذهبي وشراشيب روائح متنوعة رجالي ونسائي ثبات وفوحان عالي  السعر: 110 ريال للباكج كامل -->
+  <url>
+    <loc>https://trexshopmax.com/products/72ece833-861b-4887-91df-37cb924b7513.html</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102983138_1_IMG-20260819-WA0002.jpg.jpg</image:loc>
+      <image:title>باكج لافيرن LAVERNE الفخم 3 عطور بتغليف ملكي ذهبي وشراشيب روائح متنوعة رجالي ونسائي ثبات وفوحان عالي  السعر: 110 ريال للباكج كامل</image:title>
+      <image:caption>باكج لافيرن LAVERNE الفخم 3 عطور بتغليف ملكي ذهبي وشراشيب روائح متنوعة رجالي ونسائي ثبات وفوحان عالي  السعر: 110 ريال للباكج كامل - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال  -->
+  <url>
+    <loc>https://trexshopmax.com/products/be113d27-b8b7-46c3-9045-525e76c1c1ad.html</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102895830_1_IMG-20260819-WA0001.jpg.jpg</image:loc>
+      <image:title>عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال </image:title>
+      <image:caption>عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال  - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح -->
+  <url>
+    <loc>https://trexshopmax.com/products/74e55a8a-ae44-4f19-b792-60272079dd87.html</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787101504602_1_IMG-20260819-WA00001.jpg.jpg</image:loc>
+      <image:title>طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح</image:title>
+      <image:caption>طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل -->
+  <url>
+    <loc>https://trexshopmax.com/products/7b9fcc8f-653a-4dc4-9f2a-37ecb2104bf6.html</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008626724_1_IMG-20260818-WA0004.jpg.jpg</image:loc>
+      <image:title>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل</image:title>
+      <image:caption>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل  -->
+  <url>
+    <loc>https://trexshopmax.com/products/30b49dc7-b77d-491d-972e-d485cd5b01a6.html</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008559582_1_IMG-20260818-WA0002.jpg.jpg</image:loc>
+      <image:title>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل </image:title>
+      <image:caption>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل  - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل -->
+  <url>
+    <loc>https://trexshopmax.com/products/9a9ff643-d241-42bd-baa7-a66a72921b85.html</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008522733_1_IMG-20260818-WA0003.jpg.jpg</image:loc>
+      <image:title>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل</image:title>
+      <image:caption>خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton) -->
+  <url>
+    <loc>https://trexshopmax.com/products/edc60b5f-46c4-4ce9-b398-4cdad3c005ec.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786912518916_1_IMG-20260814-WA0115.jpg.jpg</image:loc>
+      <image:title>طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton)</image:title>
+      <image:caption>طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton) - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم المجوهرات هو نصف طقم ذهبي بتصميم دائري عصري -->
+  <url>
+    <loc>https://trexshopmax.com/products/58343acb-d1a0-4990-953b-2158fa91182d.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838589595_1_IMG-20260814-WA0029.jpg.jpg</image:loc>
+      <image:title>طقم المجوهرات هو نصف طقم ذهبي بتصميم دائري عصري</image:title>
+      <image:caption>طقم المجوهرات هو نصف طقم ذهبي بتصميم دائري عصري - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم &quot;توليب&quot; الفضي الراقي (عقد وأقراط) -->
+  <url>
+    <loc>https://trexshopmax.com/products/b5563e36-94db-49cb-acb4-4da69f857356.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838381166_1_IMG-20260814-WA0023.jpg.jpg</image:loc>
+      <image:title>طقم &quot;توليب&quot; الفضي الراقي (عقد وأقراط)</image:title>
+      <image:caption>طقم &quot;توليب&quot; الفضي الراقي (عقد وأقراط) - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: يحتوي على طقم مجوهرات نسائي مستوحى من تصميم ميسيكا (Messika) -->
+  <url>
+    <loc>https://trexshopmax.com/products/dc4bc45e-788e-4e4d-92aa-821d4d1787ce.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838122642_1_IMG-20260814-WA0022.jpg.jpg</image:loc>
+      <image:title>يحتوي على طقم مجوهرات نسائي مستوحى من تصميم ميسيكا (Messika)</image:title>
+      <image:caption>يحتوي على طقم مجوهرات نسائي مستوحى من تصميم ميسيكا (Messika) - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم مجوهرات ناعم (نصف طقم) بتصميم عالمي مستوحى من وردة روبرتو كوين أو كوزموس -->
+  <url>
+    <loc>https://trexshopmax.com/products/c2516bfa-d6b2-4faa-ae90-44d0b5cef9b0.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837961657_1_IMG-20260814-WA0017.jpg.jpg</image:loc>
+      <image:title>طقم مجوهرات ناعم (نصف طقم) بتصميم عالمي مستوحى من وردة روبرتو كوين أو كوزموس</image:title>
+      <image:caption>طقم مجوهرات ناعم (نصف طقم) بتصميم عالمي مستوحى من وردة روبرتو كوين أو كوزموس - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم مجوهرات نسائي بتصميم مستطيل مرصع بالزركون بلمسة تشبه تصاميم ميسيكا (Messika) باللون الذهبي البراق -->
+  <url>
+    <loc>https://trexshopmax.com/products/a32ff940-c004-47a5-8744-fda96c139f12.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837783837_1_IMG-20260814-WA0018.jpg.jpg</image:loc>
+      <image:title>طقم مجوهرات نسائي بتصميم مستطيل مرصع بالزركون بلمسة تشبه تصاميم ميسيكا (Messika) باللون الذهبي البراق</image:title>
+      <image:caption>طقم مجوهرات نسائي بتصميم مستطيل مرصع بالزركون بلمسة تشبه تصاميم ميسيكا (Messika) باللون الذهبي البراق - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم مجوهرات نسائي مستوحى من تصميم ماركة &quot;ميسيكا&quot; الأيقوني (مجموعة Move)، ويتكون من قلادة وزوج من الأقراط -->
+  <url>
+    <loc>https://trexshopmax.com/products/2fae7d30-ff9f-43d6-9bbe-592d2260cd37.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837631155_1_IMG-20260814-WA0013.jpg.jpg</image:loc>
+      <image:title>طقم مجوهرات نسائي مستوحى من تصميم ماركة &quot;ميسيكا&quot; الأيقوني (مجموعة Move)، ويتكون من قلادة وزوج من الأقراط</image:title>
+      <image:caption>طقم مجوهرات نسائي مستوحى من تصميم ماركة &quot;ميسيكا&quot; الأيقوني (مجموعة Move)، ويتكون من قلادة وزوج من الأقراط - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم سهرة &quot;برستيج&quot; الفاخر – قلادة وأقراط مرصعة بزيركون بقصة الزمرد والأبعاد الهندسية -->
+  <url>
+    <loc>https://trexshopmax.com/products/f5b36830-5647-44cf-bf8a-8d68f87c0aa0.html</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837370580_1_IMG-20260814-WA0009.jpg.jpg</image:loc>
+      <image:title>طقم سهرة &quot;برستيج&quot; الفاخر – قلادة وأقراط مرصعة بزيركون بقصة الزمرد والأبعاد الهندسية</image:title>
+      <image:caption>طقم سهرة &quot;برستيج&quot; الفاخر – قلادة وأقراط مرصعة بزيركون بقصة الزمرد والأبعاد الهندسية - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم إكسسوار فندي ذهبي راقي - قلادة مع أقراط دائرية -->
+  <url>
+    <loc>https://trexshopmax.com/products/0b7b3c95-1ada-451f-8f4d-a6dbbd34b5c1.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837183347_1_IMG-20260814-WA0005.jpg.jpg</image:loc>
+      <image:title>طقم إكسسوار فندي ذهبي راقي - قلادة مع أقراط دائرية</image:title>
+      <image:caption>طقم إكسسوار فندي ذهبي راقي - قلادة مع أقراط دائرية - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم مناسبات زركون ناعم (قلادة + أقراط) بتصميم نباتي راقٍ -->
+  <url>
+    <loc>https://trexshopmax.com/products/5f40783a-52c7-4afc-9f2c-ccc587c0edc6.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837234539_1_IMG-20260814-WA0003.jpg.jpg</image:loc>
+      <image:title>طقم مناسبات زركون ناعم (قلادة + أقراط) بتصميم نباتي راقٍ</image:title>
+      <image:caption>طقم مناسبات زركون ناعم (قلادة + أقراط) بتصميم نباتي راقٍ - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product:  ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة -->
+  <url>
+    <loc>https://trexshopmax.com/products/7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786755634732_1_IMG-20260814-WA0109.jpg.jpg</image:loc>
+      <image:title> ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة</image:title>
+      <image:caption> ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة -->
+  <url>
+    <loc>https://trexshopmax.com/products/caa5d7ba-dfdb-4992-a0e9-125e38681a3a.html</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786755458304_1_IMG-20260815-WA0016.jpg.jpg</image:loc>
+      <image:title>الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة</image:title>
+      <image:caption>الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة -->
+  <url>
+    <loc>https://trexshopmax.com/products/d2b7352a-3ed3-44f7-89e5-fc26018b4232.html</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754769680_1_IMG-20260815-WA0017.jpg.jpg</image:loc>
+      <image:title>الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة</image:title>
+      <image:caption>الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الصندوق طقم هدايا نسائي ساعه انيقه  يتكون من عدة قطع متناسقة -->
+  <url>
+    <loc>https://trexshopmax.com/products/4136689f-d3d4-419f-9df6-aefbe1206ae4.html</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754528153_1_IMG-20260815-WA0013.jpg.jpg</image:loc>
+      <image:title>الصندوق طقم هدايا نسائي ساعه انيقه  يتكون من عدة قطع متناسقة</image:title>
+      <image:caption>الصندوق طقم هدايا نسائي ساعه انيقه  يتكون من عدة قطع متناسقة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product:  الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة -->
+  <url>
+    <loc>https://trexshopmax.com/products/d939dd7b-9f9f-4d7a-808c-fdd70288b0f9.html</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754414502_1_IMG-20260815-WA0015.jpg.jpg</image:loc>
+      <image:title> الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة</image:title>
+      <image:caption> الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product:  طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي -->
+  <url>
+    <loc>https://trexshopmax.com/products/8f24f606-f8c8-4598-9bd5-7c02cca62a56.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752434618_1_IMG-20260814-WA0086.jpg.jpg</image:loc>
+      <image:title> طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي</image:title>
+      <image:caption> طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الصندوق طقماً هدايا رجالياً بلون فضي منسقاً بعناية، ويحتوي -->
+  <url>
+    <loc>https://trexshopmax.com/products/2e55a4f2-99d8-466e-aac8-010a3ab91b4e.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752314036_1_IMG-20260813-WA0032.jpg.jpg</image:loc>
+      <image:title>الصندوق طقماً هدايا رجالياً بلون فضي منسقاً بعناية، ويحتوي</image:title>
+      <image:caption>الصندوق طقماً هدايا رجالياً بلون فضي منسقاً بعناية، ويحتوي - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: تألقي بإطلالة أنيقة مع طقم الساعة النسائية باللون الذهبي  مع سوار متناسق وأساور -->
+  <url>
+    <loc>https://trexshopmax.com/products/918e26ac-2e87-4563-ac79-ec6c436a9061.html</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786751613782_1_IMG-20260813-WA0028.jpg.jpg</image:loc>
+      <image:title>تألقي بإطلالة أنيقة مع طقم الساعة النسائية باللون الذهبي  مع سوار متناسق وأساور</image:title>
+      <image:caption>تألقي بإطلالة أنيقة مع طقم الساعة النسائية باللون الذهبي  مع سوار متناسق وأساور - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم ساعات يد نسائية ورجالية مزود بحركة كوارتز مع ميناء أسود -->
+  <url>
+    <loc>https://trexshopmax.com/products/a599d8ba-228a-404a-8208-467678892f57.html</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786751316021_1_IMG-20260813-WA0019.jpg.jpg</image:loc>
+      <image:title>طقم ساعات يد نسائية ورجالية مزود بحركة كوارتز مع ميناء أسود</image:title>
+      <image:caption>طقم ساعات يد نسائية ورجالية مزود بحركة كوارتز مع ميناء أسود - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: طقم ساعات مزدوج (رجالي ونسائي) من ماركة سويسماكس (Swismax -->
+  <url>
+    <loc>https://trexshopmax.com/products/2801b26d-e2c8-4396-ac61-de2c2e6570c5.html</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786751072536_1_IMG-20260813-WA0029.jpg.jpg</image:loc>
+      <image:title>طقم ساعات مزدوج (رجالي ونسائي) من ماركة سويسماكس (Swismax</image:title>
+      <image:caption>طقم ساعات مزدوج (رجالي ونسائي) من ماركة سويسماكس (Swismax - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الساعات  الكلاسيكية المصنوعة من الستانلس  -->
+  <url>
+    <loc>https://trexshopmax.com/products/6dc815d3-a2aa-4c4a-a401-511e6f1e4fee.html</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786750901975_1_IMG-20260813-WA0017.jpg.jpg</image:loc>
+      <image:title>الساعات  الكلاسيكية المصنوعة من الستانلس </image:title>
+      <image:caption>الساعات  الكلاسيكية المصنوعة من الستانلس  - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: الساعة الرجالية من مجموعة &quot;Diving Sport -->
+  <url>
+    <loc>https://trexshopmax.com/products/5e97326f-9293-4a92-8b4c-0c67e4006a5a.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786750469246_1_IMG-20260813-WA00112.jpg.jpg</image:loc>
+      <image:title>الساعة الرجالية من مجموعة &quot;Diving Sport</image:title>
+      <image:caption>الساعة الرجالية من مجموعة &quot;Diving Sport - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: ساعة اليد النسائية من ماركة أوليسيا (Oulijia) بإطار ذهبي وردي  -->
+  <url>
+    <loc>https://trexshopmax.com/products/41908ea3-d393-4121-86e1-d4786c9d0779.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786644166705_1_IMG-20260813-WA0012.jpg.jpg</image:loc>
+      <image:title>ساعة اليد النسائية من ماركة أوليسيا (Oulijia) بإطار ذهبي وردي </image:title>
+      <image:caption>ساعة اليد النسائية من ماركة أوليسيا (Oulijia) بإطار ذهبي وردي  - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: من أغطية مقابض ناقل الحركة للسيارات جرابات الفتيس -->
+  <url>
+    <loc>https://trexshopmax.com/products/e2590955-71c8-4e54-b00a-3cdfe7fed470.html</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781657330719_1_IMG-20260616-WA0016.jpg.jpg</image:loc>
+      <image:title>من أغطية مقابض ناقل الحركة للسيارات جرابات الفتيس</image:title>
+      <image:caption>من أغطية مقابض ناقل الحركة للسيارات جرابات الفتيس - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: شعار مرسيدس بنز ذهبي اللون لغطاء المحرك -->
+  <url>
+    <loc>https://trexshopmax.com/products/e53bc445-f85c-4368-944c-6b7e7de5044a.html</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781657138992_1_IMG-20260616-WA0020.jpg.jpg</image:loc>
+      <image:title>شعار مرسيدس بنز ذهبي اللون لغطاء المحرك</image:title>
+      <image:caption>شعار مرسيدس بنز ذهبي اللون لغطاء المحرك - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: يدقير   مقبض ناقل حركة كريستالي (Gear Knob) شفاف يعمل باللمس مع إضاءة LED مدمجة -->
+  <url>
+    <loc>https://trexshopmax.com/products/af413bd4-b381-4e11-8c0b-ad3231d60a86.html</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781657076999_1_IMG-20260616-WA0015.jpg.jpg</image:loc>
+      <image:title>يدقير   مقبض ناقل حركة كريستالي (Gear Knob) شفاف يعمل باللمس مع إضاءة LED مدمجة</image:title>
+      <image:caption>يدقير   مقبض ناقل حركة كريستالي (Gear Knob) شفاف يعمل باللمس مع إضاءة LED مدمجة - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product:  شاشة أندرويد للسيارة من العلامة التجارية Gemstone -->
+  <url>
+    <loc>https://trexshopmax.com/products/d5028170-a2ed-4055-bc11-55ce728bdfc0.html</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781656702968_1_IMG-20260616-WA0019.jpg.jpg</image:loc>
+      <image:title> شاشة أندرويد للسيارة من العلامة التجارية Gemstone</image:title>
+      <image:caption> شاشة أندرويد للسيارة من العلامة التجارية Gemstone - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: مروحة طاولة GDTIMES صغيرة تعمل بالطاقة الشمسية مع بطارية ليثيوم 4000 مللي أمبير،.... -->
+  <url>
+    <loc>https://trexshopmax.com/products/54413bb4-1495-4fd5-8d21-e484b3f14a29.html</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780614026865_1_IMG-20260604-WA0005.jpg.jpg</image:loc>
+      <image:title>مروحة طاولة GDTIMES صغيرة تعمل بالطاقة الشمسية مع بطارية ليثيوم 4000 مللي أمبير،....</image:title>
+      <image:caption>مروحة طاولة GDTIMES صغيرة تعمل بالطاقة الشمسية مع بطارية ليثيوم 4000 مللي أمبير،.... - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: مروحه واضاءه وصوات EASY POWER EP 008 -->
+  <url>
+    <loc>https://trexshopmax.com/products/fbf9decb-f584-44a0-bfca-4f33b8244b2f.html</loc>
+    <lastmod>2026-06-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780613028978_1_IMG-20260604-WA0007.jpg.jpg</image:loc>
+      <image:title>مروحه واضاءه وصوات EASY POWER EP 008</image:title>
+      <image:caption>مروحه واضاءه وصوات EASY POWER EP 008 - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: مكواة البخار اليدوية الاحترافية موديل 868 -->
+  <url>
+    <loc>https://trexshopmax.com/products/048be37f-e441-4a50-8e3a-5fe65a2dda9e.html</loc>
+    <lastmod>2026-06-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780612429500_1_IMG-20260604-WA0010.jpg.jpg</image:loc>
+      <image:title>مكواة البخار اليدوية الاحترافية موديل 868</image:title>
+      <image:caption>مكواة البخار اليدوية الاحترافية موديل 868 - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
+  </url>
+  <!-- Product: كاويه ملابس بخار  -->
+  <url>
+    <loc>https://trexshopmax.com/products/6dbb8d79-6461-4027-b422-87a85301eea4.html</loc>
+    <lastmod>2026-06-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780611955789_1_IMG-20260604-WA0013.jpg.jpg</image:loc>
+      <image:title>كاويه ملابس بخار </image:title>
+      <image:caption>كاويه ملابس بخار  - متجر تي ريكس T-REX SHOP</image:caption>
+    </image:image>
   </url>
 </urlset>

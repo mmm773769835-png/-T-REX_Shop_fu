@@ -17,6 +17,22 @@
     {
       "src": "terms-of-use.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "sitemap.xml",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "robots.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "google-shopping-feed.xml",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "products/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -29,6 +45,10 @@
       "dest": "/robots.txt"
     },
     {
+      "src": "/google-shopping-feed.xml",
+      "dest": "/google-shopping-feed.xml"
+    },
+    {
       "src": "/privacy-policy.html",
       "dest": "/privacy-policy.html"
     },
@@ -39,6 +59,14 @@
     {
       "src": "/admin.html",
       "dest": "/admin.html"
+    },
+    {
+      "src": "/products/(.*)",
+      "dest": "/products/$1"
+    },
+    {
+      "src": "/product/(.*)",
+      "dest": "/products/$1.html"
     },
     {
       "src": "/(.*)",

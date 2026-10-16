@@ -3,6 +3,8 @@
 buildscript {
   ext {
     ndkVersion = "27.1.12297006"
+    androidXAnnotationVersion = "1.5.0"
+    androidXBrowserVersion = "1.4.0"
   }
   repositories {
     google()

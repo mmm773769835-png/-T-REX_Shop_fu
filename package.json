@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "build:android": "cd android && set JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.13.11-hotspot&& gradlew assembleRelease",
     "distribute:firebase": "powershell -ExecutionPolicy Bypass -File ./بناء-ورفع-فيرباس.ps1",
-    "build:and:distribute": "npm run build:android && npm run distribute:firebase"
+    "build:and:distribute": "npm run build:android && npm run distribute:firebase",
+    "seo": "node generate-seo.js"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
