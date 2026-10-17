@@ -1,7 +1,20 @@
 User-agent: *
 Allow: /
+Allow: /products/
+Allow: /privacy-policy
+Allow: /terms-of-use
+Allow: /affiliate
+Allow: /sitemap.xml
+Allow: /google-shopping-feed.xml
+
+# Disallow admin, internal dashboards and test files from search engines
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /superadmin
+Disallow: /superadmin.html
+Disallow: /trex-monitor-hub
+Disallow: /trex-monitor-hub.html
+Disallow: /trex-superadmin*
+Disallow: /test-*
 
 Sitemap: https://trexshopmax.com/sitemap.xml
-
-# Disallow admin panel from search engines
-Disallow: /admin.html

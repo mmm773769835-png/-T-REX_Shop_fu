@@ -19,6 +19,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "affiliate.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "sitemap.xml",
       "use": "@vercel/static"
     },
@@ -67,6 +71,10 @@
     {
       "src": "/product/(.*)",
       "dest": "/products/$1.html"
+    },
+    {
+      "src": "/affiliate",
+      "dest": "/affiliate.html"
     },
     {
       "src": "/(.*)",

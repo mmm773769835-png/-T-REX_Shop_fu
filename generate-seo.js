@@ -88,7 +88,7 @@ function generateProductHtml(product, allProducts) {
     const rawDesc = cleanDescription(product.description || product.name);
     const metaDesc = escapeHtml(`اشتري ${product.name} من متجر تي ريكس T-REX SHOP. السعر: ${formatPriceText(product.price, product.currency)}. تسوق اونلاين بأفضل سعر في اليمن مع خدمة التوصيل السريع.`);
     const imageUrl = product.image_url || `${SITE_URL}/logo.png`;
-    const productCanonical = `${SITE_URL}/products/${productId}.html`;
+    const productCanonical = `${SITE_URL}/products/${productId}`;
     const shopDirectUrl = `${SITE_URL}/?product=${encodeURIComponent(productId)}`;
     const discount = (product.original_price && product.original_price > product.price) 
         ? Math.round((1 - product.price / product.original_price) * 100) 
@@ -649,7 +649,7 @@ function generateProductHtml(product, allProducts) {
         <h2 class="section-header"><i class="fas fa-boxes-stacked"></i> منتجات أخرى من متجر تي ريكس</h2>
         <div class="related-grid">
             ${related.map(r => `
-                <a href="${SITE_URL}/products/${r.id}.html" class="card-rel">
+                <a href="${SITE_URL}/products/${r.id}" class="card-rel">
                     <img src="${r.image_url || imageUrl}" alt="${escapeHtml(r.name)}" loading="lazy">
                     <h4>${escapeHtml(r.name)}</h4>
                     <div class="rel-price">${formatPriceText(r.price, r.currency)}</div>
@@ -686,13 +686,13 @@ function generateSitemapXml(products) {
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>${SITE_URL}/privacy-policy.html</loc>
+    <loc>${SITE_URL}/privacy-policy</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>${SITE_URL}/terms-of-use.html</loc>
+    <loc>${SITE_URL}/terms-of-use</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
@@ -700,7 +700,7 @@ function generateSitemapXml(products) {
 `;
 
     for (const p of products) {
-        const prodUrl = `${SITE_URL}/products/${p.id}.html`;
+        const prodUrl = `${SITE_URL}/products/${p.id}`;
         const lastMod = (p.updated_at || p.created_at || today).split('T')[0];
         const imgUrl = p.image_url || `${SITE_URL}/logo.png`;
         const titleEscaped = escapeXml(p.name);
@@ -735,7 +735,7 @@ function generateGoogleShoppingFeed(products) {
 `;
 
     for (const p of products) {
-        const prodUrl = `${SITE_URL}/products/${p.id}.html`;
+        const prodUrl = `${SITE_URL}/products/${p.id}`;
         const imgUrl = p.image_url || `${SITE_URL}/logo.png`;
         const titleEscaped = escapeXml(p.name);
         const descEscaped = escapeXml(cleanDescription(p.description || p.name));

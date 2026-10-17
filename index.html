@@ -3803,11 +3803,11 @@
         <div class="footer-links">
             <a href="/">الرئيسية</a>
             <a href="#products">المنتجات</a>
-            <a href="affiliate.html" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة (المؤثرين)</a>
-            <a href="admin.html">🏪 حساب التاجر والأدمن</a>
+            <a href="/affiliate" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة (المؤثرين)</a>
+            <a href="admin.html" rel="nofollow noindex">🏪 حساب التاجر والأدمن</a>
             <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">تواصل معنا</a>
-            <a href="terms-of-use.html">شروط الاستخدام</a>
-            <a href="privacy-policy.html">سياسة الخصوصية</a>
+            <a href="/terms-of-use">شروط الاستخدام</a>
+            <a href="/privacy-policy">سياسة الخصوصية</a>
         </div>
         <div style="max-width: 900px; margin: 15px auto; font-size: 13px; color: #888; line-height: 1.8; text-align: center;">
             <p><strong>متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس / trexshopmax)</strong> هو المنصة الرسمية للتسوق الإلكتروني في اليمن. نوفر تشكيلة مميزة من عطور لافيرن، الساعات الرجالية والنسائية الفاخرة، والإلكترونيات بأفضل الأسعار مع التوصيل السريع لكافة المحافظات وخدمة الدفع عند الاستلام أو التحويل البنكي.</p>
@@ -6163,7 +6163,7 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                         "price": product.price,
                         "priceCurrency": product.currency || 'YER',
                         "availability": "https://schema.org/InStock",
-                        "url": 'https://trexshopmax.com/?product=' + productId
+                        "url": 'https://trexshopmax.com/products/' + productId
                     },
                     "category": product.category || 'منتجات عامة',
                     "brand": {
@@ -6214,7 +6214,9 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                                 ${renderStars(product.rating || 0)}
                                 <span>(${product.reviews_count || 0} ${t('reviews_count')})</span>
                             </div>
-                            <h3 class="product-name" itemprop="name">${product.name}</h3>
+                            <a href="/products/${productId}" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                                <h3 class="product-name" itemprop="name">${product.name}</h3>
+                            </a>
                             <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
                             <p class="product-vendor-badge" style="font-size: 11.5px; color: #17a2b8; font-weight: bold; margin: 2px 0 4px 0; background: rgba(23,162,184,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block;">
                                 <i class="fas fa-store" style="color: #FFD700;"></i> ${t('vendor_code')}: ${product.vendor_code || 'VND-MAIN'}
