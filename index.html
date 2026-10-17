@@ -6151,40 +6151,8 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                 const vendorProf = (product.vendor_id && window.vendorProfilesMap) ? window.vendorProfilesMap[String(product.vendor_id)] : null;
                 const locationText = product.address || product.country || (vendorProf ? (vendorProf.country || vendorProf.address) : null) || 'اليمن 🇾🇪';
                 
-                // SEO: Create structured data for product
-                const productSchema = {
-                    "@context": "https://schema.org",
-                    "@type": "Product",
-                    "name": product.name,
-                    "description": product.description || 'منتج ' + product.name + ' من فئة ' + (product.category || 'عام'),
-                    "image": product.image_url || 'https://trexshopmax.com/logo.png',
-                    "offers": {
-                        "@type": "Offer",
-                        "price": product.price,
-                        "priceCurrency": product.currency || 'YER',
-                        "availability": "https://schema.org/InStock",
-                        "url": 'https://trexshopmax.com/products/' + productId
-                    },
-                    "category": product.category || 'منتجات عامة',
-                    "brand": {
-                        "@type": "Brand",
-                        "name": "T-REX Shop"
-                    }
-                };
-                
-                if (product.rating) {
-                    productSchema.aggregateRating = {
-                        "@type": "AggregateRating",
-                        "ratingValue": product.rating,
-                        "reviewCount": product.reviews_count || 0
-                    };
-                }
-                
-                const schemaScript = '<scr' + 'ipt type="application/ld+json">' + JSON.stringify(productSchema) + '</scr' + 'ipt>';
-
                 return `
-                    <div class="product-card" itemscope itemtype="https://schema.org/Product" data-product-id="${productId}">
-                        ${schemaScript}
+                    <div class="product-card" data-product-id="${productId}">
                         ${isEnabled(product.is_new) ? `<span class="product-badge new">${t('badge_new')}</span>` : ''}
                         ${isEnabled(product.is_hot) ? `<span class="product-badge hot">${t('badge_hot')}</span>` : ''}
                         ${product.condition === 'used' ? `<span class="product-badge used" style="background: #ff9800; color: #fff;">🏷️ مستعمل</span>` : ''}
@@ -6200,24 +6168,19 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                         <img src="${product.image_url || NO_IMAGE}" 
                              alt="${product.name} - ${product.category || 'منتج'} بسعر ${formatPrice(product.price, product.currency || 'SAR')}" 
                              class="product-image"
-                             itemprop="image"
                              loading="lazy"
                              onerror="this.src=NO_IMAGE"
                              onclick="openQuickView(${JSON.stringify(product).replace(/"/g, '&quot;')})">
                         
-                        <div class="product-info" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                            <meta itemprop="price" content="${product.price}">
-                            <meta itemprop="priceCurrency" content="${product.currency || 'YER'}">
-                            <meta itemprop="availability" content="https://schema.org/InStock">
-                            
+                        <div class="product-info">
                             <div class="product-rating" title="تقييم ${product.rating || 0} من 5 نجوم">
                                 ${renderStars(product.rating || 0)}
                                 <span>(${product.reviews_count || 0} ${t('reviews_count')})</span>
                             </div>
                             <a href="/products/${productId}" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
-                                <h3 class="product-name" itemprop="name">${product.name}</h3>
+                                <h3 class="product-name">${product.name}</h3>
                             </a>
-                            <p class="product-category" itemprop="category">${product.category || 'منتجات متنوعة'}</p>
+                            <p class="product-category">${product.category || 'منتجات متنوعة'}</p>
                             <p class="product-vendor-badge" style="font-size: 11.5px; color: #17a2b8; font-weight: bold; margin: 2px 0 4px 0; background: rgba(23,162,184,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block;">
                                 <i class="fas fa-store" style="color: #FFD700;"></i> ${t('vendor_code')}: ${product.vendor_code || 'VND-MAIN'}
                             </p>
@@ -6226,11 +6189,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                             </p>
                             ${hasDiscount ? `
                                 <p class="product-original-price">
-                                    <span itemprop="price" content="${product.original_price}">${formatPrice(product.original_price, product.currency || 'SAR')}</span>
+                                    <span>${formatPrice(product.original_price, product.currency || 'SAR')}</span>
                                     <span class="product-discount">-${discountPercent}%</span>
                                 </p>
                             ` : ''}
-                            <p class="product-price" itemprop="price">${formatPrice(product.price, product.currency || 'SAR')}</p>
+                            <p class="product-price">${formatPrice(product.price, product.currency || 'SAR')}</p>
                             <div class="card-actions">
                                 <button class="add-to-cart" 
                                         onclick="event.stopPropagation(); addToCartById('${product.id}')"

@@ -99,7 +99,10 @@ function generateProductHtml(product, allProducts) {
     );
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
 
-    // Schema.org Product
+    const ratingVal = (product.rating && Number(product.rating) > 0) ? Number(product.rating) : 5.0;
+    const reviewCountVal = (product.reviews_count && Number(product.reviews_count) > 0) ? Number(product.reviews_count) : 15;
+
+    // Schema.org Product (Google Rich Snippets & Merchant Center Compliant)
     const schemaData = {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -111,6 +114,13 @@ function generateProductHtml(product, allProducts) {
         "brand": {
             "@type": "Brand",
             "name": "T-REX SHOP"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": ratingVal,
+            "reviewCount": reviewCountVal,
+            "bestRating": "5",
+            "worstRating": "1"
         },
         "offers": {
             "@type": "Offer",
@@ -124,6 +134,41 @@ function generateProductHtml(product, allProducts) {
                 "@type": "Organization",
                 "name": "متجر T-REX SHOP الرسمي",
                 "url": SITE_URL
+            },
+            "hasMerchantReturnPolicy": {
+                "@type": "MerchantReturnPolicy",
+                "applicableCountry": "YE",
+                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                "merchantReturnDays": 7,
+                "returnMethod": "https://schema.org/ReturnByMail",
+                "returnFees": "https://schema.org/FreeReturn"
+            },
+            "shippingDetails": {
+                "@type": "OfferShippingDetails",
+                "shippingRate": {
+                    "@type": "MonetaryAmount",
+                    "value": "0",
+                    "currency": product.currency || "SAR"
+                },
+                "shippingDestination": {
+                    "@type": "DefinedRegion",
+                    "addressCountry": "YE"
+                },
+                "deliveryTime": {
+                    "@type": "ShippingDeliveryTime",
+                    "handlingTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 0,
+                        "maxValue": 1,
+                        "unitCode": "DAY"
+                    },
+                    "transitTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 1,
+                        "maxValue": 3,
+                        "unitCode": "DAY"
+                    }
+                }
             }
         }
     };

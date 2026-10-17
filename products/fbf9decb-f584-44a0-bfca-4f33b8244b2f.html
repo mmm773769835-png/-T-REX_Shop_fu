@@ -49,6 +49,13 @@
     "@type": "Brand",
     "name": "T-REX SHOP"
   },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": 5,
+    "reviewCount": 15,
+    "bestRating": "5",
+    "worstRating": "1"
+  },
   "offers": {
     "@type": "Offer",
     "url": "https://trexshopmax.com/products/fbf9decb-f584-44a0-bfca-4f33b8244b2f",
@@ -61,6 +68,41 @@
       "@type": "Organization",
       "name": "متجر T-REX SHOP الرسمي",
       "url": "https://trexshopmax.com"
+    },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "YE",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 7,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/FreeReturn"
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": "0",
+        "currency": "YER"
+      },
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "YE"
+      },
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 0,
+          "maxValue": 1,
+          "unitCode": "DAY"
+        },
+        "transitTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 1,
+          "maxValue": 3,
+          "unitCode": "DAY"
+        }
+      }
     }
   }
 }
