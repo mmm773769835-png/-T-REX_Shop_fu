@@ -5191,7 +5191,7 @@
                 }
 
                 if (!productId && window.location.pathname) {
-                    const pathMatch = window.location.pathname.match(/\/product\/([a-zA-Z0-9-]+)/i);
+                    const pathMatch = window.location.pathname.match(/\/(?:products?)\/([a-zA-Z0-9-]+)/i);
                     if (pathMatch) {
                         productId = pathMatch[1];
                     }

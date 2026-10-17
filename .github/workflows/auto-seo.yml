@@ -2,8 +2,8 @@ name: Auto SEO & Google Feed Sync
 
 on:
   schedule:
-    # Runs automatically every 6 hours
-    - cron: '0 */6 * * *'
+    # Runs automatically every 2 hours (100% free and automated in GitHub cloud)
+    - cron: '0 */2 * * *'
   # Allows manual trigger anytime from GitHub Actions tab
   workflow_dispatch:
 
