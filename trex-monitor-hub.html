@@ -462,6 +462,43 @@
             color: #000;
         }
 
+        /* Hub Toast Notification */
+        .hub-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(18, 20, 29, 0.96);
+            border: 1.5px solid rgba(255, 215, 0, 0.3);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255, 215, 0, 0.2);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+        }
+        .hub-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .hub-toast.toast-success {
+            border-color: rgba(0, 255, 136, 0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        .hub-toast.toast-error {
+            border-color: rgba(255, 59, 48, 0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255, 59, 48, 0.3);
+        }
+
         /* App Updates Form */
         .form-group {
             display: flex;
@@ -764,8 +801,8 @@
                         <button type="button" class="btn-sm btn-details" onclick="triggerTestError()" title="اختبار وصول تنبيه الأخطاء">
                             🧪 تجربة خطأ
                         </button>
-                        <button type="button" class="btn-sm" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="loadErrorLogsAdmin()">
-                            <i class="fas fa-rotate"></i> تحديث
+                        <button type="button" class="btn-sm" id="btnRefreshLogs" style="background: rgba(255,255,255,0.1); color: #fff; display: inline-flex; align-items: center; gap: 6px;" onclick="loadErrorLogsAdmin(true)" title="تحديث سجل الأخطاء">
+                            <i class="fas fa-rotate" id="refreshLogsIcon"></i> <span id="refreshLogsText">تحديث</span>
                         </button>
                     </div>
                 </div>
@@ -957,6 +994,25 @@
         }
 
         // ==============================================================
+        // نظام الإشعارات العائمة التفاعلية (Hub Toast Notifications)
+        // ==============================================================
+        function showHubToast(message, type = 'success') {
+            let toast = document.getElementById('hubToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'hubToast';
+                toast.className = 'hub-toast';
+                document.body.appendChild(toast);
+            }
+            toast.className = `hub-toast toast-${type} show`;
+            toast.innerHTML = message;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
+
+        // ==============================================================
         // 1. نظام عداد المتواجدين بالثانية (Realtime Presence)
         // ==============================================================
         function initPresenceMeter() {
@@ -1025,7 +1081,17 @@
         // ==============================================================
         // 2. نظام وسجل الأخطاء الفورية (Error Logs Engine)
         // ==============================================================
-        async function loadErrorLogsAdmin() {
+        async function loadErrorLogsAdmin(isManualClick = false) {
+            const btn = document.getElementById('btnRefreshLogs');
+            const icon = document.getElementById('refreshLogsIcon');
+            const text = document.getElementById('refreshLogsText');
+
+            if (isManualClick && btn) {
+                btn.disabled = true;
+                if (icon) icon.classList.add('fa-spin');
+                if (text) text.textContent = 'جاري التحديث...';
+            }
+
             try {
                 const { data, error } = await supabase
                     .from('system_error_logs')
@@ -1036,8 +1102,21 @@
                 if (error) throw error;
                 allLogsData = data || [];
                 renderLogs();
+
+                if (isManualClick) {
+                    showHubToast(`✅ تم تحديث سجل الأخطاء بنجاح (تم جلب ${allLogsData.length} سجل)`, 'success');
+                }
             } catch (err) {
                 console.error('Error loading system error logs:', err);
+                if (isManualClick) {
+                    showHubToast(`❌ تعذر تحديث السجل: ${err.message || 'خطأ في الاتصال'}`, 'error');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    if (icon) icon.classList.remove('fa-spin');
+                    if (text) text.textContent = 'تحديث';
+                }
             }
         }
 
@@ -1156,8 +1235,9 @@
                     item.status = 'resolved';
                     renderLogs();
                 }
+                showHubToast('✅ تم تعليم الخطأ كمحلول وتحديث الحالة بنجاح', 'success');
             } catch (err) {
-                alert('حدث خطأ أثناء تعديل الحالة: ' + err.message);
+                showHubToast('❌ حدث خطأ أثناء تعديل الحالة: ' + err.message, 'error');
             }
         }
 
@@ -1202,9 +1282,10 @@
                     .select();
 
                 if (error) throw error;
-                alert('✅ تم إرسال الخطأ التجريبي بنجاح! راقب ظهوره وسماع صوت التنبيه فوراً.');
+                showHubToast('🧪 تم إرسال الخطأ التجريبي بنجاح! راقب ظهوره في السجل', 'success');
+                loadErrorLogsAdmin(false);
             } catch (e) {
-                alert('فشل في إرسال الخطأ التجريبي: ' + e.message);
+                showHubToast('❌ فشل في إرسال الخطأ التجريبي: ' + e.message, 'error');
             }
         }
 
