@@ -26,53 +26,10 @@
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-    <!-- Google AdSense Smart Lazy Loader (Core Web Vitals & Speed Optimized) -->
+    <!-- Google AdSense Official Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
     <script>
-        (function() {
-            var adsLoaded = false;
-            function loadAdSenseScript() {
-                if (adsLoaded) return;
-                adsLoaded = true;
-                var script = document.createElement('script');
-                script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951";
-                script.async = true;
-                script.crossOrigin = "anonymous";
-                document.head.appendChild(script);
-
-                script.onload = function() {
-                    document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])').forEach(function() {
-                        try {
-                            (window.adsbygoogle = window.adsbygoogle || []).push({});
-                        } catch(e) {
-                            console.error("AdSense push error:", e);
-                        }
-                    });
-                };
-            }
-
-            ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
-                window.addEventListener(evt, loadAdSenseScript, { passive: true, once: true });
-            });
-
-            if ('IntersectionObserver' in window) {
-                var observer = new IntersectionObserver(function(entries) {
-                    entries.forEach(function(entry) {
-                        if (entry.isIntersecting) {
-                            loadAdSenseScript();
-                            observer.disconnect();
-                        }
-                    });
-                }, { rootMargin: '200px' });
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.ad-container').forEach(function(el) {
-                        observer.observe(el);
-                    });
-                });
-            } else {
-                setTimeout(loadAdSenseScript, 3500);
-            }
-        })();
+        window.adsbygoogle = window.adsbygoogle || [];
     </script>
     <!-- Schema.org Structured Data for Google -->
     <script type="application/ld+json">
@@ -3395,6 +3352,9 @@
             <nav class="nav-links">
                 <a href="/" data-i18n="nav_home">الرئيسية</a>
                 <a href="#products" data-i18n="nav_products">المنتجات</a>
+                <a href="/blog">المدونة المعرفية</a>
+                <a href="/about-us">من نحن</a>
+                <a href="/contact-us">اتصل بنا</a>
             </nav>
 
             <!-- Header Actions - Organized Toolbar -->
@@ -3798,16 +3758,79 @@
         </div>
     </section>
 
+    
+    <!-- Blog & Knowledge Base Section -->
+    <section class="reviews-section" style="padding: 60px 20px; background: #0a0a0a; border-top: 1px solid #222;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <span style="background: rgba(255,215,0,0.1); border: 1px solid var(--primary); color: var(--primary); padding: 5px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-book-reader"></i> مدونة متجر تي ريكس المعرفية
+                </span>
+                <h2 style="font-size: 32px; font-weight: 900; color: #fff; margin: 15px 0 10px;">أحدث المقالات وأدلة التسوق الذكي</h2>
+                <p style="color: #999; font-size: 15px; max-width: 650px; margin: 0 auto;">اكتشف أسرار اختيار العطور الفاخرة، فحص الساعات الأصلية، والحفاظ على بطاريات الطوارئ الإلكترونية.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+                <!-- Article 1 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102983138_1_IMG-20260819-WA0002.jpg.jpg" alt="دليل العطور" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-spray-can-sparkles"></i> عطور وفخامة</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل شامل: كيف تختار العطور الأكثر ثباتاً وفوحاناً؟</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">الفرق بين البارفان والتواليت والمكونات التي تمنح العطر ثباتاً يتجاوز 24 ساعة.</p>
+                        <a href="/articles/guide-to-choosing-long-lasting-perfumes" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article 2 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781656702968_1_IMG-20260616-WA0019.jpg.jpg" alt="فحص الساعات" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-clock"></i> ساعات وإكسسوارات</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">كيف تفرّق بين الساعات الأصلية والمقلدة؟ 8 علامات حاسمة</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">دليل المستهلك الذكي لكشف الساعات المقلدة من حركة عقرب الثواني والخامات.</p>
+                        <a href="/articles/how-to-spot-authentic-vs-fake-watches" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article 3 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780614026865_1_IMG-20260604-WA0005.jpg.jpg" alt="بنوك الطاقة" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-bolt"></i> تكنولوجيا وطاقة</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل بنوك الطاقة وبطاريات الطوارئ في اليمن</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">كيف تختار السعة المناسبة وتحافظ على بطارية جهازك في ظل انقطاع الكهرباء.</p>
+                        <a href="/articles/power-banks-and-battery-maintenance-guide" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 35px;">
+                <a href="/blog" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px 30px; border-radius: 8px; font-weight: 800; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+                    <i class="fas fa-newspaper"></i> استعراض كافة مقالات المدونة (8 مقالات)
+                </a>
+            </div>
+        </div>
+    </section>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-links">
             <a href="/">الرئيسية</a>
             <a href="#products">المنتجات</a>
-            <a href="/affiliate" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة (المؤثرين)</a>
-            <a href="admin.html" rel="nofollow noindex">🏪 حساب التاجر والأدمن</a>
-            <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">تواصل معنا</a>
-            <a href="/terms-of-use">شروط الاستخدام</a>
+            <a href="/blog">المدونة المعرفية</a>
+            <a href="/about-us">من نحن</a>
+            <a href="/contact-us">اتصل بنا</a>
             <a href="/privacy-policy">سياسة الخصوصية</a>
+            <a href="/terms-of-use">شروط الاستخدام</a>
+            <a href="/refund-policy">الشحن والاسترجاع</a>
+            <a href="/affiliate" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة</a>
         </div>
         <div style="max-width: 900px; margin: 15px auto; font-size: 13px; color: #888; line-height: 1.8; text-align: center;">
             <p><strong>متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس / trexshopmax)</strong> هو المنصة الرسمية للتسوق الإلكتروني في اليمن. نوفر تشكيلة مميزة من عطور لافيرن، الساعات الرجالية والنسائية الفاخرة، والإلكترونيات بأفضل الأسعار مع التوصيل السريع لكافة المحافظات وخدمة الدفع عند الاستلام أو التحويل البنكي.</p>

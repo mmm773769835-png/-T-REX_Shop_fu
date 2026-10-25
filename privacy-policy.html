@@ -21,53 +21,10 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-    <!-- Google AdSense Smart Lazy Loader (Core Web Vitals & Speed Optimized) -->
+    <!-- Google AdSense Official Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
     <script>
-        (function() {
-            var adsLoaded = false;
-            function loadAdSenseScript() {
-                if (adsLoaded) return;
-                adsLoaded = true;
-                var script = document.createElement('script');
-                script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951";
-                script.async = true;
-                script.crossOrigin = "anonymous";
-                document.head.appendChild(script);
-
-                script.onload = function() {
-                    document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])').forEach(function() {
-                        try {
-                            (window.adsbygoogle = window.adsbygoogle || []).push({});
-                        } catch(e) {
-                            console.error("AdSense push error:", e);
-                        }
-                    });
-                };
-            }
-
-            ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
-                window.addEventListener(evt, loadAdSenseScript, { passive: true, once: true });
-            });
-
-            if ('IntersectionObserver' in window) {
-                var observer = new IntersectionObserver(function(entries) {
-                    entries.forEach(function(entry) {
-                        if (entry.isIntersecting) {
-                            loadAdSenseScript();
-                            observer.disconnect();
-                        }
-                    });
-                }, { rootMargin: '200px' });
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.ad-container').forEach(function(el) {
-                        observer.observe(el);
-                    });
-                });
-            } else {
-                setTimeout(loadAdSenseScript, 3500);
-            }
-        })();
+        window.adsbygoogle = window.adsbygoogle || [];
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -283,10 +240,15 @@
                     <h1>T-REX SHOP</h1>
                 </div>
             </a>
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-right"></i>
-                العودة للرئيسية
-            </a>
+            <nav class="header-nav" style="display: flex; gap: 15px; align-items: center;">
+                <a href="/" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">الرئيسية</a>
+                <a href="/blog" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">المدونة</a>
+                <a href="/about-us" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">من نحن</a>
+                <a href="/contact-us" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">اتصل بنا</a>
+                <a href="/" class="back-btn" style="padding: 6px 14px; font-size: 13px;">
+                    <i class="fas fa-store"></i> المتجر
+                </a>
+            </nav>
         </div>
     </header>
 
@@ -346,7 +308,20 @@
                 <li>تحليل كيفية استخدامك للموقع</li>
                 <li>تقديم محتوى مخصص لك</li>
             </ul>
-            <p>يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، لكن هذا قد يؤثر على وظائف الموقع.</p>
+            <p>يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، لكن هذا قد يؤثر على وظائف الموقع.</p></div>
+
+        <div class="policy-section">
+            <h3><i class="fas fa-ad"></i> إعلانات Google AdSense ومورّدو الجهات الخارجية</h3>
+            <p>نحن نستخدم خدمات إعلانية تابعة لجهات خارجية، وأبرزها <strong>Google AdSense</strong>، لعرض الإعلانات عند زيارتك لموقعنا الإلكتروني:</p>
+            <ul>
+                <li>يستخدم المورّدون التابعون لجهات خارجية، بما في ذلك Google، ملفات تعريف الارتباط (Cookies) لعرض الإعلانات بناءً على زيارات المستخدم السابقة لموقعنا أو لمواقع أخرى على الويب.</li>
+                <li>يُتيح استخدام Google لملفات تعريف الارتباط الإعلانية (بما في ذلك ملف تعريف الارتباط <strong>DoubleClick DART</strong>) إمكانية عرض إعلانات للمستخدمين استناداً إلى زياراتهم لموقعنا ومواقع أخرى عبر الإنترنت.</li>
+                <li>يمكن للمستخدمين إلغاء الاشتراك في الإعلانات المخصصة (Personalized Advertising) عن طريق الانتقال إلى <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">إعدادات إعلانات Google</a>.</li>
+                <li>بدلاً من ذلك، يمكنك إلغاء اشتراكك في استخدام مورّدي الجهات الخارجية لملفات تعريف الارتباط للإعلانات المخصصة عبر زيارة موقع <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">www.aboutads.info</a>.</li>
+            </ul>
+            <p>نحن نحرص على ألا تنتهك هذه الإعلانات خصوصيتك، وتلتزم شبكات الإعلانات بالمعايير القانونية الصارمة لحماية البيانات (مثل GDPR و CCPA).</p>
+        </div>
+        <div>
         </div>
 
         <div class="policy-section">

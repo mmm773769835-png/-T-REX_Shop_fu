@@ -706,6 +706,15 @@ function generateProductHtml(product, allProducts) {
 
     <footer>
         <div class="footer-brand">متجر T-REX SHOP الرسمي | متجر تي ريكس</div>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin: 15px 0;">
+            <a href="${SITE_URL}/" style="color: var(--primary);">الرئيسية</a>
+            <a href="${SITE_URL}/blog" style="color: #fff;">المدونة</a>
+            <a href="${SITE_URL}/about-us" style="color: #fff;">من نحن</a>
+            <a href="${SITE_URL}/contact-us" style="color: #fff;">اتصل بنا</a>
+            <a href="${SITE_URL}/privacy-policy" style="color: #fff;">سياسة الخصوصية</a>
+            <a href="${SITE_URL}/terms-of-use" style="color: #fff;">شروط الاستخدام</a>
+            <a href="${SITE_URL}/refund-policy" style="color: #fff;">الشحن والاسترجاع</a>
+        </div>
         <p>تسوّق بثقة، نوصّل بسرعة | صنعاء، اليمن - هاتف: +967-773-769-835</p>
         <p class="footer-seo">
             متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس) هو المنصة الرائدة للتسوق الإلكتروني في اليمن. نوفر عطور أصلية، ساعات رجالية ونسائية، إلكترونيات، مستحضرات تجميل بأفضل الأسعار.
@@ -740,7 +749,80 @@ function generateSitemapXml(products) {
     <loc>${SITE_URL}/terms-of-use</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/about-us</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/contact-us</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/refund-policy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/blog</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- Blog Articles -->
+  <url>
+    <loc>${SITE_URL}/articles/guide-to-choosing-long-lasting-perfumes</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/how-to-spot-authentic-vs-fake-watches</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/power-banks-and-battery-maintenance-guide</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/fragrance-layering-and-seasonal-perfumes</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/skincare-routine-and-beauty-tips</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/safe-online-shopping-guide-yemen</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/smart-watch-buying-guide-2026</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/articles/essential-accessories-for-men-and-women</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
   </url>
 `;
 

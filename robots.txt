@@ -1,10 +1,16 @@
 User-agent: *
 Allow: /
 Allow: /products/
+Allow: /blog
+Allow: /articles/
+Allow: /about-us
+Allow: /contact-us
 Allow: /privacy-policy
 Allow: /terms-of-use
+Allow: /refund-policy
 Allow: /affiliate
 Allow: /sitemap.xml
+Allow: /ads.txt
 Allow: /google-shopping-feed.xml
 
 # Disallow admin, internal dashboards and test files from search engines

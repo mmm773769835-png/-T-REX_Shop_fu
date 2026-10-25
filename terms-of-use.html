@@ -21,53 +21,10 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-    <!-- Google AdSense Smart Lazy Loader (Core Web Vitals & Speed Optimized) -->
+    <!-- Google AdSense Official Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
     <script>
-        (function() {
-            var adsLoaded = false;
-            function loadAdSenseScript() {
-                if (adsLoaded) return;
-                adsLoaded = true;
-                var script = document.createElement('script');
-                script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951";
-                script.async = true;
-                script.crossOrigin = "anonymous";
-                document.head.appendChild(script);
-
-                script.onload = function() {
-                    document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])').forEach(function() {
-                        try {
-                            (window.adsbygoogle = window.adsbygoogle || []).push({});
-                        } catch(e) {
-                            console.error("AdSense push error:", e);
-                        }
-                    });
-                };
-            }
-
-            ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
-                window.addEventListener(evt, loadAdSenseScript, { passive: true, once: true });
-            });
-
-            if ('IntersectionObserver' in window) {
-                var observer = new IntersectionObserver(function(entries) {
-                    entries.forEach(function(entry) {
-                        if (entry.isIntersecting) {
-                            loadAdSenseScript();
-                            observer.disconnect();
-                        }
-                    });
-                }, { rootMargin: '200px' });
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.ad-container').forEach(function(el) {
-                        observer.observe(el);
-                    });
-                });
-            } else {
-                setTimeout(loadAdSenseScript, 3500);
-            }
-        })();
+        window.adsbygoogle = window.adsbygoogle || [];
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -301,10 +258,13 @@
                     <h1>T-REX SHOP</h1>
                 </div>
             </a>
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-right"></i>
-                العودة للرئيسية
-            </a>
+            <nav style="display: flex; gap: 15px; align-items: center;">
+                <a href="/" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">الرئيسية</a>
+                <a href="/blog" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">المدونة</a>
+                <a href="/about-us" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">من نحن</a>
+                <a href="/contact-us" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">اتصل بنا</a>
+                <a href="/" class="back-btn" style="padding: 6px 14px; font-size: 13px;"><i class="fas fa-store"></i> المتجر</a>
+            </nav>
         </div>
     </header>
 
@@ -464,7 +424,16 @@
     </div>
 
     <footer class="footer">
-        <p>© 2026 T-REX Shop. جميع الحقوق محفوظة. | <a href="/" style="color: var(--primary); text-decoration: none;">العودة للرئيسية</a></p>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-bottom: 15px;">
+            <a href="/" style="color: #fff; text-decoration: none;">الرئيسية</a>
+            <a href="/blog" style="color: #fff; text-decoration: none;">المدونة المعرفية</a>
+            <a href="/about-us" style="color: #fff; text-decoration: none;">من نحن</a>
+            <a href="/contact-us" style="color: #fff; text-decoration: none;">اتصل بنا</a>
+            <a href="/privacy-policy" style="color: #fff; text-decoration: none;">سياسة الخصوصية</a>
+            <a href="/terms-of-use" style="color: #fff; text-decoration: none;">شروط الاستخدام</a>
+            <a href="/refund-policy" style="color: #fff; text-decoration: none;">الشحن والاسترجاع</a>
+        </div>
+        <p>© 2026 T-REX Shop. جميع الحقوق محفوظة.</p>
     </footer>
 </body>
 </html>
