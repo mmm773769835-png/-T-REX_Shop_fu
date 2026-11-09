@@ -448,20 +448,15 @@
         }
 
         .stat-icon-simple {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            background: transparent !important;
+            border-radius: 0;
+            box-shadow: none;
+            width: auto;
+            height: auto;
         }
-
-        .stat-icon-simple.icon-clock { color: #00d2d3; background: rgba(0, 210, 211, 0.1); }
-        .stat-icon-simple.icon-chart { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
-        .stat-icon-simple.icon-ticket { color: #ffa502; background: rgba(255, 165, 2, 0.1); }
-        .stat-icon-simple.icon-success { color: #00e676; background: rgba(0, 230, 118, 0.1); }
-        .stat-icon-simple.icon-box { color: #2ed573; background: rgba(46, 213, 115, 0.1); }
 
         /* Secondary actions bar */
         .secondary-actions-bar {
@@ -1112,35 +1107,47 @@
             <button class="subtab-btn" id="tabBtnWithdraw" onclick="showSection('withdraw')">السحوبات</button>
         </div>
 
-        <!-- Action Buttons Row (Always Accessible) -->
-        <div class="action-buttons-row">
-            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" rel="noopener noreferrer" class="btn-action-red">
-                <i class="fas fa-plus"></i> إضافة كروت
-            </a>
-            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="btn-action-red">
-                <i class="fas fa-gear"></i> إعدادات مايكروتيك
-            </a>
-        </div>
+        
 
         <!-- ================= SECTION 1: STATEMENT (كشف الحساب الكامل) ================= -->
         <div id="sectionStatement" style="display: block;">
             
-            <!-- Period Selector Bar -->
-            <div class="period-selector-row">
-                <button class="period-btn" onclick="selectPeriod('today', this)">اليوم</button>
-                <button class="period-btn" onclick="selectPeriod('7days', this)">آخر 7 أيام</button>
-                <button class="period-btn active" onclick="selectPeriod('30days', this)">آخر 30 يوم</button>
-                <button class="period-btn" onclick="selectPeriod('custom', this)">تخصيص</button>
+            <!-- Statement Header Card (Matching Tabweeb Image 4 & 9) -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 18px 22px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <div>
+                        <h2 style="font-size: 16px; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            كشف حساب الشبكة
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px; display: inline-block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                        </h2>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">5G فايف جي (21779)</div>
+                    </div>
+                </div>
+
+                <!-- Period Selector Bar -->
+                <div class="period-selector-row" style="margin-bottom: 0;">
+                    <button class="period-btn" onclick="selectPeriod('today', this)">اليوم</button>
+                    <button class="period-btn" onclick="selectPeriod('7days', this)">آخر 7 أيام</button>
+                    <button class="period-btn active" onclick="selectPeriod('30days', this)">آخر 30 يوم</button>
+                    <button class="period-btn" onclick="selectPeriod('custom', this)">تخصيص</button>
+                </div>
             </div>
 
-            <!-- Filter Panel: تصفية النتائج (Collapsed by default like Image 2) -->
+            <!-- Filter Panel: تصفية النتائج (Collapsed by default like Image 2 & 9) -->
             <div class="filter-panel" style="padding: 16px 20px; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleFilterBody()">
                     <span style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-filter" style="color: var(--accent-red);"></i> تصفية النتائج
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#c81e28" style="width: 17px; height: 17px; display: inline-block;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                        </svg>
+                        تصفية النتائج
                     </span>
                     <span style="font-size: 12px; color: var(--text-muted);">
-                        <i class="fas fa-chevron-down" id="filterToggleIcon"></i>
+                        <svg id="filterToggleIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#94a3b8" style="width: 15px; height: 15px; display: inline-block; transition: transform 0.2s;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
                     </span>
                 </div>
 
@@ -1222,13 +1229,17 @@
                 </div>
             </div>
 
-            <!-- The 4 Big Financial Summary Cards (Exact Layout & Icons of Image 2) -->
+            <!-- The 4 Big Financial Summary Cards (Exact Mini Icons & Layout of Image 9) -->
             <div class="stats-grid-4">
                 <!-- 1. الرصيد الافتتاحي -->
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الرصيد الافتتاحي</span>
-                        <span class="stat-icon-simple icon-clock"><i class="fa-regular fa-clock"></i></span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00d2d3" style="width: 22px; height: 22px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </span>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stOpenBal">90.00</span>
@@ -1240,7 +1251,11 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">صافي المبيعات</span>
-                        <span class="stat-icon-simple icon-chart"><i class="fas fa-arrow-trend-up"></i></span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                            </svg>
+                        </span>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stNetSales">187,650.00</span>
@@ -1252,7 +1267,14 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">إجمالي السحوبات</span>
-                        <span class="stat-icon-simple icon-ticket"><i class="fa-regular fa-credit-card"></i></span>
+                        <span class="stat-icon-simple">
+                            <span style="background: #ea580c; width: 25px; height: 18px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ffffff" style="width: 14px; height: 14px;">
+                                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                                    <circle cx="12" cy="12" r="2.5" />
+                                </svg>
+                            </span>
+                        </span>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stTotalWithdraw">181,395.00</span>
@@ -1264,13 +1286,18 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الرصيد الختامي</span>
-                        <span class="stat-icon-simple icon-success"><i class="fa-regular fa-circle-check"></i></span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00e676" style="width: 22px; height: 22px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </span>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stCloseBal">6,345.00</span>
                         <span class="stat-currency">ر.ي</span>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- Sub Nav Segmented Control (Exact Replica of Image 2) -->
@@ -1309,13 +1336,16 @@
 
         <!-- ================= SECTION 2: DAILY SALES (المبيعات اليومية - Image 1) ================= -->
         <div id="sectionSales" style="display: none;">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-                <button onclick="showSection('statement')" class="btn-action-red" style="max-width: 240px; padding: 10px 18px; font-size: 14px;">
-                    <i class="fas fa-receipt"></i> كشف الحساب الكامل
+            <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+                <button onclick="showSection('statement')" class="btn-action-red" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; border-radius: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ffffff" style="width: 18px; height: 18px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    كشف الحساب الكامل
                 </button>
             </div>
 
-            <!-- تفاصيل المبيعات اليومية -->
+            <!-- تفاصيل المبيعات اليومية (Exact match with Image 3) -->
             <div class="card-section">
                 <div class="card-section-header">
                     <h2 class="card-section-title">
@@ -1323,7 +1353,7 @@
                         تفاصيل المبيعات اليومية
                     </h2>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <span class="badge-status-green"><i class="fas fa-calendar"></i> آخر يوم (11/09 الاثنين)</span>
+                        <span class="badge-status-green"><i class="fas fa-calendar"></i> آخر يوم [x]</span>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1341,17 +1371,17 @@
                                 <td rowspan="3" style="vertical-align: middle; font-weight: 800; color: #fff; background: rgba(255,255,255,0.01);">
                                     11/09<br><span style="font-size: 12px; color: var(--text-muted);">الاثنين</span>
                                 </td>
-                                <td>250 ر.ي</td>
-                                <td style="color: #fff;"><strong>3</strong></td>
-                                <td style="color: #fff;">540 ر.ي</td>
+                                <td style="color: #fff;">250</td>
+                                <td style="color: #fff;"><strong>2</strong></td>
+                                <td style="color: #fff;">450 ر.ي</td>
                             </tr>
                             <tr>
-                                <td>100 ر.ي</td>
+                                <td style="color: #fff;">100</td>
                                 <td style="color: #fff;"><strong>5</strong></td>
                                 <td style="color: #fff;">450 ر.ي</td>
                             </tr>
                             <tr>
-                                <td>500 ر.ي</td>
+                                <td style="color: #fff;">500</td>
                                 <td style="color: #fff;"><strong>1</strong></td>
                                 <td style="color: #fff;">450 ر.ي</td>
                             </tr>
@@ -1359,8 +1389,8 @@
                         <tfoot>
                             <tr style="background: rgba(200, 30, 40, 0.12); font-weight: 900;">
                                 <td colspan="2" style="color: #fff;">مجموع الاثنين:</td>
-                                <td style="color: #fff; font-size: 16px;">9 كروت</td>
-                                <td style="color: #fff; font-size: 18px;">1,440 ر.ي</td>
+                                <td style="color: #fff; font-size: 16px;">العدد 8</td>
+                                <td style="color: #10b981; font-size: 16px;">1,350 ر.ي</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -1370,6 +1400,16 @@
 
         <!-- ================= SECTION 3: CARDS (الكروت) ================= -->
         <div id="sectionCards" style="display: none;">
+
+            <!-- Action Buttons Row (Matching Tabweeb Image 2) -->
+            <div class="action-buttons-row" style="margin-bottom: 20px;">
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                    <i class="fas fa-plus"></i> إضافة كروت
+                </a>
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                    <i class="fas fa-gear"></i> إعدادات مايكروتيك
+                </a>
+            </div>
 
             <!-- Table: توزيع الكروت حسب الفئة -->
             <div class="card-section">
@@ -1603,51 +1643,83 @@
         <div id="sectionOverview" style="display: none;">
             <div class="stats-grid-4">
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">الرصيد المتاح</span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00d2d3" style="width: 22px; height: 22px; display: block;">
+                                <rect width="20" height="14" x="2" y="5" rx="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2 10h20" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="stat-value-box">
                         <span class="stat-value" id="valAvailableBalance">6,255.00 ر.ي</span>
-                        <span class="stat-subtext">الرصيد القابل للسحب</span>
+                        <span class="stat-currency">الرصيد القابل للسحب</span>
                     </div>
-                    <div class="stat-icon-wrapper icon-wallet"><i class="fas fa-wallet"></i></div>
                 </div>
+
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">صافي المبيعات</span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="stat-value-box">
                         <span class="stat-value" id="valNetSales">57,915.00 ر.ي</span>
-                        <span class="stat-subtext">منذ بداية نوفمبر 2026</span>
+                        <span class="stat-currency">منذ بداية نوفمبر 2026</span>
                     </div>
-                    <div class="stat-icon-wrapper icon-chart"><i class="fas fa-chart-line"></i></div>
                 </div>
+
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">الكروت المباعة</span>
+                        <span class="stat-icon-simple">
+                            <span style="background: rgba(234, 88, 12, 0.2); border: 1px solid rgba(234, 88, 12, 0.4); width: 28px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ea580c" style="width: 15px; height: 15px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
+                                </svg>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="stat-value-box">
                         <span class="stat-value" id="valSoldCards">260</span>
-                        <span class="stat-subtext">منذ بداية نوفمبر 2026</span>
+                        <span class="stat-currency">منذ بداية نوفمبر 2026</span>
                     </div>
-                    <div class="stat-icon-wrapper icon-ticket"><i class="fas fa-link"></i></div>
                 </div>
+
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">الكروت المتاحة</span>
-                        <span class="stat-value" id="valAvailableCards">993</span>
-                        <span class="stat-subtext">المخزون المتبقي</span>
+                        <span class="stat-icon-simple">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 22px; height: 22px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                            </svg>
+                        </span>
                     </div>
-                    <div class="stat-icon-wrapper icon-box"><i class="fas fa-box-archive"></i></div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="valAvailableCards">993</span>
+                        <span class="stat-currency">المخزون المتبقي</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="secondary-actions-bar">
-                <button onclick="showSection('statement')" class="secondary-btn">
-                    <i class="fas fa-receipt" style="color: var(--accent-red);"></i> كشف الحساب
-                </button>
-                <span style="color: var(--border-card);">|</span>
-                <button onclick="showSection('withdraw')" class="secondary-btn">
-                    <i class="fas fa-money-bill-transfer" style="color: var(--accent-red);"></i> طلبات السحب
-                </button>
-                <span style="color: var(--border-card);">|</span>
-                <button onclick="openEditStatsModal()" class="secondary-btn">
-                    <i class="fas fa-pen-to-square" style="color: var(--accent-red);"></i> تعديل أرقام الإحصائيات
-                </button>
+            <!-- Two Action Cards (Exact Replica of Tabweeb Image 1) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 25px;">
+                <div onclick="showSection('statement')" class="stat-card" style="cursor: pointer; flex-direction: row; align-items: center; justify-content: space-between; padding: 18px 22px;">
+                    <span style="font-size: 15px; font-weight: 700; color: #ffffff;">كشف الحساب</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                </div>
+                <div onclick="showSection('withdraw')" class="stat-card" style="cursor: pointer; flex-direction: row; align-items: center; justify-content: space-between; padding: 18px 22px;">
+                    <span style="font-size: 15px; font-weight: 700; color: #ffffff;">طلبات السحب</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0H3m-.75 0v12.75a.75.75 0 0 0 .75.75H21a.75.75 0 0 0 .75-.75V6a.75.75 0 0 0-.75-.75H3.75M6.75 9.75h10.5m-10.5 3h6" />
+                    </svg>
+                </div>
             </div>
         </div>
 
