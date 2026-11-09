@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>شبكة 5G اللاسلكية | لوحة التحكم وكشف الحساب</title>
     <meta name="description" content="لوحة تحكم وإدارة شبكة 5G فايف جي اللاسلكية - كشف الحساب، المبيعات اليومية، الكروت، والسحوبات">
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -1355,7 +1358,7 @@
                                 <td>100</td>
                                 <td>100 ر.ي</td>
                                 <td id="catAvail_1" contenteditable="true" onblur="updateCategoryValue(1, 'avail', this)" title="انقر للتعديل">504</td>
-                                <td id="catTotal_1" contenteditable="true" onblur="updateCategoryValue(1, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">1122</td>
+                                <td id="catTotal_1" contenteditable="true" onblur="updateCategoryValue(1, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">800</td>
                                 <td><span class="badge-status-green">كافي</span></td>
                             </tr>
                             <tr>
@@ -1405,7 +1408,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>510</strong></td>
+                                <td><strong id="batchCount_0" contenteditable="true" onblur="updateBatchValue(0, this)" style="cursor:pointer; color: #00d2d3;" title="انقر للتعديل">800</strong></td>
                                 <td>100</td>
                                 <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
                                 <td>يدوي</td>
@@ -1414,7 +1417,7 @@
                                 <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
                             </tr>
                             <tr>
-                                <td><strong>510</strong></td>
+                                <td><strong id="batchCount_1" contenteditable="true" onblur="updateBatchValue(1, this)" style="cursor:pointer; color: #00d2d3;" title="انقر للتعديل">800</strong></td>
                                 <td>250</td>
                                 <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
                                 <td>يدوي</td>
@@ -1423,7 +1426,7 @@
                                 <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
                             </tr>
                             <tr>
-                                <td><strong>15</strong></td>
+                                <td><strong id="batchCount_2" contenteditable="true" onblur="updateBatchValue(2, this)" style="cursor:pointer;" title="انقر للتعديل">15</strong></td>
                                 <td>3000</td>
                                 <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
                                 <td>يدوي</td>
@@ -1432,7 +1435,7 @@
                                 <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
                             </tr>
                             <tr>
-                                <td><strong>255</strong></td>
+                                <td><strong id="batchCount_3" contenteditable="true" onblur="updateBatchValue(3, this)" style="cursor:pointer;" title="انقر للتعديل">404</strong></td>
                                 <td>500</td>
                                 <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
                                 <td>يدوي</td>
@@ -1441,7 +1444,7 @@
                                 <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
                             </tr>
                             <tr>
-                                <td><strong>255</strong></td>
+                                <td><strong id="batchCount_4" contenteditable="true" onblur="updateBatchValue(4, this)" style="cursor:pointer;" title="انقر للتعديل">255</strong></td>
                                 <td>100</td>
                                 <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
                                 <td>يدوي</td>
@@ -1849,6 +1852,14 @@
             }
             renderCardsTable();
             loadCategoriesData();
+            loadBatchesData();
+
+            // Ensure no old store button lingering in browser memory
+            document.querySelectorAll('a, button, div').forEach(function(el) {
+                if (el.textContent && el.textContent.trim() === 'المتجر') {
+                    el.remove();
+                }
+            });
 
             const params = new URLSearchParams(window.location.search);
             const initialTab = params.get('tab') || window.location.hash.replace('#', '') || 'overview';
@@ -2203,7 +2214,7 @@
         }
 
         function loadCategoriesData() {
-            const savedCategories = localStorage.getItem('5g_categories_data');
+            const savedCategories = localStorage.getItem('5g_categories_data_v2');
             if (savedCategories) {
                 try {
                     const cats = JSON.parse(savedCategories);
@@ -2217,29 +2228,66 @@
             } else {
                 const elTotal0 = document.getElementById('catTotal_0');
                 if (elTotal0) elTotal0.textContent = '800';
+                const elTotal1 = document.getElementById('catTotal_1');
+                if (elTotal1) elTotal1.textContent = '800';
             }
         }
 
         function updateCategoryValue(index, field, cell) {
             const val = cell.textContent.trim();
             let cats = [];
-            const saved = localStorage.getItem('5g_categories_data');
+            const saved = localStorage.getItem('5g_categories_data_v2');
             if (saved) {
                 try { cats = JSON.parse(saved); } catch(e) { cats = []; }
             }
             if (!cats.length) {
                 cats = [
                     { cat: "250", price: "250 ر.ي", avail: "289", total: "800", status: "كافي" },
-                    { cat: "100", price: "100 ر.ي", avail: "504", total: "1122", status: "كافي" },
+                    { cat: "100", price: "100 ر.ي", avail: "504", total: "800", status: "كافي" },
                     { cat: "500", price: "500 ر.ي", avail: "191", total: "404", status: "كافي" },
                     { cat: "3000", price: "3,000 ر.ي", avail: "9", total: "15", status: "كافي" }
                 ];
             }
             if (cats[index]) {
                 cats[index][field] = val;
-                localStorage.setItem('5g_categories_data', JSON.stringify(cats));
+                localStorage.setItem('5g_categories_data_v2', JSON.stringify(cats));
                 showToast("تم حفظ التعديل: " + val);
             }
+        }
+
+        function loadBatchesData() {
+            const saved = localStorage.getItem('5g_batches_data_v2');
+            if (saved) {
+                try {
+                    const batches = JSON.parse(saved);
+                    batches.forEach(function(b, i) {
+                        const el = document.getElementById('batchCount_' + i);
+                        if (el && b !== undefined) el.textContent = b;
+                    });
+                } catch(e) {}
+            } else {
+                const b0 = document.getElementById('batchCount_0');
+                if (b0) b0.textContent = '800';
+                const b1 = document.getElementById('batchCount_1');
+                if (b1) b1.textContent = '800';
+                const b3 = document.getElementById('batchCount_3');
+                if (b3) b3.textContent = '404';
+            }
+        }
+
+        function updateBatchValue(index, cell) {
+            const val = cell.textContent.trim();
+            let batches = [];
+            const saved = localStorage.getItem('5g_batches_data_v2');
+            if (saved) {
+                try { batches = JSON.parse(saved); } catch(e) { batches = []; }
+            }
+            if (!batches.length) {
+                batches = ["800", "800", "15", "404", "255"];
+            }
+            batches[index] = val;
+            localStorage.setItem('5g_batches_data_v2', JSON.stringify(batches));
+            showToast("تم حفظ عدد الدفعة: " + val);
         }
 
         function openAddCategoryModal() {

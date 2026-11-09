@@ -68,6 +68,20 @@
   status = 200
   force = false
 
+[[headers]]
+  for = "/network-5g*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/5g*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
 [[edge_functions]]
   path = "/*"
   function = "inject-metadata"
