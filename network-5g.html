@@ -1350,29 +1350,29 @@
                             <tr>
                                 <td>250</td>
                                 <td>250 ر.ي</td>
-                                <td>289</td>
-                                <td>1275</td>
+                                <td id="catAvail_0" contenteditable="true" onblur="updateCategoryValue(0, 'avail', this)" title="انقر للتعديل">289</td>
+                                <td id="catTotal_0" contenteditable="true" onblur="updateCategoryValue(0, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">800</td>
                                 <td><span class="badge-status-green">كافي</span></td>
                             </tr>
                             <tr>
                                 <td>100</td>
                                 <td>100 ر.ي</td>
-                                <td>504</td>
-                                <td>1122</td>
+                                <td id="catAvail_1" contenteditable="true" onblur="updateCategoryValue(1, 'avail', this)" title="انقر للتعديل">504</td>
+                                <td id="catTotal_1" contenteditable="true" onblur="updateCategoryValue(1, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">1122</td>
                                 <td><span class="badge-status-green">كافي</span></td>
                             </tr>
                             <tr>
                                 <td>500</td>
                                 <td>500 ر.ي</td>
-                                <td>191</td>
-                                <td>404</td>
+                                <td id="catAvail_2" contenteditable="true" onblur="updateCategoryValue(2, 'avail', this)" title="انقر للتعديل">191</td>
+                                <td id="catTotal_2" contenteditable="true" onblur="updateCategoryValue(2, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">404</td>
                                 <td><span class="badge-status-green">كافي</span></td>
                             </tr>
                             <tr>
                                 <td>3000</td>
                                 <td>3,000 ر.ي</td>
-                                <td>9</td>
-                                <td>15</td>
+                                <td id="catAvail_3" contenteditable="true" onblur="updateCategoryValue(3, 'avail', this)" title="انقر للتعديل">9</td>
+                                <td id="catTotal_3" contenteditable="true" onblur="updateCategoryValue(3, 'total', this)" title="انقر للتعديل" style="color: #00d2d3; font-weight: 800; cursor: pointer;">15</td>
                                 <td><span class="badge-status-green">كافي</span></td>
                             </tr>
                         </tbody>
@@ -1851,6 +1851,7 @@
                 localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
             }
             renderCardsTable();
+            loadCategoriesData();
 
             const params = new URLSearchParams(window.location.search);
             const initialTab = params.get('tab') || window.location.hash.replace('#', '') || 'overview';
@@ -2201,6 +2202,46 @@
                 localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
                 renderCardsTable();
                 showToast("تم حذف الكرت!");
+            }
+        }
+
+        function loadCategoriesData() {
+            const savedCategories = localStorage.getItem('5g_categories_data');
+            if (savedCategories) {
+                try {
+                    const cats = JSON.parse(savedCategories);
+                    cats.forEach(function(c, i) {
+                        const elAvail = document.getElementById('catAvail_' + i);
+                        const elTotal = document.getElementById('catTotal_' + i);
+                        if (elAvail && c.avail !== undefined) elAvail.textContent = c.avail;
+                        if (elTotal && c.total !== undefined) elTotal.textContent = c.total;
+                    });
+                } catch(e) {}
+            } else {
+                const elTotal0 = document.getElementById('catTotal_0');
+                if (elTotal0) elTotal0.textContent = '800';
+            }
+        }
+
+        function updateCategoryValue(index, field, cell) {
+            const val = cell.textContent.trim();
+            let cats = [];
+            const saved = localStorage.getItem('5g_categories_data');
+            if (saved) {
+                try { cats = JSON.parse(saved); } catch(e) { cats = []; }
+            }
+            if (!cats.length) {
+                cats = [
+                    { cat: "250", price: "250 ر.ي", avail: "289", total: "800", status: "كافي" },
+                    { cat: "100", price: "100 ر.ي", avail: "504", total: "1122", status: "كافي" },
+                    { cat: "500", price: "500 ر.ي", avail: "191", total: "404", status: "كافي" },
+                    { cat: "3000", price: "3,000 ر.ي", avail: "9", total: "15", status: "كافي" }
+                ];
+            }
+            if (cats[index]) {
+                cats[index][field] = val;
+                localStorage.setItem('5g_categories_data', JSON.stringify(cats));
+                showToast("تم حفظ التعديل: " + val);
             }
         }
 
