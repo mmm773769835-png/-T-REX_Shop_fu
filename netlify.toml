@@ -43,6 +43,16 @@
   status = 200
 
 [[redirects]]
+  from = "/network-5g"
+  to = "/network-5g.html"
+  status = 200
+
+[[redirects]]
+  from = "/5g"
+  to = "/network-5g.html"
+  status = 200
+
+[[redirects]]
   from = "/articles/:slug"
   to = "/articles/:slug.html"
   status = 200

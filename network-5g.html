@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبكة 5G اللاسلكية | لوحة تحكم شبكة فايف جي</title>
+    <meta name="description" content="لوحة تحكم وإدارة شبكة 5G فايف جي اللاسلكية - كروت الشبكة، المبيعات، السحوبات، والإحصائيات الفورية">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-body: #0a101d;
+            --bg-header-start: #78131b;
+            --bg-header-end: #1e0508;
+            --bg-card: #111a28;
+            --bg-card-alt: #131d2e;
+            --border-card: #1c2a3f;
+            --border-red: #c81e28;
+            --accent-red: #c81e28;
+            --accent-red-hover: #e51e2b;
+            --text-main: #ffffff;
+            --text-muted: #7e91a8;
+            --status-green: #00e676;
+            --badge-green-bg: rgba(0, 230, 118, 0.15);
+            --badge-green-border: rgba(0, 230, 118, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Top Bar / Header */
+        .top-navbar {
+            background: linear-gradient(90deg, var(--bg-header-start) 0%, var(--bg-header-end) 100%);
+            border-bottom: 1px solid rgba(200, 30, 40, 0.3);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .nav-right-tabs {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-tab-item {
+            color: #d8d8d8;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 6px 0;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-tab-item.active {
+            color: #ffffff;
+        }
+
+        .nav-tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+
+        .nav-tab-item:hover {
+            color: #ffffff;
+        }
+
+        .nav-left-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: #ff3838;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid var(--bg-header-start);
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 5px 12px 5px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #a81c25;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Main Container */
+        .main-content {
+            max-width: 1240px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 20px 80px;
+            flex-grow: 1;
+        }
+
+        /* Breadcrumb / Top Bar */
+        .breadcrumb-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb-path {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb-path a {
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-path a:hover {
+            color: #fff;
+        }
+
+        .portal-direct-btn {
+            background: rgba(200, 30, 40, 0.12);
+            border: 1px solid var(--accent-red);
+            color: #ff6b75;
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .portal-direct-btn:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        /* Network Header Banner */
+        .network-banner {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-top: 2px solid var(--border-red);
+            border-radius: 14px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .network-info-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .wifi-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(200, 30, 40, 0.15);
+            border: 1px solid rgba(200, 30, 40, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-red);
+            font-size: 22px;
+        }
+
+        .network-details h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .network-submeta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .status-badge-active {
+            color: var(--status-green);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+        }
+
+        .edit-network-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-network-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Main Subtabs Navigation */
+        .subtabs-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .subtab-btn {
+            background: transparent;
+            border: none;
+            color: #a0aec0;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .subtab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .subtab-btn.active {
+            background-color: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(200, 30, 40, 0.4);
+        }
+
+        /* Action Buttons Row */
+        .action-buttons-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .btn-action-red {
+            flex: 1;
+            background-color: var(--accent-red);
+            color: #ffffff;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(200, 30, 40, 0.3);
+        }
+
+        .btn-action-red:hover {
+            background-color: var(--accent-red-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards (Overview Tab) */
+        .stats-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card-alt);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(200, 30, 40, 0.4);
+        }
+
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 4px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-subtext {
+            font-size: 11px;
+            color: #6d8098;
+            font-weight: 600;
+        }
+
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .icon-wallet { background: rgba(0, 210, 211, 0.12); color: #00d2d3; }
+        .icon-chart { background: rgba(255, 71, 87, 0.12); color: #ff4757; }
+        .icon-ticket { background: rgba(255, 165, 2, 0.12); color: #ffa502; }
+        .icon-box { background: rgba(46, 213, 115, 0.12); color: #2ed573; }
+
+        /* Secondary actions bar */
+        .secondary-actions-bar {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+
+        .secondary-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--accent-red);
+        }
+
+        /* Content Sections & Tables */
+        .card-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+        }
+
+        .card-section-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-section-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-section-links {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .link-accent {
+            color: #ff6b75;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .link-accent:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        th {
+            background: #0d1522;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 16px 20px;
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge-status-green {
+            background-color: var(--badge-green-bg);
+            border: 1px solid var(--badge-green-border);
+            color: var(--status-green);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .btn-table-action {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-card);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-table-action:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* Filter Row for Cards Search */
+        .filter-toolbar {
+            padding: 16px 24px;
+            background: #0d1522;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-status-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: #a0aec0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active, .filter-chip:hover {
+            background: var(--accent-red);
+            color: #fff;
+            border-color: var(--accent-red);
+        }
+
+        .filter-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-input-box {
+            position: relative;
+        }
+
+        .search-input-box input {
+            background: #111a28;
+            border: 1px solid var(--border-card);
+            padding: 8px 36px 8px 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input-box input:focus {
+            border-color: var(--accent-red);
+        }
+
+        .search-input-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .btn-refresh {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-card);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Floating App Download Button */
+        .floating-app-btn {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 25px rgba(200, 30, 40, 0.5);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.2s;
+        }
+
+        .floating-app-btn:hover {
+            background: var(--accent-red-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(200, 30, 40, 0.7);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-red);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-card);
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .form-group input, .form-group select {
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* Toast notification */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111a28;
+            border: 1px solid var(--status-green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .stats-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar {
+                padding: 10px 15px;
+            }
+            .nav-right-tabs {
+                gap: 15px;
+            }
+            .nav-tab-item {
+                font-size: 13px;
+            }
+            .subtabs-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .action-buttons-row {
+                flex-direction: column;
+            }
+            .stats-grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .filter-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-input-box input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar Navigation (Same Wine/Maroon Gradient as image) -->
+    <header class="top-navbar">
+        <div class="nav-right-tabs">
+            <div class="nav-tab-item active" onclick="switchMainTab('dashboard')">لوحة التحكم</div>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" rel="noopener noreferrer" class="nav-tab-item">الإحالات والمكافآت</a>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="nav-tab-item">إعدادات الشبكة</a>
+        </div>
+
+        <div class="nav-left-profile">
+            <a href="https://trexshopmax.com" title="العودة للمتجر الرئيسي" style="color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 20px;">
+                <i class="fas fa-store"></i> المتجر
+            </a>
+            <div class="theme-toggle-btn" title="الوضع الليلي">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="notification-btn" title="الإشعارات">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">98</span>
+            </div>
+            <div class="user-pill" onclick="openProfileModal()">
+                <div class="user-avatar">P</div>
+                <div class="user-meta">
+                    <span class="user-name">محمد ابوالرجال</span>
+                    <span class="user-role">مالك شبكة</span>
+                </div>
+                <i class="fas fa-chevron-down" style="font-size: 10px; color: rgba(255,255,255,0.6);"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Breadcrumb / Portal Direct Link -->
+        <div class="breadcrumb-row">
+            <div class="breadcrumb-path">
+                <i class="fas fa-house" style="font-size: 13px;"></i>
+                <a href="#">لوحة التحكم</a>
+                <span>/</span>
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-arrow-right" style="font-size: 11px;"></i> العودة للشبكات
+                </a>
+            </div>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" rel="noopener noreferrer" class="portal-direct-btn">
+                <i class="fas fa-external-link-alt"></i> فتح لوحة تبويب الأصلية
+            </a>
+        </div>
+
+        <!-- Network Header Banner -->
+        <div class="network-banner">
+            <div class="network-info-right">
+                <div class="wifi-icon-box">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="network-details">
+                    <h1 id="netNameDisplay">5G فايف جي</h1>
+                    <div class="network-submeta">
+                        <span class="status-badge-active">
+                            <i class="fas fa-circle" style="font-size: 8px;"></i> نشط
+                        </span>
+                        <span>·</span>
+                        <span id="netPhoneDisplay">773769835</span>
+                        <span>·</span>
+                        <span id="netIdDisplay">21779</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="edit-network-btn" onclick="openEditNetworkModal()" title="تعديل بيانات الشبكة">
+                <i class="fas fa-pen"></i>
+            </button>
+        </div>
+
+        <!-- Main Subtabs Navigation -->
+        <div class="subtabs-container">
+            <button class="subtab-btn" id="tabBtnOverview" onclick="showSection('overview')">نظرة عامة</button>
+            <button class="subtab-btn active" id="tabBtnCards" onclick="showSection('cards')">الكروت</button>
+            <button class="subtab-btn" id="tabBtnSales" onclick="showSection('sales')">المبيعات</button>
+            <button class="subtab-btn" id="tabBtnWithdraw" onclick="showSection('withdraw')">السحوبات</button>
+        </div>
+
+        <!-- Action Buttons Row (Always Accessible) -->
+        <div class="action-buttons-row">
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                <i class="fas fa-plus"></i> إضافة كروت
+            </a>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                <i class="fas fa-gear"></i> إعدادات مايكروتيك
+            </a>
+        </div>
+
+        <!-- ================= SECTION: OVERVIEW (نظرة عامة) ================= -->
+        <div id="sectionOverview" style="display: none;">
+            <div class="stats-grid-4">
+                <!-- 1. الرصيد المتاح -->
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">الرصيد المتاح</span>
+                        <span class="stat-value" id="valAvailableBalance">6,255.00 ر.ي</span>
+                        <span class="stat-subtext">الرصيد القابل للسحب</span>
+                    </div>
+                    <div class="stat-icon-wrapper icon-wallet">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+
+                <!-- 2. صافي المبيعات -->
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">صافي المبيعات</span>
+                        <span class="stat-value" id="valNetSales">57,915.00 ر.ي</span>
+                        <span class="stat-subtext">منذ بداية نوفمبر 2026</span>
+                    </div>
+                    <div class="stat-icon-wrapper icon-chart">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+
+                <!-- 3. الكروت المباعة -->
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">الكروت المباعة</span>
+                        <span class="stat-value" id="valSoldCards">260</span>
+                        <span class="stat-subtext">منذ بداية نوفمبر 2026</span>
+                    </div>
+                    <div class="stat-icon-wrapper icon-ticket">
+                        <i class="fas fa-link"></i>
+                    </div>
+                </div>
+
+                <!-- 4. الكروت المتاحة -->
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">الكروت المتاحة</span>
+                        <span class="stat-value" id="valAvailableCards">993</span>
+                        <span class="stat-subtext">المخزون المتبقي</span>
+                    </div>
+                    <div class="stat-icon-wrapper icon-box">
+                        <i class="fas fa-box-archive"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Actions -->
+            <div class="secondary-actions-bar">
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="secondary-btn">
+                    <i class="fas fa-receipt" style="color: var(--accent-red);"></i> كشف الحساب
+                </a>
+                <span style="color: var(--border-card);">|</span>
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="secondary-btn">
+                    <i class="fas fa-money-bill-transfer" style="color: var(--accent-red);"></i> طلبات السحب
+                </a>
+                <span style="color: var(--border-card);">|</span>
+                <button onclick="openEditStatsModal()" class="secondary-btn" style="background: none; border: none;">
+                    <i class="fas fa-pen-to-square" style="color: var(--accent-red);"></i> تعديل أرقام الإحصائيات
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SECTION: CARDS (الكروت) ================= -->
+        <div id="sectionCards" style="display: block;">
+
+            <!-- Table 1: توزيع الكروت حسب الفئة -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-layer-group" style="color: var(--accent-red);"></i>
+                        توزيع الكروت حسب الفئة
+                    </h2>
+                    <button onclick="openAddCategoryModal()" class="btn-table-action">
+                        <i class="fas fa-plus"></i> فئة جديدة
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الفئة</th>
+                                <th>السعر</th>
+                                <th>المتاح</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <tr>
+                                <td>250</td>
+                                <td>250 ر.ي</td>
+                                <td>289</td>
+                                <td>1275</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td>100</td>
+                                <td>100 ر.ي</td>
+                                <td>504</td>
+                                <td>1122</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>500 ر.ي</td>
+                                <td>191</td>
+                                <td>404</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td>3000</td>
+                                <td>3,000 ر.ي</td>
+                                <td>9</td>
+                                <td>15</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 2: آخر دفعات الكروت -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-clock-rotate-left" style="color: var(--accent-red);"></i>
+                        آخر دفعات الكروت
+                    </h2>
+                    <div class="card-section-links">
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" class="link-accent">استيراد كروت</a>
+                        <span style="color: var(--border-card);">|</span>
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="link-accent">عرض الكل (12)</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>العدد</th>
+                                <th>الفئة</th>
+                                <th>نوع الملف</th>
+                                <th>طريقة الإضافة</th>
+                                <th>رفع بواسطة</th>
+                                <th>التاريخ والوقت</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>510</strong></td>
+                                <td>100</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-11-08 20:21</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>510</strong></td>
+                                <td>250</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-27 11:22</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>15</strong></td>
+                                <td>3000</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-22 06:57</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>255</strong></td>
+                                <td>500</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-22 06:53</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>255</strong></td>
+                                <td>100</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-10 18:41</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 3: آخر الكروت المباعة -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-receipt" style="color: var(--accent-red);"></i>
+                        آخر الكروت المباعة
+                    </h2>
+                    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards?statusFilter=sold" target="_blank" class="link-accent">عرض الكل</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الكرت</th>
+                                <th>الفئة</th>
+                                <th>تاريخ البيع</th>
+                                <th>نسخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldCardsBody">
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">817733600</td>
+                                <td>250 ر.ي</td>
+                                <td>2026-11-09 03:43:44</td>
+                                <td>
+                                    <button class="btn-table-action" onclick="copyText('817733600')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">001996495</td>
+                                <td>100 ر.ي</td>
+                                <td>2026-11-09 02:28:16</td>
+                                <td>
+                                    <button class="btn-table-action" onclick="copyText('001996495')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">089902229</td>
+                                <td>100 ر.ي</td>
+                                <td>2026-11-09 01:36:04</td>
+                                <td>
+                                    <button class="btn-table-action" onclick="copyText('089902229')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 4: البحث في الكروت وإدارتها -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-magnifying-glass" style="color: var(--accent-red);"></i>
+                        البحث في الكروت
+                    </h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="openAddNewCardModal()" class="btn-table-action" style="background: var(--accent-red); border-color: var(--accent-red);">
+                            <i class="fas fa-plus"></i> كرت جديد
+                        </button>
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards" target="_blank" class="link-accent" style="line-height: 2;">عرض الكل في تبويب</a>
+                    </div>
+                </div>
+
+                <div class="filter-toolbar">
+                    <div class="filter-status-group">
+                        <div class="filter-chip active" onclick="filterCardsByStatus('all', this)">كل الحالات</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('متاح', this)">متاح</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('مباع', this)">مباع</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('منتهي', this)">منتهي</div>
+                    </div>
+
+                    <div class="filter-actions-right">
+                        <div class="search-input-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="cardSearchInput" placeholder="بحث برقم الكرت..." oninput="searchCardsTable()">
+                        </div>
+                        <button class="btn-refresh" onclick="refreshCardsData()">
+                            <i class="fas fa-rotate"></i> تحديث
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الكرت</th>
+                                <th>كلمة المرور</th>
+                                <th>الفئة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchCardsTableBody">
+                            <!-- Populated dynamically via JavaScript with localStorage support -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= SECTION: SALES (المبيعات) ================= -->
+        <div id="sectionSales" style="display: none;">
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title"><i class="fas fa-chart-pie" style="color: var(--accent-red);"></i> تقرير المبيعات التفصيلي</h2>
+                    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards?statusFilter=sold" target="_blank" class="link-accent">فتح التقرير في تبويب ↗</a>
+                </div>
+                <div style="padding: 30px; text-align: center;">
+                    <div style="font-size: 44px; font-weight: 900; color: #fff; margin-bottom: 10px;">57,915.00 ر.ي</div>
+                    <p style="color: var(--text-muted); font-size: 15px;">إجمالي المبيعات لشهر نوفمبر 2026 - شبكة 5G فايف جي</p>
+                    <div style="display: flex; justify-content: center; gap: 30px; margin-top: 25px;">
+                        <div style="background: rgba(255,255,255,0.04); padding: 15px 25px; border-radius: 12px; border: 1px solid var(--border-card);">
+                            <div style="font-size: 13px; color: var(--text-muted);">الكروت المباعة</div>
+                            <div style="font-size: 22px; font-weight: 800; color: #ffa502;">260 كرت</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.04); padding: 15px 25px; border-radius: 12px; border: 1px solid var(--border-card);">
+                            <div style="font-size: 13px; color: var(--text-muted);">متوسط البيع اليومي</div>
+                            <div style="font-size: 22px; font-weight: 800; color: #00e676;">6,435 ر.ي</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION: WITHDRAWALS (السحوبات) ================= -->
+        <div id="sectionWithdraw" style="display: none;">
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title"><i class="fas fa-money-bill-wave" style="color: var(--accent-red);"></i> رصيد وسحوبات الشبكة</h2>
+                    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="link-accent">طلب سحب جديد ↗</a>
+                </div>
+                <div style="padding: 30px; text-align: center;">
+                    <div style="font-size: 44px; font-weight: 900; color: #00d2d3; margin-bottom: 10px;">6,255.00 ر.ي</div>
+                    <p style="color: var(--text-muted); font-size: 15px;">الرصيد المتاح حالياً والقابل للسحب فوراً</p>
+                    <div style="margin-top: 25px;">
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="btn-action-red" style="max-width: 250px; margin: 0 auto;">
+                            <i class="fas fa-hand-holding-dollar"></i> تقديم طلب سحب
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating App Button -->
+    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="floating-app-btn" title="تثبيت التطبيق على جوالك">
+        <i class="fas fa-download"></i>
+        <span>ثبّت التطبيق</span>
+    </a>
+
+    <!-- Toast Notification -->
+    <div id="toastMessage" class="toast-msg">
+        <i class="fas fa-circle-check" style="color: var(--status-green);"></i>
+        <span id="toastText">تمت العملية بنجاح!</span>
+    </div>
+
+    <!-- MODAL: EDIT NETWORK -->
+    <div id="modalEditNetwork" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-pen"></i> تعديل بيانات الشبكة</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalEditNetwork')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>اسم الشبكة:</label>
+                    <input type="text" id="inputNetName" value="5G فايف جي">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف:</label>
+                    <input type="text" id="inputNetPhone" value="773769835">
+                </div>
+                <div class="form-group">
+                    <label>معرّف الشبكة (ID):</label>
+                    <input type="text" id="inputNetId" value="21779">
+                </div>
+                <button class="btn-action-red" onclick="saveNetworkDetails()">
+                    <i class="fas fa-save"></i> حفظ التعديل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT STATS -->
+    <div id="modalEditStats" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-chart-line"></i> تعديل أرقام الإحصائيات</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalEditStats')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>الرصيد المتاح:</label>
+                    <input type="text" id="inputAvailBal" value="6,255.00 ر.ي">
+                </div>
+                <div class="form-group">
+                    <label>صافي المبيعات:</label>
+                    <input type="text" id="inputNetSales" value="57,915.00 ر.ي">
+                </div>
+                <div class="form-group">
+                    <label>الكروت المباعة:</label>
+                    <input type="text" id="inputSoldCards" value="260">
+                </div>
+                <div class="form-group">
+                    <label>الكروت المتاحة:</label>
+                    <input type="text" id="inputAvailCards" value="993">
+                </div>
+                <button class="btn-action-red" onclick="saveStatsDetails()">
+                    <i class="fas fa-save"></i> حفظ الإحصائيات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT CARD -->
+    <div id="modalAddCard" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalCardTitle"><i class="fas fa-ticket"></i> إضافة كرت جديد</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalAddCard')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editCardIndex" value="-1">
+                <div class="form-group">
+                    <label>رقم الكرت *:</label>
+                    <input type="text" id="inputCardNumber" placeholder="مثال: 043171525" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور (اختياري):</label>
+                    <input type="text" id="inputCardPassword" placeholder="-" value="-">
+                </div>
+                <div class="form-group">
+                    <label>الفئة *:</label>
+                    <select id="inputCardCategory">
+                        <option value="100">100 ر.ي</option>
+                        <option value="250">250 ر.ي</option>
+                        <option value="500">500 ر.ي</option>
+                        <option value="3000">3,000 ر.ي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الحالة *:</label>
+                    <select id="inputCardStatus">
+                        <option value="متاح">متاح</option>
+                        <option value="مباع">مباع</option>
+                        <option value="منتهي">منتهي</option>
+                    </select>
+                </div>
+                <button class="btn-action-red" onclick="saveCardRecord()">
+                    <i class="fas fa-check"></i> تأكيد وحفظ الكرت
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Default initial cards data matching user's input
+        const DEFAULT_CARDS = [
+            { number: "043171525", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "034528302", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "089647240", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "817733600", pass: "-", category: "250", status: "مباع", date: "2026-11-09" },
+            { number: "001996495", pass: "-", category: "100", status: "مباع", date: "2026-11-09" },
+            { number: "089902229", pass: "-", category: "100", status: "مباع", date: "2026-11-09" }
+        ];
+
+        let cardsList = [];
+        let currentStatusFilter = 'all';
+
+        // Load data from LocalStorage
+        function initData() {
+            // Network Details
+            const savedNetName = localStorage.getItem('5g_net_name') || "5G فايف جي";
+            const savedNetPhone = localStorage.getItem('5g_net_phone') || "773769835";
+            const savedNetId = localStorage.getItem('5g_net_id') || "21779";
+            document.getElementById('netNameDisplay').textContent = savedNetName;
+            document.getElementById('netPhoneDisplay').textContent = savedNetPhone;
+            document.getElementById('netIdDisplay').textContent = savedNetId;
+
+            // Stats
+            const savedAvailBal = localStorage.getItem('5g_avail_bal') || "6,255.00 ر.ي";
+            const savedNetSales = localStorage.getItem('5g_net_sales') || "57,915.00 ر.ي";
+            const savedSoldCards = localStorage.getItem('5g_sold_cards') || "260";
+            const savedAvailCards = localStorage.getItem('5g_avail_cards') || "993";
+            document.getElementById('valAvailableBalance').textContent = savedAvailBal;
+            document.getElementById('valNetSales').textContent = savedNetSales;
+            document.getElementById('valSoldCards').textContent = savedSoldCards;
+            document.getElementById('valAvailableCards').textContent = savedAvailCards;
+
+            // Cards list
+            const storedCards = localStorage.getItem('5g_cards_list');
+            if (storedCards) {
+                try {
+                    cardsList = JSON.parse(storedCards);
+                } catch(e) {
+                    cardsList = DEFAULT_CARDS;
+                }
+            } else {
+                cardsList = DEFAULT_CARDS;
+                localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+            }
+
+            renderCardsTable();
+        }
+
+        // Render Search Cards Table
+        function renderCardsTable() {
+            const tbody = document.getElementById('searchCardsTableBody');
+            tbody.innerHTML = '';
+
+            const query = (document.getElementById('cardSearchInput').value || '').trim().toLowerCase();
+
+            const filtered = cardsList.filter(card => {
+                const matchStatus = (currentStatusFilter === 'all' || card.status === currentStatusFilter);
+                const matchQuery = !query || card.number.toLowerCase().includes(query) || card.category.includes(query);
+                return matchStatus && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">لا توجد كروت مطابقة لمعايير البحث</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((card, index) => {
+                const realIndex = cardsList.indexOf(card);
+                const tr = document.createElement('tr');
+                
+                let badgeClass = "badge-status-green";
+                if (card.status === 'مباع') badgeClass = "background: rgba(255,165,2,0.15); border: 1px solid rgba(255,165,2,0.4); color: #ffa502; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block;";
+                else if (card.status === 'منتهي') badgeClass = "background: rgba(255,71,87,0.15); border: 1px solid rgba(255,71,87,0.4); color: #ff4757; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block;";
+
+                tr.innerHTML = `
+                    <td style="font-family: monospace; font-size: 15px; color: #fff;">${card.number}</td>
+                    <td>${card.pass}</td>
+                    <td>${card.category} ر.ي</td>
+                    <td><span style="${card.status === 'متاح' ? '' : badgeClass}" class="${card.status === 'متاح' ? 'badge-status-green' : ''}">${card.status}</span></td>
+                    <td>${card.date}</td>
+                    <td>
+                        <button class="btn-table-action" onclick="editCard(${realIndex})" title="تعديل"><i class="fas fa-pen"></i></button>
+                        <button class="btn-table-action" onclick="copyText('${card.number}')" title="نسخ"><i class="fas fa-copy"></i></button>
+                        <button class="btn-table-action" style="color:#ff6b75;" onclick="deleteCard(${realIndex})" title="حذف"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Subtab Switcher
+        function showSection(section) {
+            document.getElementById('sectionOverview').style.display = 'none';
+            document.getElementById('sectionCards').style.display = 'none';
+            document.getElementById('sectionSales').style.display = 'none';
+            document.getElementById('sectionWithdraw').style.display = 'none';
+
+            document.getElementById('tabBtnOverview').classList.remove('active');
+            document.getElementById('tabBtnCards').classList.remove('active');
+            document.getElementById('tabBtnSales').classList.remove('active');
+            document.getElementById('tabBtnWithdraw').classList.remove('active');
+
+            if (section === 'overview') {
+                document.getElementById('sectionOverview').style.display = 'block';
+                document.getElementById('tabBtnOverview').classList.add('active');
+            } else if (section === 'cards') {
+                document.getElementById('sectionCards').style.display = 'block';
+                document.getElementById('tabBtnCards').classList.add('active');
+            } else if (section === 'sales') {
+                document.getElementById('sectionSales').style.display = 'block';
+                document.getElementById('tabBtnSales').classList.add('active');
+            } else if (section === 'withdraw') {
+                document.getElementById('sectionWithdraw').style.display = 'block';
+                document.getElementById('tabBtnWithdraw').classList.add('active');
+            }
+        }
+
+        // Filter cards by status
+        function filterCardsByStatus(status, chipElement) {
+            currentStatusFilter = status;
+            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            if (chipElement) chipElement.classList.add('active');
+            renderCardsTable();
+        }
+
+        function searchCardsTable() {
+            renderCardsTable();
+        }
+
+        function refreshCardsData() {
+            showToast("تم تحديث البيانات بنجاح!");
+            renderCardsTable();
+        }
+
+        // Copy Text Function
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(() => {
+                showToast("تم نسخ رقم الكرت: " + txt);
+            }).catch(() => {
+                showToast("الكرت: " + txt);
+            });
+        }
+
+        // Modals Management
+        function openEditNetworkModal() {
+            document.getElementById('inputNetName').value = document.getElementById('netNameDisplay').textContent;
+            document.getElementById('inputNetPhone').value = document.getElementById('netPhoneDisplay').textContent;
+            document.getElementById('inputNetId').value = document.getElementById('netIdDisplay').textContent;
+            document.getElementById('modalEditNetwork').style.display = 'flex';
+        }
+
+        function saveNetworkDetails() {
+            const name = document.getElementById('inputNetName').value.trim();
+            const phone = document.getElementById('inputNetPhone').value.trim();
+            const id = document.getElementById('inputNetId').value.trim();
+
+            if (!name) return;
+
+            localStorage.setItem('5g_net_name', name);
+            localStorage.setItem('5g_net_phone', phone);
+            localStorage.setItem('5g_net_id', id);
+
+            document.getElementById('netNameDisplay').textContent = name;
+            document.getElementById('netPhoneDisplay').textContent = phone;
+            document.getElementById('netIdDisplay').textContent = id;
+
+            closeModal('modalEditNetwork');
+            showToast("تم تحديث بيانات الشبكة!");
+        }
+
+        function openEditStatsModal() {
+            document.getElementById('inputAvailBal').value = document.getElementById('valAvailableBalance').textContent;
+            document.getElementById('inputNetSales').value = document.getElementById('valNetSales').textContent;
+            document.getElementById('inputSoldCards').value = document.getElementById('valSoldCards').textContent;
+            document.getElementById('inputAvailCards').value = document.getElementById('valAvailableCards').textContent;
+            document.getElementById('modalEditStats').style.display = 'flex';
+        }
+
+        function saveStatsDetails() {
+            const bal = document.getElementById('inputAvailBal').value.trim();
+            const sales = document.getElementById('inputNetSales').value.trim();
+            const sold = document.getElementById('inputSoldCards').value.trim();
+            const avail = document.getElementById('inputAvailCards').value.trim();
+
+            localStorage.setItem('5g_avail_bal', bal);
+            localStorage.setItem('5g_net_sales', sales);
+            localStorage.setItem('5g_sold_cards', sold);
+            localStorage.setItem('5g_avail_cards', avail);
+
+            document.getElementById('valAvailableBalance').textContent = bal;
+            document.getElementById('valNetSales').textContent = sales;
+            document.getElementById('valSoldCards').textContent = sold;
+            document.getElementById('valAvailableCards').textContent = avail;
+
+            closeModal('modalEditStats');
+            showToast("تم حفظ الإحصائيات بنجاح!");
+        }
+
+        function openAddNewCardModal() {
+            document.getElementById('modalCardTitle').innerHTML = '<i class="fas fa-ticket"></i> إضافة كرت جديد';
+            document.getElementById('editCardIndex').value = '-1';
+            document.getElementById('inputCardNumber').value = '';
+            document.getElementById('inputCardPassword').value = '-';
+            document.getElementById('inputCardCategory').value = '100';
+            document.getElementById('inputCardStatus').value = 'متاح';
+            document.getElementById('modalAddCard').style.display = 'flex';
+        }
+
+        function editCard(index) {
+            const card = cardsList[index];
+            if (!card) return;
+            document.getElementById('modalCardTitle').innerHTML = '<i class="fas fa-pen"></i> تعديل الكرت';
+            document.getElementById('editCardIndex').value = index;
+            document.getElementById('inputCardNumber').value = card.number;
+            document.getElementById('inputCardPassword').value = card.pass;
+            document.getElementById('inputCardCategory').value = card.category;
+            document.getElementById('inputCardStatus').value = card.status;
+            document.getElementById('modalAddCard').style.display = 'flex';
+        }
+
+        function saveCardRecord() {
+            const index = parseInt(document.getElementById('editCardIndex').value);
+            const num = document.getElementById('inputCardNumber').value.trim();
+            const pass = document.getElementById('inputCardPassword').value.trim() || "-";
+            const cat = document.getElementById('inputCardCategory').value;
+            const status = document.getElementById('inputCardStatus').value;
+
+            if (!num) {
+                alert("يرجى إدخال رقم الكرت!");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            if (index >= 0 && index < cardsList.length) {
+                cardsList[index] = { ...cardsList[index], number: num, pass: pass, category: cat, status: status };
+                showToast("تم تعديل الكرت بنجاح!");
+            } else {
+                cardsList.unshift({ number: num, pass: pass, category: cat, status: status, date: today });
+                showToast("تمت إضافة الكرت بنجاح!");
+            }
+
+            localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+            closeModal('modalAddCard');
+            renderCardsTable();
+        }
+
+        function deleteCard(index) {
+            if (confirm("هل أنت متأكد من حذف هذا الكرت؟")) {
+                cardsList.splice(index, 1);
+                localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+                renderCardsTable();
+                showToast("تم حذف الكرت!");
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMessage');
+            document.getElementById('toastText').textContent = msg;
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function openProfileModal() {
+            window.open('https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913', '_blank');
+        }
+
+        function openAddCategoryModal() {
+            const cat = prompt("أدخل اسم أو فئة الكرت الجديدة (مثال: 1000):");
+            if (!cat) return;
+            const price = prompt("أدخل سعر الفئة بالريال اليمني:", cat + " ر.ي");
+            const avail = prompt("الكمية المتاحة:", "100");
+            const total = prompt("الإجمالي:", "500");
+
+            const tbody = document.getElementById('categoriesTableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${cat}</td>
+                <td>${price}</td>
+                <td>${avail}</td>
+                <td>${total}</td>
+                <td><span class="badge-status-green">كافي</span></td>
+            `;
+            tbody.appendChild(tr);
+            showToast("تمت إضافة الفئة الجديدة!");
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initData);
+    </script>
+</body>
+</html>
