@@ -447,15 +447,35 @@
             margin-top: 2px;
         }
 
-        .stat-icon-simple {
+        .stat-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: transparent !important;
-            border-radius: 0;
+            flex-shrink: 0;
             box-shadow: none;
-            width: auto;
-            height: auto;
+        }
+
+        .stat-icon-badge.badge-clock {
+            background: rgba(56, 189, 248, 0.16);
+            color: #38bdf8;
+        }
+
+        .stat-icon-badge.badge-chart {
+            background: rgba(239, 68, 68, 0.16);
+            color: #ff4757;
+        }
+
+        .stat-icon-badge.badge-cash {
+            background: rgba(245, 158, 11, 0.16);
+            color: #f59e0b;
+        }
+
+        .stat-icon-badge.badge-check {
+            background: rgba(16, 185, 129, 0.16);
+            color: #10b981;
         }
 
         /* Secondary actions bar */
@@ -1235,11 +1255,11 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الرصيد الافتتاحي</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00d2d3" style="width: 22px; height: 22px; display: block;">
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stOpenBal">90.00</span>
@@ -1251,11 +1271,12 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">صافي المبيعات</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 20px; height: 20px; display: block;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                        <div class="stat-icon-badge badge-chart">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7 15 4-4 4 4 5-6" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stNetSales">187,650.00</span>
@@ -1267,14 +1288,13 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">إجمالي السحوبات</span>
-                        <span class="stat-icon-simple">
-                            <span style="background: #ea580c; width: 25px; height: 18px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ffffff" style="width: 14px; height: 14px;">
-                                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                                    <circle cx="12" cy="12" r="2.5" />
-                                </svg>
-                            </span>
-                        </span>
+                        <div class="stat-icon-badge badge-cash">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#f59e0b" style="width: 20px; height: 20px; display: block;">
+                                <rect width="18" height="11" x="3" y="6" rx="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="12" cy="11.5" r="2.2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 11.5h.01M18 11.5h.01M5 19h15" />
+                            </svg>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stTotalWithdraw">181,395.00</span>
@@ -1286,11 +1306,11 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الرصيد الختامي</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00e676" style="width: 22px; height: 22px; display: block;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        <div class="stat-icon-badge badge-check">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#10b981" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="stCloseBal">6,345.00</span>
@@ -1645,12 +1665,12 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الرصيد المتاح</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#00d2d3" style="width: 22px; height: 22px; display: block;">
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
                                 <rect width="20" height="14" x="2" y="5" rx="2" stroke-linecap="round" stroke-linejoin="round" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2 10h20" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="valAvailableBalance">6,255.00 ر.ي</span>
@@ -1661,11 +1681,12 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">صافي المبيعات</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 20px; height: 20px; display: block;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                        <div class="stat-icon-badge badge-red">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7 15 4-4 4 4 5-6" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="valNetSales">57,915.00 ر.ي</span>
@@ -1676,13 +1697,11 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الكروت المباعة</span>
-                        <span class="stat-icon-simple">
-                            <span style="background: rgba(234, 88, 12, 0.2); border: 1px solid rgba(234, 88, 12, 0.4); width: 28px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ea580c" style="width: 15px; height: 15px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
-                                </svg>
-                            </span>
-                        </span>
+                        <div class="stat-icon-badge badge-amber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#f59e0b" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
+                            </svg>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="valSoldCards">260</span>
@@ -1693,11 +1712,11 @@
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <span class="stat-label">الكروت المتاحة</span>
-                        <span class="stat-icon-simple">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 22px; height: 22px; display: block;">
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                             </svg>
-                        </span>
+                        </div>
                     </div>
                     <div class="stat-value-box">
                         <span class="stat-value" id="valAvailableCards">993</span>
