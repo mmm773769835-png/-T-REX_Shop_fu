@@ -1907,9 +1907,8 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Master Statement Dataset: All 62 days from 2026-11-09 down to 2026-09-09
-        const ALL_STATEMENT_ROWS = [
-            // November 2026 (9 days)
+                // Exact 30-day statement array from Tabweeb (Sum = 187,650.00 YER)
+        const STATEMENT_ROWS = [
             { date: "2026-11-09", count: 9,  net: "1,440.00",  bonus: "0.00" },
             { date: "2026-11-08", count: 41, net: "12,555.00", bonus: "0.00" },
             { date: "2026-11-07", count: 36, net: "6,345.00",  bonus: "0.00" },
@@ -1919,8 +1918,6 @@
             { date: "2026-11-03", count: 30, net: "6,525.00",  bonus: "0.00" },
             { date: "2026-11-02", count: 19, net: "3,915.00",  bonus: "0.00" },
             { date: "2026-11-01", count: 31, net: "5,760.00",  bonus: "0.00" },
-
-            // October 2026 (31 days)
             { date: "2026-10-31", count: 29, net: "4,320.00",  bonus: "0.00" },
             { date: "2026-10-30", count: 35, net: "9,495.00",  bonus: "0.00" },
             { date: "2026-10-29", count: 37, net: "8,010.00",  bonus: "0.00" },
@@ -1941,45 +1938,8 @@
             { date: "2026-10-14", count: 34, net: "6,705.00",  bonus: "0.00" },
             { date: "2026-10-13", count: 31, net: "5,895.00",  bonus: "0.00" },
             { date: "2026-10-12", count: 24, net: "4,725.00",  bonus: "0.00" },
-            { date: "2026-10-11", count: 27, net: "5,040.00",  bonus: "0.00" },
-            { date: "2026-10-10", count: 15, net: "2,300.00",  bonus: "0.00" },
-            { date: "2026-10-09", count: 14, net: "2,150.00",  bonus: "0.00" },
-            { date: "2026-10-08", count: 16, net: "2,400.00",  bonus: "0.00" },
-            { date: "2026-10-07", count: 15, net: "2,250.00",  bonus: "0.00" },
-            { date: "2026-10-06", count: 14, net: "2,100.00",  bonus: "0.00" },
-            { date: "2026-10-05", count: 16, net: "2,350.00",  bonus: "0.00" },
-            { date: "2026-10-04", count: 15, net: "2,250.00",  bonus: "0.00" },
-            { date: "2026-10-03", count: 14, net: "2,200.00",  bonus: "0.00" },
-            { date: "2026-10-02", count: 14, net: "2,000.00",  bonus: "0.00" },
-            { date: "2026-10-01", count: 350, net: "70,000.00", bonus: "0.00" },
-
-            // September 2026 (down to 2026-09-09)
-            { date: "2026-09-30", count: 13, net: "1,950.00",  bonus: "0.00" },
-            { date: "2026-09-29", count: 12, net: "1,800.00",  bonus: "0.00" },
-            { date: "2026-09-28", count: 14, net: "2,100.00",  bonus: "0.00" },
-            { date: "2026-09-27", count: 11, net: "1,650.00",  bonus: "0.00" },
-            { date: "2026-09-26", count: 12, net: "1,850.00",  bonus: "0.00" },
-            { date: "2026-09-25", count: 13, net: "1,900.00",  bonus: "0.00" },
-            { date: "2026-09-24", count: 11, net: "1,600.00",  bonus: "0.00" },
-            { date: "2026-09-23", count: 10, net: "1,500.00",  bonus: "0.00" },
-            { date: "2026-09-22", count: 12, net: "1,750.00",  bonus: "0.00" },
-            { date: "2026-09-21", count: 9,  net: "1,350.00",  bonus: "0.00" },
-            { date: "2026-09-20", count: 11, net: "1,600.00",  bonus: "0.00" },
-            { date: "2026-09-19", count: 10, net: "1,450.00",  bonus: "0.00" },
-            { date: "2026-09-18", count: 8,  net: "1,200.00",  bonus: "0.00" },
-            { date: "2026-09-17", count: 9,  net: "1,300.00",  bonus: "0.00" },
-            { date: "2026-09-16", count: 7,  net: "1,050.00",  bonus: "0.00" },
-            { date: "2026-09-15", count: 8,  net: "1,150.00",  bonus: "0.00" },
-            { date: "2026-09-14", count: 6,  net: "900.00",    bonus: "0.00" },
-            { date: "2026-09-13", count: 5,  net: "750.00",    bonus: "0.00" },
-            { date: "2026-09-12", count: 4,  net: "600.00",    bonus: "0.00" },
-            { date: "2026-09-11", count: 3,  net: "450.00",    bonus: "0.00" },
-            { date: "2026-09-10", count: 2,  net: "300.00",    bonus: "0.00" },
-            { date: "2026-09-09", count: 0,  net: "0.00",      bonus: "0.00" }
+            { date: "2026-10-11", count: 27, net: "5,040.00",  bonus: "0.00" }
         ];
-
-        // Default 30-day view (matches Tabweeb last 30 days)
-        const STATEMENT_ROWS = ALL_STATEMENT_ROWS.slice(0, 30);
 
         const DEFAULT_CARDS = [
             { number: "043171525", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
@@ -2003,10 +1963,13 @@
             document.getElementById('netPhoneDisplay').textContent = savedNetPhone;
             document.getElementById('netIdDisplay').textContent = savedNetId;
 
-            const savedOpen = localStorage.getItem('5g_st_open_v4') || "90.00";
-            const savedNet = localStorage.getItem('5g_st_net_v4') || "187,650.00";
-            const savedWith = localStorage.getItem('5g_st_with_v4') || "181,395.00";
-            const savedClose = localStorage.getItem('5g_st_close_v4') || "6,345.00";
+            const savedOpen = "90.00";
+            const savedNet = "187,650.00";
+            const savedWith = "181,395.00";
+            const savedClose = "6,345.00";
+            localStorage.removeItem('5g_st_net');
+            localStorage.removeItem('5g_st_with');
+            localStorage.removeItem('5g_st_close');
             document.getElementById('stOpenBal').textContent = savedOpen;
             document.getElementById('stNetSales').textContent = savedNet;
             document.getElementById('stTotalWithdraw').textContent = savedWith;
@@ -2192,7 +2155,7 @@
             }
         }
 
-                function selectPeriod(period, btn) {
+                        function selectPeriod(period, btn) {
             document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
             if (btn) {
                 btn.classList.add('active');
@@ -2210,7 +2173,7 @@
                 document.getElementById('stCloseBal').textContent = '7,695.00';
                 document.getElementById('filterFromDate').value = '2026-11-09';
                 document.getElementById('filterToDate').value = '2026-11-09';
-                renderStatementTable(ALL_STATEMENT_ROWS.slice(0, 1));
+                renderStatementTable(STATEMENT_ROWS.slice(0, 1));
                 showToast("عرض عمليات اليوم فقط (2026-11-09)");
             } else if (period === '7days') {
                 document.getElementById('stOpenBal').textContent = '6,255.00';
@@ -2219,7 +2182,7 @@
                 document.getElementById('stCloseBal').textContent = '8,745.00';
                 document.getElementById('filterFromDate').value = '2026-11-03';
                 document.getElementById('filterToDate').value = '2026-11-09';
-                renderStatementTable(ALL_STATEMENT_ROWS.slice(0, 7));
+                renderStatementTable(STATEMENT_ROWS.slice(0, 7));
                 showToast("عرض عمليات آخر 7 أيام");
             } else if (period === '30days') {
                 document.getElementById('stOpenBal').textContent = '90.00';
@@ -2228,8 +2191,8 @@
                 document.getElementById('stCloseBal').textContent = '6,345.00';
                 document.getElementById('filterFromDate').value = '2026-10-11';
                 document.getElementById('filterToDate').value = '2026-11-09';
-                renderStatementTable(ALL_STATEMENT_ROWS.slice(0, 30));
-                showToast("عرض عمليات آخر 30 يوماً");
+                renderStatementTable(STATEMENT_ROWS);
+                showToast("عرض كشف حساب آخر 30 يوماً (187,650.00 ر.ي)");
             } else if (period === 'custom') {
                 toggleFilterBody(true);
                 const body = document.getElementById('filterFormBody');
@@ -2239,37 +2202,28 @@
         }
 
         function applyStatementFilters() {
-            const from = document.getElementById('filterFromDate').value;
-            const to = document.getElementById('filterToDate').value;
+            const from = (document.getElementById('filterFromDate').value || '').trim();
+            const to = (document.getElementById('filterToDate').value || '').trim();
             const search = (document.getElementById('filterSearchInput').value || '').trim().toLowerCase();
 
-            // عند التصفية اليدوية تفعيل زر تخصيص
-            document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
-            const customBtn = Array.from(document.querySelectorAll('.period-btn')).find(function(b) {
-                return b.getAttribute('onclick') && b.getAttribute('onclick').includes('custom');
-            });
-            if (customBtn) customBtn.classList.add('active');
-
-            // 1. تصفير الحساب لشهر تسعة حتى يوم 9 (2026-09-09)
-            if ((to && to <= '2026-09-09') || (from && from <= '2026-09-09' && (!to || to <= '2026-09-09'))) {
+            // 1. تصفير الحساب عند اختيار شهر 9
+            if ((from && from.startsWith('2026-09')) || (to && to.startsWith('2026-09') && (!from || from <= '2026-09-30'))) {
                 document.getElementById('stOpenBal').textContent = '0.00';
                 document.getElementById('stNetSales').textContent = '0.00';
                 document.getElementById('stTotalWithdraw').textContent = '0.00';
                 document.getElementById('stCloseBal').textContent = '0.00';
-                const filtered = ALL_STATEMENT_ROWS.filter(function(r) { return r.date === '2026-09-09'; });
-                renderStatementTable(filtered.length ? filtered : [{ date: "2026-09-09", count: 0, net: "0.00", bonus: "0.00" }]);
-                showToast("تم تصفير الحساب لتاريخ 9 سبتمبر (الرصيد المتاح 0.00 ر.ي)");
+                renderStatementTable([{ date: "2026-09-09", count: 0, net: "0.00", bonus: "0.00" }]);
+                showToast("تم تصفير الحساب لشهر 9 (الرصيد المتاح 0.00 ر.ي)");
                 return;
             }
 
             // 2. شرط 10 يوم 1: المبلغ 70 ألف
-            if (from === '2026-10-01' && to === '2026-10-01') {
+            if (from === '2026-10-01' && (to === '2026-10-01' || !to)) {
                 document.getElementById('stOpenBal').textContent = '0.00';
                 document.getElementById('stNetSales').textContent = '70,000.00';
                 document.getElementById('stTotalWithdraw').textContent = '0.00';
                 document.getElementById('stCloseBal').textContent = '70,000.00';
-                const filtered = ALL_STATEMENT_ROWS.filter(function(r) { return r.date === '2026-10-01'; });
-                renderStatementTable(filtered);
+                renderStatementTable([{ date: "2026-10-01", count: 35, net: "70,000.00", bonus: "0.00" }]);
                 showToast("كشف حساب 1 أكتوبر: المبلغ 70,000.00 ر.ي (الرصيد المتاح 70,000.00)");
                 return;
             }
@@ -2280,46 +2234,48 @@
                 document.getElementById('stNetSales').textContent = (from === '2026-10-02') ? '2,000.00' : '72,000.00';
                 document.getElementById('stTotalWithdraw').textContent = '0.00';
                 document.getElementById('stCloseBal').textContent = '72,000.00';
-                const filtered = (from === '2026-10-02')
-                    ? ALL_STATEMENT_ROWS.filter(function(r) { return r.date === '2026-10-02'; })
-                    : ALL_STATEMENT_ROWS.filter(function(r) { return r.date >= '2026-10-01' && r.date <= '2026-10-02'; });
-                renderStatementTable(filtered);
+                const rows = (from === '2026-10-02')
+                    ? [{ date: "2026-10-02", count: 14, net: "2,000.00", bonus: "0.00" }]
+                    : [
+                        { date: "2026-10-02", count: 14, net: "2,000.00", bonus: "0.00" },
+                        { date: "2026-10-01", count: 35, net: "70,000.00", bonus: "0.00" }
+                      ];
+                renderStatementTable(rows);
                 showToast("كشف حساب 2 أكتوبر: المبلغ الإجمالي 72,000.00 ر.ي (الرصيد المتاح 72,000.00)");
                 return;
             }
 
-            // 4. كشف آخر 30 يوماً الافتراضي
-            if (from === '2026-10-11' && to === '2026-11-09') {
-                document.getElementById('stOpenBal').textContent = '90.00';
-                document.getElementById('stNetSales').textContent = '187,650.00';
-                document.getElementById('stTotalWithdraw').textContent = '181,395.00';
-                document.getElementById('stCloseBal').textContent = '6,345.00';
-                renderStatementTable(ALL_STATEMENT_ROWS.slice(0, 30));
+            // 4. الافتراضي أو آخر 30 يوماً
+            if (!from && !to) {
+                selectPeriod('30days');
                 return;
             }
 
-            // 5. تصفية عامة لجميع التواريخ من 2026-09-09 حتى 2026-11-09
-            const filtered = ALL_STATEMENT_ROWS.filter(function(r) {
+            // تصفية ضمن جدول الـ 30 يوماً الحقيقي فقط (لا يتجاوز أبداً 187,650 ر.ي)
+            const filtered = STATEMENT_ROWS.filter(function(r) {
                 const matchDate = (!from || r.date >= from) && (!to || r.date <= to);
                 const matchSearch = !search || r.date.includes(search) || r.net.includes(search);
                 return matchDate && matchSearch;
             });
 
-            // حساب الإحصائيات ديناميكياً
-            let netSum = 0;
-            filtered.forEach(function(r) {
-                netSum += parseFloat(String(r.net).replace(/,/g, '')) || 0;
-            });
-
-            const formattedNet = netSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('stNetSales').textContent = formattedNet;
-
-            // حساب السحوبات والرصيد الختامي بشكل واقعي
-            const withdraw = Math.max(0, netSum * 0.9666);
-            const close = Math.max(0, netSum - withdraw);
-            document.getElementById('stOpenBal').textContent = '90.00';
-            document.getElementById('stTotalWithdraw').textContent = withdraw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('stCloseBal').textContent = close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (filtered.length === STATEMENT_ROWS.length) {
+                document.getElementById('stOpenBal').textContent = '90.00';
+                document.getElementById('stNetSales').textContent = '187,650.00';
+                document.getElementById('stTotalWithdraw').textContent = '181,395.00';
+                document.getElementById('stCloseBal').textContent = '6,345.00';
+            } else {
+                let netSum = 0;
+                filtered.forEach(function(r) {
+                    netSum += parseFloat(String(r.net).replace(/,/g, '')) || 0;
+                });
+                const formattedNet = netSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('stNetSales').textContent = formattedNet;
+                const withdraw = Math.max(0, netSum * 0.9666);
+                const close = Math.max(0, netSum - withdraw);
+                document.getElementById('stOpenBal').textContent = '90.00';
+                document.getElementById('stTotalWithdraw').textContent = withdraw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('stCloseBal').textContent = close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
 
             renderStatementTable(filtered);
             showToast("تم تطبيق التصفية وعرض " + filtered.length + " يوماً");
@@ -2331,7 +2287,7 @@
             document.getElementById('filterSearchInput').value = '';
             document.getElementById('filterCategorySelect').value = 'all';
             selectPeriod('30days');
-            showToast("تمت إعادة تعيين التصفية");
+            showToast("تمت إعادة تعيين التصفية إلى آخر 30 يوماً (187,650.00 ر.ي)");
         }
 
         function toggleFilterBody(forceOpen) {
