@@ -390,69 +390,78 @@
         .stats-grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
+            gap: 16px;
             margin-bottom: 25px;
         }
 
         .stat-card {
-            background-color: var(--bg-card-alt);
+            background-color: var(--bg-card);
             border: 1px solid var(--border-card);
-            border-radius: 14px;
-            padding: 22px;
+            border-top: 2px solid #8B1A24;
+            border-radius: 10px;
+            padding: 16px 18px;
             display: flex;
-            align-items: flex-start;
+            flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            min-height: 105px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: transform 0.2s, border-color 0.2s;
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: rgba(200, 30, 40, 0.4);
         }
 
-        .stat-content {
+        .stat-card-header {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
         }
 
         .stat-label {
             font-size: 13px;
             font-weight: 700;
-            color: var(--text-muted);
+            color: #94a3b8;
+        }
+
+        .stat-value-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 900;
-            color: #ffffff;
-            margin: 4px 0;
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff !important;
+            line-height: 1.2;
             letter-spacing: -0.5px;
         }
 
-        .stat-subtext {
+        .stat-currency {
             font-size: 11px;
-            color: #6d8098;
+            color: #64748b;
             font-weight: 600;
+            margin-top: 2px;
         }
 
-        .stat-icon-wrapper {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+        .stat-icon-simple {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 15px;
         }
 
-        .icon-wallet { background: rgba(0, 210, 211, 0.12); color: #00d2d3; }
-        .icon-chart { background: rgba(255, 71, 87, 0.12); color: #ff4757; }
-        .icon-ticket { background: rgba(255, 165, 2, 0.12); color: #ffa502; }
-        .icon-box { background: rgba(46, 213, 115, 0.12); color: #2ed573; }
-        .icon-clock { background: rgba(0, 210, 211, 0.12); color: #00d2d3; }
-        .icon-success { background: rgba(0, 230, 118, 0.12); color: #00e676; }
+        .stat-icon-simple.icon-clock { color: #00d2d3; background: rgba(0, 210, 211, 0.1); }
+        .stat-icon-simple.icon-chart { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+        .stat-icon-simple.icon-ticket { color: #ffa502; background: rgba(255, 165, 2, 0.1); }
+        .stat-icon-simple.icon-success { color: #00e676; background: rgba(0, 230, 118, 0.1); }
+        .stat-icon-simple.icon-box { color: #2ed573; background: rgba(46, 213, 115, 0.1); }
 
         /* Secondary actions bar */
         .secondary-actions-bar {
@@ -709,28 +718,91 @@
             margin-top: 15px;
         }
 
-        .sub-nav-pills {
+        .sub-nav-segmented {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .sub-nav-pill {
             background: #0d1522;
             border: 1px solid var(--border-card);
-            color: #a0aec0;
-            padding: 8px 18px;
             border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .sub-nav-segment {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 14px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sub-nav-segment.active {
+            background: #a81c25;
+            color: #ffffff;
+        }
+
+        .grouping-chips-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .group-chip {
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            color: #94a3b8;
+            padding: 6px 16px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .sub-nav-pill.active {
-            background: var(--accent-red);
-            color: #fff;
-            border-color: var(--accent-red);
+        .group-chip.active {
+            background: #a81c25;
+            border-color: #a81c25;
+            color: #ffffff;
+        }
+
+        .statement-table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        .statement-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        .statement-table th {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            padding: 14px 16px;
+            border-bottom: 1px solid #1c2a3f;
+        }
+
+        .statement-table td {
+            font-size: 14px;
+            color: #ffffff;
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-family: inherit;
+        }
+
+        .statement-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         /* Filter Toolbar for Search in Cards */
@@ -1061,18 +1133,18 @@
                 <button class="period-btn" onclick="selectPeriod('custom', this)">تخصيص</button>
             </div>
 
-            <!-- Filter Panel: تصفية النتائج -->
-            <div class="filter-panel">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                    <h3 style="font-size: 15px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <!-- Filter Panel: تصفية النتائج (Collapsed by default like Image 2) -->
+            <div class="filter-panel" style="padding: 16px 20px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleFilterBody()">
+                    <span style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-filter" style="color: var(--accent-red);"></i> تصفية النتائج
-                    </h3>
-                    <span style="font-size: 12px; color: var(--text-muted); cursor: pointer;" onclick="toggleFilterBody()">
-                        <i class="fas fa-chevron-up" id="filterToggleIcon"></i>
+                    </span>
+                    <span style="font-size: 12px; color: var(--text-muted);">
+                        <i class="fas fa-chevron-down" id="filterToggleIcon"></i>
                     </span>
                 </div>
 
-                <div id="filterFormBody">
+                <div id="filterFormBody" style="display: none; padding-top: 15px;">
                     <div class="filter-grid">
                         <div class="filter-field">
                             <label>من تاريخ:</label>
@@ -1143,119 +1215,94 @@
                             <i class="fas fa-check"></i> تطبيق التصفية
                         </button>
                     </div>
+                </div>
 
-                    <div class="statement-notice">
-                        <strong>توضيح التواريخ:</strong> تُعرض عمليات البيع وتغطيات المكافآت بتاريخ العملية الفعلي، بينما تُحسب الفترة والأرصدة على تاريخ الاحتساب المحاسبي. وتُعرض الإلغاءات ومكافأة الترحيب بتاريخ تسجيلها، ويُعرض تاريخ الاحتساب عند عدم توفر وقت العملية.
-                    </div>
+                <div style="font-size: 11.5px; color: #64748b; line-height: 1.8; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.03);">
+                    توضيح التواريخ: تُعرض عمليات البيع وتغطيات المكافآت بتاريخ العملية الفعلي، بينما تُحسب الفترة والأرصدة على تاريخ الاحتساب المحاسبي. وتُعرض الإلغاءات ومكافأة الترحيب بتاريخ تسجيلها، ويُعرض تاريخ الاحتساب عند عدم توفر وقت العملية.
                 </div>
             </div>
 
-            <!-- The 4 Big Financial Summary Cards -->
+            <!-- The 4 Big Financial Summary Cards (Exact Layout & Icons of Image 2) -->
             <div class="stats-grid-4">
                 <!-- 1. الرصيد الافتتاحي -->
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">الرصيد الافتتاحي</span>
-                        <span class="stat-value" id="stOpenBal" style="color: #ffffff;">90.00</span>
-                        <span class="stat-subtext" style="color: var(--text-muted); font-size: 13px;">ر.ي</span>
+                        <span class="stat-icon-simple icon-clock"><i class="fa-regular fa-clock"></i></span>
                     </div>
-                    <div class="stat-icon-wrapper icon-clock">
-                        <i class="fas fa-history"></i>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stOpenBal">90.00</span>
+                        <span class="stat-currency">ر.ي</span>
                     </div>
                 </div>
 
                 <!-- 2. صافي المبيعات -->
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">صافي المبيعات</span>
-                        <span class="stat-value" id="stNetSales" style="color: #ffffff;">187,650.00</span>
-                        <span class="stat-subtext" style="color: var(--text-muted); font-size: 13px;">ر.ي</span>
+                        <span class="stat-icon-simple icon-chart"><i class="fas fa-arrow-trend-up"></i></span>
                     </div>
-                    <div class="stat-icon-wrapper icon-chart">
-                        <i class="fas fa-arrow-trend-up"></i>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stNetSales">187,650.00</span>
+                        <span class="stat-currency">ر.ي</span>
                     </div>
                 </div>
 
                 <!-- 3. إجمالي السحوبات -->
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">إجمالي السحوبات</span>
-                        <span class="stat-value" id="stTotalWithdraw" style="color: #ffffff;">181,395.00</span>
-                        <span class="stat-subtext" style="color: var(--text-muted); font-size: 13px;">ر.ي</span>
+                        <span class="stat-icon-simple icon-ticket"><i class="fa-regular fa-credit-card"></i></span>
                     </div>
-                    <div class="stat-icon-wrapper icon-ticket">
-                        <i class="fas fa-money-bill-transfer"></i>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stTotalWithdraw">181,395.00</span>
+                        <span class="stat-currency">ر.ي</span>
                     </div>
                 </div>
 
                 <!-- 4. الرصيد الختامي -->
                 <div class="stat-card">
-                    <div class="stat-content">
+                    <div class="stat-card-header">
                         <span class="stat-label">الرصيد الختامي</span>
-                        <span class="stat-value" id="stCloseBal" style="color: #ffffff;">6,345.00</span>
-                        <span class="stat-subtext" style="color: var(--text-muted); font-size: 13px;">ر.ي</span>
+                        <span class="stat-icon-simple icon-success"><i class="fa-regular fa-circle-check"></i></span>
                     </div>
-                    <div class="stat-icon-wrapper icon-success">
-                        <i class="fas fa-circle-check"></i>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stCloseBal">6,345.00</span>
+                        <span class="stat-currency">ر.ي</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Sub Nav Pills: الملخص / التفاصيل / كشف المخزون -->
-            <div class="sub-nav-pills">
-                <button class="sub-nav-pill active" id="btnViewSummary" onclick="switchStatementSubTab('summary')">الملخص</button>
-                <button class="sub-nav-pill" id="btnViewDetails" onclick="switchStatementSubTab('details')">التفاصيل</button>
-                <button class="sub-nav-pill" id="btnViewInventory" onclick="switchStatementSubTab('inventory')">كشف المخزون</button>
+            <!-- Sub Nav Segmented Control (Exact Replica of Image 2) -->
+            <div class="sub-nav-segmented">
+                <button class="sub-nav-segment" id="btnViewInventory" onclick="switchStatementSubTab('inventory')">كشف المخزون</button>
+                <button class="sub-nav-segment" id="btnViewDetails" onclick="switchStatementSubTab('details')">التفاصيل</button>
+                <button class="sub-nav-segment active" id="btnViewSummary" onclick="switchStatementSubTab('summary')">الملخص</button>
             </div>
 
-            <!-- Grouping Row: اليوم / الفئة / المزود / النوع -->
-            <div style="display: flex; gap: 8px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;">تجميع حسب:</span>
-                <button class="filter-chip active" onclick="groupStatementBy('day', this)">اليوم</button>
-                <button class="filter-chip" onclick="groupStatementBy('category', this)">الفئة</button>
-                <button class="filter-chip" onclick="groupStatementBy('provider', this)">المزود</button>
-                <button class="filter-chip" onclick="groupStatementBy('type', this)">النوع</button>
-                <button onclick="openEditStatementModal()" class="btn-table-action" style="margin-right: auto;">
-                    <i class="fas fa-pen"></i> تعديل مبالغ الكشف
-                </button>
+            <!-- Grouping Row: اليوم / الفئة / المزود / النوع (Exact Alignment of Image 2) -->
+            <div class="grouping-chips-row">
+                <button class="group-chip" onclick="groupStatementBy('type', this)">النوع</button>
+                <button class="group-chip" onclick="groupStatementBy('provider', this)">المزود</button>
+                <button class="group-chip" onclick="groupStatementBy('category', this)">الفئة</button>
+                <button class="group-chip active" onclick="groupStatementBy('day', this)">اليوم</button>
             </div>
 
-            <!-- Full 30-Day Table Card -->
-            <div class="card-section">
-                <div class="card-section-header">
-                    <h2 class="card-section-title">
-                        <i class="fas fa-calendar-days" style="color: var(--accent-red);"></i>
-                        جدول حركات المبيعات اليومية (30 يوماً)
-                    </h2>
-                    <span style="font-size: 13px; color: #ffffff; font-weight: 700;">
-                        المجموع: 891 كرت | 187,650.00 ر.ي
-                    </span>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>التاريخ</th>
-                                <th>العدد</th>
-                                <th>الصافي</th>
-                                <th>تعديلات المكافآت</th>
-                                <th>الإجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="statementTableBody">
-                            <!-- Populated with all 30 days data -->
-                        </tbody>
-                        <tfoot>
-                            <tr style="background: #0d1522; font-weight: 800;">
-                                <td style="color: var(--accent-red);">الإجمالي العام:</td>
-                                <td id="totalCountFooter" style="color: #fff;">891</td>
-                                <td id="totalNetFooter" style="color: #ffffff; font-size: 16px;">187,650.00 ر.ي</td>
-                                <td style="color: #a0aec0;">0.00</td>
-                                <td><span class="badge-status-green">مكتمل</span></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+            <!-- Full 30-Day Table (Exact Style & Columns of Image 2) -->
+            <div class="statement-table-container">
+                <table class="statement-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">التاريخ</th>
+                            <th style="width: 20%;">العدد</th>
+                            <th style="width: 25%;">الصافي</th>
+                            <th style="width: 30%;">تعديلات المكافآت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statementTableBody">
+                        <!-- Populated dynamically with all 30 days data -->
+                    </tbody>
+                </table>
             </div>
 
         </div>
@@ -1871,20 +1918,21 @@
             tbody.innerHTML = '';
             let totalCount = 0;
 
-            rows.forEach(function(row, i) {
+            rows.forEach(function(row) {
                 totalCount += row.count;
                 const tr = document.createElement('tr');
                 tr.innerHTML = 
-                    '<td style="font-family: monospace; font-size: 14px; color: #fff;">' + row.date + '</td>' +
-                    '<td style="color: #fff;"><strong>' + row.count + '</strong></td>' +
-                    '<td style="color: #ffffff; font-weight: 700;">' + row.net + '</td>' +
-                    '<td style="color: #a0aec0;">' + row.bonus + '</td>' +
-                    '<td><button class="btn-table-action" onclick="editStatementRow(' + i + ')" title="تعديل"><i class="fas fa-pen"></i></button></td>';
+                    '<td style="font-family: monospace; font-size: 13.5px; color: #fff;">' + row.date + '</td>' +
+                    '<td style="color: #fff;">' + row.count + '</td>' +
+                    '<td style="color: #ffffff;">' + row.net + '</td>' +
+                    '<td style="color: #64748b;">' + row.bonus + '</td>';
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('totalCountFooter').textContent = totalCount;
-            document.getElementById('totalNetFooter').textContent = '187,650.00 ر.ي';
+            const elTotalCount = document.getElementById('totalCountFooter');
+            if (elTotalCount) elTotalCount.textContent = totalCount;
+            const elTotalNet = document.getElementById('totalNetFooter');
+            if (elTotalNet) elTotalNet.textContent = '187,650.00 ر.ي';
         }
 
         function renderCardsTable() {
@@ -2030,7 +2078,7 @@
         }
 
         function switchStatementSubTab(tab) {
-            document.querySelectorAll('.sub-nav-pill').forEach(function(p) { p.classList.remove('active'); });
+            document.querySelectorAll('.sub-nav-segment').forEach(function(p) { p.classList.remove('active'); });
             if (tab === 'summary') document.getElementById('btnViewSummary').classList.add('active');
             if (tab === 'details') document.getElementById('btnViewDetails').classList.add('active');
             if (tab === 'inventory') document.getElementById('btnViewInventory').classList.add('active');
@@ -2038,7 +2086,7 @@
         }
 
         function groupStatementBy(type, el) {
-            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+            document.querySelectorAll('.group-chip').forEach(function(c) { c.classList.remove('active'); });
             if (el) el.classList.add('active');
             showToast("تم التجميع حسب: " + (type === 'day' ? 'اليوم' : type === 'category' ? 'الفئة' : type === 'provider' ? 'المزود' : 'النوع'));
         }
