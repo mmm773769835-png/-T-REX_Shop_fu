@@ -1175,7 +1175,7 @@
                     <div class="filter-grid">
                         <div class="filter-field">
                             <label>من تاريخ:</label>
-                            <input type="date" id="filterFromDate" value="2026-10-11" onchange="applyStatementFilters()">
+                            <input type="date" id="filterFromDate" value="2026-08-22" onchange="applyStatementFilters()">
                         </div>
                         <div class="filter-field">
                             <label>إلى تاريخ:</label>
@@ -1907,40 +1907,89 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-                        // Exact statement array: distributed daily sales down to 2026-10-09 (Total = 187,650.00 YER)
+                                // 80-day statement array: distributed daily sales down to 2026-08-22 (Total = 187,650.00 YER)
         const STATEMENT_ROWS = [
-            { date: "2026-11-09", count: 9,  net: "1,440.00",  bonus: "0.00" },
-            { date: "2026-11-08", count: 41, net: "12,555.00", bonus: "0.00" },
-            { date: "2026-11-07", count: 36, net: "6,345.00",  bonus: "0.00" },
-            { date: "2026-11-06", count: 35, net: "6,345.00",  bonus: "0.00" },
-            { date: "2026-11-05", count: 43, net: "8,730.00",  bonus: "0.00" },
-            { date: "2026-11-04", count: 29, net: "6,390.00",  bonus: "0.00" },
-            { date: "2026-11-03", count: 30, net: "6,525.00",  bonus: "0.00" },
-            { date: "2026-11-02", count: 19, net: "3,915.00",  bonus: "0.00" },
-            { date: "2026-11-01", count: 31, net: "5,760.00",  bonus: "0.00" },
-            { date: "2026-10-31", count: 29, net: "4,320.00",  bonus: "0.00" },
-            { date: "2026-10-30", count: 35, net: "9,495.00",  bonus: "0.00" },
-            { date: "2026-10-29", count: 37, net: "8,010.00",  bonus: "0.00" },
-            { date: "2026-10-28", count: 35, net: "7,425.00",  bonus: "0.00" },
-            { date: "2026-10-27", count: 24, net: "5,040.00",  bonus: "0.00" },
-            { date: "2026-10-26", count: 20, net: "4,005.00",  bonus: "0.00" },
-            { date: "2026-10-25", count: 38, net: "13,365.00", bonus: "0.00" },
-            { date: "2026-10-24", count: 30, net: "5,895.00",  bonus: "0.00" },
-            { date: "2026-10-23", count: 29, net: "5,085.00",  bonus: "0.00" },
-            { date: "2026-10-22", count: 29, net: "8,775.00",  bonus: "0.00" },
-            { date: "2026-10-21", count: 23, net: "4,590.00",  bonus: "0.00" },
-            { date: "2026-10-20", count: 22, net: "5,175.00",  bonus: "0.00" },
-            { date: "2026-10-19", count: 19, net: "3,915.00",  bonus: "0.00" },
-            { date: "2026-10-18", count: 27, net: "5,490.00",  bonus: "0.00" },
-            { date: "2026-10-17", count: 24, net: "5,175.00",  bonus: "0.00" },
-            { date: "2026-10-16", count: 28, net: "5,535.00",  bonus: "0.00" },
-            { date: "2026-10-15", count: 31, net: "5,985.00",  bonus: "0.00" },
-            { date: "2026-10-14", count: 34, net: "6,705.00",  bonus: "0.00" },
-            { date: "2026-10-13", count: 31, net: "5,895.00",  bonus: "0.00" },
-            { date: "2026-10-12", count: 28, net: "6,265.00",  bonus: "0.00" },
-            { date: "2026-10-11", count: 11, net: "1,500.00",  bonus: "0.00" },
-            { date: "2026-10-10", count: 14, net: "2,000.00",  bonus: "0.00" },
-            { date: "2026-10-09", count: 0,  net: "0.00",      bonus: "0.00" }
+            { date: "2026-11-09", count: 9, net: "1,440.00", bonus: "0.00" },
+            { date: "2026-11-08", count: 11, net: "2,400.00", bonus: "0.00" },
+            { date: "2026-11-07", count: 12, net: "2,300.00", bonus: "0.00" },
+            { date: "2026-11-06", count: 17, net: "3,010.00", bonus: "0.00" },
+            { date: "2026-11-05", count: 8, net: "1,650.00", bonus: "0.00" },
+            { date: "2026-11-04", count: 12, net: "2,500.00", bonus: "0.00" },
+            { date: "2026-11-03", count: 15, net: "2,650.00", bonus: "0.00" },
+            { date: "2026-11-02", count: 13, net: "2,750.00", bonus: "0.00" },
+            { date: "2026-11-01", count: 14, net: "2,900.00", bonus: "0.00" },
+            { date: "2026-10-31", count: 8, net: "1,850.00", bonus: "0.00" },
+            { date: "2026-10-30", count: 12, net: "2,500.00", bonus: "0.00" },
+            { date: "2026-10-29", count: 15, net: "2,750.00", bonus: "0.00" },
+            { date: "2026-10-28", count: 16, net: "2,900.00", bonus: "0.00" },
+            { date: "2026-10-27", count: 8, net: "1,650.00", bonus: "0.00" },
+            { date: "2026-10-26", count: 10, net: "1,850.00", bonus: "0.00" },
+            { date: "2026-10-25", count: 7, net: "1,550.00", bonus: "0.00" },
+            { date: "2026-10-24", count: 14, net: "2,650.00", bonus: "0.00" },
+            { date: "2026-10-23", count: 8, net: "1,750.00", bonus: "0.00" },
+            { date: "2026-10-22", count: 15, net: "3,050.00", bonus: "0.00" },
+            { date: "2026-10-21", count: 13, net: "2,300.00", bonus: "0.00" },
+            { date: "2026-10-20", count: 15, net: "3,050.00", bonus: "0.00" },
+            { date: "2026-10-19", count: 8, net: "1,550.00", bonus: "0.00" },
+            { date: "2026-10-18", count: 12, net: "2,400.00", bonus: "0.00" },
+            { date: "2026-10-17", count: 10, net: "2,300.00", bonus: "0.00" },
+            { date: "2026-10-16", count: 12, net: "2,100.00", bonus: "0.00" },
+            { date: "2026-10-15", count: 9, net: "2,000.00", bonus: "0.00" },
+            { date: "2026-10-14", count: 12, net: "2,500.00", bonus: "0.00" },
+            { date: "2026-10-13", count: 11, net: "2,200.00", bonus: "0.00" },
+            { date: "2026-10-12", count: 10, net: "1,750.00", bonus: "0.00" },
+            { date: "2026-10-11", count: 9, net: "1,850.00", bonus: "0.00" },
+            { date: "2026-10-10", count: 11, net: "2,500.00", bonus: "0.00" },
+            { date: "2026-10-09", count: 15, net: "2,900.00", bonus: "0.00" },
+            { date: "2026-10-08", count: 10, net: "2,000.00", bonus: "0.00" },
+            { date: "2026-10-07", count: 14, net: "2,900.00", bonus: "0.00" },
+            { date: "2026-10-06", count: 13, net: "2,900.00", bonus: "0.00" },
+            { date: "2026-10-05", count: 10, net: "2,200.00", bonus: "0.00" },
+            { date: "2026-10-04", count: 7, net: "1,550.00", bonus: "0.00" },
+            { date: "2026-10-03", count: 13, net: "2,300.00", bonus: "0.00" },
+            { date: "2026-10-02", count: 9, net: "2,100.00", bonus: "0.00" },
+            { date: "2026-10-01", count: 11, net: "2,400.00", bonus: "0.00" },
+            { date: "2026-09-30", count: 9, net: "1,550.00", bonus: "0.00" },
+            { date: "2026-09-29", count: 13, net: "2,500.00", bonus: "0.00" },
+            { date: "2026-09-28", count: 16, net: "3,100.00", bonus: "0.00" },
+            { date: "2026-09-27", count: 13, net: "2,550.00", bonus: "0.00" },
+            { date: "2026-09-26", count: 9, net: "1,900.00", bonus: "0.00" },
+            { date: "2026-09-25", count: 12, net: "2,350.00", bonus: "0.00" },
+            { date: "2026-09-24", count: 10, net: "2,250.00", bonus: "0.00" },
+            { date: "2026-09-23", count: 13, net: "2,950.00", bonus: "0.00" },
+            { date: "2026-09-22", count: 12, net: "2,550.00", bonus: "0.00" },
+            { date: "2026-09-21", count: 16, net: "2,950.00", bonus: "0.00" },
+            { date: "2026-09-20", count: 12, net: "2,250.00", bonus: "0.00" },
+            { date: "2026-09-19", count: 16, net: "2,800.00", bonus: "0.00" },
+            { date: "2026-09-18", count: 14, net: "2,700.00", bonus: "0.00" },
+            { date: "2026-09-17", count: 12, net: "2,800.00", bonus: "0.00" },
+            { date: "2026-09-16", count: 16, net: "3,100.00", bonus: "0.00" },
+            { date: "2026-09-15", count: 13, net: "2,450.00", bonus: "0.00" },
+            { date: "2026-09-14", count: 13, net: "2,800.00", bonus: "0.00" },
+            { date: "2026-09-13", count: 8, net: "1,900.00", bonus: "0.00" },
+            { date: "2026-09-12", count: 9, net: "1,700.00", bonus: "0.00" },
+            { date: "2026-09-11", count: 12, net: "2,150.00", bonus: "0.00" },
+            { date: "2026-09-10", count: 13, net: "2,450.00", bonus: "0.00" },
+            { date: "2026-09-09", count: 10, net: "2,050.00", bonus: "0.00" },
+            { date: "2026-09-08", count: 13, net: "2,350.00", bonus: "0.00" },
+            { date: "2026-09-07", count: 14, net: "2,550.00", bonus: "0.00" },
+            { date: "2026-09-06", count: 9, net: "1,800.00", bonus: "0.00" },
+            { date: "2026-09-05", count: 13, net: "2,950.00", bonus: "0.00" },
+            { date: "2026-09-04", count: 8, net: "1,800.00", bonus: "0.00" },
+            { date: "2026-09-03", count: 9, net: "1,800.00", bonus: "0.00" },
+            { date: "2026-09-02", count: 8, net: "1,800.00", bonus: "0.00" },
+            { date: "2026-09-01", count: 16, net: "2,950.00", bonus: "0.00" },
+            { date: "2026-08-31", count: 11, net: "2,050.00", bonus: "0.00" },
+            { date: "2026-08-30", count: 13, net: "2,350.00", bonus: "0.00" },
+            { date: "2026-08-29", count: 9, net: "1,700.00", bonus: "0.00" },
+            { date: "2026-08-28", count: 12, net: "2,550.00", bonus: "0.00" },
+            { date: "2026-08-27", count: 11, net: "2,050.00", bonus: "0.00" },
+            { date: "2026-08-26", count: 15, net: "2,950.00", bonus: "0.00" },
+            { date: "2026-08-25", count: 16, net: "3,100.00", bonus: "0.00" },
+            { date: "2026-08-24", count: 14, net: "3,100.00", bonus: "0.00" },
+            { date: "2026-08-23", count: 10, net: "1,900.00", bonus: "0.00" },
+            { date: "2026-08-22", count: 12, net: "2,250.00", bonus: "0.00" },
+            { date: "2026-08-21", count: 0, net: "0.00", bonus: "0.00" }
         ];
 
         const DEFAULT_CARDS = [
@@ -1956,7 +2005,7 @@
         let currentStatusFilter = 'all';
 
         function initData() {
-            renderStatementTable(STATEMENT_ROWS);
+            renderStatementTable(STATEMENT_ROWS.filter(function(r) { return r.net !== '0.00'; }));
 
             const savedNetName = localStorage.getItem('5g_net_name') || "5G فايف جي";
             const savedNetPhone = localStorage.getItem('5g_net_phone') || "773769835";
@@ -2157,7 +2206,7 @@
             }
         }
 
-                                function selectPeriod(period, btn) {
+                                        function selectPeriod(period, btn) {
             document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
             if (btn) {
                 btn.classList.add('active');
@@ -2188,22 +2237,25 @@
                 document.getElementById('stTotalWithdraw').textContent = '48,000.00';
                 document.getElementById('stCloseBal').textContent = '8,745.00';
                 renderStatementTable(rows7);
-                showToast("عرض مبيعات آخر 7 أيام");
+                showToast("عرض مبيعات آخر 7 أيام: " + sum7.toLocaleString('en-US') + " ر.ي");
             } else if (period === '30days') {
-                document.getElementById('filterFromDate').value = '2026-10-10';
+                document.getElementById('filterFromDate').value = '2026-10-11';
                 document.getElementById('filterToDate').value = '2026-11-09';
+                const rows30 = STATEMENT_ROWS.slice(0, 30);
+                let sum30 = 0;
+                rows30.forEach(function(r) { sum30 += parseFloat(r.net.replace(/,/g, '')); });
                 document.getElementById('stOpenBal').textContent = '90.00';
-                document.getElementById('stNetSales').textContent = '187,650.00';
-                document.getElementById('stTotalWithdraw').textContent = '181,395.00';
-                document.getElementById('stCloseBal').textContent = '6,345.00';
-                // جدول المبيعات الفعلي للـ 31 يوماً ومجموعه بالضبط 187,650.00 ر.ي
-                renderStatementTable(STATEMENT_ROWS.filter(function(r) { return r.net !== '0.00'; }));
-                showToast("عرض كشف الحساب الكامل (صافي المبيعات: 187,650.00 ر.ي)");
+                document.getElementById('stNetSales').textContent = sum30.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const withdraw30 = Math.round(sum30 * (181395 / 187650) * 100) / 100;
+                document.getElementById('stTotalWithdraw').textContent = withdraw30.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('stCloseBal').textContent = Math.max(0, Math.round((sum30 - withdraw30) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                renderStatementTable(rows30);
+                showToast("عرض مبيعات آخر 30 يوماً");
             } else if (period === 'custom') {
                 toggleFilterBody(true);
                 const body = document.getElementById('filterFormBody');
                 if (body) body.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                showToast("تخصيص: حدد التواريخ وسيتم جمع المبيعات في الصافي تلقائياً");
+                showToast("تخصيص: اختر التواريخ وسيتم جمع المبيعات في الصافي تلقائياً");
             }
         }
 
@@ -2219,20 +2271,20 @@
             });
             if (customBtn) customBtn.classList.add('active');
 
-            // 1. تصفير الحساب عند اختيار تاريخ 9/10 أو قبله
-            if ((to && to <= '2026-10-09') || (from && from < '2026-10-09' && (!to || to <= '2026-10-09'))) {
+            // 1. تصفير الحساب عند اختيار تاريخ قبل بداية الـ 80 يوماً (قبل 2026-08-22)
+            if ((to && to <= '2026-08-21') || (from && from < '2026-08-21' && (!to || to <= '2026-08-21'))) {
                 document.getElementById('stOpenBal').textContent = '0.00';
                 document.getElementById('stNetSales').textContent = '0.00';
                 document.getElementById('stTotalWithdraw').textContent = '0.00';
                 document.getElementById('stCloseBal').textContent = '0.00';
-                renderStatementTable([{ date: "2026-10-09", count: 0, net: "0.00", bonus: "0.00" }]);
-                showToast("الحساب مصفر لتاريخ 9 / 10 (الصافي 0.00 ر.ي)");
+                renderStatementTable([{ date: "2026-08-21", count: 0, net: "0.00", bonus: "0.00" }]);
+                showToast("الحساب مصفر قبل تاريخ 22 / 8 (الصافي 0.00 ر.ي)");
                 return;
             }
 
             // 2. تصفية الأيام وفق التواريخ المحددة
             const filtered = STATEMENT_ROWS.filter(function(r) {
-                if (r.net === '0.00' && r.count === 0 && (!from || from > '2026-10-09')) return false;
+                if (r.net === '0.00' && r.count === 0 && (!from || from > '2026-08-21')) return false;
                 const matchDate = (!from || r.date >= from) && (!to || r.date <= to);
                 const matchSearch = !search || r.date.includes(search) || r.net.includes(search);
                 return matchDate && matchSearch;
@@ -2248,7 +2300,7 @@
                 return;
             }
 
-            // حساب مجموع صافي المبيعات لجميع الأيام المعروضة بدقة
+            // حساب مجموع صافي المبيعات لجميع الأيام المعروضة بدقة وتحديث الصافي أعلى الصفحة
             let netSum = 0;
             filtered.forEach(function(r) {
                 netSum += parseFloat(String(r.net).replace(/,/g, '')) || 0;
@@ -2257,7 +2309,7 @@
             const formattedNet = netSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById('stNetSales').textContent = formattedNet;
 
-            // إذا كانت الفترة هي الفترة الكاملة (187,650 ر.ي)
+            // إذا كانت الفترة هي الفترة الكاملة للـ 80 يوماً (187,650 ر.ي)
             if (Math.abs(netSum - 187650) < 1) {
                 document.getElementById('stOpenBal').textContent = '90.00';
                 document.getElementById('stNetSales').textContent = '187,650.00';
@@ -2269,7 +2321,7 @@
                 const withdraw = Math.round(netSum * withdrawRatio * 100) / 100;
                 const close = Math.max(0, Math.round((netSum - withdraw) * 100) / 100);
 
-                document.getElementById('stOpenBal').textContent = (from && from <= '2026-10-10') ? '0.00' : '90.00';
+                document.getElementById('stOpenBal').textContent = (from && from <= '2026-08-22') ? '0.00' : '90.00';
                 document.getElementById('stTotalWithdraw').textContent = withdraw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 document.getElementById('stCloseBal').textContent = close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
@@ -2279,12 +2331,16 @@
         }
 
         function resetStatementFilters() {
-            document.getElementById('filterFromDate').value = '2026-10-10';
+            document.getElementById('filterFromDate').value = '2026-08-22';
             document.getElementById('filterToDate').value = '2026-11-09';
             document.getElementById('filterSearchInput').value = '';
             document.getElementById('filterCategorySelect').value = 'all';
-            selectPeriod('30days');
-            showToast("تمت إعادة تعيين التصفية إلى الفترة الكاملة (187,650.00 ر.ي)");
+            document.getElementById('stOpenBal').textContent = '90.00';
+            document.getElementById('stNetSales').textContent = '187,650.00';
+            document.getElementById('stTotalWithdraw').textContent = '181,395.00';
+            document.getElementById('stCloseBal').textContent = '6,345.00';
+            renderStatementTable(STATEMENT_ROWS.filter(function(r) { return r.net !== '0.00'; }));
+            showToast("تمت إعادة تعيين التصفية إلى كامل فترة الـ 80 يوماً (187,650.00 ر.ي)");
         }
 
         function toggleFilterBody(forceOpen) {
@@ -2323,7 +2379,7 @@
 
             row.count = parseInt(newCount) || row.count;
             row.net = newNet;
-            renderStatementTable(STATEMENT_ROWS);
+            renderStatementTable(STATEMENT_ROWS.filter(function(r) { return r.net !== '0.00'; }));
             showToast("تم تعديل سطر التاريخ بنجاح!");
         }
 
