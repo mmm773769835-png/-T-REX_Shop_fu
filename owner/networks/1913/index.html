@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>شبكة 5G اللاسلكية | لوحة التحكم وكشف الحساب</title>
+    <meta name="description" content="لوحة تحكم وإدارة شبكة 5G فايف جي اللاسلكية - كشف الحساب، المبيعات اليومية، الكروت، والسحوبات">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-body: #0a101d;
+            --bg-header-start: #78131b;
+            --bg-header-end: #1e0508;
+            --bg-card: #111a28;
+            --bg-card-alt: #131d2e;
+            --border-card: #1c2a3f;
+            --border-red: #c81e28;
+            --accent-red: #c81e28;
+            --accent-red-hover: #e51e2b;
+            --text-main: #ffffff;
+            --text-muted: #7e91a8;
+            --status-green: #00e676;
+            --badge-green-bg: rgba(0, 230, 118, 0.15);
+            --badge-green-border: rgba(0, 230, 118, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Top Bar / Header */
+        .top-navbar {
+            background: linear-gradient(90deg, var(--bg-header-start) 0%, var(--bg-header-end) 100%);
+            border-bottom: 1px solid rgba(200, 30, 40, 0.3);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .nav-right-tabs {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-tab-item {
+            color: #d8d8d8;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 6px 0;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-tab-item.active {
+            color: #ffffff;
+        }
+
+        .nav-tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+
+        .nav-left-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: #ff3838;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid var(--bg-header-start);
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 5px 12px 5px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #a81c25;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Main Container */
+        .main-content {
+            max-width: 1240px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 20px 80px;
+            flex-grow: 1;
+        }
+
+        /* Breadcrumb / Top Bar */
+        .breadcrumb-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .breadcrumb-path {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb-path a {
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-path a:hover {
+            color: #fff;
+        }
+
+        .portal-direct-btn {
+            background: rgba(200, 30, 40, 0.12);
+            border: 1px solid var(--accent-red);
+            color: #ff6b75;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .portal-direct-btn:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        /* Network Header Banner */
+        .network-banner {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-top: 2px solid var(--border-red);
+            border-radius: 14px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .network-info-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .wifi-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(200, 30, 40, 0.15);
+            border: 1px solid rgba(200, 30, 40, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-red);
+            font-size: 22px;
+        }
+
+        .network-details h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .network-submeta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .status-badge-active {
+            color: var(--status-green);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+        }
+
+        .edit-network-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-network-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Main Subtabs Navigation */
+        .subtabs-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .subtab-btn {
+            background: transparent;
+            border: none;
+            color: #a0aec0;
+            padding: 12px 14px;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .subtab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .subtab-btn.active {
+            background-color: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(200, 30, 40, 0.4);
+        }
+
+        /* Action Buttons Row */
+        .action-buttons-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .btn-action-red {
+            flex: 1;
+            background-color: var(--accent-red);
+            color: #ffffff;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(200, 30, 40, 0.3);
+        }
+
+        .btn-action-red:hover {
+            background-color: var(--accent-red-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-top: 2px solid #8B1A24;
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 105px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(200, 30, 40, 0.4);
+        }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .stat-value-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff !important;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-currency {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .stat-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: none;
+        }
+
+        .stat-icon-badge.badge-clock {
+            background: rgba(56, 189, 248, 0.16);
+            color: #38bdf8;
+        }
+
+        .stat-icon-badge.badge-chart {
+            background: rgba(239, 68, 68, 0.16);
+            color: #ff4757;
+        }
+
+        .stat-icon-badge.badge-cash {
+            background: rgba(245, 158, 11, 0.16);
+            color: #f59e0b;
+        }
+
+        .stat-icon-badge.badge-check {
+            background: rgba(16, 185, 129, 0.16);
+            color: #10b981;
+        }
+
+        /* Secondary actions bar */
+        .secondary-actions-bar {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .secondary-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--accent-red);
+        }
+
+        /* Content Sections & Tables */
+        .card-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+        }
+
+        .card-section-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-section-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-section-links {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .link-accent {
+            color: #ff6b75;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .link-accent:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        th {
+            background: #0d1522;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 16px 20px;
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge-status-green {
+            background-color: var(--badge-green-bg);
+            border: 1px solid var(--badge-green-border);
+            color: var(--status-green);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .btn-table-action {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-card);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-table-action:hover {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* Statement Filter Form & Styling */
+        .period-selector-row {
+            display: flex;
+            background: #0d1522;
+            border-radius: 10px;
+            padding: 4px;
+            gap: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-card);
+        }
+
+        .period-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #a0aec0;
+            padding: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn.active {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .filter-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 25px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-field label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .filter-field input, .filter-field select {
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            padding: 9px 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .filter-btn-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .btn-filter-apply {
+            background: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-filter-reset {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid var(--border-card);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .statement-notice {
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 3px solid var(--accent-red);
+            padding: 12px 18px;
+            font-size: 12px;
+            color: #a0aec0;
+            line-height: 1.8;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .sub-nav-segmented {
+            display: flex;
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .sub-nav-segment {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 14px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sub-nav-segment.active {
+            background: #a81c25;
+            color: #ffffff;
+        }
+
+        .grouping-chips-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .group-chip {
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            color: #94a3b8;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .group-chip.active {
+            background: #a81c25;
+            border-color: #a81c25;
+            color: #ffffff;
+        }
+
+        .statement-table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        .statement-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        .statement-table th {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            padding: 14px 16px;
+            border-bottom: 1px solid #1c2a3f;
+        }
+
+        .statement-table td {
+            font-size: 14px;
+            color: #ffffff;
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-family: inherit;
+        }
+
+        .statement-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Filter Toolbar for Search in Cards */
+        .filter-toolbar {
+            padding: 16px 24px;
+            background: #0d1522;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-status-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: #a0aec0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active, .filter-chip:hover {
+            background: var(--accent-red);
+            color: #fff;
+            border-color: var(--accent-red);
+        }
+
+        .search-input-box {
+            position: relative;
+        }
+
+        .search-input-box input {
+            background: #111a28;
+            border: 1px solid var(--border-card);
+            padding: 8px 36px 8px 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input-box input:focus {
+            border-color: var(--accent-red);
+        }
+
+        .search-input-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .btn-refresh {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-card);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .floating-app-btn {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 25px rgba(200, 30, 40, 0.5);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.2s;
+        }
+
+        .floating-app-btn:hover {
+            background: var(--accent-red-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(200, 30, 40, 0.7);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-red);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-card);
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .form-group input, .form-group select {
+            background: #0d1522;
+            border: 1px solid var(--border-card);
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* Toast notification */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #111a28;
+            border: 1px solid var(--status-green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 992px) {
+            .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .filter-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar { padding: 10px 15px; }
+            .subtabs-container { grid-template-columns: repeat(3, 1fr); }
+            .action-buttons-row { flex-direction: column; }
+            .stats-grid-4 { grid-template-columns: 1fr; }
+            .filter-grid { grid-template-columns: 1fr; }
+            .filter-toolbar { flex-direction: column; align-items: stretch; }
+            .search-input-box input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar Navigation (Same Wine/Maroon Gradient as image) -->
+    <header class="top-navbar">
+        <div class="nav-right-tabs">
+            <div class="nav-tab-item active" onclick="showSection('statement')">لوحة التحكم</div>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" rel="noopener noreferrer" class="nav-tab-item">الإحالات والمكافآت</a>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="nav-tab-item">إعدادات الشبكة</a>
+        </div>
+
+        <div class="nav-left-profile">
+            <div class="theme-toggle-btn" title="الوضع الليلي">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="notification-btn" title="الإشعارات">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">98</span>
+            </div>
+            <div class="user-pill" onclick="openProfileModal()">
+                <div class="user-avatar">P</div>
+                <div class="user-meta">
+                    <span class="user-name">محمد ابوالرجال</span>
+                    <span class="user-role">مالك شبكة</span>
+                </div>
+                <i class="fas fa-chevron-down" style="font-size: 10px; color: rgba(255,255,255,0.6);"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Breadcrumb / Portal Direct Link -->
+        <div class="breadcrumb-row">
+            <div class="breadcrumb-path">
+                <i class="fas fa-house" style="font-size: 13px;"></i>
+                <a href="#">لوحة التحكم</a>
+                <span>/</span>
+                <span id="breadcrumbCurrentPage">كشف حساب الشبكة</span>
+                <span>/</span>
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-arrow-right" style="font-size: 11px;"></i> العودة للشبكات
+                </a>
+            </div>
+            <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/reports/statement" target="_blank" rel="noopener noreferrer" class="portal-direct-btn">
+                <i class="fas fa-external-link-alt"></i> فتح كشف الحساب في تبويب
+            </a>
+        </div>
+
+        <!-- Network Header Banner -->
+        <div class="network-banner">
+            <div class="network-info-right">
+                <div class="wifi-icon-box">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="network-details">
+                    <h1 id="netNameDisplay">5G فايف جي</h1>
+                    <div class="network-submeta">
+                        <span class="status-badge-active">
+                            <i class="fas fa-circle" style="font-size: 8px;"></i> نشط
+                        </span>
+                        <span>·</span>
+                        <span id="netPhoneDisplay">773769835</span>
+                        <span>·</span>
+                        <span id="netIdDisplay">21779</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="edit-network-btn" onclick="openEditNetworkModal()" title="تعديل بيانات الشبكة">
+                <i class="fas fa-pen"></i>
+            </button>
+        </div>
+
+        <!-- Main Subtabs Navigation (5 Tabs) -->
+        <div class="subtabs-container">
+            <button class="subtab-btn" id="tabBtnOverview" onclick="showSection('overview')">نظرة عامة</button>
+            <button class="subtab-btn" id="tabBtnCards" onclick="showSection('cards')">الكروت</button>
+            <button class="subtab-btn" id="tabBtnSales" onclick="showSection('sales')">المبيعات</button>
+            <button class="subtab-btn active" id="tabBtnStatement" onclick="showSection('statement')">كشف الحساب</button>
+            <button class="subtab-btn" id="tabBtnWithdraw" onclick="showSection('withdraw')">السحوبات</button>
+        </div>
+
+        
+
+        <!-- ================= SECTION 1: STATEMENT (كشف الحساب الكامل) ================= -->
+        <div id="sectionStatement" style="display: block;">
+            
+            <!-- Statement Header Card (Matching Tabweeb Image 4 & 9) -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 18px 22px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <div>
+                        <h2 style="font-size: 16px; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            كشف حساب الشبكة
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px; display: inline-block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                        </h2>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">5G فايف جي (21779)</div>
+                    </div>
+                </div>
+
+                <!-- Period Selector Bar -->
+                <div class="period-selector-row" style="margin-bottom: 0;">
+                    <button class="period-btn" onclick="selectPeriod('today', this)">اليوم</button>
+                    <button class="period-btn" onclick="selectPeriod('7days', this)">آخر 7 أيام</button>
+                    <button class="period-btn active" onclick="selectPeriod('30days', this)">آخر 30 يوم</button>
+                    <button class="period-btn" onclick="selectPeriod('custom', this)">تخصيص</button>
+                </div>
+            </div>
+
+            <!-- Filter Panel: تصفية النتائج (Collapsed by default like Image 2 & 9) -->
+            <div class="filter-panel" style="padding: 16px 20px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleFilterBody()">
+                    <span style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#c81e28" style="width: 17px; height: 17px; display: inline-block;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                        </svg>
+                        تصفية النتائج
+                    </span>
+                    <span style="font-size: 12px; color: var(--text-muted);">
+                        <svg id="filterToggleIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#94a3b8" style="width: 15px; height: 15px; display: inline-block; transition: transform 0.2s;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </span>
+                </div>
+
+                <div id="filterFormBody" style="display: none; padding-top: 15px;">
+                    <div class="filter-grid">
+                        <div class="filter-field">
+                            <label>من تاريخ:</label>
+                            <input type="date" id="filterFromDate" value="2026-10-11">
+                        </div>
+                        <div class="filter-field">
+                            <label>إلى تاريخ:</label>
+                            <input type="date" id="filterToDate" value="2026-11-09">
+                        </div>
+                        <div class="filter-field">
+                            <label>نوع المعاملة:</label>
+                            <select id="filterTxType">
+                                <option value="all">الكل</option>
+                                <option value="sales">مبيعات</option>
+                                <option value="withdraw">سحوبات</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>المزود:</label>
+                            <select id="filterProvider">
+                                <option value="all">الكل</option>
+                                <option value="local">محلي</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>الفئة:</label>
+                            <select id="filterCategorySelect">
+                                <option value="all">الكل</option>
+                                <option value="100">100 ر.ي</option>
+                                <option value="250">250 ر.ي</option>
+                                <option value="500">500 ر.ي</option>
+                                <option value="3000">3,000 ر.ي</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>حالة البيع:</label>
+                            <select id="filterSaleStatus">
+                                <option value="all">الكل</option>
+                                <option value="success">ناجح</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>حالة السحب:</label>
+                            <select id="filterWithdrawStatus">
+                                <option value="all">الكل</option>
+                                <option value="completed">مكتمل</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>تجميع حسب:</label>
+                            <select id="filterGroupBy">
+                                <option value="day">اليوم</option>
+                                <option value="category">الفئة</option>
+                                <option value="provider">المزود</option>
+                                <option value="type">النوع</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-field" style="margin-bottom: 10px;">
+                        <label>بحث بالمرجع أو المحفظة:</label>
+                        <input type="text" id="filterSearchInput" placeholder="رقم المرجع، المحفظة...">
+                    </div>
+
+                    <div class="filter-btn-group">
+                        <button class="btn-filter-reset" onclick="resetStatementFilters()">إعادة تعيين</button>
+                        <button class="btn-filter-apply" onclick="applyStatementFilters()">
+                            <i class="fas fa-check"></i> تطبيق التصفية
+                        </button>
+                    </div>
+                </div>
+
+                <div style="font-size: 11.5px; color: #64748b; line-height: 1.8; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.03);">
+                    توضيح التواريخ: تُعرض عمليات البيع وتغطيات المكافآت بتاريخ العملية الفعلي، بينما تُحسب الفترة والأرصدة على تاريخ الاحتساب المحاسبي. وتُعرض الإلغاءات ومكافأة الترحيب بتاريخ تسجيلها، ويُعرض تاريخ الاحتساب عند عدم توفر وقت العملية.
+                </div>
+            </div>
+
+            <!-- The 4 Big Financial Summary Cards (Exact Mini Icons & Layout of Image 9) -->
+            <div class="stats-grid-4">
+                <!-- 1. الرصيد الافتتاحي -->
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">الرصيد الافتتاحي</span>
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stOpenBal">90.00</span>
+                        <span class="stat-currency">ر.ي</span>
+                    </div>
+                </div>
+
+                <!-- 2. صافي المبيعات -->
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">صافي المبيعات</span>
+                        <div class="stat-icon-badge badge-chart">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7 15 4-4 4 4 5-6" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stNetSales">187,650.00</span>
+                        <span class="stat-currency">ر.ي</span>
+                    </div>
+                </div>
+
+                <!-- 3. إجمالي السحوبات -->
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">إجمالي السحوبات</span>
+                        <div class="stat-icon-badge badge-cash">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#f59e0b" style="width: 20px; height: 20px; display: block;">
+                                <rect width="18" height="11" x="3" y="6" rx="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="12" cy="11.5" r="2.2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 11.5h.01M18 11.5h.01M5 19h15" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stTotalWithdraw">181,395.00</span>
+                        <span class="stat-currency">ر.ي</span>
+                    </div>
+                </div>
+
+                <!-- 4. الرصيد الختامي -->
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">الرصيد الختامي</span>
+                        <div class="stat-icon-badge badge-check">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#10b981" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="stCloseBal">6,345.00</span>
+                        <span class="stat-currency">ر.ي</span>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Sub Nav Segmented Control (Exact Replica of Image 2) -->
+            <div class="sub-nav-segmented">
+                <button class="sub-nav-segment" id="btnViewInventory" onclick="switchStatementSubTab('inventory')">كشف المخزون</button>
+                <button class="sub-nav-segment" id="btnViewDetails" onclick="switchStatementSubTab('details')">التفاصيل</button>
+                <button class="sub-nav-segment active" id="btnViewSummary" onclick="switchStatementSubTab('summary')">الملخص</button>
+            </div>
+
+            <!-- Grouping Row: اليوم / الفئة / المزود / النوع (Exact Alignment of Image 2) -->
+            <div class="grouping-chips-row">
+                <button class="group-chip" onclick="groupStatementBy('type', this)">النوع</button>
+                <button class="group-chip" onclick="groupStatementBy('provider', this)">المزود</button>
+                <button class="group-chip" onclick="groupStatementBy('category', this)">الفئة</button>
+                <button class="group-chip active" onclick="groupStatementBy('day', this)">اليوم</button>
+            </div>
+
+            <!-- Full 30-Day Table (Exact Style & Columns of Image 2) -->
+            <div class="statement-table-container">
+                <table class="statement-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">التاريخ</th>
+                            <th style="width: 20%;">العدد</th>
+                            <th style="width: 25%;">الصافي</th>
+                            <th style="width: 30%;">تعديلات المكافآت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statementTableBody">
+                        <!-- Populated dynamically with all 30 days data -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ================= SECTION 2: DAILY SALES (المبيعات اليومية - Image 1) ================= -->
+        <div id="sectionSales" style="display: none;">
+            <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+                <button onclick="showSection('statement')" class="btn-action-red" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; border-radius: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ffffff" style="width: 18px; height: 18px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    كشف الحساب الكامل
+                </button>
+            </div>
+
+            <!-- تفاصيل المبيعات اليومية (Exact match with Image 3) -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-chart-line" style="color: var(--accent-red);"></i>
+                        تفاصيل المبيعات اليومية
+                    </h2>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span class="badge-status-green"><i class="fas fa-calendar"></i> آخر يوم [x]</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الفئة</th>
+                                <th>العدد</th>
+                                <th>المبلغ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="3" style="vertical-align: middle; font-weight: 800; color: #fff; background: rgba(255,255,255,0.01);">
+                                    11/09<br><span style="font-size: 12px; color: var(--text-muted);">الاثنين</span>
+                                </td>
+                                <td style="color: #fff;">250</td>
+                                <td style="color: #fff;"><strong>2</strong></td>
+                                <td style="color: #fff;">450 ر.ي</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #fff;">100</td>
+                                <td style="color: #fff;"><strong>5</strong></td>
+                                <td style="color: #fff;">450 ر.ي</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #fff;">500</td>
+                                <td style="color: #fff;"><strong>1</strong></td>
+                                <td style="color: #fff;">450 ر.ي</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: rgba(200, 30, 40, 0.12); font-weight: 900;">
+                                <td colspan="2" style="color: #fff;">مجموع الاثنين:</td>
+                                <td style="color: #fff; font-size: 16px;">العدد 8</td>
+                                <td style="color: #10b981; font-size: 16px;">1,350 ر.ي</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 3: CARDS (الكروت) ================= -->
+        <div id="sectionCards" style="display: none;">
+
+            <!-- Action Buttons Row (Matching Tabweeb Image 2) -->
+            <div class="action-buttons-row" style="margin-bottom: 20px;">
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                    <i class="fas fa-plus"></i> إضافة كروت
+                </a>
+                <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/mikrotik/settings" target="_blank" rel="noopener noreferrer" class="btn-action-red">
+                    <i class="fas fa-gear"></i> إعدادات مايكروتيك
+                </a>
+            </div>
+
+            <!-- Table: توزيع الكروت حسب الفئة -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-layer-group" style="color: var(--accent-red);"></i>
+                        توزيع الكروت حسب الفئة
+                    </h2>
+                    <button onclick="openAddCategoryModal()" class="btn-table-action">
+                        <i class="fas fa-plus"></i> فئة جديدة
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الفئة</th>
+                                <th>السعر</th>
+                                <th>المتاح</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <tr>
+                                <td style="color: #fff;">250</td>
+                                <td style="color: #fff;">250 ر.ي</td>
+                                <td id="catAvail_0" contenteditable="true" onblur="updateCategoryValue(0, 'avail', this)" title="انقر للتعديل" style="color: #fff;">289</td>
+                                <td id="catTotal_0" contenteditable="true" onblur="updateCategoryValue(0, 'total', this)" title="انقر للتعديل" style="color: #fff; font-weight: 700; cursor: pointer;">800</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td style="color: #fff;">100</td>
+                                <td style="color: #fff;">100 ر.ي</td>
+                                <td id="catAvail_1" contenteditable="true" onblur="updateCategoryValue(1, 'avail', this)" title="انقر للتعديل" style="color: #fff;">504</td>
+                                <td id="catTotal_1" contenteditable="true" onblur="updateCategoryValue(1, 'total', this)" title="انقر للتعديل" style="color: #fff; font-weight: 700; cursor: pointer;">800</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td style="color: #fff;">500</td>
+                                <td style="color: #fff;">500 ر.ي</td>
+                                <td id="catAvail_2" contenteditable="true" onblur="updateCategoryValue(2, 'avail', this)" title="انقر للتعديل" style="color: #fff;">191</td>
+                                <td id="catTotal_2" contenteditable="true" onblur="updateCategoryValue(2, 'total', this)" title="انقر للتعديل" style="color: #fff; font-weight: 700; cursor: pointer;">404</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                            <tr>
+                                <td style="color: #fff;">3000</td>
+                                <td style="color: #fff;">3,000 ر.ي</td>
+                                <td id="catAvail_3" contenteditable="true" onblur="updateCategoryValue(3, 'avail', this)" title="انقر للتعديل" style="color: #fff;">9</td>
+                                <td id="catTotal_3" contenteditable="true" onblur="updateCategoryValue(3, 'total', this)" title="انقر للتعديل" style="color: #fff; font-weight: 700; cursor: pointer;">15</td>
+                                <td><span class="badge-status-green">كافي</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table: آخر دفعات الكروت -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-clock-rotate-left" style="color: var(--accent-red);"></i>
+                        آخر دفعات الكروت
+                    </h2>
+                    <div class="card-section-links">
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards/import" target="_blank" class="link-accent">استيراد كروت</a>
+                        <span style="color: var(--border-card);">|</span>
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="link-accent">عرض الكل (12)</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>العدد</th>
+                                <th>الفئة</th>
+                                <th>نوع الملف</th>
+                                <th>طريقة الإضافة</th>
+                                <th>رفع بواسطة</th>
+                                <th>التاريخ والوقت</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong id="batchCount_0" contenteditable="true" onblur="updateBatchValue(0, this)" style="cursor:pointer; color: #fff;" title="انقر للتعديل">800</strong></td>
+                                <td style="color: #fff;">100</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-11-08 20:21</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong id="batchCount_1" contenteditable="true" onblur="updateBatchValue(1, this)" style="cursor:pointer; color: #fff;" title="انقر للتعديل">800</strong></td>
+                                <td style="color: #fff;">250</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-27 11:22</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong id="batchCount_2" contenteditable="true" onblur="updateBatchValue(2, this)" style="cursor:pointer; color: #fff;" title="انقر للتعديل">15</strong></td>
+                                <td style="color: #fff;">3000</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-22 06:57</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong id="batchCount_3" contenteditable="true" onblur="updateBatchValue(3, this)" style="cursor:pointer; color: #fff;" title="انقر للتعديل">404</strong></td>
+                                <td style="color: #fff;">500</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-22 06:53</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong id="batchCount_4" contenteditable="true" onblur="updateBatchValue(4, this)" style="cursor:pointer; color: #fff;" title="انقر للتعديل">255</strong></td>
+                                <td style="color: #fff;">100</td>
+                                <td><span style="color:#ff6b75; font-weight:700;"><i class="fas fa-file-pdf"></i> pdf</span></td>
+                                <td>يدوي</td>
+                                <td>محمد ابوالرجال</td>
+                                <td>2026-10-10 18:41</td>
+                                <td><a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/card-batches" target="_blank" class="btn-table-action">تفاصيل</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table: آخر الكروت المباعة -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-receipt" style="color: var(--accent-red);"></i>
+                        آخر الكروت المباعة
+                    </h2>
+                    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913/cards?statusFilter=sold" target="_blank" class="link-accent">عرض الكل</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الكرت</th>
+                                <th>الفئة</th>
+                                <th>تاريخ البيع</th>
+                                <th>نسخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">817733600</td>
+                                <td>250 ر.ي</td>
+                                <td>2026-11-09 03:43:44</td>
+                                <td><button class="btn-table-action" onclick="copyText('817733600')"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">001996495</td>
+                                <td>100 ر.ي</td>
+                                <td>2026-11-09 02:28:16</td>
+                                <td><button class="btn-table-action" onclick="copyText('001996495')"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace; font-size: 15px; color: #fff;">089902229</td>
+                                <td>100 ر.ي</td>
+                                <td>2026-11-09 01:36:04</td>
+                                <td><button class="btn-table-action" onclick="copyText('089902229')"><i class="fas fa-copy"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table: البحث في الكروت وإدارتها -->
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title">
+                        <i class="fas fa-magnifying-glass" style="color: var(--accent-red);"></i>
+                        البحث في الكروت
+                    </h2>
+                    <button onclick="openAddNewCardModal()" class="btn-table-action" style="background: var(--accent-red); border-color: var(--accent-red);">
+                        <i class="fas fa-plus"></i> كرت جديد
+                    </button>
+                </div>
+
+                <div class="filter-toolbar">
+                    <div class="filter-status-group">
+                        <div class="filter-chip active" onclick="filterCardsByStatus('all', this)">كل الحالات</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('متاح', this)">متاح</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('مباع', this)">مباع</div>
+                        <div class="filter-chip" onclick="filterCardsByStatus('منتهي', this)">منتهي</div>
+                    </div>
+
+                    <div class="filter-actions-right">
+                        <div class="search-input-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="cardSearchInput" placeholder="بحث برقم الكرت..." oninput="searchCardsTable()">
+                        </div>
+                        <button class="btn-refresh" onclick="refreshCardsData()">
+                            <i class="fas fa-rotate"></i> تحديث
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الكرت</th>
+                                <th>كلمة المرور</th>
+                                <th>الفئة</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchCardsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= SECTION 4: OVERVIEW (نظرة عامة) ================= -->
+        <div id="sectionOverview" style="display: none;">
+            <div class="stats-grid-4">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">الرصيد المتاح</span>
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
+                                <rect width="20" height="14" x="2" y="5" rx="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2 10h20" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="valAvailableBalance">6,255.00 ر.ي</span>
+                        <span class="stat-currency">الرصيد القابل للسحب</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">صافي المبيعات</span>
+                        <div class="stat-icon-badge badge-red">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#ff4757" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7 15 4-4 4 4 5-6" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="valNetSales">57,915.00 ر.ي</span>
+                        <span class="stat-currency">منذ بداية نوفمبر 2026</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">الكروت المباعة</span>
+                        <div class="stat-icon-badge badge-amber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#f59e0b" style="width: 18px; height: 18px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="valSoldCards">260</span>
+                        <span class="stat-currency">منذ بداية نوفمبر 2026</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-label">الكروت المتاحة</span>
+                        <div class="stat-icon-badge badge-clock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#38bdf8" style="width: 20px; height: 20px; display: block;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value-box">
+                        <span class="stat-value" id="valAvailableCards">993</span>
+                        <span class="stat-currency">المخزون المتبقي</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Action Cards (Exact Replica of Tabweeb Image 1) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 25px;">
+                <div onclick="showSection('statement')" class="stat-card" style="cursor: pointer; flex-direction: row; align-items: center; justify-content: space-between; padding: 18px 22px;">
+                    <span style="font-size: 15px; font-weight: 700; color: #ffffff;">كشف الحساب</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                </div>
+                <div onclick="showSection('withdraw')" class="stat-card" style="cursor: pointer; flex-direction: row; align-items: center; justify-content: space-between; padding: 18px 22px;">
+                    <span style="font-size: 15px; font-weight: 700; color: #ffffff;">طلبات السحب</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#ef4444" style="width: 20px; height: 20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0H3m-.75 0v12.75a.75.75 0 0 0 .75.75H21a.75.75 0 0 0 .75-.75V6a.75.75 0 0 0-.75-.75H3.75M6.75 9.75h10.5m-10.5 3h6" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 5: WITHDRAWALS (السحوبات) ================= -->
+        <div id="sectionWithdraw" style="display: none;">
+            <div class="card-section">
+                <div class="card-section-header">
+                    <h2 class="card-section-title"><i class="fas fa-money-bill-wave" style="color: var(--accent-red);"></i> رصيد وسحوبات الشبكة</h2>
+                    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="link-accent">لوحة تبويب ↗</a>
+                </div>
+                <div style="padding: 35px; text-align: center;">
+                    <div style="font-size: 46px; font-weight: 900; color: #ffffff; margin-bottom: 8px;">6,345.00 ر.ي</div>
+                    <p style="color: var(--text-muted); font-size: 15px;">الرصيد القابل للسحب الفوري لحسابك أو محفظتك</p>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 25px;">
+                        <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="btn-action-red" style="max-width: 250px;">
+                            <i class="fas fa-paper-plane"></i> تقديم طلب سحب جديد
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating App Button -->
+    <a href="https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913" target="_blank" class="floating-app-btn" title="تثبيت التطبيق على جوالك">
+        <i class="fas fa-download"></i>
+        <span>ثبّت التطبيق</span>
+    </a>
+
+    <!-- Toast Notification -->
+    <div id="toastMessage" class="toast-msg">
+        <i class="fas fa-circle-check" style="color: var(--status-green);"></i>
+        <span id="toastText">تمت العملية بنجاح!</span>
+    </div>
+
+    <!-- MODAL: EDIT NETWORK -->
+    <div id="modalEditNetwork" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-pen"></i> تعديل بيانات الشبكة</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalEditNetwork')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>اسم الشبكة:</label>
+                    <input type="text" id="inputNetName" value="5G فايف جي">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف:</label>
+                    <input type="text" id="inputNetPhone" value="773769835">
+                </div>
+                <div class="form-group">
+                    <label>معرّف الشبكة (ID):</label>
+                    <input type="text" id="inputNetId" value="21779">
+                </div>
+                <button class="btn-action-red" onclick="saveNetworkDetails()">
+                    <i class="fas fa-save"></i> حفظ التعديل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT STATEMENT SUMMARY -->
+    <div id="modalEditStatement" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-pen"></i> تعديل مبالغ كشف الحساب</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalEditStatement')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>الرصيد الافتتاحي:</label>
+                    <input type="text" id="inStOpen" value="90.00">
+                </div>
+                <div class="form-group">
+                    <label>صافي المبيعات:</label>
+                    <input type="text" id="inStNet" value="187,650.00">
+                </div>
+                <div class="form-group">
+                    <label>إجمالي السحوبات:</label>
+                    <input type="text" id="inStWith" value="181,395.00">
+                </div>
+                <div class="form-group">
+                    <label>الرصيد الختامي:</label>
+                    <input type="text" id="inStClose" value="6,345.00">
+                </div>
+                <button class="btn-action-red" onclick="saveStatementSummary()">
+                    <i class="fas fa-save"></i> حفظ البيانات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT OVERVIEW STATS -->
+    <div id="modalEditStats" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-chart-line"></i> تعديل أرقام الإحصائيات العامة</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalEditStats')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>الرصيد المتاح:</label>
+                    <input type="text" id="inStatAvail" value="6,345.00 ر.ي">
+                </div>
+                <div class="form-group">
+                    <label>صافي المبيعات (نوفمبر):</label>
+                    <input type="text" id="inStatNet" value="57,915.00 ر.ي">
+                </div>
+                <div class="form-group">
+                    <label>الكروت المباعة:</label>
+                    <input type="text" id="inStatSold" value="260">
+                </div>
+                <div class="form-group">
+                    <label>الكروت المتاحة:</label>
+                    <input type="text" id="inStatCards" value="993">
+                </div>
+                <button class="btn-action-red" onclick="saveOverviewStats()">
+                    <i class="fas fa-save"></i> حفظ الإحصائيات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT CARD -->
+    <div id="modalAddCard" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalCardTitle"><i class="fas fa-ticket"></i> إضافة كرت جديد</h3>
+                <button class="modal-close-btn" onclick="closeModal('modalAddCard')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editCardIndex" value="-1">
+                <div class="form-group">
+                    <label>رقم الكرت *:</label>
+                    <input type="text" id="inputCardNumber" placeholder="مثال: 043171525" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور (اختياري):</label>
+                    <input type="text" id="inputCardPassword" placeholder="-" value="-">
+                </div>
+                <div class="form-group">
+                    <label>الفئة *:</label>
+                    <select id="inputCardCategory">
+                        <option value="100">100 ر.ي</option>
+                        <option value="250">250 ر.ي</option>
+                        <option value="500">500 ر.ي</option>
+                        <option value="3000">3,000 ر.ي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الحالة *:</label>
+                    <select id="inputCardStatus">
+                        <option value="متاح">متاح</option>
+                        <option value="مباع">مباع</option>
+                        <option value="منتهي">منتهي</option>
+                    </select>
+                </div>
+                <button class="btn-action-red" onclick="saveCardRecord()">
+                    <i class="fas fa-check"></i> تأكيد وحفظ الكرت
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // The complete 30-day statement array provided by the user
+        const STATEMENT_ROWS = [
+            { date: "2026-11-09", count: 9,  net: "1,440.00",  bonus: "0.00" },
+            { date: "2026-11-08", count: 41, net: "12,555.00", bonus: "0.00" },
+            { date: "2026-11-07", count: 36, net: "6,345.00",  bonus: "0.00" },
+            { date: "2026-11-06", count: 35, net: "6,345.00",  bonus: "0.00" },
+            { date: "2026-11-05", count: 43, net: "8,730.00",  bonus: "0.00" },
+            { date: "2026-11-04", count: 29, net: "6,390.00",  bonus: "0.00" },
+            { date: "2026-11-03", count: 30, net: "6,525.00",  bonus: "0.00" },
+            { date: "2026-11-02", count: 19, net: "3,915.00",  bonus: "0.00" },
+            { date: "2026-11-01", count: 31, net: "5,760.00",  bonus: "0.00" },
+            { date: "2026-10-31", count: 29, net: "4,320.00",  bonus: "0.00" },
+            { date: "2026-10-30", count: 35, net: "9,495.00",  bonus: "0.00" },
+            { date: "2026-10-29", count: 37, net: "8,010.00",  bonus: "0.00" },
+            { date: "2026-10-28", count: 35, net: "7,425.00",  bonus: "0.00" },
+            { date: "2026-10-27", count: 24, net: "5,040.00",  bonus: "0.00" },
+            { date: "2026-10-26", count: 20, net: "4,005.00",  bonus: "0.00" },
+            { date: "2026-10-25", count: 38, net: "13,365.00", bonus: "0.00" },
+            { date: "2026-10-24", count: 30, net: "5,895.00",  bonus: "0.00" },
+            { date: "2026-10-23", count: 29, net: "5,085.00",  bonus: "0.00" },
+            { date: "2026-10-22", count: 29, net: "8,775.00",  bonus: "0.00" },
+            { date: "2026-10-21", count: 23, net: "4,590.00",  bonus: "0.00" },
+            { date: "2026-10-20", count: 22, net: "5,175.00",  bonus: "0.00" },
+            { date: "2026-10-19", count: 19, net: "3,915.00",  bonus: "0.00" },
+            { date: "2026-10-18", count: 27, net: "5,490.00",  bonus: "0.00" },
+            { date: "2026-10-17", count: 24, net: "5,175.00",  bonus: "0.00" },
+            { date: "2026-10-16", count: 28, net: "5,535.00",  bonus: "0.00" },
+            { date: "2026-10-15", count: 31, net: "5,985.00",  bonus: "0.00" },
+            { date: "2026-10-14", count: 34, net: "6,705.00",  bonus: "0.00" },
+            { date: "2026-10-13", count: 31, net: "5,895.00",  bonus: "0.00" },
+            { date: "2026-10-12", count: 24, net: "4,725.00",  bonus: "0.00" },
+            { date: "2026-10-11", count: 27, net: "5,040.00",  bonus: "0.00" }
+        ];
+
+        const DEFAULT_CARDS = [
+            { number: "043171525", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "034528302", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "089647240", pass: "-", category: "100", status: "متاح", date: "2026-11-08" },
+            { number: "817733600", pass: "-", category: "250", status: "مباع", date: "2026-11-09" },
+            { number: "001996495", pass: "-", category: "100", status: "مباع", date: "2026-11-09" },
+            { number: "089902229", pass: "-", category: "100", status: "مباع", date: "2026-11-09" }
+        ];
+
+        let cardsList = [];
+        let currentStatusFilter = 'all';
+
+        function initData() {
+            renderStatementTable(STATEMENT_ROWS);
+
+            const savedNetName = localStorage.getItem('5g_net_name') || "5G فايف جي";
+            const savedNetPhone = localStorage.getItem('5g_net_phone') || "773769835";
+            const savedNetId = localStorage.getItem('5g_net_id') || "21779";
+            document.getElementById('netNameDisplay').textContent = savedNetName;
+            document.getElementById('netPhoneDisplay').textContent = savedNetPhone;
+            document.getElementById('netIdDisplay').textContent = savedNetId;
+
+            const savedOpen = localStorage.getItem('5g_st_open_v4') || "90.00";
+            const savedNet = localStorage.getItem('5g_st_net_v4') || "187,650.00";
+            const savedWith = localStorage.getItem('5g_st_with_v4') || "181,395.00";
+            const savedClose = localStorage.getItem('5g_st_close_v4') || "6,345.00";
+            document.getElementById('stOpenBal').textContent = savedOpen;
+            document.getElementById('stNetSales').textContent = savedNet;
+            document.getElementById('stTotalWithdraw').textContent = savedWith;
+            document.getElementById('stCloseBal').textContent = savedClose;
+
+            const savedAvailBal = localStorage.getItem('5g_stat_avail_v4') || "6,345.00 ر.ي";
+            const savedStatNet = localStorage.getItem('5g_stat_net_v4') || "57,915.00 ر.ي";
+            const savedSoldCards = localStorage.getItem('5g_stat_sold_v4') || "260";
+            const savedAvailCards = localStorage.getItem('5g_stat_cards_v4') || "993";
+            document.getElementById('valAvailableBalance').textContent = savedAvailBal;
+            document.getElementById('valNetSales').textContent = savedStatNet;
+            document.getElementById('valSoldCards').textContent = savedSoldCards;
+            document.getElementById('valAvailableCards').textContent = savedAvailCards;
+
+            const storedCards = localStorage.getItem('5g_cards_list');
+            if (storedCards) {
+                try { cardsList = JSON.parse(storedCards); } catch(e) { cardsList = DEFAULT_CARDS; }
+            } else {
+                cardsList = DEFAULT_CARDS;
+                localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+            }
+            renderCardsTable();
+            loadCategoriesData();
+            loadBatchesData();
+
+            // Ensure no old store button lingering in browser memory
+            document.querySelectorAll('a, button, div').forEach(function(el) {
+                if (el.textContent && el.textContent.trim() === 'المتجر') {
+                    el.remove();
+                }
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            const pathName = window.location.pathname.toLowerCase();
+            let initialTab = params.get('tab') || window.location.hash.replace('#', '');
+            if (!initialTab) {
+                if (pathName.includes('/statement') || pathName.includes('statement')) {
+                    initialTab = 'statement';
+                } else if (pathName.includes('/cards')) {
+                    initialTab = 'cards';
+                } else if (pathName.includes('/sales')) {
+                    initialTab = 'sales';
+                } else {
+                    initialTab = 'overview';
+                }
+            }
+            showSection(initialTab);
+        }
+
+        function renderStatementTable(rows) {
+            const tbody = document.getElementById('statementTableBody');
+            tbody.innerHTML = '';
+            let totalCount = 0;
+
+            rows.forEach(function(row) {
+                totalCount += row.count;
+                const tr = document.createElement('tr');
+                tr.innerHTML = 
+                    '<td style="font-family: monospace; font-size: 13.5px; color: #fff;">' + row.date + '</td>' +
+                    '<td style="color: #fff;">' + row.count + '</td>' +
+                    '<td style="color: #ffffff;">' + row.net + '</td>' +
+                    '<td style="color: #64748b;">' + row.bonus + '</td>';
+                tbody.appendChild(tr);
+            });
+
+            const elTotalCount = document.getElementById('totalCountFooter');
+            if (elTotalCount) elTotalCount.textContent = totalCount;
+            const elTotalNet = document.getElementById('totalNetFooter');
+            if (elTotalNet) elTotalNet.textContent = '187,650.00 ر.ي';
+        }
+
+        function renderCardsTable() {
+            const tbody = document.getElementById('searchCardsTableBody');
+            tbody.innerHTML = '';
+            const query = (document.getElementById('cardSearchInput').value || '').trim().toLowerCase();
+
+            const filtered = cardsList.filter(function(card) {
+                const matchStatus = (currentStatusFilter === 'all' || card.status === currentStatusFilter);
+                const matchQuery = !query || card.number.toLowerCase().includes(query) || card.category.includes(query);
+                return matchStatus && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">لا توجد كروت مطابقة لمعايير البحث</td></tr>';
+                return;
+            }
+
+            filtered.forEach(function(card, index) {
+                const realIndex = cardsList.indexOf(card);
+                const tr = document.createElement('tr');
+                let badgeClass = "badge-status-green";
+                let styleOverride = "";
+                if (card.status === 'مباع') {
+                    styleOverride = "background: rgba(255,165,2,0.15); border: 1px solid rgba(255,165,2,0.4); color: #ffa502; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block;";
+                    badgeClass = "";
+                } else if (card.status === 'منتهي') {
+                    styleOverride = "background: rgba(255,71,87,0.15); border: 1px solid rgba(255,71,87,0.4); color: #ff4757; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block;";
+                    badgeClass = "";
+                }
+
+                tr.innerHTML = 
+                    '<td style="font-family: monospace; font-size: 15px; color: #fff;">' + card.number + '</td>' +
+                    '<td>' + card.pass + '</td>' +
+                    '<td>' + card.category + ' ر.ي</td>' +
+                    '<td><span style="' + styleOverride + '" class="' + badgeClass + '">' + card.status + '</span></td>' +
+                    '<td>' + card.date + '</td>' +
+                    '<td>' +
+                        '<button class="btn-table-action" onclick="editCard(' + realIndex + ')" title="تعديل"><i class="fas fa-pen"></i></button> ' +
+                        '<button class="btn-table-action" onclick="copyText(\'' + card.number + '\')" title="نسخ"><i class="fas fa-copy"></i></button> ' +
+                        '<button class="btn-table-action" style="color:#ff6b75;" onclick="deleteCard(' + realIndex + ')" title="حذف"><i class="fas fa-trash"></i></button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showSection(section) {
+            if (!['statement', 'sales', 'cards', 'overview', 'withdraw'].includes(section)) {
+                section = 'overview';
+            }
+
+            document.getElementById('sectionStatement').style.display = 'none';
+            document.getElementById('sectionSales').style.display = 'none';
+            document.getElementById('sectionCards').style.display = 'none';
+            document.getElementById('sectionOverview').style.display = 'none';
+            document.getElementById('sectionWithdraw').style.display = 'none';
+
+            document.getElementById('tabBtnStatement').classList.remove('active');
+            document.getElementById('tabBtnSales').classList.remove('active');
+            document.getElementById('tabBtnCards').classList.remove('active');
+            document.getElementById('tabBtnOverview').classList.remove('active');
+            document.getElementById('tabBtnWithdraw').classList.remove('active');
+
+            if (section === 'statement') {
+                document.getElementById('sectionStatement').style.display = 'block';
+                document.getElementById('tabBtnStatement').classList.add('active');
+                document.getElementById('breadcrumbCurrentPage').textContent = 'كشف حساب الشبكة';
+            } else if (section === 'sales') {
+                document.getElementById('sectionSales').style.display = 'block';
+                document.getElementById('tabBtnSales').classList.add('active');
+                document.getElementById('breadcrumbCurrentPage').textContent = 'تفاصيل المبيعات اليومية';
+            } else if (section === 'cards') {
+                document.getElementById('sectionCards').style.display = 'block';
+                document.getElementById('tabBtnCards').classList.add('active');
+                document.getElementById('breadcrumbCurrentPage').textContent = 'إدارة وتوزيع الكروت';
+            } else if (section === 'overview') {
+                document.getElementById('sectionOverview').style.display = 'block';
+                document.getElementById('tabBtnOverview').classList.add('active');
+                document.getElementById('breadcrumbCurrentPage').textContent = 'نظرة عامة';
+            } else if (section === 'withdraw') {
+                document.getElementById('sectionWithdraw').style.display = 'block';
+                document.getElementById('tabBtnWithdraw').classList.add('active');
+                document.getElementById('breadcrumbCurrentPage').textContent = 'طلبات السحب';
+            }
+
+            if (window.history && window.history.replaceState) {
+                let targetUrl = '/owner/networks/1913';
+                if (section === 'statement') {
+                    targetUrl = '/owner/networks/1913/reports/statement';
+                } else if (section === 'cards') {
+                    targetUrl = '/owner/networks/1913?tab=cards';
+                } else if (section === 'sales') {
+                    targetUrl = '/owner/networks/1913?tab=sales';
+                } else if (section === 'withdraw') {
+                    targetUrl = '/owner/networks/1913?tab=withdraw';
+                } else {
+                    targetUrl = '/owner/networks/1913';
+                }
+                window.history.replaceState({}, '', targetUrl);
+            }
+        }
+
+        function selectPeriod(period, btn) {
+            document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
+            if (btn) btn.classList.add('active');
+
+            if (period === 'today') {
+                renderStatementTable(STATEMENT_ROWS.slice(0, 1));
+                showToast("عرض عمليات اليوم فقط");
+            } else if (period === '7days') {
+                renderStatementTable(STATEMENT_ROWS.slice(0, 7));
+                showToast("عرض عمليات آخر 7 أيام");
+            } else if (period === '30days' || period === 'custom') {
+                renderStatementTable(STATEMENT_ROWS);
+                showToast("عرض عمليات الفترة كاملة (30 يوماً)");
+            }
+        }
+
+        function applyStatementFilters() {
+            const from = document.getElementById('filterFromDate').value;
+            const to = document.getElementById('filterToDate').value;
+            const search = (document.getElementById('filterSearchInput').value || '').trim().toLowerCase();
+
+            const filtered = STATEMENT_ROWS.filter(function(r) {
+                const matchDate = (!from || r.date >= from) && (!to || r.date <= to);
+                const matchSearch = !search || r.date.includes(search) || r.net.includes(search);
+                return matchDate && matchSearch;
+            });
+
+            renderStatementTable(filtered);
+            showToast("تم تطبيق التصفية على النتائج!");
+        }
+
+        function resetStatementFilters() {
+            document.getElementById('filterFromDate').value = '2026-10-11';
+            document.getElementById('filterToDate').value = '2026-11-09';
+            document.getElementById('filterSearchInput').value = '';
+            document.getElementById('filterCategorySelect').value = 'all';
+            renderStatementTable(STATEMENT_ROWS);
+            showToast("تمت إعادة تعيين التصفية");
+        }
+
+        function toggleFilterBody() {
+            const body = document.getElementById('filterFormBody');
+            const icon = document.getElementById('filterToggleIcon');
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                body.style.display = 'none';
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
+
+        function switchStatementSubTab(tab) {
+            document.querySelectorAll('.sub-nav-segment').forEach(function(p) { p.classList.remove('active'); });
+            if (tab === 'summary') document.getElementById('btnViewSummary').classList.add('active');
+            if (tab === 'details') document.getElementById('btnViewDetails').classList.add('active');
+            if (tab === 'inventory') document.getElementById('btnViewInventory').classList.add('active');
+            showToast("تم التبديل إلى تبويب " + (tab === 'summary' ? 'الملخص' : tab === 'details' ? 'التفاصيل' : 'كشف المخزون'));
+        }
+
+        function groupStatementBy(type, el) {
+            document.querySelectorAll('.group-chip').forEach(function(c) { c.classList.remove('active'); });
+            if (el) el.classList.add('active');
+            showToast("تم التجميع حسب: " + (type === 'day' ? 'اليوم' : type === 'category' ? 'الفئة' : type === 'provider' ? 'المزود' : 'النوع'));
+        }
+
+        function editStatementRow(i) {
+            const row = STATEMENT_ROWS[i];
+            if (!row) return;
+            const newCount = prompt("تعديل عدد الكروت لتاريخ " + row.date + ":", row.count);
+            if (newCount === null) return;
+            const newNet = prompt("تعديل الصافي بالريال اليمني:", row.net);
+            if (newNet === null) return;
+
+            row.count = parseInt(newCount) || row.count;
+            row.net = newNet;
+            renderStatementTable(STATEMENT_ROWS);
+            showToast("تم تعديل سطر التاريخ بنجاح!");
+        }
+
+        function openEditStatementModal() {
+            document.getElementById('inStOpen').value = document.getElementById('stOpenBal').textContent;
+            document.getElementById('inStNet').value = document.getElementById('stNetSales').textContent;
+            document.getElementById('inStWith').value = document.getElementById('stTotalWithdraw').textContent;
+            document.getElementById('inStClose').value = document.getElementById('stCloseBal').textContent;
+            document.getElementById('modalEditStatement').style.display = 'flex';
+        }
+
+        function saveStatementSummary() {
+            const open = document.getElementById('inStOpen').value.trim();
+            const net = document.getElementById('inStNet').value.trim();
+            const withVal = document.getElementById('inStWith').value.trim();
+            const close = document.getElementById('inStClose').value.trim();
+
+            localStorage.setItem('5g_st_open', open);
+            localStorage.setItem('5g_st_net', net);
+            localStorage.setItem('5g_st_with', withVal);
+            localStorage.setItem('5g_st_close', close);
+
+            document.getElementById('stOpenBal').textContent = open;
+            document.getElementById('stNetSales').textContent = net;
+            document.getElementById('stTotalWithdraw').textContent = withVal;
+            document.getElementById('stCloseBal').textContent = close;
+
+            closeModal('modalEditStatement');
+            showToast("تم تحديث مبالغ كشف الحساب بنجاح!");
+        }
+
+        function openEditStatsModal() {
+            document.getElementById('inStatAvail').value = document.getElementById('valAvailableBalance').textContent;
+            document.getElementById('inStatNet').value = document.getElementById('valNetSales').textContent;
+            document.getElementById('inStatSold').value = document.getElementById('valSoldCards').textContent;
+            document.getElementById('inStatCards').value = document.getElementById('valAvailableCards').textContent;
+            document.getElementById('modalEditStats').style.display = 'flex';
+        }
+
+        function saveOverviewStats() {
+            const avail = document.getElementById('inStatAvail').value.trim();
+            const net = document.getElementById('inStatNet').value.trim();
+            const sold = document.getElementById('inStatSold').value.trim();
+            const cards = document.getElementById('inStatCards').value.trim();
+
+            localStorage.setItem('5g_stat_avail', avail);
+            localStorage.setItem('5g_stat_net', net);
+            localStorage.setItem('5g_stat_sold', sold);
+            localStorage.setItem('5g_stat_cards', cards);
+
+            document.getElementById('valAvailableBalance').textContent = avail;
+            document.getElementById('valNetSales').textContent = net;
+            document.getElementById('valSoldCards').textContent = sold;
+            document.getElementById('valAvailableCards').textContent = cards;
+
+            closeModal('modalEditStats');
+            showToast("تم حفظ إحصائيات النظرة العامة بنجاح!");
+        }
+
+        function filterCardsByStatus(status, chipElement) {
+            currentStatusFilter = status;
+            document.querySelectorAll('.filter-chip').forEach(function(el) { el.classList.remove('active'); });
+            if (chipElement) chipElement.classList.add('active');
+            renderCardsTable();
+        }
+
+        function searchCardsTable() { renderCardsTable(); }
+        function refreshCardsData() { showToast("تم تحديث الكروت بنجاح!"); renderCardsTable(); }
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(function() {
+                showToast("تم نسخ: " + txt);
+            }).catch(function() {
+                showToast("تم: " + txt);
+            });
+        }
+
+        function openEditNetworkModal() {
+            document.getElementById('inputNetName').value = document.getElementById('netNameDisplay').textContent;
+            document.getElementById('inputNetPhone').value = document.getElementById('netPhoneDisplay').textContent;
+            document.getElementById('inputNetId').value = document.getElementById('netIdDisplay').textContent;
+            document.getElementById('modalEditNetwork').style.display = 'flex';
+        }
+
+        function saveNetworkDetails() {
+            const name = document.getElementById('inputNetName').value.trim();
+            const phone = document.getElementById('inputNetPhone').value.trim();
+            const id = document.getElementById('inputNetId').value.trim();
+            if (!name) return;
+
+            localStorage.setItem('5g_net_name', name);
+            localStorage.setItem('5g_net_phone', phone);
+            localStorage.setItem('5g_net_id', id);
+
+            document.getElementById('netNameDisplay').textContent = name;
+            document.getElementById('netPhoneDisplay').textContent = phone;
+            document.getElementById('netIdDisplay').textContent = id;
+
+            closeModal('modalEditNetwork');
+            showToast("تم تحديث بيانات الشبكة!");
+        }
+
+        function openAddNewCardModal() {
+            document.getElementById('modalCardTitle').innerHTML = '<i class="fas fa-ticket"></i> إضافة كرت جديد';
+            document.getElementById('editCardIndex').value = '-1';
+            document.getElementById('inputCardNumber').value = '';
+            document.getElementById('inputCardPassword').value = '-';
+            document.getElementById('inputCardCategory').value = '100';
+            document.getElementById('inputCardStatus').value = 'متاح';
+            document.getElementById('modalAddCard').style.display = 'flex';
+        }
+
+        function editCard(index) {
+            const card = cardsList[index];
+            if (!card) return;
+            document.getElementById('modalCardTitle').innerHTML = '<i class="fas fa-pen"></i> تعديل الكرت';
+            document.getElementById('editCardIndex').value = index;
+            document.getElementById('inputCardNumber').value = card.number;
+            document.getElementById('inputCardPassword').value = card.pass;
+            document.getElementById('inputCardCategory').value = card.category;
+            document.getElementById('inputCardStatus').value = card.status;
+            document.getElementById('modalAddCard').style.display = 'flex';
+        }
+
+        function saveCardRecord() {
+            const index = parseInt(document.getElementById('editCardIndex').value);
+            const num = document.getElementById('inputCardNumber').value.trim();
+            const pass = document.getElementById('inputCardPassword').value.trim() || "-";
+            const cat = document.getElementById('inputCardCategory').value;
+            const status = document.getElementById('inputCardStatus').value;
+
+            if (!num) {
+                alert("يرجى إدخال رقم الكرت!");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            if (index >= 0 && index < cardsList.length) {
+                cardsList[index] = { number: num, pass: pass, category: cat, status: status, date: cardsList[index].date || today };
+                showToast("تم تعديل الكرت بنجاح!");
+            } else {
+                cardsList.unshift({ number: num, pass: pass, category: cat, status: status, date: today });
+                showToast("تمت إضافة الكرت بنجاح!");
+            }
+
+            localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+            closeModal('modalAddCard');
+            renderCardsTable();
+        }
+
+        function deleteCard(index) {
+            if (confirm("هل أنت متأكد من حذف هذا الكرت؟")) {
+                cardsList.splice(index, 1);
+                localStorage.setItem('5g_cards_list', JSON.stringify(cardsList));
+                renderCardsTable();
+                showToast("تم حذف الكرت!");
+            }
+        }
+
+        function loadCategoriesData() {
+            const savedCategories = localStorage.getItem('5g_categories_data_v2');
+            if (savedCategories) {
+                try {
+                    const cats = JSON.parse(savedCategories);
+                    cats.forEach(function(c, i) {
+                        const elAvail = document.getElementById('catAvail_' + i);
+                        const elTotal = document.getElementById('catTotal_' + i);
+                        if (elAvail && c.avail !== undefined) elAvail.textContent = c.avail;
+                        if (elTotal && c.total !== undefined) elTotal.textContent = c.total;
+                    });
+                } catch(e) {}
+            } else {
+                const elTotal0 = document.getElementById('catTotal_0');
+                if (elTotal0) elTotal0.textContent = '800';
+                const elTotal1 = document.getElementById('catTotal_1');
+                if (elTotal1) elTotal1.textContent = '800';
+            }
+        }
+
+        function updateCategoryValue(index, field, cell) {
+            const val = cell.textContent.trim();
+            let cats = [];
+            const saved = localStorage.getItem('5g_categories_data_v2');
+            if (saved) {
+                try { cats = JSON.parse(saved); } catch(e) { cats = []; }
+            }
+            if (!cats.length) {
+                cats = [
+                    { cat: "250", price: "250 ر.ي", avail: "289", total: "800", status: "كافي" },
+                    { cat: "100", price: "100 ر.ي", avail: "504", total: "800", status: "كافي" },
+                    { cat: "500", price: "500 ر.ي", avail: "191", total: "404", status: "كافي" },
+                    { cat: "3000", price: "3,000 ر.ي", avail: "9", total: "15", status: "كافي" }
+                ];
+            }
+            if (cats[index]) {
+                cats[index][field] = val;
+                localStorage.setItem('5g_categories_data_v2', JSON.stringify(cats));
+                showToast("تم حفظ التعديل: " + val);
+            }
+        }
+
+        function loadBatchesData() {
+            const saved = localStorage.getItem('5g_batches_data_v2');
+            if (saved) {
+                try {
+                    const batches = JSON.parse(saved);
+                    batches.forEach(function(b, i) {
+                        const el = document.getElementById('batchCount_' + i);
+                        if (el && b !== undefined) el.textContent = b;
+                    });
+                } catch(e) {}
+            } else {
+                const b0 = document.getElementById('batchCount_0');
+                if (b0) b0.textContent = '800';
+                const b1 = document.getElementById('batchCount_1');
+                if (b1) b1.textContent = '800';
+                const b3 = document.getElementById('batchCount_3');
+                if (b3) b3.textContent = '404';
+            }
+        }
+
+        function updateBatchValue(index, cell) {
+            const val = cell.textContent.trim();
+            let batches = [];
+            const saved = localStorage.getItem('5g_batches_data_v2');
+            if (saved) {
+                try { batches = JSON.parse(saved); } catch(e) { batches = []; }
+            }
+            if (!batches.length) {
+                batches = ["800", "800", "15", "404", "255"];
+            }
+            batches[index] = val;
+            localStorage.setItem('5g_batches_data_v2', JSON.stringify(batches));
+            showToast("تم حفظ عدد الدفعة: " + val);
+        }
+
+        function openAddCategoryModal() {
+            const cat = prompt("أدخل اسم أو فئة الكرت الجديدة (مثال: 1000):");
+            if (!cat) return;
+            const price = prompt("أدخل سعر الفئة بالريال اليمني:", cat + " ر.ي");
+            const avail = prompt("الكمية المتاحة:", "100");
+            const total = prompt("الإجمالي:", "500");
+
+            const tbody = document.getElementById('categoriesTableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = 
+                '<td>' + cat + '</td>' +
+                '<td>' + price + '</td>' +
+                '<td>' + avail + '</td>' +
+                '<td>' + total + '</td>' +
+                '<td><span class="badge-status-green">كافي</span></td>';
+            tbody.appendChild(tr);
+            showToast("تمت إضافة الفئة الجديدة!");
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showToast(msg) {
+            const toast = document.getElementById('toastMessage');
+            document.getElementById('toastText').textContent = msg;
+            toast.style.display = 'flex';
+            setTimeout(function() { toast.style.display = 'none'; }, 3000);
+        }
+        function openProfileModal() { window.open('https://kurootalshabakah.tabweeb.com.ye/owner/networks/1913', '_blank'); }
+
+        window.addEventListener('DOMContentLoaded', initData);
+    </script>
+</body>
+</html>

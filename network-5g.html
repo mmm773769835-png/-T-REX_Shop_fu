@@ -2000,7 +2000,19 @@
             });
 
             const params = new URLSearchParams(window.location.search);
-            const initialTab = params.get('tab') || window.location.hash.replace('#', '') || 'overview';
+            const pathName = window.location.pathname.toLowerCase();
+            let initialTab = params.get('tab') || window.location.hash.replace('#', '');
+            if (!initialTab) {
+                if (pathName.includes('/statement') || pathName.includes('statement')) {
+                    initialTab = 'statement';
+                } else if (pathName.includes('/cards')) {
+                    initialTab = 'cards';
+                } else if (pathName.includes('/sales')) {
+                    initialTab = 'sales';
+                } else {
+                    initialTab = 'overview';
+                }
+            }
             showSection(initialTab);
         }
 
@@ -2110,9 +2122,19 @@
             }
 
             if (window.history && window.history.replaceState) {
-                const url = new URL(window.location);
-                url.searchParams.set('tab', section);
-                window.history.replaceState({}, '', url);
+                let targetUrl = '/owner/networks/1913';
+                if (section === 'statement') {
+                    targetUrl = '/owner/networks/1913/reports/statement';
+                } else if (section === 'cards') {
+                    targetUrl = '/owner/networks/1913?tab=cards';
+                } else if (section === 'sales') {
+                    targetUrl = '/owner/networks/1913?tab=sales';
+                } else if (section === 'withdraw') {
+                    targetUrl = '/owner/networks/1913?tab=withdraw';
+                } else {
+                    targetUrl = '/owner/networks/1913';
+                }
+                window.history.replaceState({}, '', targetUrl);
             }
         }
 

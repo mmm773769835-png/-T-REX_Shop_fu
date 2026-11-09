@@ -43,6 +43,48 @@
   status = 200
 
 [[redirects]]
+  from = "/owner/networks/1913/reports/statement"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks/1913/cards/*"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks/1913/cards"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks/1913/*"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks/1913"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks/*"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/owner/networks"
+  to = "/network-5g.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/network-5g"
   to = "/network-5g.html"
   status = 200
@@ -77,6 +119,13 @@
 
 [[headers]]
   for = "/5g*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/owner/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
