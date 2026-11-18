@@ -21,13 +21,8 @@ const commonHead = (title, description, canonicalUrl) => `<!DOCTYPE html>
     <meta property="og:description" content="${description}">
     <meta property="og:url" content="${canonicalUrl}">
     <meta property="og:image" content="https://trexshopmax.com/logo.png">
+    <!-- Twitter & OG -->
     <meta name="twitter:card" content="summary_large_image">
-
-    <!-- Google AdSense Official Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
-    <script>
-        window.adsbygoogle = window.adsbygoogle || [];
-    </script>
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -285,8 +280,20 @@ const commonHead = (title, description, canonicalUrl) => `<!DOCTYPE html>
         }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero-title { font-size: 28px; }
+            .header-inner { flex-wrap: wrap; gap: 10px; }
+            .nav-links {
+                display: flex;
+                width: 100%;
+                order: 3;
+                overflow-x: auto;
+                gap: 14px;
+                padding-top: 8px;
+                border-top: 1px solid #222;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .nav-links a { font-size: 13px; white-space: nowrap; }
+            .hero-title { font-size: 26px; }
             .content-card { padding: 22px; }
             .container { padding: 0 15px; }
         }
@@ -315,22 +322,6 @@ const commonHead = (title, description, canonicalUrl) => `<!DOCTYPE html>
 `;
 
 const commonFooter = `
-    <!-- AdSense Display Unit -->
-    <div class="container">
-        <div class="ad-container">
-            <span class="ad-label"><i class="fas fa-ad"></i> إعلان تجاري / Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-4708671001798951"
-                 data-ad-slot="auto"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
-
     <footer>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
@@ -338,6 +329,7 @@ const commonFooter = `
             <a href="/about-us">من نحن</a>
             <a href="/contact-us">اتصل بنا</a>
             <a href="/privacy-policy">سياسة الخصوصية</a>
+            <a href="/delete-account">حذف الحساب</a>
             <a href="/terms-of-use">شروط الاستخدام</a>
             <a href="/refund-policy">الشحن والاسترجاع</a>
         </div>
@@ -517,6 +509,28 @@ const contactUsHtml = commonHead(
                 </form>
             </div>
         </div>
+
+        <article class="content-card">
+            <h2><i class="fas fa-clock"></i> معايير الاستجابة وخدمة العملاء</h2>
+            <p>
+                يلتزم فريق الدعم الفني والمبيعات في متجر <strong>T-REX SHOP</strong> في صنعاء بتقديم خدمة عملاء سريعة وشفافة لجميع المتسوقين والتجار في كافة المحافظات اليمنية:
+            </p>
+            <ul>
+                <li><strong>متوسط زمن الرد عبر الواتساب:</strong> خلال 5 إلى 15 دقيقة طوال ساعات الدوام الرسمي (من 9:00 صباحاً وحتى 11:30 مساءً).</li>
+                <li><strong>متوسط زمن الرد عبر البريد الإلكتروني:</strong> خلال مدة أقصاها 24 ساعة لاستفسارات التجار والشراكات وطلبات الخصوصية.</li>
+                <li><strong>متابعة الشحنات في المحافظات:</strong> يتم تزويد العميل برقم تتبع وبيانات مكتب النقل أو المندوب فور خروج الشحنة من مركز التوزيع في صنعاء.</li>
+            </ul>
+
+            <h2><i class="fas fa-question-circle"></i> أسئلة شائعة قبل التواصل</h2>
+            <h3>1. هل أستطيع معاينة الطلب قبل دفع المبلغ؟</h3>
+            <p>نعم، في جميع الطلبات المشمولة بخدمة الدفع عند الاستلام يمكنك التأكد من مطابقة المنتج للمواصفات الموضحة في صفحة الشراء قبل تسليم المبلغ للمندوب.</p>
+
+            <h3>2. كيف أتابع حالة طلبي أو أطلب التبديل؟</h3>
+            <p>يكفي إرسال رقم الطلب أو الاسم ورقم الهاتف المستخدم عند الشراء عبر الواتساب الرسمي، وسيتولى فريق خدمة العملاء تأكيد موعد الوصول أو معالجة طلب التبديل خلال 7 أيام وفق <a href="/refund-policy" style="color: var(--primary); text-decoration: underline;">سياسة الشحن والاسترجاع</a>.</p>
+
+            <h3>3. كيف أقدم طلباً لحذف حسابي أو بياناتي الشخصية؟</h3>
+            <p>يمكنك حذف الحساب فوراً من داخل تطبيق الهاتف المحمول أو إرسال طلب مباشر عبر صفحة <a href="/delete-account" style="color: var(--primary); text-decoration: underline;">حذف الحساب والبيانات الشخصية</a> دون الحاجة لتسجيل الدخول.</p>
+        </article>
     </main>
 
     <script>

@@ -21,11 +21,6 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-    <!-- Google AdSense Official Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
-    <script>
-        window.adsbygoogle = window.adsbygoogle || [];
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -38,33 +33,6 @@
             --card: #1a1a1a;
             --text: #ffffff;
             --text-muted: #888;
-        }
-        /* AdSense Layout & CLS Prevention */
-        .ad-container {
-            margin: 25px auto;
-            padding: 12px 10px;
-            max-width: 1000px;
-            width: 95%;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-            box-sizing: border-box;
-            min-height: 110px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .ad-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-            display: inline-block;
         }
         body {
             font-family: 'Cairo', sans-serif;
@@ -222,7 +190,9 @@
             font-size: 14px;
         }
         @media (max-width: 768px) {
-            .container { padding: 100px 15px 40px; }
+            .header-content { flex-wrap: wrap; gap: 10px; }
+            .header-nav { flex-wrap: wrap; justify-content: center; width: 100%; gap: 10px !important; }
+            .container { padding: 40px 15px 40px; }
             .page-title h2 { font-size: 24px; }
             .policy-section { padding: 20px; }
             .logo-text h1 { font-size: 18px; }
@@ -255,7 +225,7 @@
     <div class="container">
         <div class="page-title">
             <h2><i class="fas fa-shield-alt"></i> سياسة الخصوصية</h2>
-            <p>آخر تحديث: 14 مايو 2026</p>
+            <p>آخر تحديث: 13 نوفمبر 2026</p>
         </div>
 
         <div class="policy-section">
@@ -288,6 +258,39 @@
             </ul>
         </div>
 
+        <!-- Dedicated Section for Android Mobile App (com.trexshop.app) -->
+        <div class="policy-section" id="mobile-app-policy" style="border: 2px solid var(--primary); background: linear-gradient(180deg, rgba(255, 215, 0, 0.05) 0%, rgba(26, 26, 26, 1) 100%);">
+            <h3><i class="fas fa-mobile-alt"></i> سياسة الخصوصية الخاصة بتطبيق الهاتف المحمول (T-REX Shop - com.trexshop.app)</h3>
+            <p>ينطبق هذا القسم بشكل خاص على مستخدمي تطبيق الهاتف المحمول <strong>T-REX Shop</strong> المنشور على متجر Google Play والمحمل برمز الحزمة <code>com.trexshop.app</code>:</p>
+            
+            <p><strong>1. البيانات التي يجمعها التطبيق والغرض منها:</strong></p>
+            <ul>
+                <li><strong>بيانات الحساب والاتصال:</strong> الاسم الكامل، البريد الإلكتروني، رقم الهاتف، وعناوين التوصيل، وذلك لغرض إنشاء الحساب، وتسجيل الدخول، وتوصيل الطلبات وتأكيدها.</li>
+                <li><strong>بيانات المشتريات والطلبات:</strong> المنتجات المضافة للسلة، سجل الطلبات السابقة، وتفاصيل الفاتورة لتسهيل إدارة طلباتك وخدمات ما بعد البيع.</li>
+                <li><strong>الصور والوسائط (الكاميرا والمعرض):</strong> يطلب التطبيق إذن الوصول للكاميرا ومعرض الصور فقط عندما يختار المستخدم بنفسه التقاط أو إرفاق صورة (مثل صورة شخصية للملف، صورة لمنتج بواسطة التجار، أو صورة إيصال تحويل للطلبات). لا يقوم التطبيق بالوصول إلى ألبوم الصور أو الكاميرا في الخلفية مطلقاً، ولا يطلب التطبيق أو يسجل أي تسجيلات صوتية (تم حظر الميكروفون <code>RECORD_AUDIO: false</code>).</li>
+            </ul>
+
+            <p><strong>2. الأمان ونقل البيانات والتخزين:</strong></p>
+            <ul>
+                <li>تتم جميع الاتصالات ونقل البيانات بين تطبيق T-REX وخوادمنا عبر قنوات مشفرة وآمنة تماماً باستخدام بروتوكول <strong>HTTPS / TLS</strong> القياسي في الصناعة.</li>
+                <li>يتم تخزين بيانات المصادقة وقواعد البيانات بشكل آمن ومحمي باستخدام منصة <strong>Supabase Cloud</strong> المشفرة.</li>
+                <li><strong>عدم مشاركة البيانات:</strong> لا نبيع أو نؤجر أو نشارك أي بيانات شخصية مع أي شبكات إعلانية أو أطراف ثالثة لأغراض تجارية أو تتبعية.</li>
+                <li><strong>خلو التطبيق من الإعلانات:</strong> لا يحتوي تطبيق <code>com.trexshop.app</code> على أي مكتبات أو حزم إعلانية خارجية أو تتبع سلوكي؛ إعلانات Google AdSense تقتصر حصراً على صفحات الموقع الإلكتروني التصفحية فقط.</li>
+            </ul>
+
+            <p><strong>3. حذف الحساب والبيانات (Google Play Account Deletion):</strong></p>
+            <ul>
+                <li><strong>من داخل التطبيق:</strong> يمكن لأي مستخدم حذف حسابه وكافة بياناته الشخصية فوراً بالدخول إلى شاشة <em>«الملف الشخصي» (حسابي)</em> واختيار <em>«حذف الحساب نهائياً 🗑️»</em>.</li>
+                <li><strong>عبر صفحة الويب المخصصة (بدون الحاجة لتسجيل الدخول أو تثبيت التطبيق):</strong> يمكن لأي مستخدم تقديم طلب حذف الحساب والبيانات في أي وقت عبر الرابط الرسمي المباشر: <br>
+                    <a href="https://trexshopmax.com/delete-account" target="_blank" style="color: var(--primary); font-weight: 700; text-decoration: underline;">https://trexshopmax.com/delete-account</a>
+                </li>
+                <li>عند طلب الحذف، يتم مسح بيانات الملف الشخصي، والعناوين، وبيانات الدخول فوراً وبصورة دائمة. ويتم فقط الاحتفاظ ببيانات الفواتير المالية والمعاملات المكتملة بصيغة مجهولة الهوية وفقاً للمتطلبات المحاسبية والقانونية المعمول بها.</li>
+            </ul>
+
+            <p><strong>4. التواصل ومراسلات الدعم:</strong></p>
+            <p>أي تواصل يتم عبر تطبيق واتساب أو الاتصال الهاتفي يتم بمبادرة اختيارية كاملة من المستخدم عند الضغط على أزرار الدعم الفني، ولا يقوم التطبيق بالوصول إلى سجل المكالمات أو جهات اتصال المستخدم.</p>
+        </div>
+
         <div class="policy-section">
             <h3><i class="fas fa-shield-alt"></i> حماية البيانات</h3>
             <p>نحن نتخذ إجراءات أمنية مناسبة لحماية معلوماتك من الوصول غير المصرح به أو التغيير أو الإفصاح أو التدمير. تشمل هذه الإجراءات:</p>
@@ -311,8 +314,8 @@
             <p>يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، لكن هذا قد يؤثر على وظائف الموقع.</p></div>
 
         <div class="policy-section">
-            <h3><i class="fas fa-ad"></i> إعلانات Google AdSense ومورّدو الجهات الخارجية</h3>
-            <p>نحن نستخدم خدمات إعلانية تابعة لجهات خارجية، وأبرزها <strong>Google AdSense</strong>، لعرض الإعلانات عند زيارتك لموقعنا الإلكتروني:</p>
+            <h3><i class="fas fa-ad"></i> إعلانات Google AdSense ومورّدو الجهات الخارجية (الموقع الإلكتروني)</h3>
+            <p>نحن نستخدم خدمات إعلانية تابعة لجهات خارجية، وأبرزها <strong>Google AdSense</strong>، لعرض الإعلانات عند زيارتك لموقعنا الإلكتروني عبر المتصفح (تطبيق الهاتف المحمول لا يحتوي على أي إعلانات):</p>
             <ul>
                 <li>يستخدم المورّدون التابعون لجهات خارجية، بما في ذلك Google، ملفات تعريف الارتباط (Cookies) لعرض الإعلانات بناءً على زيارات المستخدم السابقة لموقعنا أو لمواقع أخرى على الويب.</li>
                 <li>يُتيح استخدام Google لملفات تعريف الارتباط الإعلانية (بما في ذلك ملف تعريف الارتباط <strong>DoubleClick DART</strong>) إمكانية عرض إعلانات للمستخدمين استناداً إلى زياراتهم لموقعنا ومواقع أخرى عبر الإنترنت.</li>
@@ -325,13 +328,13 @@
         </div>
 
         <div class="policy-section">
-            <h3><i class="fas fa-user-shield"></i> حقوقك</h3>
-            <p>لديك الحقوق التالية بخصوص بياناتك الشخصية:</p>
+            <h3><i class="fas fa-user-shield"></i> حقوقك وخياراتك</h3>
+            <p>لديك الحقوق التالية بخصوص بياناتك الشخصية في المتجر والتطبيق:</p>
             <ul>
-                <li><strong>الحق في الوصول:</strong> طلب نسخة من بياناتك الشخصية</li>
-                <li><strong>الحق في التصحيح:</strong> تحديث أو تصحيح معلوماتك غير الدقيقة</li>
-                <li><strong>الحق في الحذف:</strong> طلب حذف بياناتك (مع استثناءات قانونية)</li>
-                <li><strong>الحق في الاعتراض:</strong> الاعتراض على معالجة بياناتك لأغراض تسويقية</li>
+                <li><strong>الحق في الوصول:</strong> طلب نسخة من بياناتك الشخصية المسجلة لدينا.</li>
+                <li><strong>الحق في التصحيح:</strong> تحديث أو تصحيح معلوماتك غير الدقيقة عبر صفحة تعديل الملف الشخصي.</li>
+                <li><strong>الحق في الحذف:</strong> طلب حذف حسابك وكافة بياناتك نهائياً سواء من داخل التطبيق (الملف الشخصي -> حذف الحساب) أو عبر صفحة الويب المخصصة: <a href="https://trexshopmax.com/delete-account" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: 700;">طلب حذف الحساب (delete-account)</a> دون الحاجة لتسجيل دخول.</li>
+                <li><strong>الحق في الاعتراض:</strong> الاعتراض على معالجة بياناتك لأغراض تسويقية أو إلغاء الاشتراك في الرسائل الترويجية.</li>
             </ul>
         </div>
 
@@ -352,19 +355,19 @@
             <p><i class="fab fa-whatsapp"></i> واتساب: <a href="https://wa.me/967773769835" target="_blank" rel="noopener noreferrer">+967 773 769 835</a></p>
         </div>
 
-        <!-- AdSense: Policy Page Bottom Unit -->
-        <div class="ad-container" id="ad-privacy-unit">
-            <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block; width:100%;"
-                 data-ad-client="ca-pub-4708671001798951"
-                 data-ad-slot="auto"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-        </div>
     </div>
 
     <footer class="footer">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-bottom: 15px;">
+            <a href="/" style="color: #fff; text-decoration: none;">الرئيسية</a>
+            <a href="/blog" style="color: #fff; text-decoration: none;">المدونة المعرفية</a>
+            <a href="/about-us" style="color: #fff; text-decoration: none;">من نحن</a>
+            <a href="/contact-us" style="color: #fff; text-decoration: none;">اتصل بنا</a>
+            <a href="/privacy-policy" style="color: var(--primary); text-decoration: none;">سياسة الخصوصية</a>
+            <a href="/delete-account" style="color: #fff; text-decoration: none;">حذف الحساب</a>
+            <a href="/terms-of-use" style="color: #fff; text-decoration: none;">شروط الاستخدام</a>
+            <a href="/refund-policy" style="color: #fff; text-decoration: none;">الشحن والاسترجاع</a>
+        </div>
         <p>© 2026 T-REX Shop. جميع الحقوق محفوظة. | <a href="/" style="color: var(--primary); text-decoration: none;">العودة للرئيسية</a></p>
     </footer>
 </body>

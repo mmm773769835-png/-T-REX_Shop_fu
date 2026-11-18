@@ -19,13 +19,8 @@
     <meta property="og:description" content="تعرف على سياسة التوصيل والشحن السريع في اليمن، وضمان المنتجات، وشروط الاستبدال والاسترجاع الميسرة في متجر تي ريكس T-REX SHOP.">
     <meta property="og:url" content="https://trexshopmax.com/refund-policy">
     <meta property="og:image" content="https://trexshopmax.com/logo.png">
+    <!-- Twitter & OG -->
     <meta name="twitter:card" content="summary_large_image">
-
-    <!-- Google AdSense Official Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
-    <script>
-        window.adsbygoogle = window.adsbygoogle || [];
-    </script>
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -283,8 +278,20 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero-title { font-size: 28px; }
+            .header-inner { flex-wrap: wrap; gap: 10px; }
+            .nav-links {
+                display: flex;
+                width: 100%;
+                order: 3;
+                overflow-x: auto;
+                gap: 14px;
+                padding-top: 8px;
+                border-top: 1px solid #222;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .nav-links a { font-size: 13px; white-space: nowrap; }
+            .hero-title { font-size: 26px; }
             .content-card { padding: 22px; }
             .container { padding: 0 15px; }
         }
@@ -351,22 +358,6 @@
         </article>
     </main>
 
-    <!-- AdSense Display Unit -->
-    <div class="container">
-        <div class="ad-container">
-            <span class="ad-label"><i class="fas fa-ad"></i> إعلان تجاري / Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-4708671001798951"
-                 data-ad-slot="auto"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
-
     <footer>
         <div class="footer-links">
             <a href="/">الرئيسية</a>
@@ -374,6 +365,7 @@
             <a href="/about-us">من نحن</a>
             <a href="/contact-us">اتصل بنا</a>
             <a href="/privacy-policy">سياسة الخصوصية</a>
+            <a href="/delete-account">حذف الحساب</a>
             <a href="/terms-of-use">شروط الاستخدام</a>
             <a href="/refund-policy">الشحن والاسترجاع</a>
         </div>

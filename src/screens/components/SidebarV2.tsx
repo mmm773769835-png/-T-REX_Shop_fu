@@ -154,35 +154,6 @@ const SidebarV2: React.FC<SidebarProps> = ({
               <Ionicons name="chevron-forward" size={18} color="#888" />
             </TouchableOpacity>
 
-            {/* Payment Notification */}
-            <TouchableOpacity
-              style={[styles.menuItem, isDarkMode ? styles.darkMenuItem : styles.lightMenuItem]}
-              onPress={() => {
-                Alert.alert(
-                  language === "ar" ? "إرسال إشعار دفع" : "Send Payment Receipt",
-                  language === "ar"
-                    ? "يرجى التواصل مع الدعم أو رفع صورة إيصال التحويل عبر واتساب المبيعات."
-                    : "Please contact support or attach receipt via WhatsApp.",
-                  [
-                    { text: language === "ar" ? "حسناً" : "OK" }
-                  ]
-                );
-              }}
-            >
-              <View style={[styles.iconBox, { backgroundColor: 'rgba(40, 167, 69, 0.15)' }]}>
-                <Ionicons name="receipt" size={20} color="#28a745" />
-              </View>
-              <View style={styles.menuTextContainer}>
-                <Text style={[styles.menuText, { color: isDarkMode ? '#fff' : '#1a1a1a' }]}>
-                  {language === "ar" ? "إرسال إشعار دفع" : "Send Payment Receipt"}
-                </Text>
-                <Text style={styles.menuSubtext}>
-                  {language === "ar" ? "إرفاق إيصال السداد للاشتراك" : "Attach transfer receipt"}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#888" />
-            </TouchableOpacity>
-
             {/* Section: Management */}
             <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFD700' : '#d4af37' }]}>
               🏬 {language === "ar" ? "لوحة التحكم والمنتجات" : "Dashboard & Products"}
@@ -202,7 +173,7 @@ const SidebarV2: React.FC<SidebarProps> = ({
                     {language === "ar" ? "لوحة منتجات التاجر" : "Vendor Dashboard"}
                   </Text>
                   <Text style={styles.menuSubtext}>
-                    {language === "ar" ? "إدارة وتعديل وااشتراك المنتجات" : "Manage your items & subscription"}
+                    {language === "ar" ? "إدارة وتعديل المنتجات" : "Manage and edit products"}
                   </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#888" />

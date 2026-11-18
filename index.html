@@ -26,11 +26,9 @@
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-    <!-- Google AdSense Official Script -->
+    <!-- Google AdSense Official Auto Ads -->
+    <meta name="google-adsense-account" content="ca-pub-4708671001798951">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
-    <script>
-        window.adsbygoogle = window.adsbygoogle || [];
-    </script>
     <!-- Schema.org Structured Data for Google -->
     <script type="application/ld+json">
     {
@@ -170,37 +168,60 @@
             --text: #ffffff;
             --text-muted: #888;
         }
-        /* AdSense Layout & CLS Prevention */
-        .ad-container {
-            margin: 25px auto;
-            padding: 12px 10px;
+        /* Editorial Guide & FAQ Section */
+        .editorial-guide-section {
+            padding: 55px 20px;
+            background: #0d0d0f;
+            border-top: 1px solid #222;
+        }
+        .editorial-wrap {
             max-width: 1200px;
-            width: 95%;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-            box-sizing: border-box;
-            min-height: 110px;
+            margin: 0 auto;
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 25px;
+        }
+        .editorial-card {
+            background: #151518;
+            border: 1px solid #26262a;
+            border-radius: 16px;
+            padding: 24px;
+            line-height: 1.8;
+        }
+        .editorial-card h3 {
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 10px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
+            gap: 10px;
         }
-        .ad-container-mid {
-            min-height: 270px;
+        .editorial-card p, .editorial-card li {
+            color: #cfcfcf;
+            font-size: 14.5px;
+            line-height: 1.85;
         }
-        .ad-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-            display: inline-block;
+        .editorial-card ul {
+            padding-right: 20px;
+            margin-top: 10px;
         }
+        .faq-home-box {
+            margin-top: 32px;
+            background: #141416;
+            border: 1px solid #26262a;
+            border-radius: 16px;
+            padding: 28px;
+        }
+        .faq-home-item {
+            border-bottom: 1px solid #232328;
+            padding: 14px 0;
+        }
+        .faq-home-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .faq-home-item h4 { color: var(--primary); font-size: 16px; margin-bottom: 6px; }
+        .faq-home-item p { color: #ccc; font-size: 14.5px; line-height: 1.8; }
         body {
             font-family: 'Cairo', sans-serif;
             background: var(--darker);
@@ -2901,11 +2922,23 @@
 
         /* Responsive - Mobile */
         @media (max-width: 768px) {
+            .header { padding: 10px 0 8px; }
+            .header-content { flex-wrap: wrap; gap: 8px; }
             .hero h1 { font-size: 28px; }
             .hero p { font-size: 16px; margin-bottom: 20px; }
-            .hero { padding: 50px 15px; margin-top: 65px; }
+            .hero { padding: 45px 15px; margin-top: 112px; }
             .cta-btn { padding: 12px 30px; font-size: 16px; }
-            .nav-links { display: none; }
+            .nav-links {
+                display: flex;
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 14px;
+                padding-top: 8px;
+                border-top: 1px solid #1f1f1f;
+                font-size: 13px;
+            }
             .modal-body { grid-template-columns: 1fr; }
             .modal-overlay { padding: 88px 12px 18px; }
             .modal-content { border-radius: 15px; max-height: calc(100vh - 105px); }
@@ -3560,26 +3593,86 @@
         </div>
     </div>
 
-    <!-- AdSense: Top Banner Unit -->
-    <div class="ad-container" id="ad-top-unit">
-        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
-        <ins class="adsbygoogle"
-             style="display:block; width:100%;"
-             data-ad-client="ca-pub-4708671001798951"
-             data-ad-slot="auto"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-    </div>
-
     <!-- Featured Carousel -->
     <section class="featured-section">
         <h2 class="featured-title">
             <i class="fas fa-star"></i> منتجات مميزة
         </h2>
         <div class="swiper featuredSwiper">
-            <div class="swiper-wrapper" id="featuredContainer">
-                <!-- Featured products will be loaded here -->
-            </div>
+            <div class="swiper-wrapper" id="featuredContainer"><!-- SSR_FEATURED_START -->
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/74e55a8a-ae44-4f19-b792-60272079dd87" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787101504602_1_IMG-20260819-WA00001.jpg.jpg" alt="طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح</h3>
+                    <p class="swiper-slide-price">160 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/9a9ff643-d241-42bd-baa7-a66a72921b85" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008522733_1_IMG-20260818-WA0003.jpg.jpg" alt="خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل</h3>
+                    <p class="swiper-slide-price">6 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/edc60b5f-46c4-4ce9-b398-4cdad3c005ec" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786912518916_1_IMG-20260814-WA0115.jpg.jpg" alt="طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton)" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton)</h3>
+                    <p class="swiper-slide-price">50 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786755634732_1_IMG-20260814-WA0109.jpg.jpg" alt=" ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title"> ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة</h3>
+                    <p class="swiper-slide-price">40 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/d939dd7b-9f9f-4d7a-808c-fdd70288b0f9" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754414502_1_IMG-20260815-WA0015.jpg.jpg" alt=" الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title"> الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة</h3>
+                    <p class="swiper-slide-price">100 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/8f24f606-f8c8-4598-9bd5-7c02cca62a56" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752434618_1_IMG-20260814-WA0086.jpg.jpg" alt=" طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title"> طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي</h3>
+                    <p class="swiper-slide-price">70 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/2801b26d-e2c8-4396-ac61-de2c2e6570c5" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786751072536_1_IMG-20260813-WA0029.jpg.jpg" alt="طقم ساعات مزدوج (رجالي ونسائي) من ماركة سويسماكس (Swismax" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">طقم ساعات مزدوج (رجالي ونسائي) من ماركة سويسماكس (Swismax</h3>
+                    <p class="swiper-slide-price">100 ر.س</p>
+                </div>
+            </a>
+        </div>
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/6dc815d3-a2aa-4c4a-a401-511e6f1e4fee" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786750901975_1_IMG-20260813-WA0017.jpg.jpg" alt="الساعات  الكلاسيكية المصنوعة من الستانلس " loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">الساعات  الكلاسيكية المصنوعة من الستانلس </h3>
+                    <p class="swiper-slide-price">40 ر.س</p>
+                </div>
+            </a>
+        </div>
+            <!-- SSR_FEATURED_END --></div>
             <div class="swiper-pagination"></div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
@@ -3588,7 +3681,7 @@
 
     <!-- Sort and Results -->
     <div class="sort-container">
-        <span class="results-count" id="resultsCount">جاري تحميل المنتجات...</span>
+        <span class="results-count" id="resultsCount"><!-- SSR_RESULTS_START -->37 منتج<!-- SSR_RESULTS_END --></span>
         <select class="sort-select" id="sortSelect" onchange="sortProducts()" title="ترتيب المنتجات" aria-label="ترتيب المنتجات">
             <option value="newest">الأحدث أولاً</option>
             <option value="price-low">السعر: من الأقل للأعلى</option>
@@ -3604,7 +3697,7 @@
             <div class="stat-item">
                 <i class="fas fa-box"></i>
                 <div>
-                    <span class="stat-value" id="productsCountStat">-</span>
+                    <span class="stat-value" id="productsCountStat"><!-- SSR_COUNT_START -->37<!-- SSR_COUNT_END --></span>
                     <span class="stat-label">منتج متاح</span>
                 </div>
             </div>
@@ -3657,40 +3750,518 @@
         </div>
     </div>
 
-    <!-- AdSense: Mid-Page Unit -->
-    <div class="ad-container ad-container-mid" id="ad-mid-unit">
-        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
-        <ins class="adsbygoogle"
-             style="display:block; width:100%;"
-             data-ad-client="ca-pub-4708671001798951"
-             data-ad-slot="auto"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-    </div>
-
     <!-- Products Section -->
     <section class="products-section" id="products">
         <h2 class="section-title">
             <i class="fas fa-fire"></i> جميع المنتجات
         </h2>
-        <div id="products-container" class="products-grid">
-            <div class="loading">
-                <i class="fas fa-spinner"></i>
-                <p>جاري تحميل المنتجات...</p>
+        <div id="products-container" class="products-grid"><!-- SSR_PRODUCTS_START -->
+        <div class="product-card" data-product-id="72ece833-861b-4887-91df-37cb924b7513">
+            <span class="product-badge sale">-9%</span>
+            <a href="/products/72ece833-861b-4887-91df-37cb924b7513" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102983138_1_IMG-20260819-WA0002.jpg.jpg" alt="باكج لافيرن LAVERNE الفخم 3 عطور بتغليف ملكي ذهبي وشراشيب روائح متنوعة رجالي ونسائي ثبات وفوحان عالي  السعر: 110 ريال للباكج كامل" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/72ece833-861b-4887-91df-37cb924b7513" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">باكج لافيرن LAVERNE الفخم 3 عطور بتغليف ملكي ذهبي وشراشيب روائح متنوعة رجالي ونسائي ثبات وفوحان عالي  السعر: 110 ريال للباكج كامل</h3>
+                </a>
+                <p class="product-category">جمال</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/72ece833-861b-4887-91df-37cb924b7513" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
             </div>
         </div>
+        <div class="product-card" data-product-id="be113d27-b8b7-46c3-9045-525e76c1c1ad">
+            <span class="product-badge sale">-38%</span>
+            <a href="/products/be113d27-b8b7-46c3-9045-525e76c1c1ad" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102895830_1_IMG-20260819-WA0001.jpg.jpg" alt="عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال " class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/be113d27-b8b7-46c3-9045-525e76c1c1ad" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال </h3>
+                </a>
+                <p class="product-category">جمال</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">50 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/be113d27-b8b7-46c3-9045-525e76c1c1ad" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="74e55a8a-ae44-4f19-b792-60272079dd87">
+            <span class="product-badge sale">-11%</span>
+            <a href="/products/74e55a8a-ae44-4f19-b792-60272079dd87" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787101504602_1_IMG-20260819-WA00001.jpg.jpg" alt="طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/74e55a8a-ae44-4f19-b792-60272079dd87" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم عطور من ابراق مكون من 9حبات سعر الباكج 180ريال 😍😍 9 عطور ميني متنوعة تغليف فخم بوكس ذهبي مناسب للهدايا والتوزيعات توصيل جدة متاح</h3>
+                </a>
+                <p class="product-category">جمال</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">160 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/74e55a8a-ae44-4f19-b792-60272079dd87" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="7b9fcc8f-653a-4dc4-9f2a-37ecb2104bf6">
+            
+            <a href="/products/7b9fcc8f-653a-4dc4-9f2a-37ecb2104bf6" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008626724_1_IMG-20260818-WA0004.jpg.jpg" alt="خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/7b9fcc8f-653a-4dc4-9f2a-37ecb2104bf6" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">6 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/7b9fcc8f-653a-4dc4-9f2a-37ecb2104bf6" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="30b49dc7-b77d-491d-972e-d485cd5b01a6">
+            
+            <a href="/products/30b49dc7-b77d-491d-972e-d485cd5b01a6" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008559582_1_IMG-20260818-WA0002.jpg.jpg" alt="خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل " class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/30b49dc7-b77d-491d-972e-d485cd5b01a6" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل </h3>
+                </a>
+                <p class="product-category">إلكترونيات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">6 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/30b49dc7-b77d-491d-972e-d485cd5b01a6" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="9a9ff643-d241-42bd-baa7-a66a72921b85">
+            
+            <a href="/products/9a9ff643-d241-42bd-baa7-a66a72921b85" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787008522733_1_IMG-20260818-WA0003.jpg.jpg" alt="خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/9a9ff643-d241-42bd-baa7-a66a72921b85" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">خاتم نسائي ذهبي ✨ 3 فصوص زركون مستطيلة + ترصيع خامة ستيل مطلي ثابت ما يتغير مقاس قابل للتعديل</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">6 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/9a9ff643-d241-42bd-baa7-a66a72921b85" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="edc60b5f-46c4-4ce9-b398-4cdad3c005ec">
+            
+            <a href="/products/edc60b5f-46c4-4ce9-b398-4cdad3c005ec" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786912518916_1_IMG-20260814-WA0115.jpg.jpg" alt="طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton)" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/edc60b5f-46c4-4ce9-b398-4cdad3c005ec" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم مجوهرات (عقد وأقراط) مستوحى من تصميم &quot;كلور بلوسوم&quot; (Color Blossom) الشهير لدار لويس فيتون (Louis Vuitton)</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">50 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/edc60b5f-46c4-4ce9-b398-4cdad3c005ec" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="58343acb-d1a0-4990-953b-2158fa91182d">
+            
+            <a href="/products/58343acb-d1a0-4990-953b-2158fa91182d" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838589595_1_IMG-20260814-WA0029.jpg.jpg" alt="طقم المجوهرات هو نصف طقم ذهبي بتصميم دائري عصري" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/58343acb-d1a0-4990-953b-2158fa91182d" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم المجوهرات هو نصف طقم ذهبي بتصميم دائري عصري</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">35 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/58343acb-d1a0-4990-953b-2158fa91182d" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="b5563e36-94db-49cb-acb4-4da69f857356">
+            
+            <a href="/products/b5563e36-94db-49cb-acb4-4da69f857356" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838381166_1_IMG-20260814-WA0023.jpg.jpg" alt="طقم &quot;توليب&quot; الفضي الراقي (عقد وأقراط)" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/b5563e36-94db-49cb-acb4-4da69f857356" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم &quot;توليب&quot; الفضي الراقي (عقد وأقراط)</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">35 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/b5563e36-94db-49cb-acb4-4da69f857356" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="dc4bc45e-788e-4e4d-92aa-821d4d1787ce">
+            
+            <a href="/products/dc4bc45e-788e-4e4d-92aa-821d4d1787ce" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786838122642_1_IMG-20260814-WA0022.jpg.jpg" alt="يحتوي على طقم مجوهرات نسائي مستوحى من تصميم ميسيكا (Messika)" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/dc4bc45e-788e-4e4d-92aa-821d4d1787ce" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">يحتوي على طقم مجوهرات نسائي مستوحى من تصميم ميسيكا (Messika)</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/dc4bc45e-788e-4e4d-92aa-821d4d1787ce" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="c2516bfa-d6b2-4faa-ae90-44d0b5cef9b0">
+            
+            <a href="/products/c2516bfa-d6b2-4faa-ae90-44d0b5cef9b0" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837961657_1_IMG-20260814-WA0017.jpg.jpg" alt="طقم مجوهرات ناعم (نصف طقم) بتصميم عالمي مستوحى من وردة روبرتو كوين أو كوزموس" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/c2516bfa-d6b2-4faa-ae90-44d0b5cef9b0" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم مجوهرات ناعم (نصف طقم) بتصميم عالمي مستوحى من وردة روبرتو كوين أو كوزموس</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/c2516bfa-d6b2-4faa-ae90-44d0b5cef9b0" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="a32ff940-c004-47a5-8744-fda96c139f12">
+            
+            <a href="/products/a32ff940-c004-47a5-8744-fda96c139f12" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837783837_1_IMG-20260814-WA0018.jpg.jpg" alt="طقم مجوهرات نسائي بتصميم مستطيل مرصع بالزركون بلمسة تشبه تصاميم ميسيكا (Messika) باللون الذهبي البراق" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/a32ff940-c004-47a5-8744-fda96c139f12" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم مجوهرات نسائي بتصميم مستطيل مرصع بالزركون بلمسة تشبه تصاميم ميسيكا (Messika) باللون الذهبي البراق</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/a32ff940-c004-47a5-8744-fda96c139f12" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="2fae7d30-ff9f-43d6-9bbe-592d2260cd37">
+            
+            <a href="/products/2fae7d30-ff9f-43d6-9bbe-592d2260cd37" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837631155_1_IMG-20260814-WA0013.jpg.jpg" alt="طقم مجوهرات نسائي مستوحى من تصميم ماركة &quot;ميسيكا&quot; الأيقوني (مجموعة Move)، ويتكون من قلادة وزوج من الأقراط" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/2fae7d30-ff9f-43d6-9bbe-592d2260cd37" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم مجوهرات نسائي مستوحى من تصميم ماركة &quot;ميسيكا&quot; الأيقوني (مجموعة Move)، ويتكون من قلادة وزوج من الأقراط</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/2fae7d30-ff9f-43d6-9bbe-592d2260cd37" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="f5b36830-5647-44cf-bf8a-8d68f87c0aa0">
+            
+            <a href="/products/f5b36830-5647-44cf-bf8a-8d68f87c0aa0" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837370580_1_IMG-20260814-WA0009.jpg.jpg" alt="طقم سهرة &quot;برستيج&quot; الفاخر – قلادة وأقراط مرصعة بزيركون بقصة الزمرد والأبعاد الهندسية" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/f5b36830-5647-44cf-bf8a-8d68f87c0aa0" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم سهرة &quot;برستيج&quot; الفاخر – قلادة وأقراط مرصعة بزيركون بقصة الزمرد والأبعاد الهندسية</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/f5b36830-5647-44cf-bf8a-8d68f87c0aa0" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="0b7b3c95-1ada-451f-8f4d-a6dbbd34b5c1">
+            
+            <a href="/products/0b7b3c95-1ada-451f-8f4d-a6dbbd34b5c1" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837183347_1_IMG-20260814-WA0005.jpg.jpg" alt="طقم إكسسوار فندي ذهبي راقي - قلادة مع أقراط دائرية" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/0b7b3c95-1ada-451f-8f4d-a6dbbd34b5c1" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم إكسسوار فندي ذهبي راقي - قلادة مع أقراط دائرية</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/0b7b3c95-1ada-451f-8f4d-a6dbbd34b5c1" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="5f40783a-52c7-4afc-9f2c-ccc587c0edc6">
+            
+            <a href="/products/5f40783a-52c7-4afc-9f2c-ccc587c0edc6" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786837234539_1_IMG-20260814-WA0003.jpg.jpg" alt="طقم مناسبات زركون ناعم (قلادة + أقراط) بتصميم نباتي راقٍ" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/5f40783a-52c7-4afc-9f2c-ccc587c0edc6" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">طقم مناسبات زركون ناعم (قلادة + أقراط) بتصميم نباتي راقٍ</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">45 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/5f40783a-52c7-4afc-9f2c-ccc587c0edc6" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1">
+            
+            <a href="/products/7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786755634732_1_IMG-20260814-WA0109.jpg.jpg" alt=" ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name"> ساعة نسائية ذات تصميم كلاسيكي ومجوهرات معدنية باللون الذهبي مع مينا أسود وعقارب دقيقة</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">40 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/7b3a58d0-b2c6-40ad-a228-9ba43d3dfbb1" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="caa5d7ba-dfdb-4992-a0e9-125e38681a3a">
+            
+            <a href="/products/caa5d7ba-dfdb-4992-a0e9-125e38681a3a" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786755458304_1_IMG-20260815-WA0016.jpg.jpg" alt="الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/caa5d7ba-dfdb-4992-a0e9-125e38681a3a" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/caa5d7ba-dfdb-4992-a0e9-125e38681a3a" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="d2b7352a-3ed3-44f7-89e5-fc26018b4232">
+            
+            <a href="/products/d2b7352a-3ed3-44f7-89e5-fc26018b4232" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754769680_1_IMG-20260815-WA0017.jpg.jpg" alt="الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/d2b7352a-3ed3-44f7-89e5-fc26018b4232" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">الصندوق طقم هدايا نسائي مكون من ساعه   أنيقه يتكون من عدة قطع متناسقة</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/d2b7352a-3ed3-44f7-89e5-fc26018b4232" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="4136689f-d3d4-419f-9df6-aefbe1206ae4">
+            
+            <a href="/products/4136689f-d3d4-419f-9df6-aefbe1206ae4" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754528153_1_IMG-20260815-WA0013.jpg.jpg" alt="الصندوق طقم هدايا نسائي ساعه انيقه  يتكون من عدة قطع متناسقة" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/4136689f-d3d4-419f-9df6-aefbe1206ae4" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">الصندوق طقم هدايا نسائي ساعه انيقه  يتكون من عدة قطع متناسقة</h3>
+                </a>
+                <p class="product-category">إلكترونيات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/4136689f-d3d4-419f-9df6-aefbe1206ae4" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="d939dd7b-9f9f-4d7a-808c-fdd70288b0f9">
+            
+            <a href="/products/d939dd7b-9f9f-4d7a-808c-fdd70288b0f9" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786754414502_1_IMG-20260815-WA0015.jpg.jpg" alt=" الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/d939dd7b-9f9f-4d7a-808c-fdd70288b0f9" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name"> الصندوق طقم هدايا نسائي أنيق يتكون من عدة قطع متناسقة</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/d939dd7b-9f9f-4d7a-808c-fdd70288b0f9" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="8f24f606-f8c8-4598-9bd5-7c02cca62a56">
+            
+            <a href="/products/8f24f606-f8c8-4598-9bd5-7c02cca62a56" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752434618_1_IMG-20260814-WA0086.jpg.jpg" alt=" طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/8f24f606-f8c8-4598-9bd5-7c02cca62a56" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name"> طقم ساعة نسائية كوارتز من ماركة Flen باللون الذهبي</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">70 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/8f24f606-f8c8-4598-9bd5-7c02cca62a56" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="2e55a4f2-99d8-466e-aac8-010a3ab91b4e">
+            
+            <a href="/products/2e55a4f2-99d8-466e-aac8-010a3ab91b4e" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752314036_1_IMG-20260813-WA0032.jpg.jpg" alt="الصندوق طقماً هدايا رجالياً بلون فضي منسقاً بعناية، ويحتوي" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/2e55a4f2-99d8-466e-aac8-010a3ab91b4e" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">الصندوق طقماً هدايا رجالياً بلون فضي منسقاً بعناية، ويحتوي</h3>
+                </a>
+                <p class="product-category">إلكترونيات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/2e55a4f2-99d8-466e-aac8-010a3ab91b4e" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="product-card" data-product-id="918e26ac-2e87-4563-ac79-ec6c436a9061">
+            
+            <a href="/products/918e26ac-2e87-4563-ac79-ec6c436a9061" style="text-decoration: none; color: inherit; display: block;">
+                <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786751613782_1_IMG-20260813-WA0028.jpg.jpg" alt="تألقي بإطلالة أنيقة مع طقم الساعة النسائية باللون الذهبي  مع سوار متناسق وأساور" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/918e26ac-2e87-4563-ac79-ec6c436a9061" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">تألقي بإطلالة أنيقة مع طقم الساعة النسائية باللون الذهبي  مع سوار متناسق وأساور</h3>
+                </a>
+                <p class="product-category">إكسسوارات</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: اليمن 🇾🇪
+                </p>
+                <p class="product-price">100 ر.س</p>
+                <div class="card-actions">
+                    <a href="/products/918e26ac-2e87-4563-ac79-ec6c436a9061" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- SSR_PRODUCTS_END --></div>
     </section>
-
-    <!-- AdSense: Pre-Footer Unit -->
-    <div class="ad-container" id="ad-footer-unit">
-        <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
-        <ins class="adsbygoogle"
-             style="display:block; width:100%;"
-             data-ad-client="ca-pub-4708671001798951"
-             data-ad-slot="auto"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-    </div>
 
     <!-- Reviews Section -->
     <section class="reviews-section">
@@ -3759,6 +4330,93 @@
     </section>
 
     
+    <!-- Editorial Buying Guide & Consumer FAQ Section -->
+    <section class="editorial-guide-section" id="shopping-guide">
+        <div class="editorial-wrap">
+            <div style="text-align: center; margin-bottom: 35px;">
+                <span style="background: rgba(255,215,0,0.1); border: 1px solid var(--primary); color: var(--primary); padding: 5px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-compass"></i> موسوعة التسوق الذكي في اليمن
+                </span>
+                <h2 style="font-size: 30px; font-weight: 900; color: #fff; margin: 14px 0 10px;">دليل المشتري: كيف تختار الجودة الأصلية وتتسوق بأمان؟</h2>
+                <p style="color: #a0a0a0; font-size: 15px; max-width: 720px; margin: 0 auto;">نجمع في متجر T-REX SHOP بين عرض المنتجات المختارة وتقديم المعرفة التحريرية التي تساعدك على قراءة المواصفات الفنية بدقة قبل الشراء.</p>
+            </div>
+
+            <div class="editorial-grid">
+                <article class="editorial-card">
+                    <h3><i class="fas fa-spray-can-sparkles"></i> معايير اختيار العطور الثابتة</h3>
+                    <p>لضمان بقاء العطر لساعات ممتدة في الأجواء الدافئة، يركز خبراؤنا على نسبة الزيت العطري ومكونات القاعدة (Base Notes):</p>
+                    <ul>
+                        <li>تركيزات <strong>Parfum (20%–40%)</strong> و <strong>Eau de Parfum (15%–20%)</strong> تناسب المناسبات المسائية والشتاء وتثبت لفترات أطول على الملابس.</li>
+                        <li>نوتات العنبر، خشب الصندل، الباتشولي، والعود تبطئ تطاير القمة الحمضية الخفيفة وتمنح تدرجاً عطرياً متوازناً.</li>
+                        <li>حفظ القنينة في خزانة مظلمة بعيداً عن رطوبة الحمام أو حرارة السيارة يحمي التركيبة من التأكسد وتغيّر الرائحة.</li>
+                    </ul>
+                </article>
+
+                <article class="editorial-card">
+                    <h3><i class="fas fa-clock"></i> فحص الساعات والإكسسوارات</h3>
+                    <p>قبل اعتماد أي ساعة أو طقم مجوهرات، يجدر بك مراجعة أربعة تفاصيل صناعية تميز القطعة المتقنة عن النسخ التجارية الرديئة:</p>
+                    <ul>
+                        <li>التأكد من استخدام معدن <strong>الستانلس ستيل 316L</strong> أو الطلاء المقاوم للأكسدة والتعرق لتجنب اسوداد المعصم.</li>
+                        <li>في ساعات الكوارتز السويسرية واليابانية: التحقق من دقة توقف العقرب على شرطات الثواني، وتجربة أزرار الكرونوغراف الجانبية.</li>
+                        <li>الالتزام بقاعدة «العطر قبل الإكسسوار» لحماية لمعان فصوص الزركون وطلاء الذهب الوردي لسنوات طويلة.</li>
+                    </ul>
+                </article>
+
+                <article class="editorial-card">
+                    <h3><i class="fas fa-bolt"></i> منظومات الطاقة والسيارات</h3>
+                    <p>تتطلب الأجهزة الكهربائية وشاشات السيارات في اليمن مراعاة جودة الدوائر الكهربائية والسعة الصافية الحقيقية:</p>
+                    <ul>
+                        <li>السعة القابلة للاستخدام في أي باور بانك تمثل نحو <strong>68%–75%</strong> من السعة المكتوبة نتيجة تحويل الجهد من 3.7V إلى 5V/9V.</li>
+                        <li>في المراوح العاملة بالطاقة الشمسية وإضاءة الطوارئ، يُنصح بتنظيف الألواح من الغبار أسبوعياً وعدم ترك البطارية فارغة تماماً.</li>
+                        <li>شاشات الأندرويد للسيارات يفضل أن تبدأ بـ 2–4GB RAM مع كابلات فيشة وكالة دون قص الضفيرة الأصلية.</li>
+                    </ul>
+                </article>
+            </div>
+
+            <div class="faq-home-box">
+                <h3 style="color: #fff; font-size: 21px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-question-circle" style="color: var(--primary);"></i> الأسئلة الشائعة حول الطلب والتوصيل والضمان
+                </h3>
+                <div class="faq-home-item">
+                    <h4>كيف يتم التحقق من المنتج قبل دفع المبلغ؟</h4>
+                    <p>يدعم المتجر خيار الدفع عند الاستلام داخل صنعاء ومعظم المدن؛ حيث يحق للمشتري معاينة الطرد والتأكد من مطابقة الموديل والكمية والسعر الموضح في الفاتورة عند الوصول قبل تسليم المبلغ.</p>
+                </div>
+                <div class="faq-home-item">
+                    <h4>ما هي المدة الزمنية للتوصيل داخل صنعاء والمحافظات اليمنية؟</h4>
+                    <p>يصل المندوب داخل العاصمة صنعاء خلال 2 إلى 24 ساعة من تأكيد الطلب، بينما تستغرق الشحنات المرسلة عبر شركات النقل المعتمدة إلى بقية المحافظات اليمنية ما بين 24 إلى 72 ساعة.</p>
+                </div>
+                <div class="faq-home-item">
+                    <h4>هل تتوفر عملات متعددة لعرض الأسعار؟ وما آلية الاسترجاع؟</h4>
+                    <p>يمكنك التبديل الفوري بين الريال السعودي، الريال اليمني، والدولار وبقية العملات من أعلى الصفحة. كما نلتزم بسياسة استبدال واسترجاع واضحة خلال 7 أيام لأي عيب مصنعي وفق <a href="/refund-policy" style="color: var(--primary); text-decoration: underline;">سياسة الشحن والاسترجاع</a>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "كيف يتم التحقق من المنتج قبل دفع المبلغ؟",
+                "acceptedAnswer": { "@type": "Answer", "text": "يدعم المتجر خيار الدفع عند الاستلام مع حق المعاينة للتأكد من مطابقة الموديل والكمية والسعر الموضح في الفاتورة عند الاستلام." }
+            },
+            {
+                "@type": "Question",
+                "name": "ما هي المدة الزمنية للتوصيل داخل صنعاء والمحافظات اليمنية؟",
+                "acceptedAnswer": { "@type": "Answer", "text": "يتم التوصيل داخل العاصمة صنعاء خلال 2 إلى 24 ساعة، وإلى بقية المحافظات اليمنية خلال 24 إلى 72 ساعة عبر شركات النقل المعتمدة." }
+            },
+            {
+                "@type": "Question",
+                "name": "ما هي سياسة الاستبدال والاسترجاع في متجر T-REX SHOP؟",
+                "acceptedAnswer": { "@type": "Answer", "text": "يوفر المتجر ضمان استبدال واسترجاع خلال 7 أيام من تاريخ الاستلام في حال وجود عيب مصنعي أو عدم مطابقة المواصفات." }
+            }
+        ]
+    }
+    </script>
+
     <!-- Blog & Knowledge Base Section -->
     <section class="reviews-section" style="padding: 60px 20px; background: #0a0a0a; border-top: 1px solid #222;">
         <div style="max-width: 1200px; margin: 0 auto;">
@@ -3767,30 +4425,30 @@
                     <i class="fas fa-book-reader"></i> مدونة متجر تي ريكس المعرفية
                 </span>
                 <h2 style="font-size: 32px; font-weight: 900; color: #fff; margin: 15px 0 10px;">أحدث المقالات وأدلة التسوق الذكي</h2>
-                <p style="color: #999; font-size: 15px; max-width: 650px; margin: 0 auto;">اكتشف أسرار اختيار العطور الفاخرة، فحص الساعات الأصلية، والحفاظ على بطاريات الطوارئ الإلكترونية.</p>
+                <p style="color: #999; font-size: 15px; max-width: 680px; margin: 0 auto;">أدلة متعمقة تساعدك على اختيار العطور الثابتة، فحص الساعات الأصلية، وصيانة أجهزة الطاقة والسيارات.</p>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
                 <!-- Article 1 -->
                 <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
-                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102983138_1_IMG-20260819-WA0002.jpg.jpg" alt="دليل العطور" style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1787102983138_1_IMG-20260819-WA0002.jpg.jpg" alt="دليل العطور الثابتة" style="width: 100%; height: 180px; object-fit: cover;">
                     <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
                         <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-spray-can-sparkles"></i> عطور وفخامة</span>
                         <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل شامل: كيف تختار العطور الأكثر ثباتاً وفوحاناً؟</h3>
-                        <p style="font-size: 13px; color: #888; line-height: 1.6;">الفرق بين البارفان والتواليت والمكونات التي تمنح العطر ثباتاً يتجاوز 24 ساعة.</p>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">الفرق بين البارفان والتواليت والمكونات القاعدية التي تمنح العطر ثباتاً يتجاوز 24 ساعة.</p>
                         <a href="/articles/guide-to-choosing-long-lasting-perfumes" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
                             قراءة المقال <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Article 2 -->
+                <!-- Article 2 (Fixed image to genuine luxury watch) -->
                 <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
-                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781656702968_1_IMG-20260616-WA0019.jpg.jpg" alt="فحص الساعات" style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786750469246_1_IMG-20260813-WA00112.jpg.jpg" alt="فحص الساعات الأصلية" style="width: 100%; height: 180px; object-fit: cover;">
                     <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
                         <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-clock"></i> ساعات وإكسسوارات</span>
                         <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">كيف تفرّق بين الساعات الأصلية والمقلدة؟ 8 علامات حاسمة</h3>
-                        <p style="font-size: 13px; color: #888; line-height: 1.6;">دليل المستهلك الذكي لكشف الساعات المقلدة من حركة عقرب الثواني والخامات.</p>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">دليل المستهلك الذكي لكشف الساعات المقلدة من حركة عقرب الثواني واختبار الزجاج والخامات.</p>
                         <a href="/articles/how-to-spot-authentic-vs-fake-watches" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
                             قراءة المقال <i class="fas fa-arrow-left"></i>
                         </a>
@@ -3799,12 +4457,51 @@
 
                 <!-- Article 3 -->
                 <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
-                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780614026865_1_IMG-20260604-WA0005.jpg.jpg" alt="بنوك الطاقة" style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1780614026865_1_IMG-20260604-WA0005.jpg.jpg" alt="بنوك الطاقة والطاقة الشمسية" style="width: 100%; height: 180px; object-fit: cover;">
                     <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
                         <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-bolt"></i> تكنولوجيا وطاقة</span>
-                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل بنوك الطاقة وبطاريات الطوارئ في اليمن</h3>
-                        <p style="font-size: 13px; color: #888; line-height: 1.6;">كيف تختار السعة المناسبة وتحافظ على بطارية جهازك في ظل انقطاع الكهرباء.</p>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل بنوك الطاقة ومراوح الطاقة الشمسية في اليمن</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">حساب السعة الفعلية للبطاريات وحماية الأجهزة الإلكترونية في ظل انقطاع الكهرباء.</p>
                         <a href="/articles/power-banks-and-battery-maintenance-guide" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article 4 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1781656702968_1_IMG-20260616-WA0019.jpg.jpg" alt="شاشات الأندرويد للسيارات" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-car"></i> سيارات وأجهزة</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل اختيار شاشات الأندرويد للسيارات وإكسسوارات المقصورة</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">فهم مواصفات الذاكرة RAM، شاشات IPS، ودعم الكاميرا الخلفية والتركيب الآمن.</p>
+                        <a href="/articles/car-android-screens-and-accessories-guide" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article 5 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786752314036_1_IMG-20260813-WA0032.jpg.jpg" alt="التسوق الآمن في اليمن" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-shield-halved"></i> نصائح تسوق</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">دليل التسوق الإلكتروني الآمن في اليمن والدفع عند الاستلام</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">خطوات فحص البضاعة قبل الدفع وتمييز المتاجر الرسمية الموثوقة من الصفحات العشوائية.</p>
+                        <a href="/articles/safe-online-shopping-guide-yemen" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                            قراءة المقال <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Article 6 -->
+                <div style="background: #141414; border: 1px solid #262626; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
+                    <img src="https://udqnrsrwzifrzseixrcj.supabase.co/storage/v1/object/public/products/1786912518916_1_IMG-20260814-WA0115.jpg.jpg" alt="تنسيق الإكسسوارات" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+                        <span style="font-size: 11px; color: var(--primary); font-weight: 700;"><i class="fas fa-gem"></i> ساعات وإكسسوارات</span>
+                        <h3 style="font-size: 17px; color: #fff; font-weight: 800; line-height: 1.5;">الإكسسوارات والمجوهرات المطليّة التي لا يتغير لونها</h3>
+                        <p style="font-size: 13px; color: #888; line-height: 1.6;">الفرق بين الستانلس ستيل 316L والمعادن العادية ونصائح الحفاظ على بريق الزركون.</p>
+                        <a href="/articles/essential-accessories-for-men-and-women" style="margin-top: auto; color: var(--primary); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
                             قراءة المقال <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>
@@ -3813,7 +4510,7 @@
 
             <div style="text-align: center; margin-top: 35px;">
                 <a href="/blog" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px 30px; border-radius: 8px; font-weight: 800; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
-                    <i class="fas fa-newspaper"></i> استعراض كافة مقالات المدونة (8 مقالات)
+                    <i class="fas fa-newspaper"></i> استعراض كافة أدلة المدونة (13 دليلاً شاملاً)
                 </a>
             </div>
         </div>
@@ -3828,12 +4525,13 @@
             <a href="/about-us">من نحن</a>
             <a href="/contact-us">اتصل بنا</a>
             <a href="/privacy-policy">سياسة الخصوصية</a>
+            <a href="/delete-account">حذف الحساب</a>
             <a href="/terms-of-use">شروط الاستخدام</a>
             <a href="/refund-policy">الشحن والاسترجاع</a>
             <a href="/affiliate" style="color: #00e676; font-weight: bold;">📣 بوابة التسويق بالعمولة</a>
         </div>
         <div style="max-width: 900px; margin: 15px auto; font-size: 13px; color: #888; line-height: 1.8; text-align: center;">
-            <p><strong>متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس / trexshopmax)</strong> هو المنصة الرسمية للتسوق الإلكتروني في اليمن. نوفر تشكيلة مميزة من عطور لافيرن، الساعات الرجالية والنسائية الفاخرة، والإلكترونيات بأفضل الأسعار مع التوصيل السريع لكافة المحافظات وخدمة الدفع عند الاستلام أو التحويل البنكي.</p>
+            <p><strong>متجر تي ريكس (T-REX SHOP)</strong> منصة التسوق الإلكتروني والأدلة الشرائية في اليمن. نوفر العطور الفاخرة، الساعات الأصلية، الأجهزة الإلكترونية، وإكسسوارات السيارات مع حق المعاينة قبل الدفع والتوصيل السريع لكافة المحافظات.</p>
         </div>
         <p class="copyright">
             © 2026 متجر T-REX SHOP الرسمي (متجر تي ريكس). جميع الحقوق محفوظة. | صنعاء - اليمن
@@ -6348,7 +7046,10 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
         // Load Products from Supabase
         async function loadProducts() {
             const container = document.getElementById('products-container');
-            renderSkeletonLoaders(8);
+            const hasPreRendered = container && container.querySelector('.product-card');
+            if (!hasPreRendered) {
+                renderSkeletonLoaders(8);
+            }
             
             try {
                 console.log('[PRODUCTS] Loading products from Supabase...');
@@ -6398,19 +7099,22 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
                 registerProductsToMap(allProducts);
                 renderProducts();
                 renderFeatured(allProducts);
+                if (typeof updateStats === 'function') updateStats();
                 updateCartDisplay();
                 updateWishlistCount();
                 openProductFromUrl();
 
             } catch (error) {
                 console.error('[PRODUCTS] Error loading products:', error);
-                container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
-                        <h3>حدث خطأ في تحميل المنتجات</h3>
-                        <p>${error?.message || 'يرجى المحاولة مرة أخرى لاحقاً'}</p>
-                    </div>
-                `;
+                if (!hasPreRendered && container) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 60px;"></i>
+                            <h3>حدث خطأ في تحميل المنتجات</h3>
+                            <p>${error?.message || 'يرجى المحاولة مرة أخرى لاحقاً'}</p>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -7292,11 +7996,17 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
         function showPushBanner() {
             const banner = document.getElementById('pushNotificationBanner');
             const dismissed = localStorage.getItem('pushBannerDismissed');
+            const isBot = /bot|google|bing|crawl|spider|lighthouse/i.test(navigator.userAgent || '');
             
-            if (!dismissed && 'Notification' in window && Notification.permission !== 'granted') {
-                setTimeout(() => {
-                    banner.classList.add('show');
-                }, 3000);
+            if (banner && !isBot && !dismissed && 'Notification' in window && Notification.permission === 'default') {
+                const triggerBanner = () => {
+                    setTimeout(() => {
+                        if (!localStorage.getItem('pushBannerDismissed')) {
+                            banner.classList.add('show');
+                        }
+                    }, 12000);
+                };
+                window.addEventListener('scroll', triggerBanner, { once: true, passive: true });
             }
         }
 
@@ -7680,17 +8390,11 @@ ${notes ? `📝 *ملاحظات:* ${notes}\n` : ''}${(() => {
             // Check OAuth first (if user is returning from Google login)
             const hasOAuthTokens = window.location.hash && window.location.hash.includes('access_token=');
             
-            if (hasOAuthTokens) {
-                // Process OAuth login first
-                const oauthSuccess = await handleOAuthCallback();
-                if (!oauthSuccess) {
-                    await checkAuthState();
-                }
-            } else {
-                await checkAuthState();
-            }
-            
-            await loadProducts();
+            const authPromise = hasOAuthTokens
+                ? handleOAuthCallback().then(ok => { if (!ok) return checkAuthState(); })
+                : checkAuthState();
+
+            await Promise.allSettled([authPromise, loadProducts()]);
             fetchExchangeRates(); // Load live currency rates
             loadSettings();
             startCountdown();

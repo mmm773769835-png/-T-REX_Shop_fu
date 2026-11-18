@@ -6,7 +6,7 @@
     "name": "T-REX Shop",
     "slug": "trex-shop",
     "owner": "trexshop",
-    "version": "2.0.0",
+    "version": "2.5.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "trexshop",
@@ -16,7 +16,15 @@
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "التطبيق يحتاج الوصول إلى معرض الصور لاختيار صور المنتجات أو الحساب الشخصي",
+          "cameraPermission": "التطبيق يحتاج الوصول إلى الكاميرا لالتقاط صور المنتجات",
+          "microphonePermission": false
+        }
+      ]
     ],
     "splash": {
       "image": "./assets/splash.png",
@@ -44,6 +52,7 @@
     },
     "android": {
       "package": "com.trexshop.app",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121212"
@@ -51,9 +60,13 @@
       "permissions": [
         "INTERNET",
         "VIBRATE",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
         "CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "intentFilters": [
         {

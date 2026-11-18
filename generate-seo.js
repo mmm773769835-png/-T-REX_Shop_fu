@@ -82,8 +82,72 @@ async function fetchProducts(retries = 5, delay = 2000) {
     }
 }
 
+function getCategoryEditorialGuide(product) {
+    const cat = String(product.category || '').trim();
+    const name = String(product.name || '');
+    const isPerfume = /عطر|لافيرن|عطور|جمال|عنبر|باكج/.test(cat + ' ' + name);
+    const isCar = /سيارات|أندرويد|قير|شاشة/.test(cat + ' ' + name);
+    const isElectronics = /إلكترونيات|مروحة|مكواة|بخار|طاقة|شحن|بطارية/.test(cat + ' ' + name);
+
+    if (isPerfume) {
+        return {
+            title: 'دليل الاستخدام الاحترافي والحفاظ على ثبات العطر',
+            tips: [
+                'يُفضل رش العطر على نقاط النبض الدافئة (المعصمين والرقبة وخلف الأذنين) على بشرة مرطبة ليمتد الفوحان والثبات طوال اليوم.',
+                'تجنّب فرك المعصمين معاً بعد الرش لأن الاحتكاك الحراري يكسر جزيئات القمة العطرية ويغيّر تدرج الرائحة.',
+                'احفظ القنينة في خزانة مظلمة ومعتدلة الحرارة بعيداً عن أشعة الشمس المباشرة أو حرارة السيارة والرطوبة العالية.'
+            ],
+            articles: [
+                { slug: 'guide-to-choosing-long-lasting-perfumes', label: 'دليل اختيار العطور الأكثر ثباتاً وفوحاناً' },
+                { slug: 'how-to-store-perfumes-and-detect-originals', label: 'كيف تحفظ عطورك من التلف وتفحص جودة العبوة' }
+            ]
+        };
+    }
+    if (isCar) {
+        return {
+            title: 'دليل الفحص والتركيب الآمن لإكسسوارات السيارات',
+            tips: [
+                'لشاشات الأندرويد والإلكترونيات: يُنصح بالاعتماد على فيشة التوصيل المخصصة (Plug & Play) دون قص الأسلاك الأصلية للسيارة.',
+                'احرص على معاينة المقاس والشكل والتوافق مع سنة صنع سيارتك قبل التركيب النهائي وتأكيد عمل جميع المنافذ.',
+                'يتيح المتجر حق الفحص الأولي عند الاستلام لضمان خلو القطعة من أي خدوش أو عيوب نقل.'
+            ],
+            articles: [
+                { slug: 'car-android-screens-and-accessories-guide', label: 'دليل اختيار شاشات الأندرويد للسيارات والمقصورة' },
+                { slug: 'safe-online-shopping-guide-yemen', label: 'دليل التسوق الإلكتروني الآمن والدفع عند الاستلام في اليمن' }
+            ]
+        };
+    }
+    if (isElectronics) {
+        return {
+            title: 'إرشادات التشغيل الآمن وإطالة عمر الأجهزة الإلكترونية',
+            tips: [
+                'للأجهزة القابلة للشحن والمراوح الشمسية: اشحن الجهاز بالكامل في المرة الأولى ولا تترك البطارية فارغة حتى الصفر لفترات طويلة.',
+                'في أجهزة مكواة البخار والسخانات: استخدم ماءً مفلترًا أو معبّأً قليل الأملاح وأفرغ الخزان بعد كل استخدام لمنع تكلس الفتحات.',
+                'نوصي باستخدام منظم جهد أو شواحن أصلية مناسبة عند تذبذب التيار المنزلي لحماية الدوائر الداخلية.'
+            ],
+            articles: [
+                { slug: 'power-banks-and-battery-maintenance-guide', label: 'دليل منظومات الطاقة البديلة وصيانة البطاريات' },
+                { slug: 'home-appliances-steam-iron-maintenance-guide', label: 'دليل العناية بمكواة البخار والأجهزة المنزلية' }
+            ]
+        };
+    }
+    return {
+        title: 'دليل اختيار وفحص الساعات والإكسسوارات قبل الارتداء',
+        tips: [
+            'احرص على وضع العطور ومستحضرات البشرة قبل ارتداء الساعات والإكسسوارات بدقيقتين لحماية طبقة الطلاء وبريق الزركون.',
+            'في ساعات الكوارتز والستانلس ستيل: تأكد من إغلاق التاج (Crown) بإحكام وتجنب تعريض الساعة لبخار الماء الساخن.',
+            'احفظ كل قطعة في علبة مبطنة منفصلة أو كيس مخملي بعد مسحها بقطعة قماش جافة ناعمة للحفاظ على لمعانها.'
+        ],
+        articles: [
+            { slug: 'how-to-spot-authentic-vs-fake-watches', label: 'كيف تفرّق بين الساعات الأصلية والمقلدة؟ 8 علامات حاسمة' },
+            { slug: 'essential-accessories-for-men-and-women', label: 'دليل الإكسسوارات والمجوهرات المطليّة التي لا يتغير لونها' }
+        ]
+    };
+}
+
 function generateProductHtml(product, allProducts) {
     const productId = product.id;
+    const guide = getCategoryEditorialGuide(product);
     const title = `${escapeHtml(product.name)} | متجر تي ريكس T-REX SHOP`;
     const rawDesc = cleanDescription(product.description || product.name);
     const metaDesc = escapeHtml(`اشتري ${product.name} من متجر تي ريكس T-REX SHOP. السعر: ${formatPriceText(product.price, product.currency)}. تسوق اونلاين بأفضل سعر في اليمن مع خدمة التوصيل السريع.`);
@@ -600,6 +664,47 @@ function generateProductHtml(product, allProducts) {
             line-height: 1.8;
             opacity: 0.7;
         }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #101010;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #262626;
+        }
+        .spec-table th, .spec-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+            text-align: right;
+        }
+        .spec-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            width: 36%;
+            font-weight: 700;
+        }
+        .buyer-guide-box {
+            margin-top: 22px;
+            padding: 18px 20px;
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid #2a2a2a;
+            border-right: 4px solid var(--primary);
+            border-radius: 12px;
+        }
+        .buyer-guide-box h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .buyer-guide-box p, .buyer-guide-box li {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.85;
+            margin-bottom: 8px;
+        }
+        .buyer-guide-box ul { padding-right: 20px; }
     </style>
 </head>
 <body>
@@ -683,8 +788,31 @@ function generateProductHtml(product, allProducts) {
             </div>
 
             <div class="desc-section">
-                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج</h3>
+                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج والمواصفات</h3>
                 <p>${escapeHtml(product.description || product.name)}</p>
+
+                <table class="spec-table">
+                    <tbody>
+                        <tr><th>القسم / الفئة</th><td>${escapeHtml(product.category || 'منتجات عامة')}</td></tr>
+                        <tr><th>الحالة</th><td>${product.condition === 'used' ? 'مستعمل بحالة ممتازة' : 'جديد ومفحوص 100%'}</td></tr>
+                        <tr><th>خيارات الدفع</th><td>الدفع عند الاستلام أو التحويل عبر المحافظ البنكية</td></tr>
+                        <tr><th>الشحن داخل صنعاء</th><td>توصيل سريع خلال 2 إلى 24 ساعة مع حق المعاينة</td></tr>
+                        <tr><th>الشحن للمحافظات</th><td>خلال 24 إلى 72 ساعة عبر شركات النقل المعتمدة</td></tr>
+                        <tr><th>سياسة الاستبدال</th><td>ضمان استرجاع واستبدال خلال 7 أيام وفق الشروط المعتمدة</td></tr>
+                        <tr><th>رمز الصنف (SKU)</th><td style="font-family: monospace; font-size: 12px;">${escapeHtml(productId)}</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="buyer-guide-box">
+                    <h4><i class="fas fa-lightbulb"></i> ${guide.title}</h4>
+                    <ul>
+                        ${guide.tips.map(t => `<li>${t}</li>`).join('')}
+                    </ul>
+                    <p style="margin-top: 12px; color: #fff; font-weight: 700;">أدلة شرائية مفيدة من مدونتنا:</p>
+                    <ul>
+                        ${guide.articles.map(a => `<li><a href="${SITE_URL}/articles/${a.slug}" style="color: var(--primary); text-decoration: underline;">${a.label}</a></li>`).join('')}
+                    </ul>
+                </div>
             </div>
         </div>
     </main>
@@ -712,12 +840,13 @@ function generateProductHtml(product, allProducts) {
             <a href="${SITE_URL}/about-us" style="color: #fff;">من نحن</a>
             <a href="${SITE_URL}/contact-us" style="color: #fff;">اتصل بنا</a>
             <a href="${SITE_URL}/privacy-policy" style="color: #fff;">سياسة الخصوصية</a>
+            <a href="${SITE_URL}/delete-account" style="color: #fff;">حذف الحساب</a>
             <a href="${SITE_URL}/terms-of-use" style="color: #fff;">شروط الاستخدام</a>
             <a href="${SITE_URL}/refund-policy" style="color: #fff;">الشحن والاسترجاع</a>
         </div>
         <p>تسوّق بثقة، نوصّل بسرعة | صنعاء، اليمن - هاتف: +967-773-769-835</p>
         <p class="footer-seo">
-            متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس) هو المنصة الرائدة للتسوق الإلكتروني في اليمن. نوفر عطور أصلية، ساعات رجالية ونسائية، إلكترونيات، مستحضرات تجميل بأفضل الأسعار.
+            متجر تي ريكس (T-REX SHOP) منصة التسوق الإلكتروني والأدلة الشرائية في اليمن. نوفر العطور الفاخرة، الساعات الأصلية، الأجهزة الإلكترونية، ومستلزمات العناية مع حق المعاينة قبل الدفع.
         </p>
         <p style="margin-top: 15px; opacity: 0.5;">جميع الحقوق محفوظة &copy; ${new Date().getFullYear()} T-REX SHOP</p>
     </footer>
@@ -728,6 +857,10 @@ function generateProductHtml(product, allProducts) {
 
 function generateSitemapXml(products) {
     const today = new Date().toISOString().split('T')[0];
+    const articlesDir = path.join(__dirname, 'articles');
+    const articleFiles = fs.existsSync(articlesDir)
+        ? fs.readdirSync(articlesDir).filter(f => f.endsWith('.html')).sort()
+        : [];
     
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -773,57 +906,15 @@ function generateSitemapXml(products) {
     <loc>${SITE_URL}/blog</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <!-- Editorial Knowledge Base Articles -->
+${articleFiles.map(file => `  <url>
+    <loc>${SITE_URL}/articles/${file.replace(/\.html$/, '')}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-  </url>
-  <!-- Blog Articles -->
-  <url>
-    <loc>${SITE_URL}/articles/guide-to-choosing-long-lasting-perfumes</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/how-to-spot-authentic-vs-fake-watches</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/power-banks-and-battery-maintenance-guide</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/fragrance-layering-and-seasonal-perfumes</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/skincare-routine-and-beauty-tips</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/safe-online-shopping-guide-yemen</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/smart-watch-buying-guide-2026</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/articles/essential-accessories-for-men-and-women</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
+  </url>`).join('\n')}
 `;
 
     for (const p of products) {
@@ -890,6 +981,74 @@ function generateGoogleShoppingFeed(products) {
     return xml;
 }
 
+function injectSsrIntoIndex(products) {
+    const indexPath = path.join(__dirname, 'index.html');
+    if (!fs.existsSync(indexPath) || !Array.isArray(products) || products.length === 0) return;
+
+    let html = fs.readFileSync(indexPath, 'utf-8');
+    const featured = products.filter(p => p.is_featured === true || p.is_featured === 'true').slice(0, 8);
+    const featuredItems = featured.length > 0 ? featured : products.slice(0, 6);
+
+    const featuredHtml = featuredItems.map(p => `
+        <div class="swiper-slide" style="cursor: pointer;">
+            <a href="/products/${p.id}" style="text-decoration: none; color: inherit; display: block;">
+                <img src="${p.image_url || `${SITE_URL}/logo.png`}" alt="${escapeHtml(p.name)}" loading="lazy">
+                <div class="swiper-slide-content">
+                    <h3 class="swiper-slide-title">${escapeHtml(p.name)}</h3>
+                    <p class="swiper-slide-price">${formatPriceText(p.price, p.currency)}</p>
+                </div>
+            </a>
+        </div>`).join('');
+
+    const cardsHtml = products.slice(0, 24).map(p => {
+        const hasDiscount = p.original_price && p.original_price > p.price;
+        const discountPercent = hasDiscount ? Math.round((1 - p.price / p.original_price) * 100) : 0;
+        const locationText = escapeHtml(p.address || p.country || 'اليمن 🇾🇪');
+        return `
+        <div class="product-card" data-product-id="${p.id}">
+            ${hasDiscount ? `<span class="product-badge sale">-${discountPercent}%</span>` : ''}
+            <a href="/products/${p.id}" style="text-decoration: none; color: inherit; display: block;">
+                <img src="${p.image_url || `${SITE_URL}/logo.png`}" alt="${escapeHtml(p.name)}" class="product-image" loading="lazy">
+            </a>
+            <div class="product-info">
+                <a href="/products/${p.id}" class="product-name-link" style="text-decoration: none; color: inherit; display: block;">
+                    <h3 class="product-name">${escapeHtml(p.name)}</h3>
+                </a>
+                <p class="product-category">${escapeHtml(p.category || 'منتجات متنوعة')}</p>
+                <p class="product-country-badge" style="font-size: 12px; color: #28a745; font-weight: bold; margin: 4px 0 6px 0;">
+                    <i class="fas fa-map-marker-alt" style="color: #FFD700;"></i> متوفر في: ${locationText}
+                </p>
+                <p class="product-price">${formatPriceText(p.price, p.currency)}</p>
+                <div class="card-actions">
+                    <a href="/products/${p.id}" class="add-to-cart" style="text-decoration: none; text-align: center;">
+                        <i class="fas fa-eye"></i> عرض التفاصيل والشراء
+                    </a>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    html = html.replace(
+        /<!-- SSR_FEATURED_START -->[\s\S]*?<!-- SSR_FEATURED_END -->/,
+        `<!-- SSR_FEATURED_START -->${featuredHtml}\n            <!-- SSR_FEATURED_END -->`
+    );
+    html = html.replace(
+        /<!-- SSR_PRODUCTS_START -->[\s\S]*?<!-- SSR_PRODUCTS_END -->/,
+        `<!-- SSR_PRODUCTS_START -->${cardsHtml}\n        <!-- SSR_PRODUCTS_END -->`
+    );
+    html = html.replace(
+        /<!-- SSR_COUNT_START -->[\s\S]*?<!-- SSR_COUNT_END -->/,
+        `<!-- SSR_COUNT_START -->${products.length}<!-- SSR_COUNT_END -->`
+    );
+    html = html.replace(
+        /<!-- SSR_RESULTS_START -->[\s\S]*?<!-- SSR_RESULTS_END -->/,
+        `<!-- SSR_RESULTS_START -->${products.length} منتج<!-- SSR_RESULTS_END -->`
+    );
+
+    fs.writeFileSync(indexPath, html, 'utf-8');
+    console.log(`Injected ${Math.min(products.length, 24)} SSR product cards into index.html.`);
+}
+
 async function main() {
     try {
         const products = await fetchProducts();
@@ -909,13 +1068,16 @@ async function main() {
         }
         console.log(`Generated ${products.length} static pages in /products directory.`);
 
-        // 3. Generate sitemap.xml
+        // 3. Inject pre-rendered product catalog into index.html for instant Googlebot/AdSense indexing
+        injectSsrIntoIndex(products);
+
+        // 4. Generate sitemap.xml
         console.log('Generating sitemap.xml with image sitemaps...');
         const sitemapXml = generateSitemapXml(products);
         fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), sitemapXml, 'utf-8');
         console.log('Saved sitemap.xml');
 
-        // 4. Generate google-shopping-feed.xml
+        // 5. Generate google-shopping-feed.xml
         console.log('Generating Google Merchant Center Feed (google-shopping-feed.xml)...');
         const feedXml = generateGoogleShoppingFeed(products);
         fs.writeFileSync(path.join(__dirname, 'google-shopping-feed.xml'), feedXml, 'utf-8');
@@ -925,6 +1087,7 @@ async function main() {
         console.log('SEO GENERATION COMPLETE SUCCESS!');
         console.log(`Total indexed products: ${products.length}`);
         console.log('Files generated:');
+        console.log('- index.html (SSR pre-rendered catalog)');
         console.log('- sitemap.xml');
         console.log('- google-shopping-feed.xml');
         console.log(`- products/*.html (${products.length} files)`);

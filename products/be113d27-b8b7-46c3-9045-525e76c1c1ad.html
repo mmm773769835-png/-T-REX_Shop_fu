@@ -488,6 +488,47 @@
             line-height: 1.8;
             opacity: 0.7;
         }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #101010;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #262626;
+        }
+        .spec-table th, .spec-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+            text-align: right;
+        }
+        .spec-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            width: 36%;
+            font-weight: 700;
+        }
+        .buyer-guide-box {
+            margin-top: 22px;
+            padding: 18px 20px;
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid #2a2a2a;
+            border-right: 4px solid var(--primary);
+            border-radius: 12px;
+        }
+        .buyer-guide-box h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .buyer-guide-box p, .buyer-guide-box li {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.85;
+            margin-bottom: 8px;
+        }
+        .buyer-guide-box ul { padding-right: 20px; }
     </style>
 </head>
 <body>
@@ -571,8 +612,31 @@
             </div>
 
             <div class="desc-section">
-                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج</h3>
+                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج والمواصفات</h3>
                 <p>عطر لافيرن عنبر رويال Amber Royal عنبر ملكي فخم وثبات يدوم طويل حجم 100 مل السعر: 80ريال سوينا عليه خصم لولا 100طلب با 50ريال </p>
+
+                <table class="spec-table">
+                    <tbody>
+                        <tr><th>القسم / الفئة</th><td>جمال</td></tr>
+                        <tr><th>الحالة</th><td>جديد ومفحوص 100%</td></tr>
+                        <tr><th>خيارات الدفع</th><td>الدفع عند الاستلام أو التحويل عبر المحافظ البنكية</td></tr>
+                        <tr><th>الشحن داخل صنعاء</th><td>توصيل سريع خلال 2 إلى 24 ساعة مع حق المعاينة</td></tr>
+                        <tr><th>الشحن للمحافظات</th><td>خلال 24 إلى 72 ساعة عبر شركات النقل المعتمدة</td></tr>
+                        <tr><th>سياسة الاستبدال</th><td>ضمان استرجاع واستبدال خلال 7 أيام وفق الشروط المعتمدة</td></tr>
+                        <tr><th>رمز الصنف (SKU)</th><td style="font-family: monospace; font-size: 12px;">be113d27-b8b7-46c3-9045-525e76c1c1ad</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="buyer-guide-box">
+                    <h4><i class="fas fa-lightbulb"></i> دليل الاستخدام الاحترافي والحفاظ على ثبات العطر</h4>
+                    <ul>
+                        <li>يُفضل رش العطر على نقاط النبض الدافئة (المعصمين والرقبة وخلف الأذنين) على بشرة مرطبة ليمتد الفوحان والثبات طوال اليوم.</li><li>تجنّب فرك المعصمين معاً بعد الرش لأن الاحتكاك الحراري يكسر جزيئات القمة العطرية ويغيّر تدرج الرائحة.</li><li>احفظ القنينة في خزانة مظلمة ومعتدلة الحرارة بعيداً عن أشعة الشمس المباشرة أو حرارة السيارة والرطوبة العالية.</li>
+                    </ul>
+                    <p style="margin-top: 12px; color: #fff; font-weight: 700;">أدلة شرائية مفيدة من مدونتنا:</p>
+                    <ul>
+                        <li><a href="https://trexshopmax.com/articles/guide-to-choosing-long-lasting-perfumes" style="color: var(--primary); text-decoration: underline;">دليل اختيار العطور الأكثر ثباتاً وفوحاناً</a></li><li><a href="https://trexshopmax.com/articles/how-to-store-perfumes-and-detect-originals" style="color: var(--primary); text-decoration: underline;">كيف تحفظ عطورك من التلف وتفحص جودة العبوة</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </main>
@@ -618,12 +682,13 @@
             <a href="https://trexshopmax.com/about-us" style="color: #fff;">من نحن</a>
             <a href="https://trexshopmax.com/contact-us" style="color: #fff;">اتصل بنا</a>
             <a href="https://trexshopmax.com/privacy-policy" style="color: #fff;">سياسة الخصوصية</a>
+            <a href="https://trexshopmax.com/delete-account" style="color: #fff;">حذف الحساب</a>
             <a href="https://trexshopmax.com/terms-of-use" style="color: #fff;">شروط الاستخدام</a>
             <a href="https://trexshopmax.com/refund-policy" style="color: #fff;">الشحن والاسترجاع</a>
         </div>
         <p>تسوّق بثقة، نوصّل بسرعة | صنعاء، اليمن - هاتف: +967-773-769-835</p>
         <p class="footer-seo">
-            متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس) هو المنصة الرائدة للتسوق الإلكتروني في اليمن. نوفر عطور أصلية، ساعات رجالية ونسائية، إلكترونيات، مستحضرات تجميل بأفضل الأسعار.
+            متجر تي ريكس (T-REX SHOP) منصة التسوق الإلكتروني والأدلة الشرائية في اليمن. نوفر العطور الفاخرة، الساعات الأصلية، الأجهزة الإلكترونية، ومستلزمات العناية مع حق المعاينة قبل الدفع.
         </p>
         <p style="margin-top: 15px; opacity: 0.5;">جميع الحقوق محفوظة &copy; 2026 T-REX SHOP</p>
     </footer>

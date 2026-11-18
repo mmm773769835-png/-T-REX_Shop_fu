@@ -21,7 +21,7 @@ export interface AppUpdateInfo {
 export class SystemMonitorService {
   private static instance: SystemMonitorService;
   private presenceChannel: any = null;
-  private currentVersion = '2.0.0';
+  private currentVersion = '2.5.0';
   private updateListeners: ((update: AppUpdateInfo | null) => void)[] = [];
   private activeUpdate: AppUpdateInfo | null = null;
 

@@ -8,16 +8,21 @@ Allow: /contact-us
 Allow: /privacy-policy
 Allow: /terms-of-use
 Allow: /refund-policy
-Allow: /affiliate
 Allow: /sitemap.xml
 Allow: /ads.txt
 Allow: /google-shopping-feed.xml
 
-# Disallow admin, internal dashboards and test files from search engines
+# Disallow admin, affiliate, network billing dashboards, and test utilities
 Disallow: /admin
 Disallow: /admin.html
 Disallow: /superadmin
 Disallow: /superadmin.html
+Disallow: /affiliate
+Disallow: /affiliate.html
+Disallow: /network-5g
+Disallow: /network-5g.html
+Disallow: /5g
+Disallow: /owner/
 Disallow: /trex-monitor-hub
 Disallow: /trex-monitor-hub.html
 Disallow: /trex-superadmin*

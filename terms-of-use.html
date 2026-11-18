@@ -21,11 +21,6 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
-    <!-- Google AdSense Official Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4708671001798951" crossorigin="anonymous"></script>
-    <script>
-        window.adsbygoogle = window.adsbygoogle || [];
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -38,33 +33,6 @@
             --card: #1a1a1a;
             --text: #ffffff;
             --text-muted: #888;
-        }
-        /* AdSense Layout & CLS Prevention */
-        .ad-container {
-            margin: 25px auto;
-            padding: 12px 10px;
-            max-width: 1000px;
-            width: 95%;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-            box-sizing: border-box;
-            min-height: 110px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .ad-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-            display: inline-block;
         }
         body {
             font-family: 'Cairo', sans-serif;
@@ -240,7 +208,9 @@
             font-size: 14px;
         }
         @media (max-width: 768px) {
-            .container { padding: 100px 15px 40px; }
+            .header-content { flex-wrap: wrap; gap: 10px; }
+            .header-nav { flex-wrap: wrap; justify-content: center; width: 100%; gap: 10px !important; }
+            .container { padding: 140px 15px 40px; }
             .page-title h2 { font-size: 24px; }
             .terms-section { padding: 20px; }
             .logo-text h1 { font-size: 18px; }
@@ -258,7 +228,7 @@
                     <h1>T-REX SHOP</h1>
                 </div>
             </a>
-            <nav style="display: flex; gap: 15px; align-items: center;">
+            <nav class="header-nav" style="display: flex; gap: 15px; align-items: center;">
                 <a href="/" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">الرئيسية</a>
                 <a href="/blog" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">المدونة</a>
                 <a href="/about-us" style="color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;">من نحن</a>
@@ -271,7 +241,7 @@
     <div class="container">
         <div class="page-title">
             <h2><i class="fas fa-file-contract"></i> شروط الاستخدام</h2>
-            <p>آخر تحديث: 14 مايو 2026</p>
+            <p>آخر تحديث: 17 نوفمبر 2026</p>
         </div>
 
         <div class="terms-section">
@@ -409,17 +379,6 @@
         <div class="contact-box">
             <h4><i class="fas fa-check-circle"></i> باستخدامك للموقع، فإنك توافق على جميع الشروط والأحكام المذكورة أعلاه</h4>
             <p>© 2026 T-REX Shop. جميع الحقوق محفوظة.</p>
-        </div>
-
-        <!-- AdSense: Terms Page Bottom Unit -->
-        <div class="ad-container" id="ad-terms-unit">
-            <span class="ad-label"><i class="fas fa-ad"></i> إعلان / Advertisement</span>
-            <ins class="adsbygoogle"
-                 style="display:block; width:100%;"
-                 data-ad-client="ca-pub-4708671001798951"
-                 data-ad-slot="auto"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
         </div>
     </div>
 

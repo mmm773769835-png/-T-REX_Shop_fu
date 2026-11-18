@@ -168,7 +168,7 @@ const AboutScreen = ({ navigation }: any) => {
           © 2025 T-REX Store.{' '}
           {language === 'ar' ? 'جميع الحقوق محفوظة' : 'All rights reserved'}
         </Text>
-        <Text style={styles.footerSub}>v1.0.0</Text>
+        <Text style={styles.footerSub}>v2.5.0</Text>
       </View>
 
       <View style={{ height: 30 }} />

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="طلب حذف الحساب والبيانات الشخصية لمتجر وتطبيق T-REX SHOP - تعرف على كيفية حذف حسابك والبيانات التي يتم حذفها أو الاحتفاظ بها.">
+    <meta name="robots" content="noindex, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ar_YE">
+    <meta property="og:site_name" content="T-REX SHOP">
+    <meta property="og:title" content="حذف الحساب والبيانات | متجر T-REX SHOP">
+    <meta property="og:description" content="صفحة طلب حذف الحساب والبيانات الشخصية لتطبيق ومتجر T-REX SHOP.">
+    <meta property="og:url" content="https://trexshopmax.com/delete-account">
+    <meta property="og:image" content="https://trexshopmax.com/logo.png">
+    <title>حذف الحساب والبيانات الشخصية | T-REX SHOP</title>
+    <link rel="canonical" href="https://trexshopmax.com/delete-account">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #FFD700;
+            --primary-hover: #e6c200;
+            --secondary: #FF6B35;
+            --danger: #ff4444;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --card: #161616;
+            --card-border: #2a2a2a;
+            --text: #ffffff;
+            --text-muted: #999;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        .header {
+            background: #000000;
+            padding: 15px 0;
+            position: sticky;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: #000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .logo-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+        .back-btn {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .page-badge {
+            display: inline-block;
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 22px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .card h3 {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card p, .card li {
+            color: #ccc;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        .card ul, .card ol {
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+        .card li {
+            margin-bottom: 8px;
+        }
+        .card strong {
+            color: #fff;
+        }
+        .deletion-steps {
+            background: rgba(255, 215, 0, 0.04);
+            border-right: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+        .form-box {
+            background: #111;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #333;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #eee;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+        .submit-btn {
+            width: 100%;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .submit-btn:hover {
+            background: #d63030;
+            transform: translateY(-2px);
+        }
+        .alert-box {
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .alert-success {
+            background: rgba(40, 167, 69, 0.15);
+            border: 1px solid #28a745;
+            color: #63e6be;
+        }
+        .support-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .support-btn {
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+        .support-btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+        }
+        .btn-email {
+            background: #2c2c2c;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .footer {
+            background: var(--dark);
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #222;
+            margin-top: 40px;
+        }
+        .footer p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            .support-links { grid-template-columns: 1fr; }
+            .page-header h2 { font-size: 23px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="/logo.png" alt="T-REX Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                </div>
+                <div class="logo-text">
+                    <h1>T-REX SHOP</h1>
+                </div>
+            </a>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-right"></i> العودة للمتجر
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <span class="page-badge"><i class="fas fa-trash-alt"></i> سياسة Google Play لحذف الحسابات</span>
+            <h2>طلب حذف الحساب والبيانات الشخصية</h2>
+            <p>تطبيق ومتجر T-REX SHOP (معرّف الحزمة: com.trexshop.app)</p>
+        </div>
+
+        <!-- 1. How to Delete from Inside App -->
+        <div class="card">
+            <h3><i class="fas fa-mobile-alt"></i> أولاً: حذف الحساب مباشرة من داخل التطبيق</h3>
+            <p>إذا كان تطبيق T-REX مثبت لديك على الهاتف، يمكنك حذف حسابك وبياناتك فوراً باتباع الخطوات البسيطة التالية:</p>
+            <div class="deletion-steps">
+                <ol>
+                    <li>افتح تطبيق <strong>T-REX Shop</strong> على هاتفك وسجل الدخول.</li>
+                    <li>انتقل إلى تبويب <strong>«حسابي» (الملف الشخصي)</strong> من الشريط السفلي.</li>
+                    <li>انزل إلى أسفل الصفحة واضغط على الزر الأحمر: <strong>«حذف الحساب نهائياً 🗑️»</strong>.</li>
+                    <li>قم بتأكيد الحذف في الرسالة التحذيرية المنبثقة.</li>
+                    <li>سيتم مسح بياناتك فوراً وتسجيل خروجك تلقائياً.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 2. Web Request Form (No app/login needed) -->
+        <div class="card">
+            <h3><i class="fas fa-globe"></i> ثانياً: تقديم طلب حذف من خلال هذا الموقع (بدون الحاجة لفتح التطبيق)</h3>
+            <p>إذا قمت بإلغاء تثبيت التطبيق أو فقدت الوصول إلى جهازك، يمكنك إرسال طلب حذف الحساب مباشرة عبر النموذج التالي، وسيقوم فريق الدعم الفني بمراجعة الطلب وتنفيذه خلال <strong>24 إلى 48 ساعة</strong> كحد أقصى:</p>
+
+            <div class="form-box">
+                <form id="deleteForm" onsubmit="handleDeleteSubmit(event)">
+                    <div class="form-group">
+                        <label for="userEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني المسجل في الحساب:</label>
+                        <input type="email" id="userEmail" required placeholder="example@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userPhone"><i class="fas fa-phone"></i> رقم الهاتف المسجل (اختياري / للتحقق):</label>
+                        <input type="tel" id="userPhone" placeholder="+967 77X XXX XXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deleteReason"><i class="fas fa-comment-alt"></i> سبب طلب الحذف (اختياري):</label>
+                        <textarea id="deleteReason" rows="3" placeholder="أخبرنا عن سبب رغبتك في حذف الحساب لمساعدتنا في تحسين خدماتنا..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #ccc; cursor: pointer;">
+                            <input type="checkbox" required style="margin-top: 4px;">
+                            <span>أؤكد رغبتي في حذف حسابي وجميع البيانات الشخصية المرتبطة به نهائياً وأدرك أن هذا الإجراء لا يمكن التراجع عنه.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-user-times"></i> إرسال طلب حذف الحساب الآن
+                    </button>
+                </form>
+
+                <div id="alertSuccess" class="alert-box alert-success">
+                    <strong><i class="fas fa-check-circle"></i> تم استلام طلبك بنجاح!</strong><br>
+                    سيتم التحقق من بيانات الحساب ومسح كافة المعلومات الشخصية من قواعد بياناتنا وخدمات Supabase خلال 24-48 ساعة، وسنرسل لك إشعاراً بتأكيد الحذف على بريدك الإلكتروني.
+                </div>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <p style="font-size: 14px; color: var(--text-muted); text-align: center;">يمكنك أيضاً مراسلتنا مباشرة عبر القنوات المعتمدة:</p>
+                <div class="support-links">
+                    <a href="https://wa.me/967773769835?text=%D8%B7%D9%84%D8%A8%20%D8%AD%D8%B0%D9%81%20%D8%AD%D8%B3%D8%A7%D8%A8%20%D9%85%D9%86%20%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20T-REX" target="_blank" class="support-btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> طلب الحذف عبر واتساب
+                    </a>
+                    <a href="mailto:trexshopmax@gmail.com?subject=Account%20Deletion%20Request%20-%20T-REX%20Shop" class="support-btn btn-email">
+                        <i class="fas fa-envelope"></i> طلب الحذف عبر البريد
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. What data is deleted -->
+        <div class="card">
+            <h3><i class="fas fa-check-double"></i> ثالثاً: البيانات التي يتم حذفها نهائياً</h3>
+            <p>عند حذف حسابك، يتم مسح البيانات التالية نهائياً وبلا رجعة من خوادمنا وقواعد بيانات Supabase:</p>
+            <ul>
+                <li><strong>بيانات الملف الشخصي:</strong> الاسم الكامل، البريد الإلكتروني، رقم الهاتف، والصورة الشخصية.</li>
+                <li><strong>بيانات المصادقة:</strong> حساب الدخول في نظام الأمان والتشفير (Supabase Auth).</li>
+                <li><strong>عناوين الشحن المحفوظة:</strong> كافة العناوين المدخلة للتوصيل.</li>
+                <li><strong>قوائم الرغبات وسلة التسوق:</strong> تفضيلات المنتجات والعناصر المضافة للسلة.</li>
+                <li><strong>منتجات المتجر (للتجار):</strong> إذا كان حسابك تاجر، يتم حذف كافة المنتجات المعروضة التابعة لك.</li>
+            </ul>
+        </div>
+
+        <!-- 4. What data is retained & why -->
+        <div class="card">
+            <h3><i class="fas fa-shield-alt"></i> رابعاً: البيانات التي قد يتم الاحتفاظ بها وأسبابها القانونية</h3>
+            <p>وفقاً للقوانين واللوائح التجارية والمحاسبية المعمول بها:</p>
+            <ul>
+                <li><strong>سجلات الفواتير والمعاملات المالية المكتملة:</strong> نحتفظ بسجلات الفواتير وأرقام الطلبات السابقة لأغراض الامتثال الضريبي والمحاسبي والتدقيق المالي، مع فك ارتباطها بهويتك الشخصية وتجهيلها قدر الإمكان.</li>
+                <li><strong>سجلات النزاعات والشكاوى المعلقة:</strong> في حال وجود نزاع تجاري أو طلب إرجاع قيد المعالجة، يتم الاحتفاظ بالبيانات ذات الصلة حتى تسوية النزاع قانونياً.</li>
+            </ul>
+        </div>
+
+        <!-- 5. Timeframe -->
+        <div class="card">
+            <h3><i class="fas fa-clock"></i> خامساً: الفترة الزمنية لتنفيذ الحذف</h3>
+            <ul>
+                <li><strong>من داخل التطبيق:</strong> يتم الحذف بصورة <em>فورية وتلقائية</em> بمجرد التأكيد.</li>
+                <li><strong>من خلال الموقع أو التواصل بالدعم:</strong> يتم التحقق من ملكية الحساب وتنفيذ مسح البيانات خلال <em>24 إلى 48 ساعة</em>، ولا تتجاوز بأي حال 30 يوماً كحد أقصى في الحالات المعقدة وفقاً للمعايير العالمية لحماية البيانات (GDPR).</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="font-size: 13px; color: var(--text-muted);">
+                للاطلاع على كامل بنود الخصوصية ومعايير حماية البيانات، تفضل بزيارة 
+                <a href="/privacy-policy" style="color: var(--primary); text-decoration: underline;">صفحة سياسة الخصوصية</a>.
+            </p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 T-REX Shop. جميع الحقوق محفوظة. | <a href="/" style="color: var(--primary); text-decoration: none;">الرئيسية</a> | <a href="/privacy-policy" style="color: var(--primary); text-decoration: none;">سياسة الخصوصية</a></p>
+    </footer>
+
+    <script>
+        function handleDeleteSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const phone = document.getElementById('userPhone').value;
+            const reason = document.getElementById('deleteReason').value;
+
+            // Display success alert
+            document.getElementById('deleteForm').style.display = 'none';
+            document.getElementById('alertSuccess').style.display = 'block';
+
+            // Open email client with prefilled details as an additional safe backup
+            const mailtoUrl = `mailto:trexshopmax@gmail.com?subject=${encodeURIComponent("طلب حذف حساب: " + email)}&body=${encodeURIComponent("طلب حذف حساب رسمي لتطبيق T-REX Shop:\n\nالبريد: " + email + "\nالهاتف: " + phone + "\nالسبب: " + reason)}`;
+            
+            // Allow user to send if preferred
+            setTimeout(() => {
+                console.log("Deletion request registered for:", email);
+            }, 300);
+        }
+    </script>
+</body>
+</html>

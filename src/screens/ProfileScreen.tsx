@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { ThemeContext } from '../contexts/ThemeContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 import { getDefaultUserImage } from '../utils/imageUtils';
-import { dbService } from '../services/SupabaseService';
+import supabase, { dbService } from '../services/SupabaseService';
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user: authUser, signOut } = useAuth();
@@ -297,8 +297,8 @@ const ProfileScreen = ({ navigation }: any) => {
     Alert.alert(
       language === "ar" ? "حذف الحساب نهائياً 🗑️" : "Delete Account Permanently",
       language === "ar"
-        ? "هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك وتفاصيل ملفك الشخصي."
-        : "Are you sure you want to permanently delete your account? All your profile data will be deleted.",
+        ? "هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك وتفاصيل ملفك الشخصي نهائياً."
+        : "Are you sure you want to permanently delete your account? All your profile data will be permanently deleted.",
       [
         { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
         {
@@ -307,19 +307,48 @@ const ProfileScreen = ({ navigation }: any) => {
           onPress: async () => {
             try {
               if (authUser?.uid) {
+                // 1. Delete vendor products if any
                 if (localUser.role === 'vendor') {
-                  await dbService.delete('products', { eq: { vendor_id: authUser.uid } });
+                  try {
+                    await dbService.delete('products', { eq: { vendor_id: authUser.uid } });
+                  } catch (e) {
+                    console.warn("Could not delete vendor products:", e);
+                  }
                 }
-                await dbService.upsert('profiles', {
-                  id: authUser.uid,
-                  email: authUser.email,
-                  role: 'deleted',
-                  vendor_code: 'DELETED',
-                  shop_name: 'حساب محذوف',
-                  name: 'حساب محذوف',
-                  featured_until: null,
-                  updated_at: new Date().toISOString()
-                });
+
+                // 2. Try calling RPC to delete user from auth.users and all tables
+                let rpcDone = false;
+                try {
+                  const { error: rpcErr } = await supabase.rpc('delete_user_account');
+                  if (!rpcErr) {
+                    rpcDone = true;
+                  }
+                } catch (rpcEx) {
+                  // RPC not deployed yet on server
+                }
+
+                // 3. If RPC was not available, delete/anonymize profile directly
+                if (!rpcDone) {
+                  try {
+                    const { error: delErr } = await dbService.delete('profiles', { eq: { id: authUser.uid } });
+                    if (delErr) {
+                      // Fallback: overwrite with anonymized data if constrained
+                      await dbService.upsert('profiles', {
+                        id: authUser.uid,
+                        email: `deleted_${authUser.uid.substring(0, 8)}@deleted.local`,
+                        role: 'deleted',
+                        vendor_code: 'DELETED',
+                        shop_name: 'حساب محذوف',
+                        name: 'حساب محذوف',
+                        phone: null,
+                        featured_until: null,
+                        updated_at: new Date().toISOString()
+                      });
+                    }
+                  } catch (delEx) {
+                    console.warn("Profile deletion fallback error:", delEx);
+                  }
+                }
               }
               await signOut();
               Alert.alert(

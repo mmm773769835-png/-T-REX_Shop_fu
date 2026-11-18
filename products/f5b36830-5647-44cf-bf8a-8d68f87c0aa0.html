@@ -488,6 +488,47 @@
             line-height: 1.8;
             opacity: 0.7;
         }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #101010;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #262626;
+        }
+        .spec-table th, .spec-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+            text-align: right;
+        }
+        .spec-table th {
+            background: rgba(255, 215, 0, 0.08);
+            color: var(--primary);
+            width: 36%;
+            font-weight: 700;
+        }
+        .buyer-guide-box {
+            margin-top: 22px;
+            padding: 18px 20px;
+            background: rgba(255, 215, 0, 0.04);
+            border: 1px solid #2a2a2a;
+            border-right: 4px solid var(--primary);
+            border-radius: 12px;
+        }
+        .buyer-guide-box h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .buyer-guide-box p, .buyer-guide-box li {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.85;
+            margin-bottom: 8px;
+        }
+        .buyer-guide-box ul { padding-right: 20px; }
     </style>
 </head>
 <body>
@@ -568,8 +609,31 @@
             </div>
 
             <div class="desc-section">
-                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج</h3>
+                <h3><i class="fas fa-align-right"></i> تفاصيل المنتج والمواصفات</h3>
                 <p>نقدم لكِ طقم مجوهرات نسائي راقٍ يجمع بين الفخامة العصرية والكلاسيكية الملكية. صُمم هذا الطقم المكون من قطعتين (سلسال ناعم مع قلادة متدلية + أقراط متناسقة) ليمنحكِ حضوراً لافتاً ينبض بالجاذبية في مناسباتكِ السعيدة وسهراتكِ المميزة99</p>
+
+                <table class="spec-table">
+                    <tbody>
+                        <tr><th>القسم / الفئة</th><td>إكسسوارات</td></tr>
+                        <tr><th>الحالة</th><td>جديد ومفحوص 100%</td></tr>
+                        <tr><th>خيارات الدفع</th><td>الدفع عند الاستلام أو التحويل عبر المحافظ البنكية</td></tr>
+                        <tr><th>الشحن داخل صنعاء</th><td>توصيل سريع خلال 2 إلى 24 ساعة مع حق المعاينة</td></tr>
+                        <tr><th>الشحن للمحافظات</th><td>خلال 24 إلى 72 ساعة عبر شركات النقل المعتمدة</td></tr>
+                        <tr><th>سياسة الاستبدال</th><td>ضمان استرجاع واستبدال خلال 7 أيام وفق الشروط المعتمدة</td></tr>
+                        <tr><th>رمز الصنف (SKU)</th><td style="font-family: monospace; font-size: 12px;">f5b36830-5647-44cf-bf8a-8d68f87c0aa0</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="buyer-guide-box">
+                    <h4><i class="fas fa-lightbulb"></i> دليل اختيار وفحص الساعات والإكسسوارات قبل الارتداء</h4>
+                    <ul>
+                        <li>احرص على وضع العطور ومستحضرات البشرة قبل ارتداء الساعات والإكسسوارات بدقيقتين لحماية طبقة الطلاء وبريق الزركون.</li><li>في ساعات الكوارتز والستانلس ستيل: تأكد من إغلاق التاج (Crown) بإحكام وتجنب تعريض الساعة لبخار الماء الساخن.</li><li>احفظ كل قطعة في علبة مبطنة منفصلة أو كيس مخملي بعد مسحها بقطعة قماش جافة ناعمة للحفاظ على لمعانها.</li>
+                    </ul>
+                    <p style="margin-top: 12px; color: #fff; font-weight: 700;">أدلة شرائية مفيدة من مدونتنا:</p>
+                    <ul>
+                        <li><a href="https://trexshopmax.com/articles/how-to-spot-authentic-vs-fake-watches" style="color: var(--primary); text-decoration: underline;">كيف تفرّق بين الساعات الأصلية والمقلدة؟ 8 علامات حاسمة</a></li><li><a href="https://trexshopmax.com/articles/essential-accessories-for-men-and-women" style="color: var(--primary); text-decoration: underline;">دليل الإكسسوارات والمجوهرات المطليّة التي لا يتغير لونها</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </main>
@@ -615,12 +679,13 @@
             <a href="https://trexshopmax.com/about-us" style="color: #fff;">من نحن</a>
             <a href="https://trexshopmax.com/contact-us" style="color: #fff;">اتصل بنا</a>
             <a href="https://trexshopmax.com/privacy-policy" style="color: #fff;">سياسة الخصوصية</a>
+            <a href="https://trexshopmax.com/delete-account" style="color: #fff;">حذف الحساب</a>
             <a href="https://trexshopmax.com/terms-of-use" style="color: #fff;">شروط الاستخدام</a>
             <a href="https://trexshopmax.com/refund-policy" style="color: #fff;">الشحن والاسترجاع</a>
         </div>
         <p>تسوّق بثقة، نوصّل بسرعة | صنعاء، اليمن - هاتف: +967-773-769-835</p>
         <p class="footer-seo">
-            متجر تي ريكس (T-REX SHOP / تيركس شوب / تي ركس) هو المنصة الرائدة للتسوق الإلكتروني في اليمن. نوفر عطور أصلية، ساعات رجالية ونسائية، إلكترونيات، مستحضرات تجميل بأفضل الأسعار.
+            متجر تي ريكس (T-REX SHOP) منصة التسوق الإلكتروني والأدلة الشرائية في اليمن. نوفر العطور الفاخرة، الساعات الأصلية، الأجهزة الإلكترونية، ومستلزمات العناية مع حق المعاينة قبل الدفع.
         </p>
         <p style="margin-top: 15px; opacity: 0.5;">جميع الحقوق محفوظة &copy; 2026 T-REX SHOP</p>
     </footer>
